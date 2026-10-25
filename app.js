@@ -53,14 +53,15 @@
 
   // ---------------------------------------------------------------- ayudas
   const AYUDA_METRO = {
-    cuerpo: ["Cuerpo", "Tu salud y tu fuerza, de 0 a 10. Cada mañana decide cuántos dados tiras: 9-10, cinco; 7-8, cuatro; 5-6, tres; 3-4, dos; 1-2, uno. A 0, mueres. Sube descansando sin que te vean, curándote en el hospital o durmiendo bajo techo. Baja con el hambre, las fiebres y los azotes."],
-    monedas: ["Monedas", "Para comprar pan por la noche y pagar el mesón. Las consigues pidiendo, trabajando, hurtando o delatando."],
-    raciones: ["Raciones", "Cada noche comes una (la viuda, dos). Si te falta, pierdes 2 de cuerpo por cada ración que falte. Se compran de noche al precio del pan de ese día, que va subiendo. La sopa del convento y las sobras del mercado dan raciones."],
+    cuerpo: ["Cuerpo", "Tu salud y tu fuerza, de 0 a 10. Cada mañana decide cuántos dados tiras: 9-10, cinco; 7-8, cuatro; 5-6, tres; 3-4, dos; 1-2, uno. A 0, mueres. Dormir al raso cuesta 1 cada noche. Sube descansando sin que te vean (con dado 3 o más), durmiendo bajo techo o curándote en el hospital. Baja con el hambre, el raso, las fiebres, los robos y los azotes."],
+    monedas: ["Monedas", "Para comprar pan y pagar el mesón (cuesta lo que una ración). Ojo: un pobre con dinero es sospechoso. Con más de 4 monedas encima, si te ven pedir un alguacil o la beneficencia, te tienen por fingidor (+1); si duermes al raso, te pueden robar la mitad y pegarte; y si te detienen, te lo quitan todo."],
+    raciones: ["Raciones", "Cada noche comes una (la viuda, dos). Si te falta, pierdes 2 de cuerpo por cada ración que falte. Se compran de noche al precio del pan de ese día, que va subiendo. Solo puedes guardar 2 de una noche a otra: lo que sobre se pierde, así que mejor compártelo. La sopa del convento y las sobras del mercado dan raciones."],
     rumores: ["Rumores", "Lo que te cuentan otros pobres. Cuando te vea un testigo, puedes gastar un rumor para repetir el dado de testigo (sabías por dónde pasaba la ronda)."],
     termo: ["Termómetro", "Cómo te clasifica la autoridad, de −3 a +3. Hacia arriba: +1 sospechoso, +2 vagabundo, +3 reincidente. Hacia abajo: −1 pobre conocido, −2 con licencia (solo con el examen del cura, y solo naturales) y −3 recogido (te encierran y la partida acaba; solo pasa en el hospital). Sin licencia no bajas de −1. El termómetro no mata solo: decide el castigo si te detienen."],
-    tb: ["Te buscan", `Cuánto te tiene fichado la justicia. Cuando llega a ${P.tbMax}, te detienen. El castigo depende del termómetro: con 0 o menos, reprensión; con +1, azotes; con +2, trabajo forzado o marca; con +3, la horca. Vuelve a 0 después de cada detención.`],
+    tb: ["Te buscan", `Cuánto te tiene fichado la justicia. Cuando llega a ${P.tbMax}, te detienen. El castigo depende del termómetro: con 0 o menos, reprensión; con +1, azotes; con +2, trabajo forzado o marca; con +3, la horca. Después de cada detención ya te conocen: empieza en el número de veces que te han detenido (hasta 3).`],
     muralla: ["La muralla", "El puente y el arrabal están fuera de la muralla; el resto de sitios, dentro. Para pasar de un lado a otro tienes que cruzar la puerta en el puente, donde la guardia vigila a los forasteros. Si la autoridad cierra la puerta, sin licencia no entras. Para dormir en el arrabal tienes que estar fuera."],
-    red: ["Tu red", "Los pobres que conoces. Compartir o preguntar sube la relación. Con relación 2 o más con alguien: puedes dormir con esa persona (si vive de tu lado de la muralla), te encubre si te ve hurtar y, si mueres, no mueres solo. Delatar a alguien de tu red lo borra de ella."],
+    red: ["Tu red", "Los pobres que conoces. Compartir o preguntar sube la relación; negar comida a quien te la pide, la baja. Con relación 2: puedes dormir con esa persona (si vive de tu lado de la muralla), te encubre si te ve hurtar y, si mueres, no mueres solo. Con relación 3: si te falta pan, te da una ración. Pero la autoridad interroga a tu gente: con relación baja, te venden. Y enferman, desaparecen o mueren. Solo puedes delatar a alguien de tu red, y lo pierdes."],
+    hospital: ["Hospital", "Solo admite enfermos (cuerpo 5 o menos). Cada vez que te curan o duermes allí, te apuntan en el libro. A la tercera, te recogen: entras en la institución y la partida acaba."],
     treta: ["Treta", "La has preparado al amanecer. Durante todo el día pides con ella: si su calidad es 4 o más y no está catalogada, te dan una moneda más, y te tienen por impedido. Pero si te ve la beneficencia o el cura, tiran un dado: si iguala o supera la calidad (más 1 si está catalogada), te descubren."],
   };
 
@@ -87,8 +88,11 @@
 
   function htmlRed() {
     if (!s || !s.contactos.length) return `<h2>Tu red</h2><p>Todavía no conoces a nadie. Compartir o preguntar en el convento, la ribera o el mesón te pone en contacto con otros pobres.</p><p class="muted small">${esc(AYUDA_METRO.red[1])}</p>`;
-    let h = `<h2>Tu red</h2><table class="t"><tr><th>Persona</th><th>Relación</th><th>Vive</th></tr>`;
-    s.contactos.forEach((c) => { h += `<tr><td>${esc(c.nombre)}</td><td>${c.rel}</td><td>${c.lado === "fuera" ? "en el arrabal" : "en la ciudad"}</td></tr>`; });
+    let h = `<h2>Tu red</h2><table class="t"><tr><th>Persona</th><th>Relación</th><th>Estado</th></tr>`;
+    s.contactos.forEach((c) => {
+      const est = c.estado ? { muerto: "Ha muerto", traidor: "Te vendió", delatado: "Lo delataste" }[c.estado] : (c.ausenteHasta && c.ausenteHasta >= s.dia ? (c.ausenteMotivo === "enfermo" ? "Enfermo" : "Detenido") + " hasta el día " + c.ausenteHasta : (c.lado === "fuera" ? "Vive en el arrabal" : "Vive en la ciudad"));
+      h += `<tr><td>${c.estado ? "<s>" + esc(c.nombre) + "</s>" : esc(c.nombre)}</td><td>${c.estado ? "—" : c.rel}</td><td>${esc(est)}</td></tr>`;
+    });
     return h + `</table><p class="muted small">${esc(AYUDA_METRO.red[1])}</p>`;
   }
 
@@ -117,7 +121,11 @@
     if (s.treta) b.push(`<span class="badge" data-act="metro" data-k="treta">Treta: ${esc(s.treta.nombre)} (${s.treta.calidad})${s.treta.catalogada ? ", catalogada" : ""}</span>`);
     if (s.venganza) b.push(`<span class="badge mal" data-act="metro" data-k="red">Alguien quiere vengarse</span>`);
     if (s.tf > 0) b.push(`<span class="badge mal">Trabajo forzado: ${plural(s.tf, "día", "días")}</span>`);
-    b.push(`<span class="badge" data-act="red">Red: ${s.contactos.length ? s.contactos.map((c) => esc(c.nombre.split(" ")[0]) + " " + c.rel).join(", ") : "nadie"}</span>`);
+    if (s.detenciones) b.push(`<span class="badge mal" data-act="metro" data-k="tb">Te conocen: ${plural(s.detenciones, "detención", "detenciones")}</span>`);
+    if (s.apuntes) b.push(`<span class="badge mal" data-act="metro" data-k="hospital">Apuntado en el hospital: ${s.apuntes} de ${P.hospitalVeces}</span>`);
+    if (s.monedas > P.dineroUmbral) b.push(`<span class="badge mal" data-act="metro" data-k="monedas">Llevas demasiado dinero encima</span>`);
+    const red = E.contactosDisponibles(s);
+    b.push(`<span class="badge" data-act="red">Red: ${red.length ? red.map((c) => esc(c.nombre.split(" ")[0]) + " " + c.rel).join(", ") : "nadie"}${s.contactos.length > red.length ? " (+" + (s.contactos.length - red.length) + " que no están)" : ""}</span>`);
     return `<div class="estado">
         <button class="chip ${s.cuerpo <= 2 ? "alerta" : ""}" data-act="metro" data-k="cuerpo">Cuerpo<b>${s.cuerpo}</b>${dadosMan} dados</button>
         <button class="chip" data-act="metro" data-k="monedas">Monedas<b>${s.monedas}</b>pan a ${E.precioPan(s)}</button>
@@ -214,7 +222,15 @@
         <button class="btn secundario" data-act="introVista">Entendido</button></div>`;
     }
     h += `<div class="card"><h3>Lo que ha hecho la autoridad</h3>${aut.length ? `<ul class="lista">${aut.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>` : `<p class="muted">Nada que se vea.</p>`}</div>`;
-    s.hoy.eventos.forEach((x) => { h += `<div class="card aviso"><p>${esc(x)}</p></div>`; });
+    if (s.hoy.suceso) h += `<div class="card ${s.hoy.suceso.id === "cofradia" ? "bueno" : s.hoy.suceso.id === "nada" ? "" : "aviso"}"><h3>${esc(s.hoy.suceso.titulo)}</h3><p>${esc(s.hoy.suceso.txt)}</p></div>`;
+    s.hoy.eventos.filter((x) => !(s.hoy.suceso && x.startsWith(s.hoy.suceso.titulo)) && !(s.hoy.favor && x.startsWith(s.hoy.favor.nombre + " te pide"))).forEach((x) => { h += `<div class="card aviso"><p>${esc(x)}</p></div>`; });
+    if (s.hoy.favor) {
+      const f = s.hoy.favor;
+      if (!f.respondido) h += `<div class="card aviso"><h3>${esc(f.nombre)} te pide algo de comer</h3>
+        <p class="small">Si le das una ración, vuestra relación sube (+1). Si no, baja (−1). Si empiezas el día sin contestar, cuenta como que no. Tienes ${plural(s.raciones, "ración", "raciones")}.</p>
+        <div class="fila-btns"><button class="btn" data-act="favor" data-d="1" ${s.raciones < 1 ? "disabled" : ""}>Darle una ración</button><button class="btn" data-act="favor" data-d="0">No darle nada</button></div></div>`;
+      else h += `<div class="card"><p>${esc(f.txt)}</p></div>`;
+    }
     if (s.hoy.forzado) {
       h += `<button class="btn primary" data-act="empezarDia">Pasar el día en el trabajo forzado</button>`;
       return h;
@@ -274,8 +290,8 @@
         } else h += `<p class="muted small">Esta acción no tira dado de testigo.</p>`;
         if (a.red) {
           h += `<p class="paso">3. ${ui.accion === "delatar" ? "¿A quién delatas?" : "¿Con quién?"}</p>`;
-          h += `<button class="btn ${ui.contacto === "nuevo" ? "sel" : ""}" data-act="contacto" data-id="nuevo"><span class="t">${ui.accion === "delatar" ? "A un pobre que no conoces" : "Con alguien nuevo"}</span></button>`;
-          s.contactos.forEach((c) => { h += `<button class="btn ${ui.contacto === c.id ? "sel" : ""}" data-act="contacto" data-id="${c.id}"><span class="t">${esc(c.nombre)}</span><span class="d">Relación ${c.rel}${ui.accion === "delatar" ? " · lo perderás" : ""}</span></button>`; });
+          if (ui.accion !== "delatar") h += `<button class="btn ${ui.contacto === "nuevo" ? "sel" : ""}" data-act="contacto" data-id="nuevo"><span class="t">Con alguien nuevo</span></button>`;
+          E.contactosDisponibles(s).forEach((c) => { h += `<button class="btn ${ui.contacto === c.id ? "sel" : ""}" data-act="contacto" data-id="${c.id}"><span class="t">${esc(c.nombre)}</span><span class="d">Relación ${c.rel}${ui.accion === "delatar" ? " · lo perderás" : ""}</span></button>`; });
         }
         if (a.dado) {
           h += `<p class="paso">${a.red ? "4" : "3"}. ¿Qué dado usas?</p>`;
@@ -343,6 +359,8 @@
     h += `<p class="paso">2. Pan</p><p class="small">La ración cuesta ${pan} ${pan === 1 ? "moneda" : "monedas"} hoy. ${nec ? `Esta noche necesitas ${plural(nec, "ración", "raciones")} y tienes ${s.raciones}.` : "Esta noche no comes por tu cuenta."}</p>
       <div class="stepper"><button data-act="compra" data-d="-1" aria-label="Comprar una menos">−</button><span class="v">${ui.compra}</span><button data-act="compra" data-d="1" aria-label="Comprar una más">+</button>
       <span class="small muted">compras ${plural(ui.compra, "ración", "raciones")} · te quedan ${s.monedas - coste - ui.compra * pan} monedas</span></div>`;
+    const sobran = s.raciones + ui.compra - nec - P.hatillo;
+    if (sobran > 0) h += `<p class="small" style="color:var(--warn)">Solo puedes guardar ${P.hatillo} raciones de una noche a otra: perderás ${plural(sobran, "ración", "raciones")}. Mejor compártelas de día.</p>`;
     const faltan = Math.max(0, nec - s.raciones - ui.compra);
     if (faltan) h += `<p class="small" style="color:var(--bad)">Te ${faltan === 1 ? "faltará 1 ración" : "faltarán " + faltan + " raciones"}: perderás ${faltan * 2} de cuerpo${s.cuerpo - faltan * 2 <= 0 ? ", y morirías" : ""}.</p>`;
     h += `<button class="btn primary" data-act="dormir" ${op && op.ok ? "" : "disabled"}>Dormir</button>`;
@@ -360,7 +378,7 @@
     let h = `<h2>Noche del día ${s.dia}</h2>` + vNocheResumen();
     if (ui.castigoRes) h += `<div class="card malo"><p><b>${esc(ui.castigoRes.tipo)}.</b> ${esc(ui.castigoRes.txt)}</p></div>`;
     h += `<div class="card"><h3>Mientras duermes, la autoridad mueve ficha</h3>
-      <p class="small">Su atención de hoy es <b>${a.atencion}</b>: suma 1 por cada vez que te vio un alguacil o la guardia, 2 por cada hurto que alguien vio, 1 por cada delación y 1 si la ronda te encontró en un pórtico. Con 0-2 hace un movimiento; con 3-5, dos; con 6 o más, tres, y el tercero es fuerte.</p>
+      <p class="small">Su atención de hoy es <b>${a.atencion}</b>: suma 1 por cada vez que te vio un alguacil o la guardia, 2 por cada hurto que alguien vio, 1 por cada delación y 1 si la ronda te encontró en un pórtico. Con 0-2 hace un movimiento; con 3-5, dos; con 6 o más, tres, y el tercero es fuerte. Desde el pregón de expulsión (día ${P.escaladaDesde}), uno más cada noche, te vea o no.</p>
       <ul class="lista">${a.movimientos.map((m) => `<li>${esc(m.txt)}</li>`).join("")}</ul></div>`;
     h += `<button class="btn primary" data-act="amanece">Amanece: día ${s.dia + 1}</button>`;
     return h;
@@ -515,6 +533,7 @@
     cambiarSitio() { ui.sitio = null; ui.accion = null; ui.dado = null; render(); },
     accion(d) {
       ui.accion = d.id; ui.dado = null; ui.contacto = "nuevo";
+      if (d.id === "delatar") { const c = E.contactosDisponibles(s)[0]; ui.contacto = c ? c.id : null; }
       const libres = s.dados.map((x, i) => [x, i]).filter(([x]) => !x.usado);
       if (R.ACCIONES[d.id].dado && libres.length === 1) ui.dado = libres[0][1];
       render();
@@ -554,6 +573,7 @@
       resetUI(); persistir(); render();
     },
     noche(d) { ui.noche = d.id; render(); },
+    favor(d) { E.responderFavor(s, d.d === "1"); persistir(); render(); },
     compra(d) { ui.compra = Math.max(0, (ui.compra || 0) + (+d.d)); render(); },
     dormir() {
       const antes = E.snapshot(s);

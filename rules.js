@@ -42,9 +42,9 @@
       desc: "La catedral nueva, en obras desde 1513. Misas, limosnas y peones.",
       franjas: [
         f("Misa: pedir +1. Pórtico para descansar.", 1, "P D"),
-        f("Obras: contratan peones. Pórtico.", 0, "P T D"),
-        f("Obras: contratan peones. Pórtico.", 0, "P T D"),
-        f("Obras: contratan peones. Pórtico.", 0, "P T D"),
+        f("Obras: contratan peones a primera hora. Pórtico.", 0, "P T D"),
+        f("Obras: ya no contratan a nadie más. Pórtico.", 0, "P D"),
+        f("Obras: ya no contratan a nadie más. Pórtico.", 0, "P D"),
         f("Oficio: pedir +1. Pórtico.", 1, "P D"),
       ],
     },
@@ -65,7 +65,7 @@
       franjas: [
         f("Oficio: se puede pedir. Pobres a la puerta (red).", 0, "P R"),
         f("Nada a esta hora: pedir −1.", -1, "P"),
-        f("Sopa: al pedir te dan 1 ración con dado 3 o más (con 1-2 llegas tarde). Pobres a la puerta (red).", 0, "P R", { pedirDa: "racion", umbral: 3 }),
+        f("Sopa: al pedir te dan 1 ración con dado 4 o más (con menos, se acaba antes de que llegues). Pobres a la puerta (red).", 0, "P R", { pedirDa: "racion", umbral: 4 }),
         f("Nada a esta hora: pedir −1.", -1, "P"),
         f("Oficio: se puede pedir. Pobres a la puerta (red).", 0, "P R"),
       ],
@@ -84,7 +84,7 @@
     {
       id: "hospital", nombre: "Hospital", corto: "Hospital", dentro: true,
       desc: "Te curan, pero te apuntan. Quien entra muy débil ya no sale.",
-      franjas: [0, 1, 2, 3, 4].map(() => f("Curarse: +2 de cuerpo con dado 3 o más, pero te apuntan (−1). Si entras con cuerpo 2 o menos, te recogen.", 0, "P C")),
+      franjas: [0, 1, 2, 3, 4].map(() => f("Curarse (solo enfermos: cuerpo 5 o menos): +2 de cuerpo con dado 3 o más, pero te apuntan (−1). A la tercera vez, o con cuerpo 2 o menos, te recogen.", 0, "P C")),
     },
     {
       id: "puente", nombre: "Puente y arrabal", corto: "Puente", dentro: false, ambos: true,
@@ -221,28 +221,43 @@
   };
 
   const ACCIONES = {
-    pedir: { nombre: "Pedir", dado: true, testigo: true, desc: "Mendigar. Con 1 no te dan nada; 2-3, una moneda; 4-5, dos; 6, tres. Más lo que dé el sitio. Quien te vea te clasifica." },
-    trabajar: { nombre: "Trabajar a jornal", dado: true, testigo: true, desc: "Hacer de peón. Con dado 4 o más (más tu modificador) te contratan: 3 monedas. Ocupa también la franja siguiente." },
+    pedir: { nombre: "Pedir", dado: true, testigo: true, desc: "Mendigar. Con 1-2 no te dan nada; 3-4, una moneda; 5, dos; 6, tres. Más lo que dé el sitio (con 1 nunca te dan nada). Quien te vea te clasifica." },
+    trabajar: { nombre: "Trabajar a jornal", dado: true, testigo: true, desc: "Hacer de peón. Con dado 4 o más (más tu modificador) te contratan: 3 monedas. Ocupa también la franja siguiente. Antes de la siega hay poco trabajo: solo contratan a primera hora en la plaza (prima) y en las obras de la catedral (tercia)." },
     hurtar: { nombre: "Hurtar", dado: true, testigo: true, desc: "Robar entre el gentío. 1-2: fallas y te ven. 3-4: 2 monedas. 5-6: 4 monedas. Si te ve un alguacil, te detienen en el acto." },
-    descansar: { nombre: "Descansar", dado: true, testigo: true, desc: "Esconderte y recuperarte: +1 de cuerpo si nadie te ve. Si te ven tirado, cuenta como vagancia." },
-    curarse: { nombre: "Curarse", dado: true, testigo: false, desc: "+2 de cuerpo con dado 3 o más, pero te apuntan en el libro (−1). Si entras con cuerpo 2 o menos, te recogen y no sales." },
+    descansar: { nombre: "Descansar", dado: true, testigo: true, desc: "Esconderte y recuperarte: +1 de cuerpo si nadie te ve y el dado es 3 o más (con menos, el hambre no te deja). Si te ven tirado, cuenta como vagancia." },
+    curarse: { nombre: "Curarse", dado: true, testigo: false, desc: "Solo admiten enfermos (cuerpo 5 o menos). +2 de cuerpo con dado 3 o más, pero te apuntan en el libro (−1). A la tercera vez que te apuntan, o si entras con cuerpo 2 o menos, te recogen y no sales." },
     examen: { nombre: "Pedir licencia", dado: true, testigo: false, desc: "El cura te examina. Solo para naturales de la ciudad. Si apruebas, pasas a pobre con licencia (−2): limosna segura en tu parroquia, pero si te ven pedir fuera, la pierdes." },
     compartir: { nombre: "Compartir", dado: true, testigo: true, desc: "Das una ración (o una moneda si no tienes) a alguien de tu red o a alguien nuevo: sube la relación y te cuenta algo (+1 rumor)." },
     preguntar: { nombre: "Preguntar", dado: true, testigo: true, desc: "Hablar con alguien. Con dado 3 o más te cuenta algo (+1 rumor) y sube la relación." },
-    delatar: { nombre: "Delatar", dado: true, testigo: true, desc: "Vender a otro pobre al alguacil: 2 monedas y −1. La autoridad toma nota (atención +1). Si otro pobre te ve, se vengará." },
+    delatar: { nombre: "Delatar", dado: true, testigo: true, desc: "Vender a alguien de tu red al alguacil: 2 monedas y −1, pero lo pierdes. La autoridad toma nota (atención +1). Si otro pobre te ve, se corre la voz: el resto de tu red te baja la relación y alguien se vengará." },
     cruzar: { nombre: "Cruzar la puerta", dado: false, testigo: true, desc: "Entrar o salir de la ciudad. No gasta dado, pero ocupa la franja. La guardia vigila a los forasteros." },
   };
   const COD_ACC = { P: ["pedir"], T: ["trabajar"], H: ["hurtar"], D: ["descansar"], C: ["curarse"], E: ["examen"], R: ["compartir", "preguntar", "delatar"], X: ["cruzar"] };
 
   const PARAMS = {
     jornalUmbral: 4, jornalPaga: 3, delatarPaga: 2, delatarT: -1, compartirCoste: 1,
-    curarUmbral: 3, curarC: 2, curarT: -1, recogidoCuerpo: 2, descansarC: 1, hambreC: -2,
+    curarUmbral: 3, curarC: 2, curarT: -1, recogidoCuerpo: 2, descansarC: 1, descansarUmbral: 3, hambreC: -2,
     tretaUmbral: 4, tretaBonus: 1, catalogadaExam: 1, licMin: 1, licPrima: 1, limosnaPub: 2,
     sitioLimosna: "catedral", preguntarUmbral: 3, rivalUmbral: 2, delatorUmbral: 2, delatorUmbralRed: 1,
     tbMax: 6, examenGenUmbral: 2, examenGenFuerte: 3, tfCuerpo: -1, tfDias: 3, aten2: 3, aten3: 6,
     pregonInicio: 3, pregonVence: 10, pregonDias: 3, rondaDias: 2,
+    // v0.2
+    hatillo: 2,            // raciones que puedes guardar de una noche a otra
+    dineroUmbral: 4,       // con más monedas encima, pedir ante alguacil o beneficencia te delata como fingidor (+1)
+    roboRiesgo: 1,         // durmiendo al raso con más de dineroUmbral monedas, con este dado o menos te roban
+    roboCuerpo: -1,        // y te pegan
+    reincidenciaMax: 3,    // tras cada detención, «Te buscan» empieza en el número de detenciones (máximo 3)
+    escaladaDesde: 3,      // desde este día la autoridad hace un movimiento más cada noche
+    interrogaBase: 4,      // en un interrogatorio, te vende si su dado es ≤ interrogaBase − relación
+    interrogaDias: 2,      // días que se llevan a quien no habla
+    traicionRel: 1,        // con «se paga el doble por delatar», quien tenga esta relación o menos puede venderte
+    favorProb: 2,          // cada amanecer, con este dado o menos alguien de tu red te pide comida
+    prestamoRel: 3,        // con esta relación, si te falta pan alguien te da una ración (y baja la relación)
+    sucesosDesde: 2,
+    hospitalMaxCuerpo: 5,  // el hospital solo admite a quien tenga este cuerpo o menos
+    hospitalVeces: 3,      // a la tercera vez que te apuntan, te recogen
   };
-  const PEDIR_DADO = [0, 1, 1, 2, 2, 3];   // dado 1..6
+  const PEDIR_DADO = [0, 0, 1, 1, 2, 3];   // dado 1..6
   const HURTAR_DADO = [0, 0, 2, 2, 4, 4];
   const DADOS_CUERPO = [[1, 2, 1], [3, 4, 2], [5, 6, 3], [7, 8, 4], [9, 10, 5]];
 
@@ -252,20 +267,19 @@
     { dia: 3, fecha: "Miércoles 3 de junio", que: "Se pregona la expulsión de los forasteros: tienen siete días para irse.", pan: 2 },
     { dia: 4, fecha: "Jueves 4 de junio", que: "Corpus Christi. Procesión de tercia a sexta: pedir +2 en la catedral y la plaza, se puede hurtar entre el gentío (+1) y hay más alguaciles. Es fiesta: no hay jornal.", pan: 3 },
     { dia: 5, fecha: "Viernes 5 de junio", que: "Día corriente. El pan ha subido.", pan: 3 },
-    { dia: 6, fecha: "Sábado 6 de junio", que: "Día corriente.", pan: 3 },
+    { dia: 6, fecha: "Sábado 6 de junio", que: "Día corriente. El pan vuelve a subir.", pan: 4 },
     { dia: 7, fecha: "Domingo 7 de junio", que: "Misa mayor: pedir +1 a prima en la parroquia y la catedral. No hay mercado ni obras: ni jornal ni hurto en la plaza.", pan: 4 },
-    { dia: 8, fecha: "Lunes 8 de junio", que: "Día corriente. El pan sigue subiendo.", pan: 4 },
-    { dia: 9, fecha: "Martes 9 de junio", que: "Día de mercado: la plaza rinde +1 más a tercia y sexta.", pan: 4 },
-    { dia: 10, fecha: "Miércoles 10 de junio", que: "Vence el pregón: el forastero sin licencia al que vea un alguacil o la guardia dentro de la muralla queda detenido. Si llegas a la noche, sobrevives.", pan: 5 },
+    { dia: 8, fecha: "Lunes 8 de junio", que: "Día corriente. El pan sigue subiendo.", pan: 5 },
+    { dia: 9, fecha: "Martes 9 de junio", que: "Día de mercado: la plaza rinde +1 más a tercia y sexta. El pan, más caro que nunca.", pan: 5 },
+    { dia: 10, fecha: "Miércoles 10 de junio", que: "Vence el pregón: el forastero sin licencia al que vea un alguacil o la guardia dentro de la muralla queda detenido. Si llegas a la noche, sobrevives.", pan: 6 },
   ];
   // día, sitio, franja, mod pedir, hurtar (1 permite / −1 prohíbe), mod hurtar, prohíbe jornal, alguacil extra
   const MODS = [
     [2, "plaza", "Tercia", 1, 0, 0, 0, 0], [2, "plaza", "Sexta", 1, 0, 0, 0, 0],
     [4, "plaza", "Prima", 0, 0, 0, 1, 0], [4, "plaza", "Tercia", 2, 0, 1, 0, 1], [4, "plaza", "Sexta", 2, 0, 1, 0, 1],
-    [4, "catedral", "Tercia", 2, 1, 1, 1, 1], [4, "catedral", "Sexta", 2, 1, 1, 1, 1], [4, "catedral", "Nona", 0, 0, 0, 1, 0],
+    [4, "catedral", "Tercia", 2, 1, 1, 1, 1], [4, "catedral", "Sexta", 2, 1, 1, 0, 1],
     [7, "plaza", "Prima", 0, 0, 0, 1, 0], [7, "plaza", "Tercia", -1, -1, 0, 0, 0], [7, "plaza", "Sexta", -1, -1, 0, 0, 0],
-    [7, "catedral", "Prima", 1, 0, 0, 0, 0], [7, "catedral", "Tercia", 0, 0, 0, 1, 0], [7, "catedral", "Sexta", 0, 0, 0, 1, 0],
-    [7, "catedral", "Nona", 0, 0, 0, 1, 0], [7, "parroquia", "Prima", 1, 0, 0, 0, 0],
+    [7, "catedral", "Prima", 1, 0, 0, 0, 0], [7, "catedral", "Tercia", 0, 0, 0, 1, 0], [7, "parroquia", "Prima", 1, 0, 0, 0, 0],
     [9, "plaza", "Tercia", 1, 0, 0, 0, 0], [9, "plaza", "Sexta", 1, 0, 0, 0, 0],
   ].map(([dia, sitio, franja, pedir, hurtar, modHurtar, sinJornal, alguacil]) => ({ dia, sitio, franja, pedir, hurtar, modHurtar, sinJornal, alguacil }));
 
@@ -302,14 +316,14 @@
   ];
 
   const DORMIR = [
-    { id: "portico", nombre: "Pórtico de iglesia", lado: "dentro", coste: 0, c: 0, t: 0, tb: 0, rumor: 0, riesgo: 2, rc: 0, rt: 1, rtb: 1,
-      riesgoTxt: "Pasa la ronda: vagancia +1 y Te buscan +1", desc: "Gratis. Con 1-2 en el dado de noche te encuentra la ronda." },
-    { id: "arrabal", nombre: "Arrabal, junto a la ribera", lado: "fuera", coste: 0, c: 0, t: 0, tb: 0, rumor: 0, riesgo: 1, rc: -1, rt: 0, rtb: 0,
-      riesgoTxt: "Agua y fiebres: −1 de cuerpo", desc: "Gratis y sin rondas. Con 1 en el dado de noche, −1 de cuerpo. Mañana amaneces fuera de la muralla." },
+    { id: "portico", nombre: "Pórtico de iglesia", lado: "dentro", raso: true, coste: 0, c: -1, t: 0, tb: 0, rumor: 0, riesgo: 2, rc: 0, rt: 1, rtb: 1,
+      riesgoTxt: "Pasa la ronda: vagancia +1 y Te buscan +1", desc: "Gratis, pero al raso: −1 de cuerpo. Con 1-2 en el dado de noche te encuentra la ronda." },
+    { id: "arrabal", nombre: "Arrabal, junto a la ribera", lado: "fuera", raso: true, coste: 0, c: -1, t: 0, tb: 0, rumor: 0, riesgo: 1, rc: -1, rt: 0, rtb: 0,
+      riesgoTxt: "Agua y fiebres: otro −1 de cuerpo", desc: "Gratis y sin rondas, pero al raso: −1 de cuerpo, y con 1 en el dado de noche, fiebres (otro −1). Mañana amaneces fuera de la muralla." },
     { id: "meson", nombre: "Mesón", lado: "dentro", coste: 2, c: 1, t: 0, tb: 0, rumor: 1, riesgo: 0, rc: 0, rt: 0, rtb: 0,
-      riesgoTxt: "", desc: "2 monedas. +1 de cuerpo y oyes un rumor (+1)." },
+      costePan: true, riesgoTxt: "", desc: "Cuesta lo mismo que una ración de pan. +1 de cuerpo y oyes un rumor (+1)." },
     { id: "hospital", nombre: "Hospital", lado: "dentro", coste: 0, c: 2, t: -1, tb: 0, rumor: 0, riesgo: 0, rc: 0, rt: 0, rtb: 0,
-      riesgoTxt: "", desc: "Gratis. +2 de cuerpo, pero te apuntan (−1). Si entras con cuerpo 2 o menos, te recogen." },
+      riesgoTxt: "", desc: "Gratis. Solo admiten enfermos (cuerpo 5 o menos). +2 de cuerpo, pero te apuntan en el libro (−1). A la tercera vez que te apuntan, o si entras con cuerpo 2 o menos, te recogen." },
     { id: "red", nombre: "Con alguien de tu red", lado: "ambos", coste: 0, c: 1, t: 0, tb: 0, rumor: 0, riesgo: 0, rc: 0, rt: 0, rtb: 0,
       riesgoTxt: "", desc: "Gratis. +1 de cuerpo y nadie te ve. Necesitas relación 2 o más con alguien que viva de tu lado de la muralla." },
     { id: "carcel", nombre: "Cárcel", lado: "ambos", coste: 0, c: 0, t: 0, tb: 0, rumor: 0, riesgo: 0, rc: 0, rt: 0, rtb: 0,
@@ -318,9 +332,10 @@
 
   const CLASIF = { "-3": "Recogido", "-2": "Con licencia", "-1": "Pobre conocido", "0": "Desconocido", "1": "Sospechoso", "2": "Vagabundo", "3": "Reincidente" };
 
-  const MOVIMIENTOS = ["Ronda", "Ronda", "Cerrar la puerta", "Pregón", "Examen general", "Limosna pública"];
+  const MOVIMIENTOS = ["Ronda", "Interrogatorio", "Cerrar la puerta", "Pregón", "Examen general", "Limosna pública"];
   const MOV_DESC = {
     "Ronda": "Manda una ronda donde más te vieron: durante dos días, el resultado más bajo del dado de testigo de ese sitio pasa a ser «Alguacil». Las rondas se acumulan.",
+    "Interrogatorio": "Detiene a alguien de tu red y le pregunta por ti. Si vuestra relación es baja, te vende (Te buscan +2). Si aguanta, se lo llevan dos días.",
     "Cerrar la puerta": "Mañana no se entra en la ciudad desde fuera sin licencia.",
     "Pregón": "Pregona una norma nueva para los próximos días.",
     "Examen general": "Mañana el cura examina a todos los pobres con licencia: pueden perderla.",
@@ -335,6 +350,18 @@
     { tipo: 3, txt: "Se paga el doble por delatar." },
   ];
 
+  // Sucesos del amanecer (uno al día desde el día 2). La hoja los elige al azar.
+  const SUCESOS = [
+    { id: "fiebres", titulo: "Fiebres", txt: "Hay fiebres entre los que duermen al raso." },
+    { id: "tormenta", titulo: "Tormenta de verano", txt: "Se espera tormenta: esta noche, dormir al raso cuesta 1 de cuerpo más." },
+    { id: "pan", titulo: "Escasea el trigo", txt: "Hoy el pan cuesta 1 moneda más." },
+    { id: "redada", titulo: "Redada", txt: "Los alguaciles baten la ciudad: hoy, en todos los sitios, el 1 del dado de testigo es alguacil." },
+    { id: "cofradia", titulo: "Pan de cofradía", txt: "Una cofradía reparte pan a la puerta de las iglesias." },
+    { id: "muerte", titulo: "Un muerto en la ribera", txt: "Amanece un pobre muerto junto a la ribera." },
+    { id: "forasteros", titulo: "Llegan más pobres", txt: "Llegan pobres de los pueblos tras la mala cosecha: hoy los rivales te delatan con 1-3." },
+    { id: "nada", titulo: "Día sin novedad", txt: "Nada fuera de lo corriente." },
+  ];
+
   const NOMBRES = ["Perico el Tuerto", "Juana la Ronca", "Martín de Toro", "Catalina la del puente", "Antón el Mellado",
     "María la Rubia", "Diego el Zurdo", "Inés de Zamora", "Pedro el Navarro", "Lucía la Viuda", "Bartolo el Cojo",
     "Francisca la Morena", "Gil el Romero", "Teresa la Larga", "Alonso el Pelado", "Ana de Ledesma"];
@@ -343,20 +370,23 @@
     ["De qué va", "Eres un pobre en Salamanca, en junio de 1545. La autoridad acaba de decidir quién merece limosna y quién es un vagabundo. Tienes que llegar vivo al día 10 sin que te ahorquen, sin morir de hambre y sin que te encierren. Nadie sale de pobre."],
     ["El día", "Cada día tiene un amanecer, cinco franjas (prima, tercia, sexta, nona y vísperas), la noche y el turno de la autoridad. En cada franja eliges un sitio y una acción."],
     ["Cuerpo y dados", "El cuerpo (0 a 10) es tu salud. Cada mañana decide cuántos dados tiras: 9-10, cinco; 7-8, cuatro; 5-6, tres; 3-4, dos; 1-2, uno. Cada acción gasta un dado y su valor es lo bien que te sale. Tú eliges qué dado va a cada acción. A 0 de cuerpo, mueres."],
-    ["Comer", "Cada noche comes una ración (la viuda, dos). Si te falta, pierdes 2 de cuerpo por ración. El pan se compra de noche y sube de precio cada pocos días."],
+    ["Comer", "Cada noche comes una ración (la viuda, dos). Si te falta, pierdes 2 de cuerpo por ración. El pan se compra de noche y sube de precio cada pocos días. Solo puedes guardar 2 raciones de una noche a otra: el resto se pone duro o te lo quitan, así que lo que te sobre, mejor compártelo."],
+    ["Dormir al raso", "Dormir en un pórtico o en el arrabal es gratis, pero cuesta 1 de cuerpo cada noche. Bajo techo (mesón, hospital, alguien de tu red) recuperas."],
+    ["Dinero", "Un pobre con dinero es sospechoso. Si llevas más de 4 monedas y te ven pedir un alguacil o la beneficencia, te tienen por fingidor (+1). Si duermes al raso con más de 4, te pueden robar la mitad y pegarte (−1 de cuerpo). Si te detienen, te lo quitan todo."],
     ["Testigos", "Cada acción tira un dado de testigo: decide quién te ve. Vecinos, otros pobres, la beneficencia, frailes o alguaciles. Cada uno te mira a su manera y eso mueve tu termómetro."],
     ["Termómetro", "Cómo te clasifica la autoridad, de −3 a +3. Hacia arriba: sospechoso, vagabundo, reincidente. Hacia abajo: pobre conocido, con licencia y, al final, recogido (te encierran en una institución y la partida acaba). Sin licencia no bajas de −1. El termómetro no mata solo: decide el castigo si te detienen."],
-    ["Te buscan", "Cuando llega a 6, te detienen. El castigo depende del termómetro: con 0 o menos, reprensión; con +1, azotes; con +2, trabajo forzado o marca; con +3, la horca."],
-    ["La autoridad", "Cada noche juega según lo que vio: manda rondas a donde más te vieron, cierra la puerta, pregona normas, examina a los pobres o reparte limosna pública. Lo que hace lo ves al amanecer."],
+    ["Te buscan", "Cuando llega a 6, te detienen. El castigo depende del termómetro: con 0 o menos, reprensión; con +1, azotes; con +2, trabajo forzado o marca; con +3, la horca. Después, ya te conocen: «Te buscan» empieza en el número de veces que te han detenido (hasta 3)."],
+    ["La autoridad", "Cada noche juega según lo que vio: manda rondas a donde más te vieron, interroga a tu gente, cierra la puerta, pregona normas, examina a los pobres o reparte limosna pública. Desde el pregón de expulsión (día 3) aprieta más: un movimiento extra cada noche, te vea o no. Lo que hace lo ves al amanecer."],
+    ["Sucesos", "Cada amanecer pasa algo en la ciudad: fiebres, tormentas, subidas del pan, redadas, repartos de pan o muertes. No los controlas."],
     ["Fingir", "Al amanecer puedes gastar un dado en preparar una treta (llagas, ceguera, falso peregrino…). Ese dado es su calidad para todo el día: te dan más y te tienen por impedido, pero si te examina la beneficencia o el cura y su dado iguala tu calidad, te descubren."],
-    ["Red y rumores", "Puedes compartir o preguntar a otros pobres. Con relación 2 puedes dormir con alguien, te encubre si te ve robar y no mueres solo. Un rumor sirve para repetir un dado de testigo."],
+    ["Red y rumores", "Puedes compartir o preguntar a otros pobres. Con relación 2 puedes dormir con alguien, te encubre si te ve robar y no mueres solo. Con relación 3, si te falta pan, te da una ración. Pero la autoridad interroga a tu gente: con relación baja, te venden. Te pedirán comida, enfermarán, desaparecerán o morirán: una red de una sola persona no aguanta. Un rumor sirve para repetir un dado de testigo."],
     ["La muralla", "El puente y el arrabal están fuera. Si duermes fuera, para entrar tienes que cruzar la puerta, donde la guardia vigila a los forasteros. Si la autoridad cierra la puerta, sin licencia te quedas fuera."],
   ];
 
   const RULES = {
-    version: "0.1b", CONFIG, FRANJAS, FRANJA_DESC, SITIOS, TESTIGOS, CATEGORIA, TESTIGO_DESC, CATS, EFECTOS, ACCIONES, COD_ACC,
+    version: "0.2", CONFIG, FRANJAS, FRANJA_DESC, SITIOS, TESTIGOS, CATEGORIA, TESTIGO_DESC, CATS, EFECTOS, ACCIONES, COD_ACC,
     PARAMS, PEDIR_DADO, HURTAR_DADO, DADOS_CUERPO, CALENDARIO, MODS, PERSONAJES, TRETAS, DORMIR, CLASIF,
-    MOVIMIENTOS, MOV_DESC, PREGONES, NOMBRES, AYUDA,
+    MOVIMIENTOS, MOV_DESC, PREGONES, NOMBRES, AYUDA, SUCESOS,
   };
   root.RULES = RULES;
   if (typeof module !== "undefined" && module.exports) module.exports = RULES;

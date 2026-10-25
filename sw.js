@@ -1,6 +1,6 @@
 /* Service worker: el juego funciona sin conexión.
  * Cuando cambies cualquier archivo, sube VERSION para que los móviles descarguen lo nuevo. */
-const VERSION = "lv-0.1b-1";
+const VERSION = "lv-0.2-1";
 const ARCHIVOS = ["./", "index.html", "styles.css", "rules.js", "engine.js", "app.js", "manifest.webmanifest",
   "icons/icon-192.png", "icons/icon-512.png", "icons/icon-maskable-512.png", "icons/apple-touch-icon.png"];
 

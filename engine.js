@@ -14,7 +14,7 @@
   }
   const d6 = (s) => 1 + Math.floor(rand(s) * 6);
   const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-  const signo = (n) => (n > 0 ? "+" + n : String(n));
+  const signo = (n) => (n > 0 ? "+" + n : n < 0 ? "−" + -n : "0");
   const sitio = (id) => R.SITIOS.find((x) => x.id === id);
   const pj = (s) => R.PERSONAJES.find((p) => p.id === s.pj);
   const cal = (d) => R.CALENDARIO[Math.min(d, R.CALENDARIO.length) - 1];
@@ -38,7 +38,8 @@
   }
 
   function snapshot(s) {
-    return { cuerpo: s.cuerpo, monedas: s.monedas, raciones: s.raciones, termo: s.termo, tb: s.tb, rumores: s.rumores, fuera: s.fuera, marca: s.marca };
+    return { cuerpo: s.cuerpo, monedas: s.monedas, raciones: s.raciones, termo: s.termo, tb: s.tb, rumores: s.rumores, fuera: s.fuera, marca: s.marca,
+      nino: s.nino ? (s.nino.perdido ? "perdido" : s.nino.cuerpo) : null, ninoCon: s.nino && s.nino.con ? s.nino.con : null };
   }
 
   const vivo = (c) => !c.estado;
@@ -59,8 +60,10 @@
     if (o.recogido) { s.termo = -3; return; }
     if (o.fijar !== undefined) { s.termo = o.fijar; return; }
     const suelo = s.marca ? 1 : licencia(s) ? (o.hospital ? -3 : -2) : -1;
-    s.termo = clamp(s.termo + delta, Math.min(suelo, s.termo), 3);
+    s.termo = clamp(s.termo + delta, Math.min(suelo, s.termo), Math.max(techo(s), s.termo));
   }
+  // Sin detenciones previas no se pasa de +2: «reincidente» es quien ya ha sido detenido.
+  const techo = (s) => ((s.detenciones || 0) > 0 ? 3 : P.techoSinDetencion);
 
   // ---------------------------------------------------------------- autoridad visible
   const rondasEn = (s, sid, dia, franjaIdx) =>
@@ -108,6 +111,7 @@
       contactos: [], venganza: false, usosTreta: {}, nombresUsados: [], detenciones: 0, ultimoDormir: null, apuntes: 0,
       hoy: null, autoridad: { rondas: [], puerta: [], examen: {}, limosna: {}, pregones: [] },
       catalogo: (opts.catalogo || []).slice(), diario: [], final: null, encuesta: null, ultimaAutoridad: null,
+      nino: p.nino ? { cuerpo: P.ninoCuerpo0, con: null, perdido: false, motivo: "" } : null,
     };
     amanecer(s);
     return s;
@@ -121,8 +125,9 @@
     switch (su.id) {
       case "fiebres": {
         if (s.ultimoDormir === "portico" || s.ultimoDormir === "arrabal") { s.cuerpo = clamp(s.cuerpo - 1, 0, 10); txts.push("Anoche dormiste al raso: −1 de cuerpo."); }
+        if (ninoConmigo(s) && d6(s) <= P.ninoFiebre) { s.nino.cuerpo = clamp(s.nino.cuerpo - 1, 0, P.ninoMax); txts.push("Al niño le sube la fiebre (−1 a su cuerpo)."); }
         const c = alAzar(s, contactosDisponibles(s));
-        if (c) { c.ausenteHasta = s.dia + 1; c.ausenteMotivo = "enfermo"; txts.push(`${c.nombre} cae enfermo: hoy y mañana no podrás contar con él.`); }
+        if (c) { c.ausenteHasta = s.dia + 1; c.ausenteMotivo = "enfermo"; txts.push(`${c.nombre} cae con fiebres: hoy y mañana no podrás contar con esa persona.`); }
         break;
       }
       case "tormenta": s.hoy.frio = 1; break;
@@ -144,6 +149,46 @@
     ev.push(`${su.titulo}. ${txts.join(" ")}`);
   }
 
+  // ---------------------------------------------------------------- el niño (viuda)
+  const ninoConmigo = (s) => !!(s.nino && !s.nino.perdido && !s.nino.con);
+  function perderNino(s, txt, ev) {
+    s.nino.perdido = true; s.nino.con = null; s.nino.motivo = txt; s.nino.dia = s.dia;
+    if (ev) ev.push(txt);
+  }
+  function revisarNino(s, ev) {
+    const n = s.nino;
+    if (!n || n.perdido) return;
+    if (n.con) {
+      const c = s.contactos.find((x) => x.id === n.con);
+      if (!c || c.estado) { perderNino(s, `${c ? c.nombre : "Quien cuidaba de tu hijo"} ya no está. La autoridad encuentra al niño y se lo lleva a los niños de la doctrina.`, ev); return; }
+      if (c.ausenteHasta && c.ausenteHasta >= s.dia) {
+        if (c.ausenteMotivo === "enfermo") { n.con = null; ev.push(`En casa de ${c.nombre} hay fiebres: te devuelve al niño.`); }
+        else { perderNino(s, `Se han llevado a ${c.nombre}. Tu hijo estaba en su casa: lo dejan en los niños de la doctrina.`, ev); return; }
+      } else if (c.rel < 2) { n.con = null; ev.push(`${c.nombre} no puede seguir cuidando del niño y te lo devuelve.`); }
+    }
+    if (n.cuerpo <= 0) { perderNino(s, "El niño enferma gravemente. Se lo llevan al hospital de niños y no te dejan verlo.", ev); return; }
+    if (!n.con && n.cuerpo <= P.ninoDebil && !s.fuera) {
+      const c = mejorContacto(s);
+      if (c) { n.con = c.id; ev.push(`El niño está muy débil. Antes de que lo vea el cura, ${c.nombre} se lo lleva y lo esconde.`); }
+      else perderNino(s, "El niño está muy débil. El cura lo ve y se lo lleva a los niños de la doctrina.", ev);
+    }
+  }
+  function puedeCuidar(s) { return contactosDisponibles(s).filter((c) => c.rel >= 2); }
+  function dejarNino(s, contactoId) {
+    if (!ninoConmigo(s)) throw new Error("El niño no está contigo.");
+    const c = puedeCuidar(s).find((x) => x.id === contactoId);
+    if (!c) throw new Error("Esa persona no puede quedarse con él.");
+    s.nino.con = c.id;
+    diaActual(s).amanecer.eventos.push(`Dejas al niño con ${c.nombre}.`);
+    return c;
+  }
+  function recogerNino(s) {
+    if (!s.nino || s.nino.perdido || !s.nino.con) throw new Error("El niño no está con nadie.");
+    const c = s.contactos.find((x) => x.id === s.nino.con);
+    s.nino.con = null;
+    diaActual(s).amanecer.eventos.push(`Recoges al niño${c ? " de casa de " + c.nombre : ""}.`);
+  }
+
   function amanecer(s) {
     s.hoy = { dia: s.dia, pedidas: {}, visto: {}, actuado: {}, atencion: 0, detenido: null, castigo: null, eventos: [], forzado: false, suceso: null, favor: null };
     s.franja = 0; s.ocupada = false; s.treta = null; s.fase = "amanecer";
@@ -152,6 +197,7 @@
     const entrada = { dia: s.dia, amanecer: null, fingir: null, favor: null, acciones: [], castigo: null, noche: null, autoridad: null, fin: null };
     s.diario.push(entrada);
     if (s.dia >= P.sucesosDesde) suceso(s, ev);
+    revisarNino(s, ev);
     if (s.cuerpo <= 0) {
       entrada.amanecer = { estado: snapshot(s), dados: [], eventos: ev.slice(), autoridad: resumenAutoridad(s, s.dia) };
       s.hoy.eventos = ev;
@@ -247,6 +293,8 @@
     const st = sitio(sid), fr = st.franjas[s.franja], m = modsDe(s.dia, sid, s.franja), p = pj(s);
     let ids = [];
     fr.acts.forEach((c) => ids.push(...R.COD_ACC[c]));
+    const oficios = p.oficios || ["peon"];
+    ids = ids.filter((id) => (id !== "trabajar" || oficios.includes("peon")) && (id !== "lavar" || oficios.includes("lavar")));
     if (m.hurtar > 0 && !ids.includes("hurtar")) ids.push("hurtar");
     const libres = s.dados.filter((d) => !d.usado).length;
     return ids.map((id) => {
@@ -282,7 +330,7 @@
         if (licencia(s)) return sid === "parroquia" ? "Pedir con licencia (tu parroquia)" : "Pedir con licencia (fuera)";
         return "Pedir sin licencia";
       case "hurtar": return "Hurtar";
-      case "trabajar": return "Trabajar";
+      case "trabajar": case "lavar": return "Trabajar";
       case "descansar": return "Descansar";
       case "compartir": case "preguntar": return "La red";
       case "delatar": return "Delatar";
@@ -291,6 +339,8 @@
     }
   }
 
+  // la limosna que se da en moneda (no la sopa ni el pan) rinde más si llevas al niño
+  const x0 = (s, sid) => sitio(sid).franjas[s.franja].pedirDa !== "racion";
   function monedasPedir(s, sid, v) {
     const fr = sitio(sid).franjas[s.franja], m = modsDe(s.dia, sid, s.franja);
     const lp = grupoEfecto(s, sid, "pedir") === "Pedir con licencia (tu parroquia)";
@@ -299,7 +349,8 @@
     const x = R.PEDIR_DADO[v - 1] + fr.modPedir + m.pedir +
       (licencia(s) && sid === "parroquia" && s.franja === 0 ? P.licPrima : 0) +
       (limosnaEn(s, sid, s.dia) ? P.limosnaPub : 0) +
-      (s.treta && s.treta.calidad >= P.tretaUmbral && !s.treta.catalogada ? P.tretaBonus : 0);
+      (s.treta && s.treta.calidad >= P.tretaUmbral && !s.treta.catalogada ? P.tretaBonus : 0) +
+      (ninoConmigo(s) && x0(s, sid) ? P.ninoPedir : 0);
     return Math.max(minimo, x);
   }
 
@@ -308,16 +359,8 @@
     const fr = sitio(sid).franjas[s.franja], m = modsDe(s.dia, sid, s.franja), p = pj(s);
     switch (accion) {
       case "pedir":
-        if (fr.pedirDa === "racion") return v >= fr.umbral ? "1 ración" : "nada";
-        { const n = monedasPedir(s, sid, v); return n ? n + (n === 1 ? " moneda" : " monedas") : "nada"; }
-      case "trabajar": return v + p.modJornal >= P.jornalUmbral ? `te contratan: ${P.jornalPaga} monedas` : "no te contratan";
-      case "hurtar": { const ev = Math.min(6, v + m.modHurtar); return ev <= 2 ? "fallas y te ven" : R.HURTAR_DADO[ev - 1] + " monedas"; }
-      case "descansar": return v >= P.descansarUmbral ? "+1 de cuerpo si nadie te ve" : "no consigues descansar (hace falta 3 o más)";
-      case "curarse": return s.cuerpo <= P.recogidoCuerpo ? "te recogen" : v >= P.curarUmbral ? "+2 de cuerpo y −1" : "no te atienden";
-      case "examen": return v >= (p.difExamen || 99) ? "apruebas: licencia" : "suspendes: +1";
-      case "compartir": return "+1 rumor y relación +1";
-      case "preguntar": return v >= P.preguntarUmbral ? "+1 rumor y relación +1" : "no te cuentan nada";
-      case "delatar": return `${P.delatarPaga * (pregonActivo(s, 3) ? 2 : 1)} monedas y −1`;
+        if (fr.pedirDa === "racion") return "";
+        { const n = monedasPedir(s, sid, v); return n <= 0 ? "no te darán nada" : n === 1 ? "te darán poco" : n <= 3 ? "te darán algo" : "te darán bastante"; }
       default: return "";
     }
   }
@@ -412,6 +455,11 @@
         if (o.contratado) { o.dM = P.jornalPaga; o.resultado = `Te contratan: ${P.jornalPaga} monedas. La franja siguiente sigues trabajando.`; }
         else { wT = 0; wTB = 0; o.resultado = "No te contratan."; }
         break;
+      case "lavar":
+        o.contratado = v >= P.lavarUmbral;
+        if (o.contratado) { o.dM = P.lavarPaga; o.resultado = `Te dan ropa que lavar: ${P.lavarPaga} monedas.`; }
+        else { wT = 0; wTB = 0; o.resultado = "Hoy no te dan ropa que lavar."; }
+        break;
       case "hurtar":
         if (o.cat === "Autoridad") { o.detenido = true; o.motivoDet = `${o.testigo === "Guardia" ? "La guardia" : "Un alguacil"} te ve hurtar.`; o.resultado = "Te pillan en el acto."; }
         else if (ev <= 2) o.resultado = "Fallas y te ven.";
@@ -470,7 +518,7 @@
         case "DELATOR": l += ` Saca ${o.x}: ${o.condOk ? "te delata" : "te encubre"}.`; break;
         case "FORASTERO": l += o.condOk ? " Eres forastero sin licencia." : ""; break;
       }
-      if (accion === "trabajar" && !o.contratado && ef.t) l += " Como no te contratan, no cuenta.";
+      if ((accion === "trabajar" || accion === "lavar") && !o.contratado && ef.t) l += " Como no trabajas, no cuenta.";
       o.lineas.push(l);
     }
     if (o.fingidorDinero) o.lineas.push(`Llevas ${s.monedas} monedas encima: un pobre con dinero es un fingidor (+1).`);
@@ -523,9 +571,10 @@
     if (o.descubierta) catalogar(s, s.treta.nombre, `Descubierta por ${o.testigo === "Cura" ? "el cura" : "la beneficencia"}`);
     if (o.accion === "trabajar" && o.contratado) s.ocupada = true;
     if (o.detenido) s.hoy.detenido = { motivo: o.motivoDet, termo: s.termo, noche: false };
+    const lineasLic = antes.termo === -2 && s.termo > -2 ? ["Pierdes la licencia."] : antes.termo !== -2 && s.termo === -2 ? ["Ahora tienes licencia."] : [];
     diaActual(s).acciones.push({
       franja: o.franjaNombre, sitio: sitio(o.sitio).nombre, accion: R.ACCIONES[o.accion].nombre, dado: o.v, testigo: o.testigo, dadoTestigo: o.w, dadoExtra: o.x,
-      resultado: o.resultado, lineas: o.lineas.slice(), cambios: { monedas: o.dM, raciones: o.dR, cuerpo: o.dC, termo: s.termo - antes.termo, tb: s.tb - antes.tb, rumores: o.rumor, atencion: o.aten },
+      resultado: o.resultado, lineas: o.lineas.concat(lineasLic), cambios: { monedas: o.dM, raciones: o.dR, cuerpo: o.dC, termo: s.termo - antes.termo, tb: s.tb - antes.tb, rumores: o.rumor, atencion: o.aten },
       rumorGastado: !!eleccion.rumorGastado, estado: snapshot(s),
     });
     if (s.termo <= -3) { terminar(s, "Recogido", o.recogido ? (o.apunte ? "Le apuntaron en el hospital por tercera vez." : "Entró al hospital sin fuerzas.") : "Le apuntaron en el hospital teniendo licencia."); return; }
@@ -587,6 +636,11 @@
     s.detenciones = (s.detenciones || 0) + 1;
     const conf = s.monedas; s.monedas = 0;
     s.tb = Math.min(P.reincidenciaMax, s.detenciones); s.fuera = false; d.castigado = true; s.hoy.castigo = tipo;
+    if (ninoConmigo(s) && tipo !== "Horca") {
+      const c = puedeCuidar(s).sort((a, b) => b.rel - a.rel)[0];
+      if (c) { s.nino.con = c.id; txt += ` ${c.nombre} se queda con tu hijo mientras tanto.`; }
+      else { perderNino(s, "Mientras te llevan detenida, se llevan al niño a los niños de la doctrina."); txt += " Se llevan a tu hijo a los niños de la doctrina."; }
+    }
     if (tipo !== "Horca") txt += `${conf ? " Te quitan las " + conf + " monedas que llevabas." : ""} Ya te conocen: «Te buscan» empieza en ${s.tb}.`;
     diaActual(s).castigo = { motivo: d.motivo, termo: t, tipo, noche: d.noche, txt };
     if (tipo === "Horca") { terminar(s, "Horca", `Detenido con el termómetro en +3. ${d.motivo}`); return { tipo, txt }; }
@@ -597,7 +651,7 @@
 
   // ---------------------------------------------------------------- noche
   function precioPan(s) { return cal(s.dia).pan + (s.hoy && s.hoy.dia === s.dia ? s.hoy.panExtra || 0 : 0); }
-  function racionesNecesarias(s) { return s.hoy.forzado ? 0 : pj(s).raciones; }
+  function racionesNecesarias(s) { return s.hoy.forzado ? 0 : pj(s).raciones + (ninoConmigo(s) ? 1 : 0); }
 
   function opcionesNoche(s) {
     if ((s.hoy.detenido && s.hoy.detenido.castigado && !s.hoy.detenido.noche) || s.hoy.forzado) {
@@ -619,7 +673,7 @@
         const pct = Math.round((d.riesgo / 6) * 100);
         o.riesgos.push(`${d.riesgo === 1 ? "Con un 1" : "Con 1-" + d.riesgo} en el dado de noche (${pct} %): ${d.riesgoTxt.toLowerCase()}.`);
         if (d.rtb > 0 && s.tb + d.rtb >= P.tbMax) {
-          const t = clamp(s.termo + d.rt, -1, 3);
+          const t = clamp(s.termo + d.rt, -1, Math.max(techo(s), s.termo));
           o.riesgos.push(`¡Cuidado! «Te buscan» llegaría a ${P.tbMax}: te detendrían, y con termómetro ${signo(t)} te tocaría ${textoCastigo(t)}.`);
           o.peligro = true;
         }
@@ -672,16 +726,36 @@
     if (op.id === "meson") o.lineas.push("En el mesón oyes un rumor (+1).");
     if (op.id === "red") o.lineas.push(`Duermes con ${op.con}: nadie te ve.`);
     if (op.id === "hospital") o.lineas.push(o.recogido ? (s.cuerpo <= P.recogidoCuerpo ? "Llegas sin fuerzas: te recogen." : `Es la ${P.hospitalVeces}ª vez que te apuntan: te recogen.`) : `Te curan y te apuntan en el libro (−1). Llevas ${s.apuntes} de ${P.hospitalVeces}.`);
-    const nec = racionesNecesarias(s);
-    const disp = s.raciones + compra;
-    o.faltan = Math.max(0, nec - disp);
-    o.dR = compra - Math.min(nec, disp);
-    if (o.faltan > 0) {
+    const necMadre = s.hoy.forzado ? 0 : pj(s).raciones;
+    const necNino = ninoConmigo(s) && !s.hoy.forzado ? 1 : 0;
+    let disp = s.raciones + compra, prest = 0;
+    if (disp < necMadre + necNino) {
       const amigo = contactosDisponibles(s).filter((c) => c.rel >= P.prestamoRel).sort((a, b) => b.rel - a.rel)[0];
-      if (amigo) { o.faltan -= 1; amigo.rel -= 1; o.lineas.push(`${amigo.nombre} comparte su pan contigo (relación −1).`); }
+      if (amigo) { prest = 1; amigo.rel -= 1; o.lineas.push(`${amigo.nombre} comparte su pan contigo (relación −1).`); }
     }
+    disp += prest;
+    let comeMadre, comeNino;
+    if (disp >= necMadre + necNino) { comeMadre = necMadre; comeNino = necNino; }
+    else if (eleccion.comeNino === false) { comeMadre = Math.min(necMadre, disp); comeNino = Math.min(necNino, disp - comeMadre); }
+    else { comeNino = Math.min(necNino, disp); comeMadre = Math.min(necMadre, disp - comeNino); }
+    o.faltan = necMadre - comeMadre; o.faltanNino = necNino - comeNino;
+    o.dR = compra - Math.max(0, comeMadre + comeNino - prest);
     o.dC += o.faltan * P.hambreC;
-    if (nec) o.lineas.push(o.faltan ? `Te ${o.faltan === 1 ? "falta 1 ración" : "faltan " + o.faltan + " raciones"}: ${o.faltan * P.hambreC} de cuerpo.` : `Comes (${nec === 1 ? "1 ración" : nec + " raciones"}).`);
+    if (necMadre) o.lineas.push(o.faltan ? `${necNino ? "Le das tu parte al niño. " : ""}Te ${o.faltan === 1 ? "falta 1 ración" : "faltan " + o.faltan + " raciones"}: ${signo(o.faltan * P.hambreC)} de cuerpo.` : necNino ? (o.faltanNino ? "Comes tú." : "Coméis los dos.") : "Comes.");
+    o.dNino = 0;
+    if (s.nino && !s.nino.perdido) {
+      if (!s.nino.con && necNino) {
+        if (o.faltanNino) { o.dNino += P.ninoHambre; o.lineas.push(`El niño se acuesta sin comer (${signo(P.ninoHambre)} a su cuerpo).`); }
+        if (op.raso && s.hoy.frio) { o.dNino -= 1; o.lineas.push("La tormenta también le cala a él (−1 a su cuerpo)."); }
+        if (!op.raso && !o.faltanNino) { o.dNino += 1; o.lineas.push("Bajo techo y comido, el niño se recupera (+1)."); }
+      } else if (s.nino.con) {
+        const c = s.contactos.find((x) => x.id === s.nino.con);
+        o.dNino += 1;
+        if (s.raciones + o.dR >= 1) { o.dR -= 1; o.lineas.push(`Le das una ración a ${c.nombre} por cuidar del niño.`); }
+        else if (s.monedas + o.dM >= pan) { o.dM -= pan; o.lineas.push(`Le pagas ${pan} monedas a ${c.nombre} por cuidar del niño.`); }
+        else { c.rel = Math.max(0, c.rel - 1); o.lineas.push(`No tienes con qué pagar a ${c.nombre} por cuidar del niño: relación −1.`); }
+      }
+    }
     const quedan = s.raciones + o.dR;
     if (quedan > P.hatillo) { const pierdes = quedan - P.hatillo; o.dR -= pierdes; o.perdidas = pierdes; o.lineas.push(`Solo puedes guardar ${P.hatillo} raciones: pierdes ${pierdes} (se ponen duras o te las quitan).`); }
     if (pregonActivo(s, 3)) {
@@ -694,7 +768,9 @@
     const antes = snapshot(s);
     s.monedas += o.dM; s.raciones += o.dR; s.rumores += o.rumor;
     s.cuerpo = clamp(s.cuerpo + o.dC, 0, 10);
+    if (s.nino && !s.nino.perdido) s.nino.cuerpo = clamp(s.nino.cuerpo + o.dNino, 0, P.ninoMax);
     aplicarT(s, o.dT, { hospital: op.id === "hospital", recogido: o.recogido });
+    if (antes.termo === -2 && s.termo > -2) o.lineas.push("Pierdes la licencia.");
     s.tb = clamp(s.tb + o.dTB, 0, P.tbMax);
     s.hoy.atencion += o.aten;
     if (s.hoy.forzado) s.tf = Math.max(0, s.tf - 1);
@@ -739,6 +815,7 @@
           const c = alAzar(s, contactosDisponibles(s));
           const x = d6(s);
           m.contacto = c.nombre; m.dadoInterroga = x;
+          const conNino = s.nino && !s.nino.perdido && s.nino.con === c.id;
           if (x <= P.interrogaBase + (fuerte ? 1 : 0) - c.rel) {
             s.tb = clamp(s.tb + 2, 0, P.tbMax); c.estado = "traidor"; m.vendido = true;
             m.txt = `Interroga a ${c.nombre} (relación ${c.rel}; saca ${x}): te vende. Te buscan +2.`;
@@ -746,6 +823,7 @@
             c.ausenteHasta = d + P.interrogaDias; c.ausenteMotivo = "detenido";
             m.txt = `Interroga a ${c.nombre} (relación ${c.rel}; saca ${x}): no dice nada. Se lo llevan ${P.interrogaDias} días.`;
           }
+          if (conNino) m.txt += " Tenía a tu hijo.";
           break;
         }
         case "Ronda":
@@ -815,11 +893,16 @@
     const f = s.final; if (!f) return "";
     const p = pj(s);
     const con = f.acompanado;
+    const n = s.nino;
+    const hijo = !n ? "" : n.perdido ? " Tu hijo está en manos de la institución." : n.con ? ` ${(s.contactos.find((c) => c.id === n.con) || {}).nombre || "Alguien"} cuida de tu hijo.` : ["Horca", "Muerte"].includes(f.tipo) ? " Tu hijo se queda solo en Salamanca." : f.tipo === "Recogido" ? " A tu hijo lo llevan a los niños de la doctrina." : " Tu hijo sigue contigo.";
+    return textoFinalBase(s, f, p, con) + hijo;
+  }
+  function textoFinalBase(s, f, p, con) {
     switch (f.tipo) {
       case "Horca": return `Te ahorcan en la plaza el día ${f.dia}. La autoridad lo llama justicia y lo hace delante de todos, para que se vea. ${con ? con + " está entre la gente que mira. Sabe tu nombre." : "Nadie de los que miran sabe tu nombre."}`;
-      case "Muerte": return `Mueres el día ${f.dia}. ${con ? con + " se queda contigo hasta el final." : "Mueres solo."} El pan seguía subiendo.`;
+      case "Muerte": return `Mueres el día ${f.dia}. ${con ? con + " se queda contigo hasta el final." : (p.id === "viuda" ? "Mueres sola." : "Mueres solo.")} El pan seguía subiendo.`;
       case "Recogido": return `Te recogen el día ${f.dia}. Comerás todos los días, rezarás a sus horas y no volverás a salir. La piedad también encierra.`;
-      case "Sobrevive": return `Llegas a la noche del día ${f.dia}. Sigues siendo pobre, pero sigues vivo${p.forastero ? " y nadie te ha echado de la ciudad todavía" : ""}. La siega aún no ha empezado: el prototipo acaba aquí.`;
+      case "Sobrevive": return `Llegas a la noche del día ${f.dia}. Sigues siendo pobre, pero sigues ${p.id === "viuda" ? "viva" : "vivo"}${p.forastero ? " y nadie te ha echado de la ciudad todavía" : ""}. La siega aún no ha empezado: el prototipo acaba aquí.`;
       case "Abandono": return `Dejas la partida el día ${f.dia}.`;
       default: return "";
     }
@@ -838,7 +921,7 @@
   function informe(s) {
     const p = pj(s);
     const L = [];
-    const est = (e) => `cuerpo ${e.cuerpo} · monedas ${e.monedas} · raciones ${e.raciones} · termómetro ${signo(e.termo)} (${clasif(e.termo)}) · Te buscan ${e.tb} · rumores ${e.rumores}${e.fuera ? " · fuera de la muralla" : ""}`;
+    const est = (e) => `cuerpo ${e.cuerpo}${e.nino === null || e.nino === undefined ? "" : e.nino === "perdido" ? " · niño perdido" : " · niño " + e.nino + (e.ninoCon ? " (con otra persona)" : "")} · monedas ${e.monedas} · raciones ${e.raciones} · termómetro ${signo(e.termo)} (${clasif(e.termo)}) · Te buscan ${e.tb} · rumores ${e.rumores}${e.fuera ? " · fuera de la muralla" : ""}`;
     const cam = (c) => Object.entries(c || {}).filter(([, v]) => v).map(([k, v]) => `${{ monedas: "monedas", raciones: "raciones", cuerpo: "cuerpo", termo: "termómetro", tb: "Te buscan", rumores: "rumores", atencion: "atención" }[k]} ${signo(v)}`).join(", ");
     const mins = minutosPorDia(s);
     L.push(`LIBER VAGATORUM · informe de partida (prototipo ${s.v})`);
@@ -884,6 +967,7 @@
     L.push("");
     L.push(`Red: ${s.contactos.length ? s.contactos.map((c) => c.nombre + " (relación " + c.rel + (c.estado ? ", " + ({ muerto: "muerto", traidor: "te vendió", delatado: "lo delataste" }[c.estado] || c.estado) : "") + ")").join(", ") : "nadie"}`);
     L.push(`Detenciones: ${s.detenciones || 0}`);
+    if (s.nino) L.push(`Niño: ${s.nino.perdido ? "perdido el día " + s.nino.dia + " (" + s.nino.motivo + ")" : "cuerpo " + s.nino.cuerpo + (s.nino.con ? ", al cuidado de " + ((s.contactos.find((c) => c.id === s.nino.con) || {}).nombre || "alguien") : ", contigo")}`);
     L.push(`Catálogo de tretas de la autoridad: ${s.catalogo.length ? s.catalogo.map((c) => c.treta + " (" + c.como + ")").join(", ") : "vacío"}`);
     L.push("");
     L.push("--- DATOS PARA ANALIZAR (no hace falta leerlos) ---");
@@ -903,7 +987,7 @@
     grupoEfecto, ganancia, previewTestigos, testigoPara, tirar, resolver, aplicar, gastarRumor, pasarFranja, acabarDia,
     castigoPendiente, aplicarCastigo, textoCastigo, opcionesNoche, dormir, precioPan, racionesNecesarias, turnoAutoridad,
     siguienteDia, abandonar, textoFinal, informe, resumenCorto, minutosPorDia, catalogada, puertaCerrada,
-    responderFavor, contactosDisponibles, disponible,
+    responderFavor, contactosDisponibles, disponible, monedasPedir, ninoConmigo, dejarNino, recogerNino, puedeCuidar, techo,
   };
   root.ENGINE = ENGINE;
   if (typeof module !== "undefined" && module.exports) module.exports = ENGINE;

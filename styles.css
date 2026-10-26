@@ -62,6 +62,7 @@ p { margin: 0.4em 0; }
 .termo { display: grid; grid-template-columns: repeat(7, 1fr); flex: 1; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
 .termo span { text-align: center; font-size: 0.72rem; padding: 2px 0; background: var(--surface); color: var(--muted); }
 .termo span.on { background: var(--accent); color: var(--accent-ink); font-weight: 700; }
+.termo span.cerrado { opacity: 0.35; text-decoration: line-through; }
 .termo span.neg { border-right: 1px solid var(--line); }
 .pips { display: flex; gap: 4px; flex: 1; }
 .pip { flex: 1; height: 12px; border-radius: 3px; border: 1px solid var(--line); background: var(--surface); }

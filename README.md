@@ -1,4 +1,4 @@
-# Liber Vagatorum · prototipo jugable (v0.2)
+# Liber Vagatorum · prototipo jugable (v0.3)
 
 Prototipo web de las reglas del día: Salamanca, 1 a 10 de junio de 1545. Una página estática, sin servidor ni base de datos, instalable en el móvil y jugable sin conexión.
 
@@ -33,8 +33,8 @@ Todas las reglas están en `rules.js`: sitios, testigos, efectos, parámetros, c
 
 **Cada vez que cambies algo, sube la versión en dos sitios**, o los móviles seguirán usando la copia antigua:
 
-1. `rules.js` → `version: "0.2"`, por ejemplo a `"0.2a"`.
-2. `sw.js` → `const VERSION = "lv-0.2-1"`, por ejemplo a `"lv-0.2a-1"`.
+1. `rules.js` → `version: "0.3"`, por ejemplo a `"0.3a"`.
+2. `sw.js` → `const VERSION = "lv-0.3-1"`, por ejemplo a `"lv-0.3a-1"`.
 
 Las partidas a medias de una versión anterior avisan de que pueden fallar.
 
@@ -48,6 +48,28 @@ python3 -m http.server 8000
 
 y abre `http://localhost:8000`.
 
+## Qué cambia en la v0.3 (tras el segundo playtest, con la viuda)
+
+- **Dados sin cifras exactas:** sigues viendo tus dados al amanecer, pero al elegir dado ya no te dice «3 monedas», sino «te darán poco / algo / bastante». Los umbrales (3 o más, 4 o más…) siguen en la descripción de cada acción.
+- **El niño de la viuda:** tiene su propio cuerpo (de 0 a 5). Cada noche come: si no hay pan para los dos, eliges quién come. Bajo techo y comido se recupera; las fiebres y las tormentas le afectan aparte. Con cuerpo 0, se lo llevan al hospital de niños. Muy débil (1) y dentro de la muralla, el cura se lo lleva a los niños de la doctrina, salvo que alguien de tu red lo esconda. En el arrabal no se lo llevan.
+- **Si detienen a la viuda,** se llevan al niño, salvo que alguien de su red (relación 2 o más) se quede con él. Al amanecer también puedes dejarlo con alguien: cada noche le das una ración o su precio, y si no puedes, la relación baja. Si interrogan o se llevan a quien lo cuida, lo pierdes.
+- **Con el niño al lado, la limosna en moneda rinde +1** (añadido mío: hace que dejarlo con alguien tenga un coste, no solo una ventaja). Se cambia en `PARAMS.ninoPedir`.
+- **La viuda no trabaja de peón:** lava ropa en la ribera, a tercia y a sexta (dado 3 o más: 2 monedas).
+- **Sin detención previa, el termómetro no pasa de +2:** «reincidente» es quien ya ha sido detenido. La primera detención nunca es la horca.
+- **Licencia:** ahora se avisa cuando la consigues y cuando la pierdes.
+
+### Simulación (corregida)
+
+La simulación de la v0.2 tenía un fallo en el bot: cuando no tenía nada bueno que hacer, cruzaba la puerta, gastaba franjas y dormía fuera. Los porcentajes de la v0.2 (36 % / 65 % / 81 %) estaban mal. Con el bot corregido, 1.500 partidas por personaje, bot prudente que ve todos los riesgos:
+
+| | v0.2 | v0.3 |
+|---|---|---|
+| Mozo | 54 % (horca 46 %) | 86 % (horca 13 %) |
+| Viuda | 82 % | 100 % (pierde al niño en el 36 %) |
+| Soldado | 95 % | 99 % |
+
+Jugando al azar no sobrevive casi nadie (2 %). Para un jugador cuidadoso, el juego es fácil: los supervivientes acaban con cuerpo 8-9. El techo de +2 es lo que más facilita la partida del mozo.
+
 ## Qué cambia en la v0.2 (tras el primer playtest: «fácil y plano»)
 
 - **Hatillo:** solo puedes guardar 2 raciones de una noche a otra. Ya no se puede acaparar pan barato.
@@ -60,7 +82,7 @@ y abre `http://localhost:8000`.
 - **Sucesos al amanecer:** fiebres, tormentas, subidas del pan, redadas, pan de cofradía, muertes, más pobres.
 - **Economía más justa:** pedir da menos con dados bajos (1-2 nada; 3-4 una moneda; 5 dos; 6 tres). La sopa necesita 4 o más. Las obras solo contratan a tercia. El pan sube hasta 6.
 
-Simulación con 1.500 partidas por personaje: jugando al azar no sobrevive casi nadie. Un bot prudente, que ve todos los riesgos, sobrevive el 36 % con el mozo, el 65 % con la viuda y el 81 % con el soldado.
+(La simulación que se publicó con la v0.2 tenía un fallo en el bot; ver los números corregidos en la sección de la v0.3.)
 
 ## Qué cambió respecto al kit en Excel (v0.1a → v0.1b)
 

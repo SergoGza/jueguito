@@ -661,7 +661,7 @@
     const lado = s.fuera ? "fuera" : "dentro";
     return R.DORMIR.filter((d) => d.id !== "carcel").map((d) => {
       const o = Object.assign({}, d, { ok: true, motivo: "", riesgos: [], con: null });
-      if (d.costePan) { o.coste = precioPan(s); o.desc = `${o.coste} monedas (lo que una ración hoy). +1 de cuerpo y oyes un rumor (+1).`; }
+      if (d.costePan) { o.coste = precioPan(s) + (P.mesonExtra || 0); o.desc = `${o.coste} monedas (una ración${P.mesonExtra ? " más " + P.mesonExtra : ""}). ${o.c > 0 ? "+" + o.c + " de cuerpo" : "Duermes bajo techo (no pierdes cuerpo)"} y oyes un rumor (+1).`; }
       if (d.lado !== "ambos" && d.lado !== lado) { o.ok = false; o.motivo = lado === "fuera" ? "Estás fuera de la muralla." : "Estás dentro de la muralla: para dormir en el arrabal tienes que haber salido antes por la puerta."; }
       if (d.id === "red") {
         const c = mejorContacto(s, lado);

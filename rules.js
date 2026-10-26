@@ -259,7 +259,7 @@
     hospitalVeces: 3,      // a la tercera vez que te apuntan, te recogen
     // v0.3
     techoSinDetencion: 2,  // sin detenciones previas el termómetro no pasa de +2: «reincidente» es quien ya ha sido detenido
-    lavarUmbral: 3, lavarPaga: 2, ninoPedir: 1,
+    lavarUmbral: 3, lavarPaga: 2, ninoPedir: 2, mesonExtra: 2,
     ninoCuerpo0: 4, ninoMax: 5, ninoHambre: -2, ninoDebil: 1, ninoFiebre: 3,
   };
   const PEDIR_DADO = [0, 0, 1, 1, 2, 3];   // dado 1..6
@@ -267,16 +267,16 @@
   const DADOS_CUERPO = [[1, 2, 1], [3, 4, 2], [5, 6, 3], [7, 8, 4], [9, 10, 5]];
 
   const CALENDARIO = [
-    { dia: 1, fecha: "Lunes 1 de junio de 1545", que: "Empieza la partida.", pan: 2 },
-    { dia: 2, fecha: "Martes 2 de junio", que: "Día de mercado: la plaza rinde +1 más a tercia y sexta.", pan: 2 },
-    { dia: 3, fecha: "Miércoles 3 de junio", que: "Se pregona la expulsión de los forasteros: tienen siete días para irse.", pan: 2 },
-    { dia: 4, fecha: "Jueves 4 de junio", que: "Corpus Christi. Procesión de tercia a sexta: pedir +2 en la catedral y la plaza, se puede hurtar entre el gentío (+1) y hay más alguaciles. Es fiesta: no hay jornal.", pan: 3 },
-    { dia: 5, fecha: "Viernes 5 de junio", que: "Día corriente. El pan ha subido.", pan: 3 },
-    { dia: 6, fecha: "Sábado 6 de junio", que: "Día corriente. El pan vuelve a subir.", pan: 4 },
-    { dia: 7, fecha: "Domingo 7 de junio", que: "Misa mayor: pedir +1 a prima en la parroquia y la catedral. No hay mercado ni obras: ni jornal ni hurto en la plaza.", pan: 4 },
-    { dia: 8, fecha: "Lunes 8 de junio", que: "Día corriente. El pan sigue subiendo.", pan: 5 },
-    { dia: 9, fecha: "Martes 9 de junio", que: "Día de mercado: la plaza rinde +1 más a tercia y sexta. El pan, más caro que nunca.", pan: 5 },
-    { dia: 10, fecha: "Miércoles 10 de junio", que: "Vence el pregón: el forastero sin licencia al que vea un alguacil o la guardia dentro de la muralla queda detenido. Si llegas a la noche, sobrevives.", pan: 6 },
+    { dia: 1, fecha: "Lunes 1 de junio de 1545", que: "Empieza la partida.", pan: 3 },
+    { dia: 2, fecha: "Martes 2 de junio", que: "Día de mercado: la plaza rinde +1 más a tercia y sexta.", pan: 3 },
+    { dia: 3, fecha: "Miércoles 3 de junio", que: "Se pregona la expulsión de los forasteros: tienen siete días para irse.", pan: 3 },
+    { dia: 4, fecha: "Jueves 4 de junio", que: "Corpus Christi. Procesión de tercia a sexta: pedir +2 en la catedral y la plaza, se puede hurtar entre el gentío (+1) y hay más alguaciles. Es fiesta: no hay jornal.", pan: 4 },
+    { dia: 5, fecha: "Viernes 5 de junio", que: "Día corriente. El pan ha subido.", pan: 4 },
+    { dia: 6, fecha: "Sábado 6 de junio", que: "Día corriente. El pan vuelve a subir.", pan: 6 },
+    { dia: 7, fecha: "Domingo 7 de junio", que: "Misa mayor: pedir +1 a prima en la parroquia y la catedral. No hay mercado ni obras: ni jornal ni hurto en la plaza.", pan: 6 },
+    { dia: 8, fecha: "Lunes 8 de junio", que: "Día corriente. El pan sigue subiendo.", pan: 7 },
+    { dia: 9, fecha: "Martes 9 de junio", que: "Día de mercado: la plaza rinde +1 más a tercia y sexta. El pan, más caro que nunca.", pan: 7 },
+    { dia: 10, fecha: "Miércoles 10 de junio", que: "Vence el pregón: el forastero sin licencia al que vea un alguacil o la guardia dentro de la muralla queda detenido. Si llegas a la noche, sobrevives.", pan: 8 },
   ];
   // día, sitio, franja, mod pedir, hurtar (1 permite / −1 prohíbe), mod hurtar, prohíbe jornal, alguacil extra
   const MODS = [
@@ -300,8 +300,8 @@
       id: "viuda", nombre: "Viuda con un hijo pequeño", origen: "Natural de Salamanca", cuerpoTipo: "Válida, con cargas",
       forastero: false, impedido: false, raciones: 1, modJornal: -1, difExamen: 4, oficios: ["lavar"], nino: true,
       termo0: -1, cuerpo0: 8, monedas0: 2, raciones0: 1, tretaOficio: null, bonusTreta: 0,
-      resumen: "Conocida en su parroquia: puede pedir licencia al cura. Va con su hijo pequeño, que tiene su propio cuerpo y come cada noche. Con el niño al lado da más pena: la limosna en moneda rinde +1. Si el niño enferma o a ella la detienen, la autoridad puede llevárselo. No trabaja de peón, pero puede lavar ropa en la ribera.",
-      claves: ["Natural: puede sacar licencia (examen a tercia, dado 4+)", "Va con su hijo: dos bocas cada noche", "Si no hay pan para los dos, eliges quién come", "Con el niño al lado, la limosna rinde +1 moneda", "Lava ropa en la ribera a tercia y sexta (2 monedas)", "Empieza como pobre conocida (−1)"],
+      resumen: "Conocida en su parroquia: puede pedir licencia al cura. Va con su hijo pequeño, que tiene su propio cuerpo y come cada noche. Con el niño al lado da más pena: la limosna en moneda rinde +2. Si el niño enferma o a ella la detienen, la autoridad puede llevárselo. No trabaja de peón, pero puede lavar ropa en la ribera.",
+      claves: ["Natural: puede sacar licencia (examen a tercia, dado 4+)", "Va con su hijo: dos bocas cada noche", "Si no hay pan para los dos, eliges quién come", "Con el niño al lado, la limosna rinde +2 monedas", "Lava ropa en la ribera a tercia y sexta (2 monedas)", "Empieza como pobre conocida (−1)"],
     },
     {
       id: "soldado", nombre: "Soldado licenciado y cojo", origen: "Forastero", cuerpoTipo: "Impedido",
@@ -325,12 +325,12 @@
       riesgoTxt: "Pasa la ronda: vagancia +1 y Te buscan +1", desc: "Gratis, pero al raso: −1 de cuerpo. Con 1-2 en el dado de noche te encuentra la ronda." },
     { id: "arrabal", nombre: "Arrabal, junto a la ribera", lado: "fuera", raso: true, coste: 0, c: -1, t: 0, tb: 0, rumor: 0, riesgo: 1, rc: -1, rt: 0, rtb: 0,
       riesgoTxt: "Agua y fiebres: otro −1 de cuerpo", desc: "Gratis y sin rondas, pero al raso: −1 de cuerpo, y con 1 en el dado de noche, fiebres (otro −1). Mañana amaneces fuera de la muralla." },
-    { id: "meson", nombre: "Mesón", lado: "dentro", coste: 2, c: 1, t: 0, tb: 0, rumor: 1, riesgo: 0, rc: 0, rt: 0, rtb: 0,
-      costePan: true, riesgoTxt: "", desc: "Cuesta lo mismo que una ración de pan. +1 de cuerpo y oyes un rumor (+1)." },
+    { id: "meson", nombre: "Mesón", lado: "dentro", coste: 2, c: 0, t: 0, tb: 0, rumor: 1, riesgo: 0, rc: 0, rt: 0, rtb: 0,
+      costePan: true, riesgoTxt: "", desc: "Cuesta una ración de pan más 2 monedas. Duermes bajo techo (no pierdes cuerpo) y oyes un rumor (+1)." },
     { id: "hospital", nombre: "Hospital", lado: "dentro", coste: 0, c: 2, t: -1, tb: 0, rumor: 0, riesgo: 0, rc: 0, rt: 0, rtb: 0,
       riesgoTxt: "", desc: "Gratis. Solo admiten enfermos (cuerpo 5 o menos). +2 de cuerpo, pero te apuntan en el libro (−1). A la tercera vez que te apuntan, o si entras con cuerpo 2 o menos, te recogen." },
-    { id: "red", nombre: "Con alguien de tu red", lado: "ambos", coste: 0, c: 1, t: 0, tb: 0, rumor: 0, riesgo: 0, rc: 0, rt: 0, rtb: 0,
-      riesgoTxt: "", desc: "Gratis. +1 de cuerpo y nadie te ve. Necesitas relación 2 o más con alguien que viva de tu lado de la muralla." },
+    { id: "red", nombre: "Con alguien de tu red", lado: "ambos", coste: 0, c: 0, t: 0, tb: 0, rumor: 0, riesgo: 0, rc: 0, rt: 0, rtb: 0,
+      riesgoTxt: "", desc: "Gratis. Duermes bajo techo (no pierdes cuerpo) y nadie te ve. Necesitas relación 2 o más con alguien que viva de tu lado de la muralla." },
     { id: "carcel", nombre: "Cárcel", lado: "ambos", coste: 0, c: 0, t: 0, tb: 0, rumor: 0, riesgo: 0, rc: 0, rt: 0, rtb: 0,
       riesgoTxt: "", desc: "Te han detenido." },
   ];
@@ -376,11 +376,11 @@
     ["El día", "Cada día tiene un amanecer, cinco franjas (prima, tercia, sexta, nona y vísperas), la noche y el turno de la autoridad. En cada franja eliges un sitio y una acción."],
     ["Cuerpo y dados", "El cuerpo (0 a 10) es tu salud. Cada mañana decide cuántos dados tiras: 9-10, cinco; 7-8, cuatro; 5-6, tres; 3-4, dos; 1-2, uno. Cada acción gasta un dado y su valor es lo bien que te sale. Tú eliges qué dado va a cada acción. A 0 de cuerpo, mueres."],
     ["Comer", "Cada noche comes una ración (la viuda, dos). Si te falta, pierdes 2 de cuerpo por ración. El pan se compra de noche y sube de precio cada pocos días. Solo puedes guardar 2 raciones de una noche a otra: el resto se pone duro o te lo quitan, así que lo que te sobre, mejor compártelo."],
-    ["Dormir al raso", "Dormir en un pórtico o en el arrabal es gratis, pero cuesta 1 de cuerpo cada noche. Bajo techo (mesón, hospital, alguien de tu red) recuperas."],
+    ["Dormir al raso", "Dormir en un pórtico o en el arrabal es gratis, pero cuesta 1 de cuerpo cada noche. Bajo techo (mesón, alguien de tu red) no pierdes cuerpo, pero tampoco recuperas: para eso hay que descansar o ir al hospital."],
     ["Dinero", "Un pobre con dinero es sospechoso. Si llevas más de 4 monedas y te ven pedir un alguacil o la beneficencia, te tienen por fingidor (+1). Si duermes al raso con más de 4, te pueden robar la mitad y pegarte (−1 de cuerpo). Si te detienen, te lo quitan todo."],
     ["Testigos", "Cada acción tira un dado de testigo: decide quién te ve. Vecinos, otros pobres, la beneficencia, frailes o alguaciles. Cada uno te mira a su manera y eso mueve tu termómetro."],
     ["Termómetro", "Cómo te clasifica la autoridad, de −3 a +3. Hacia arriba: sospechoso, vagabundo y reincidente (+3, solo si ya te han detenido antes). Hacia abajo: pobre conocido, con licencia y, al final, recogido (te encierran en una institución y la partida acaba). Sin licencia no bajas de −1. El termómetro no mata solo: decide el castigo si te detienen."],
-    ["Tu hijo (viuda)", "La viuda va con su hijo. Con él al lado, la limosna en moneda rinde +1 (si lo dejas con alguien, no). Tiene su propio cuerpo (0 a 5) y come cada noche: si no hay pan para los dos, eliges quién come. Bajo techo y comido se recupera; las tormentas y las fiebres le afectan aparte. Si está muy débil (1 o menos) y estás dentro de la muralla, el cura se lo lleva a los niños de la doctrina, salvo que alguien de tu red (relación 2 o más) lo esconda. Si te detienen, se lo llevan, salvo que alguien de tu red se quede con él. Al amanecer puedes dejarlo con alguien de tu red: cada noche le das una ración o su precio, y si no puedes, la relación baja. Si interrogan a quien lo cuida, lo pierdes."],
+    ["Tu hijo (viuda)", "La viuda va con su hijo. Con él al lado, la limosna en moneda rinde +2 (si lo dejas con alguien, no). Tiene su propio cuerpo (0 a 5) y come cada noche: si no hay pan para los dos, eliges quién come. Bajo techo y comido se recupera; las tormentas y las fiebres le afectan aparte. Si está muy débil (1 o menos) y estás dentro de la muralla, el cura se lo lleva a los niños de la doctrina, salvo que alguien de tu red (relación 2 o más) lo esconda. Si te detienen, se lo llevan, salvo que alguien de tu red se quede con él. Al amanecer puedes dejarlo con alguien de tu red: cada noche le das una ración o su precio, y si no puedes, la relación baja. Si interrogan a quien lo cuida, lo pierdes."],
     ["Te buscan", "Cuando llega a 6, te detienen. El castigo depende del termómetro: con 0 o menos, reprensión; con +1, azotes; con +2, trabajo forzado o marca; con +3, la horca. Después, ya te conocen: «Te buscan» empieza en el número de veces que te han detenido (hasta 3)."],
     ["La autoridad", "Cada noche juega según lo que vio: manda rondas a donde más te vieron, interroga a tu gente, cierra la puerta, pregona normas, examina a los pobres o reparte limosna pública. Desde el pregón de expulsión (día 3) aprieta más: un movimiento extra cada noche, te vea o no. Lo que hace lo ves al amanecer."],
     ["Sucesos", "Cada amanecer pasa algo en la ciudad: fiebres, tormentas, subidas del pan, redadas, repartos de pan o muertes. No los controlas."],
@@ -390,7 +390,7 @@
   ];
 
   const RULES = {
-    version: "0.3", CONFIG, FRANJAS, FRANJA_DESC, SITIOS, TESTIGOS, CATEGORIA, TESTIGO_DESC, CATS, EFECTOS, ACCIONES, COD_ACC,
+    version: "0.3a", CONFIG, FRANJAS, FRANJA_DESC, SITIOS, TESTIGOS, CATEGORIA, TESTIGO_DESC, CATS, EFECTOS, ACCIONES, COD_ACC,
     PARAMS, PEDIR_DADO, HURTAR_DADO, DADOS_CUERPO, CALENDARIO, MODS, PERSONAJES, TRETAS, DORMIR, CLASIF,
     MOVIMIENTOS, MOV_DESC, PREGONES, NOMBRES, AYUDA, SUCESOS,
   };

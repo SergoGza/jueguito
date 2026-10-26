@@ -1,4 +1,4 @@
-# Liber Vagatorum · prototipo jugable (v0.3)
+# Liber Vagatorum · prototipo jugable (v0.3a)
 
 Prototipo web de las reglas del día: Salamanca, 1 a 10 de junio de 1545. Una página estática, sin servidor ni base de datos, instalable en el móvil y jugable sin conexión.
 
@@ -33,8 +33,8 @@ Todas las reglas están en `rules.js`: sitios, testigos, efectos, parámetros, c
 
 **Cada vez que cambies algo, sube la versión en dos sitios**, o los móviles seguirán usando la copia antigua:
 
-1. `rules.js` → `version: "0.3"`, por ejemplo a `"0.3a"`.
-2. `sw.js` → `const VERSION = "lv-0.3-1"`, por ejemplo a `"lv-0.3a-1"`.
+1. `rules.js` → `version: "0.3a"`, por ejemplo a `"0.3b"`.
+2. `sw.js` → `const VERSION = "lv-0.3a-1"`, por ejemplo a `"lv-0.3b-1"`.
 
 Las partidas a medias de una versión anterior avisan de que pueden fallar.
 
@@ -47,6 +47,25 @@ python3 -m http.server 8000
 ```
 
 y abre `http://localhost:8000`.
+
+## Qué cambia en la v0.3a (más difícil)
+
+La v0.3 era demasiado fácil para quien juega con cuidado. Como referencia, Slay the Spire 2 gana el 25 % de las partidas (el 16 % en la dificultad base) y Slay the Spire 1 el 9 % en la base. El objetivo acordado es que un jugador cuidadoso sobreviva el 35-50 % de las veces en estos 10 días y llegue al final justo de cuerpo.
+
+- **Dormir bajo techo ya no cura:** el mesón y la casa de alguien de tu red evitan el desgaste, pero no suben el cuerpo. Para recuperar hay que descansar o ir al hospital.
+- **El mesón cuesta una ración más 2 monedas.**
+- **El pan es más caro:** 3, 3, 3, 4, 4, 6, 6, 7, 7, 8.
+- **Con el niño al lado, la limosna en moneda rinde +2** (antes +1). Sin esto, la viuda se hunde: paga tres veces el precio del pan cada noche.
+
+Simulación, 1.500 partidas por personaje:
+
+| | Bot prudente | Superviviente: cuerpo medio | Muertes principales | Al azar |
+|---|---|---|---|---|
+| Mozo | 46 % | 3,6 | hambre 42 %, recogido 11 % | 0 % |
+| Viuda | 41 % (29 % con el niño) | 3,5 | hambre 52 %, recogida 7 % | 0 % |
+| Soldado | 59 % | 4,4 | hambre 20 %, recogido 20 % | 0 % |
+
+Para el bot prudente, la horca casi desaparece (1-2 %): ve todos los testigos y no se arriesga. Las personas sí se arriesgan.
 
 ## Qué cambia en la v0.3 (tras el segundo playtest, con la viuda)
 

@@ -53,8 +53,8 @@
 
   // ---------------------------------------------------------------- ayudas
   const AYUDA_METRO = {
-    cuerpo: ["Cuerpo", "Tu salud y tu fuerza, de 0 a 10. Cada mañana decide cuántos dados tiras: 9-10, cinco; 7-8, cuatro; 5-6, tres; 3-4, dos; 1-2, uno. A 0, mueres. Dormir al raso cuesta 1 cada noche. Sube descansando sin que te vean (con dado 3 o más), durmiendo bajo techo o curándote en el hospital. Baja con el hambre, el raso, las fiebres, los robos y los azotes."],
-    monedas: ["Monedas", "Para comprar pan y pagar el mesón (cuesta lo que una ración). Ojo: un pobre con dinero es sospechoso. Con más de 4 monedas encima, si te ven pedir un alguacil o la beneficencia, te tienen por fingidor (+1); si duermes al raso, te pueden robar la mitad y pegarte; y si te detienen, te lo quitan todo."],
+    cuerpo: ["Cuerpo", "Tu salud y tu fuerza, de 0 a 10. Cada mañana decide cuántos dados tiras: 9-10, cinco; 7-8, cuatro; 5-6, tres; 3-4, dos; 1-2, uno. A 0, mueres. Dormir al raso cuesta 1 cada noche. Bajo techo no lo pierdes, pero no se recupera solo: sube descansando sin que te vean (con dado 3 o más) o curándote en el hospital. Baja con el hambre, el raso, las fiebres, los robos y los azotes."],
+    monedas: ["Monedas", "Para comprar pan y pagar el mesón (cuesta una ración más 2 monedas). Ojo: un pobre con dinero es sospechoso. Con más de 4 monedas encima, si te ven pedir un alguacil o la beneficencia, te tienen por fingidor (+1); si duermes al raso, te pueden robar la mitad y pegarte; y si te detienen, te lo quitan todo."],
     raciones: ["Raciones", "Cada noche comes una; si llevas a tu hijo, él también come una. Si te falta, pierdes 2 de cuerpo por cada ración que falte. Se compran de noche al precio del pan de ese día, que va subiendo. Solo puedes guardar 2 de una noche a otra: lo que sobre se pierde, así que mejor compártelo. La sopa del convento y las sobras del mercado dan raciones."],
     rumores: ["Rumores", "Lo que te cuentan otros pobres. Cuando te vea un testigo, puedes gastar un rumor para repetir el dado de testigo (sabías por dónde pasaba la ronda)."],
     termo: ["Termómetro", "Cómo te clasifica la autoridad, de −3 a +3. Hacia arriba: +1 sospechoso, +2 vagabundo, +3 reincidente (solo si ya te han detenido alguna vez: antes no pasas de +2). Hacia abajo: −1 pobre conocido, −2 con licencia (solo con el examen del cura, y solo naturales) y −3 recogido (te encierran y la partida acaba; solo pasa en el hospital). Sin licencia no bajas de −1. El termómetro no mata solo: decide el castigo si te detienen."],
@@ -278,7 +278,7 @@
         <button class="btn" data-act="recogerNino">Recogerlo: hoy va contigo</button></div>`;
     }
     const cuid = E.puedeCuidar(s);
-    let h = `<div class="card ${n.cuerpo <= 2 ? "aviso" : ""}"><h3>Tu hijo va contigo</h3><p class="small">${estado} Come cada noche. Con él al lado, la limosna en moneda rinde +1. Si te detienen, se lo llevan, salvo que alguien de tu red se quede con él.</p>`;
+    let h = `<div class="card ${n.cuerpo <= 2 ? "aviso" : ""}"><h3>Tu hijo va contigo</h3><p class="small">${estado} Come cada noche. Con él al lado, la limosna en moneda rinde +${P.ninoPedir}. Si te detienen, se lo llevan, salvo que alguien de tu red se quede con él.</p>`;
     if (cuid.length) {
       h += `<p class="small">Puedes dejarlo hoy con alguien de tu red (relación 2 o más). Le darás cada noche una ración o su precio.</p>`;
       cuid.forEach((c) => { h += `<button class="btn" data-act="dejarNino" data-id="${c.id}"><span class="t">Dejarlo con ${esc(c.nombre)}</span><span class="d">Relación ${c.rel}</span></button>`; });

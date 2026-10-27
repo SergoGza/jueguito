@@ -43,7 +43,9 @@ function jugar(personaje, seed, politica) {
       if (s.hoy.favor && !s.hoy.favor.respondido) E.responderFavor(s, politica === "azar" ? rnd() < 0.5 : s.raciones >= 2);
       if (!s.hoy.forzado && s.dados.length > 1) {
         const best = s.dados.map((d, i) => [d.v, i]).sort((a, b) => b[0] - a[0])[0];
-        const quiere = politica === "azar" ? rnd() < 0.3 : (E.pj(s).forastero && !E.pj(s).impedido && best[0] >= 5);
+        // FINGIR: nunca (por defecto: fingir sale a cuenta casi nunca), auto (el mozo, con 5+), siempre, o un número (finge si su mejor dado llega a ese valor)
+        const F = process.env.FINGIR || "nunca";
+        const quiere = politica === "azar" ? rnd() < 0.3 : F === "nunca" ? false : F === "siempre" ? true : F === "auto" ? (E.pj(s).forastero && !E.pj(s).impedido && best[0] >= 5) : best[0] >= +F;
         if (quiere) E.fingir(s, best[1], E.pj(s).tretaOficio || pick(R.TRETAS, rnd).nombre);
       }
       if (s.nino && !s.nino.perdido) {
@@ -78,10 +80,10 @@ function jugar(personaje, seed, politica) {
           if (op.accion === "trabajar") g = vmax + E.pj(s).modJornal >= P.jornalUmbral ? 3 : 0;
           if (op.accion === "lavar") g = vmax >= P.lavarUmbral ? 2 : 0;
           if (op.accion === "hurtar") g = 2.5 - r.det * 20;
-          if (op.accion === "descansar") g = s.cuerpo < 9 ? 1.5 : 0;
-          if (op.accion === "curarse") g = s.cuerpo <= 2 || E.licencia(s) ? -50 : s.cuerpo <= 6 ? 2 : 0;
+          if (op.accion === "descansar") g = s.cuerpo < 9 && vmax >= P.descansarUmbral ? 1.5 : 0;
+          if (op.accion === "curarse") g = s.cuerpo <= 2 || E.licencia(s) ? -50 : s.cuerpo <= 6 && vmax >= P.curarUmbral ? 2 : 0;
           if (op.accion === "examen") g = 6;
-          if (op.accion === "preguntar") g = 0.8;
+          if (op.accion === "preguntar") g = vmax >= P.preguntarUmbral ? 0.8 : 0;
           if (op.accion === "compartir") g = s.raciones > 1 ? 0.6 : -1;
           if (op.accion === "delatar") g = 1;
           if (op.accion === "cruzar") g = s.fuera ? 1 : -1;
@@ -108,6 +110,7 @@ function jugar(personaje, seed, politica) {
       E.aplicarCastigo(s, rnd() < 0.5 ? "marca" : "trabajo");
       if (s.termo !== -2) s._examen = false;
     } else if (s.fase === "noche") {
+      if (!s.hoy.forzado) { s._dados = (s._dados || 0) + s.dados.length; s._sinUsar = (s._sinUsar || []).concat(s.dados.filter((d) => !d.usado).map((d) => d.v)); }
       const ops = E.opcionesNoche(s).filter((x) => x.ok);
       let op;
       if (politica === "azar") op = pick(ops, rnd);

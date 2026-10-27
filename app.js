@@ -53,7 +53,7 @@
 
   // ---------------------------------------------------------------- ayudas
   const AYUDA_METRO = {
-    cuerpo: ["Cuerpo", "Tu salud y tu fuerza, de 0 a 10. Cada mañana decide cuántos dados tiras: 9-10, cinco; 7-8, cuatro; 5-6, tres; 3-4, dos; 1-2, uno. A 0, mueres. Dormir al raso cuesta 1 cada noche. Bajo techo no lo pierdes, pero no se recupera solo: sube descansando sin que te vean (con dado 3 o más) o curándote en el hospital. Baja con el hambre, el raso, las fiebres, los robos y los azotes."],
+    cuerpo: ["Cuerpo", "Tu salud y tu fuerza, de 0 a 10. Cada mañana decide cuántos dados tiras: 9-10, cinco; 7-8, cuatro; 5-6, tres; 3-4, dos; 1-2, uno. A 0, mueres. Dormir al raso cuesta 1 cada noche. Bajo techo no lo pierdes, pero no se recupera solo: sube descansando sin que te vean (si el dado no es bajo) o curándote en el hospital. Baja con el hambre, el raso, las fiebres, los robos y los azotes."],
     monedas: ["Monedas", "Para comprar pan y pagar el mesón (cuesta una ración más 2 monedas). Ojo: un pobre con dinero es sospechoso. Con más de 4 monedas encima, si te ven pedir un alguacil o la beneficencia, te tienen por fingidor (+1); si duermes al raso, te pueden robar la mitad y pegarte; y si te detienen, te lo quitan todo."],
     raciones: ["Raciones", "Cada noche comes una; si llevas a tu hijo, él también come una. Si te falta, pierdes 2 de cuerpo por cada ración que falte. Se compran de noche al precio del pan de ese día, que va subiendo. Solo puedes guardar 2 de una noche a otra: lo que sobre se pierde, así que mejor compártelo. La sopa del convento y las sobras del mercado dan raciones."],
     rumores: ["Rumores", "Lo que te cuentan otros pobres. Cuando te vea un testigo, puedes gastar un rumor para repetir el dado de testigo (sabías por dónde pasaba la ronda)."],
@@ -64,7 +64,7 @@
     hospital: ["Hospital", "Solo admite enfermos (cuerpo 5 o menos). Cada vez que te curan o duermes allí, te apuntan en el libro. A la tercera, te recogen: entras en la institución y la partida acaba."],
     nino: ["Tu hijo", R.AYUDA.find((x) => x[0] === "Tu hijo (viuda)")[1]],
     licencia: ["Licencia", "Con el termómetro en −2 tienes licencia para pedir: el cura te la da si apruebas el examen (solo naturales). La pierdes en cuanto el termómetro sube de −2, por ejemplo si un alguacil te ve hacer algo sospechoso. Para recuperarla, otro examen."],
-    treta: ["Treta", "La has preparado al amanecer. Durante todo el día pides con ella: si su calidad es 4 o más y no está catalogada, te dan una moneda más, y te tienen por impedido. Pero si te ve la beneficencia o el cura, tiran un dado: si iguala o supera la calidad (más 1 si está catalogada), te descubren."],
+    treta: ["Treta", "La has preparado al amanecer. Durante todo el día pides con ella. Si la preparaste con un dado bueno y no está catalogada, te dan más y te tienen por impedido. Pero si te ve la beneficencia o el cura, te pueden descubrir: cuanto mejor la preparaste, más difícil; si está catalogada, más fácil."],
   };
 
   function abrirModal(html) {
@@ -254,7 +254,7 @@
       <p class="small">Tienes ${plural(s.dados.length, "dado", "dados")} para cinco franjas: cada acción gasta uno. Piensa dónde va cada valor: un 6 rinde mucho pidiendo en misa; un 1 no te da nada al pedir.</p></div>`;
     if (!s.treta && libres > 0) {
       h += `<div class="card"><h3>¿Fingir hoy? <span class="muted small">(opcional)</span></h3>
-        <p class="small">Gastas un dado en preparar una treta. Su valor es la calidad de la treta para todo el día: si es 4 o más, cada petición te da una moneda más, y te tienen por impedido. Si te ve la beneficencia o el cura, tiran un dado: si iguala o supera la calidad, te descubren (+2, Te buscan +2).</p>
+        <p class="small">Gastas un dado en preparar una treta para todo el día. Con un dado bueno, cada petición te da más y te tienen por impedido. Si te ve la beneficencia o el cura, te pueden descubrir (+2, Te buscan +2): cuanto mejor la preparaste, más difícil.</p>
         <p class="paso">1. Elige la treta</p>
         ${R.TRETAS.map((t) => { const cat = E.catalogada(s, t.nombre); const of = E.pj(s).tretaOficio === t.nombre;
           return `<button class="btn ${ui.treta === t.nombre ? "sel" : ""}" data-act="treta" data-t="${esc(t.nombre)}"><span class="t">${esc(t.nombre)}${of ? " (+1: es tu oficio)" : ""}</span><span class="d">${esc(t.desc)}</span>${cat ? `<span class="no">Catalogada por la autoridad: rinde menos y te pillan antes.</span>` : ""}</button>`; }).join("")}

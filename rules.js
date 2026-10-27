@@ -34,7 +34,7 @@
         f("Mercado: pedir +1. Hay gentío para hurtar.", 1, "P H"),
         f("Mercado: pedir +1. Hay gentío para hurtar.", 1, "P H"),
         f("Poco movimiento: pedir −1.", -1, "P"),
-        f("Cierre del mercado: al pedir te dan sobras (1 ración con dado 4 o más).", 0, "P", { pedirDa: "racion", umbral: 4 }),
+        f("Cierre del mercado: al pedir te dan sobras (1 ración, si el dado es bueno).", 0, "P", { pedirDa: "racion", umbral: 4 }),
       ],
     },
     {
@@ -65,7 +65,7 @@
       franjas: [
         f("Oficio: se puede pedir. Pobres a la puerta (red).", 0, "P R"),
         f("Nada a esta hora: pedir −1.", -1, "P"),
-        f("Sopa: al pedir te dan 1 ración con dado 4 o más (con menos, se acaba antes de que llegues). Pobres a la puerta (red).", 0, "P R", { pedirDa: "racion", umbral: 4 }),
+        f("Sopa: al pedir te dan 1 ración si el dado es bueno (si no, se acaba antes de que llegues). Pobres a la puerta (red).", 0, "P R", { pedirDa: "racion", umbral: 4 }),
         f("Nada a esta hora: pedir −1.", -1, "P"),
         f("Oficio: se puede pedir. Pobres a la puerta (red).", 0, "P R"),
       ],
@@ -84,7 +84,7 @@
     {
       id: "hospital", nombre: "Hospital", corto: "Hospital", dentro: true,
       desc: "Te curan, pero te apuntan. Quien entra muy débil ya no sale.",
-      franjas: [0, 1, 2, 3, 4].map(() => f("Curarse (solo enfermos: cuerpo 5 o menos): +2 de cuerpo con dado 3 o más, pero te apuntan (−1). A la tercera vez, o con cuerpo 2 o menos, te recogen.", 0, "P C")),
+      franjas: [0, 1, 2, 3, 4].map(() => f("Curarse (solo enfermos: cuerpo 5 o menos): +2 de cuerpo si el dado no es bajo, pero te apuntan (−1). A la tercera vez, o con cuerpo 2 o menos, te recogen.", 0, "P C")),
     },
     {
       id: "puente", nombre: "Puente y arrabal", corto: "Puente", dentro: false, ambos: true,
@@ -221,16 +221,16 @@
   };
 
   const ACCIONES = {
-    pedir: { nombre: "Pedir", dado: true, testigo: true, desc: "Mendigar. Con 1-2 no te dan nada; 3-4, una moneda; 5, dos; 6, tres. Más lo que dé el sitio (con 1 nunca te dan nada). Quien te vea te clasifica." },
-    trabajar: { nombre: "Trabajar a jornal", dado: true, testigo: true, desc: "Hacer de peón. Con dado 4 o más (más tu modificador) te contratan: 3 monedas. Ocupa también la franja siguiente. Antes de la siega hay poco trabajo: solo contratan a primera hora en la plaza (prima) y en las obras de la catedral (tercia)." },
-    hurtar: { nombre: "Hurtar", dado: true, testigo: true, desc: "Robar entre el gentío. 1-2: fallas y te ven. 3-4: 2 monedas. 5-6: 4 monedas. Si te ve un alguacil, te detienen en el acto." },
-    descansar: { nombre: "Descansar", dado: true, testigo: true, desc: "Esconderte y recuperarte: +1 de cuerpo si nadie te ve y el dado es 3 o más (con menos, el hambre no te deja). Si te ven tirado, cuenta como vagancia." },
-    curarse: { nombre: "Curarse", dado: true, testigo: false, desc: "Solo admiten enfermos (cuerpo 5 o menos). +2 de cuerpo con dado 3 o más, pero te apuntan en el libro (−1). A la tercera vez que te apuntan, o si entras con cuerpo 2 o menos, te recogen y no sales." },
-    examen: { nombre: "Pedir licencia", dado: true, testigo: false, desc: "El cura te examina. Solo para naturales de la ciudad. Si apruebas, pasas a pobre con licencia (−2): limosna segura en tu parroquia, pero si te ven pedir fuera, la pierdes." },
+    pedir: { nombre: "Pedir", dado: true, testigo: true, desc: "Mendigar. Cuanto más alto el dado, más te dan; con un dado bajo, nada. Hay sitios y horas que rinden más que otros. Quien te vea te clasifica." },
+    trabajar: { nombre: "Trabajar a jornal", dado: true, testigo: true, desc: "Hacer de peón. Con un dado bueno te contratan y te pagan bien por el día. Ocupa también la franja siguiente. Antes de la siega hay poco trabajo: solo contratan a primera hora en la plaza (prima) y en las obras de la catedral (tercia)." },
+    hurtar: { nombre: "Hurtar", dado: true, testigo: true, desc: "Robar entre el gentío. Con un dado bajo fallas y te ven; cuanto más alto, más sacas. Si te ve un alguacil, te detienen en el acto." },
+    descansar: { nombre: "Descansar", dado: true, testigo: true, desc: "Esconderte y recuperarte: +1 de cuerpo si nadie te ve. Con un dado bajo, el hambre no te deja descansar. Si te ven tirado, cuenta como vagancia." },
+    curarse: { nombre: "Curarse", dado: true, testigo: false, desc: "Solo admiten enfermos (cuerpo 5 o menos). +2 de cuerpo si el dado no es bajo, pero te apuntan en el libro (−1). A la tercera vez que te apuntan, o si entras con cuerpo 2 o menos, te recogen y no sales." },
+    examen: { nombre: "Pedir licencia", dado: true, testigo: false, desc: "El cura te examina. Solo para naturales de la ciudad. Hace falta un dado bueno. Si apruebas, pasas a pobre con licencia (−2): limosna segura en tu parroquia, pero si te ven pedir fuera, la pierdes." },
     compartir: { nombre: "Compartir", dado: true, testigo: true, desc: "Das una ración (o una moneda si no tienes) a alguien de tu red o a alguien nuevo: sube la relación y te cuenta algo (+1 rumor)." },
-    preguntar: { nombre: "Preguntar", dado: true, testigo: true, desc: "Hablar con alguien. Con dado 3 o más te cuenta algo (+1 rumor) y sube la relación." },
+    preguntar: { nombre: "Preguntar", dado: true, testigo: true, desc: "Hablar con alguien. Si el dado no es bajo, te cuenta algo (+1 rumor) y sube la relación." },
     delatar: { nombre: "Delatar", dado: true, testigo: true, desc: "Vender a alguien de tu red al alguacil: 2 monedas y −1, pero lo pierdes. La autoridad toma nota (atención +1). Si otro pobre te ve, se corre la voz: el resto de tu red te baja la relación y alguien se vengará." },
-    lavar: { nombre: "Lavar ropa en la ribera", dado: true, testigo: true, desc: "Lavar ropa ajena en el Tormes. Con dado 3 o más te pagan 2 monedas. En la ribera, a tercia y a sexta. Si te ven trabajar, te tienen por pobre honrada (−1)." },
+    lavar: { nombre: "Lavar ropa en la ribera", dado: true, testigo: true, desc: "Lavar ropa ajena en el Tormes. Si el dado no es bajo, te dan ropa y te pagan. En la ribera, a tercia y a sexta. Si te ven trabajar, te tienen por pobre honrada (−1)." },
     cruzar: { nombre: "Cruzar la puerta", dado: false, testigo: true, desc: "Entrar o salir de la ciudad. No gasta dado, pero ocupa la franja. La guardia vigila a los forasteros." },
   };
   const COD_ACC = { P: ["pedir"], T: ["trabajar"], H: ["hurtar"], D: ["descansar"], C: ["curarse"], E: ["examen"], R: ["compartir", "preguntar", "delatar"], X: ["cruzar"], L: ["lavar"] };
@@ -301,7 +301,7 @@
       forastero: false, impedido: false, raciones: 1, modJornal: -1, difExamen: 4, oficios: ["lavar"], nino: true,
       termo0: -1, cuerpo0: 8, monedas0: 2, raciones0: 1, tretaOficio: null, bonusTreta: 0,
       resumen: "Conocida en su parroquia: puede pedir licencia al cura. Va con su hijo pequeño, que tiene su propio cuerpo y come cada noche. Con el niño al lado da más pena: la limosna en moneda rinde +2. Si el niño enferma o a ella la detienen, la autoridad puede llevárselo. No trabaja de peón, pero puede lavar ropa en la ribera.",
-      claves: ["Natural: puede sacar licencia (examen a tercia, dado 4+)", "Va con su hijo: dos bocas cada noche", "Si no hay pan para los dos, eliges quién come", "Con el niño al lado, la limosna rinde +2 monedas", "Lava ropa en la ribera a tercia y sexta (2 monedas)", "Empieza como pobre conocida (−1)"],
+      claves: ["Natural: puede sacar licencia (examen a tercia, con un dado bueno)", "Va con su hijo: dos bocas cada noche", "Si no hay pan para los dos, eliges quién come", "Con el niño al lado, la limosna rinde +2 monedas", "Lava ropa en la ribera a tercia y sexta", "Empieza como pobre conocida (−1)"],
     },
     {
       id: "soldado", nombre: "Soldado licenciado y cojo", origen: "Forastero", cuerpoTipo: "Impedido",
@@ -390,7 +390,7 @@
   ];
 
   const RULES = {
-    version: "0.3a", CONFIG, FRANJAS, FRANJA_DESC, SITIOS, TESTIGOS, CATEGORIA, TESTIGO_DESC, CATS, EFECTOS, ACCIONES, COD_ACC,
+    version: "0.3b", CONFIG, FRANJAS, FRANJA_DESC, SITIOS, TESTIGOS, CATEGORIA, TESTIGO_DESC, CATS, EFECTOS, ACCIONES, COD_ACC,
     PARAMS, PEDIR_DADO, HURTAR_DADO, DADOS_CUERPO, CALENDARIO, MODS, PERSONAJES, TRETAS, DORMIR, CLASIF,
     MOVIMIENTOS, MOV_DESC, PREGONES, NOMBRES, AYUDA, SUCESOS,
   };

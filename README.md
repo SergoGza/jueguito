@@ -1,4 +1,4 @@
-# Liber Vagatorum · prototipo jugable (v0.3a)
+# Liber Vagatorum · prototipo jugable (v0.3b)
 
 Prototipo web de las reglas del día: Salamanca, 1 a 10 de junio de 1545. Una página estática, sin servidor ni base de datos, instalable en el móvil y jugable sin conexión.
 
@@ -33,8 +33,8 @@ Todas las reglas están en `rules.js`: sitios, testigos, efectos, parámetros, c
 
 **Cada vez que cambies algo, sube la versión en dos sitios**, o los móviles seguirán usando la copia antigua:
 
-1. `rules.js` → `version: "0.3a"`, por ejemplo a `"0.3b"`.
-2. `sw.js` → `const VERSION = "lv-0.3a-1"`, por ejemplo a `"lv-0.3b-1"`.
+1. `rules.js` → `version: "0.3b"`, por ejemplo a `"0.3c"`.
+2. `sw.js` → `const VERSION = "lv-0.3b-1"`, por ejemplo a `"lv-0.3c-1"`.
 
 Las partidas a medias de una versión anterior avisan de que pueden fallar.
 
@@ -47,6 +47,11 @@ python3 -m http.server 8000
 ```
 
 y abre `http://localhost:8000`.
+
+## Qué cambia en la v0.3b
+
+- Las descripciones de las acciones, los sitios y la treta ya no dan cifras exactas de lo que sale con cada dado («con un dado bajo, nada»; «hace falta un dado bueno»). Quién te puede ver sigue mostrándose con detalle.
+- Corrección de la simulación: el bot prudente fingía casi todos los días con el mozo, y fingir sale a cuenta casi nunca. Sin fingir, el mozo sobrevive el 74 %, no el 46 %. Con la viuda (41 %) y el soldado (57 %), igual que antes.
 
 ## Qué cambia en la v0.3a (más difícil)
 

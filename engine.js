@@ -190,7 +190,7 @@
   }
 
   function amanecer(s) {
-    s.hoy = { dia: s.dia, pedidas: {}, visto: {}, actuado: {}, atencion: 0, detenido: null, castigo: null, eventos: [], forzado: false, suceso: null, favor: null };
+    s.hoy = { dia: s.dia, pedidas: {}, visto: {}, actuado: {}, atencion: 0, detenido: null, castigo: null, eventos: [], forzado: false, suceso: null, favor: null, senalados: [], vistosJuntos: [] };
     s.franja = 0; s.ocupada = false; s.treta = null; s.fase = "amanecer";
     s.tiempos[s.dia] = { inicio: ahora(), fin: null };
     const ev = [];
@@ -319,7 +319,7 @@
       if (id === "hurtar") aviso = "Si te ve un alguacil, te detienen en el acto.";
       if (id === "cruzar" && s.fuera && s.dia >= P.pregonVence && p.forastero && !licencia(s)) aviso = "Ha vencido el pregón: si te ve la guardia, no te deja entrar.";
       const nombre = id === "cruzar" ? (s.fuera ? "Cruzar la puerta (entrar)" : "Cruzar la puerta (salir)") : a.nombre;
-      return { id, nombre, desc: a.desc, dado: a.dado, testigo: a.testigo, red: ["compartir", "preguntar", "delatar"].includes(id), ok, motivo, aviso };
+      return { id, nombre, desc: a.desc, dado: a.dado, testigo: a.testigo, red: ["compartir", "juntarse", "delatar"].includes(id), ok, motivo, aviso };
     });
   }
 
@@ -332,7 +332,7 @@
       case "hurtar": return "Hurtar";
       case "trabajar": case "lavar": return "Trabajar";
       case "descansar": return "Descansar";
-      case "compartir": case "preguntar": return "La red";
+      case "compartir": case "juntarse": return "La red";
       case "delatar": return "Delatar";
       case "cruzar": return "Cruzar la puerta";
       default: return null;
@@ -361,6 +361,7 @@
       case "pedir":
         if (fr.pedirDa === "racion") return "";
         { const n = monedasPedir(s, sid, v); return n <= 0 ? "no te darán nada" : n === 1 ? "te darán poco" : n <= 3 ? "te darán algo" : "te darán bastante"; }
+      case "juntarse": return v >= P.juntarseRumor ? "os acercáis y te cuenta algo" : "os acercáis, pero no te cuenta nada";
       default: return "";
     }
   }
@@ -392,7 +393,7 @@
   // ---------------------------------------------------------------- resolver una acción
   function tirar(s, eleccion) {
     const rolls = { w: d6(s), x: d6(s), nombre: null };
-    if (eleccion && ["compartir", "preguntar"].includes(eleccion.accion) && eleccion.contacto === "nuevo") rolls.nombre = nombreNuevo(s);
+    if (eleccion && ["compartir", "juntarse"].includes(eleccion.accion) && eleccion.contacto === "nuevo") rolls.nombre = nombreNuevo(s);
     return rolls;
   }
 
@@ -442,7 +443,7 @@
     }
     let wT = ef ? (o.condOk ? ef.at : ef.t) : 0;
     let wTB = ef ? (o.condOk ? ef.atb : ef.tb) : 0;
-    if (["compartir", "preguntar", "delatar"].includes(accion)) o.nombre = nombreDe(s, eleccion, rolls);
+    if (["compartir", "juntarse", "delatar"].includes(accion)) o.nombre = nombreDe(s, eleccion, rolls);
 
     switch (accion) {
       case "pedir":
@@ -486,12 +487,13 @@
         break;
       case "compartir":
         if (s.raciones >= 1) o.dR = -1; else o.dM = -P.compartirCoste;
-        o.rumor = 1; o.relacion = { contacto: eleccion.contacto || "nuevo", delta: 1 };
+        o.rumor = 1; o.relacion = { contacto: eleccion.contacto || "nuevo", delta: 1 }; o.senalar = true;
         o.resultado = `Compartes ${s.raciones >= 1 ? "una ración" : "una moneda"} con ${o.nombre}. Te cuenta algo (+1 rumor) y os acercáis (relación +1).`;
         break;
-      case "preguntar":
-        if (v >= P.preguntarUmbral) { o.rumor = 1; o.relacion = { contacto: eleccion.contacto || "nuevo", delta: 1 }; o.resultado = `${o.nombre} te cuenta algo (+1 rumor). Relación +1.`; }
-        else { o.relacion = { contacto: eleccion.contacto || "nuevo", delta: 0 }; o.resultado = `${o.nombre} no te cuenta nada.`; }
+      case "juntarse":
+        o.relacion = { contacto: eleccion.contacto || "nuevo", delta: 1 }; o.senalar = true;
+        if (v >= P.juntarseRumor) { o.rumor = 1; o.resultado = `Pasas el rato con ${o.nombre}: os acercáis (relación +1) y te cuenta algo (+1 rumor).`; }
+        else o.resultado = `Pasas el rato con ${o.nombre}: os acercáis (relación +1), pero no te cuenta nada.`;
         break;
       case "delatar":
         o.dM = P.delatarPaga * (pregonActivo(s, 3) ? 2 : 1); o.dT += P.delatarT; o.aten += 1;
@@ -531,6 +533,10 @@
     if (!o.detenido && s.tb + o.dTB >= P.tbMax) { o.detenido = true; o.motivoDet = `«Te buscan» llega a ${P.tbMax}.`; }
     o.descubierta = o.grupo === "Pedir con treta" && o.cond === "EXAMEN" && o.condOk;
     if (o.descubierta) o.lineas.push("Tu treta queda catalogada: desde mañana rinde menos y te pillan antes. La autoridad no la olvida entre partidas.");
+    if (o.senalar && !o.detenido) {
+      o.vistoJuntos = o.cat === "Autoridad";
+      o.lineas.push(o.vistoJuntos ? `Os ha visto un alguacil: esta noche interrogará a ${o.nombre}.` : `Queda señalado quien estuvo contigo: si esta noche la autoridad interroga, irá a por ${o.nombre}.`);
+    }
     if (o.venganzaNueva) o.lineas.push("Otro pobre te ha visto: se corre la voz. El resto de tu red te baja la relación (−1) y alguien se vengará la próxima vez que te vea otro pobre.");
     if (o.detenido) o.lineas.push("TE DETIENEN. " + o.motivoDet + " La jornada se acaba.");
     return o;
@@ -561,6 +567,11 @@
         s.contactos.push(c); s.nombresUsados.push(o.nombre);
       }
       c.rel = clamp(c.rel + o.relacion.delta, 0, 5);
+      if (o.senalar && !o.detenido) {
+        s.hoy.senalados = s.hoy.senalados || []; s.hoy.vistosJuntos = s.hoy.vistosJuntos || [];
+        if (!s.hoy.senalados.includes(c.id)) s.hoy.senalados.push(c.id);
+        if (o.vistoJuntos && !s.hoy.vistosJuntos.includes(c.id)) s.hoy.vistosJuntos.push(c.id);
+      }
     }
     if (o.delatado) {
       const c = s.contactos.find((x) => x.id === o.delatado);
@@ -807,12 +818,15 @@
       if (sc > ms) { ms = sc; mejor = st.id; }
     });
     const d = s.dia, movs = [];
-    const add = (tipo, fuerte, dado, escalada) => {
+    const senalados = () => (s.hoy.senalados || []).map((id) => s.contactos.find((c) => c.id === id)).filter((c) => c && disponible(s, c));
+    const add = (tipo, fuerte, dado, escalada, objetivo) => {
       const m = { tipo, fuerte, dado, sitio: null, txt: "", escalada: !!escalada };
       if (tipo === "Interrogatorio" && !contactosDisponibles(s).length) { tipo = "Ronda"; m.tipo = "Ronda"; m.sinRed = true; }
       switch (tipo) {
         case "Interrogatorio": {
-          const c = alAzar(s, contactosDisponibles(s));
+          const sen = senalados();
+          const c = objetivo || alAzar(s, sen.length ? sen : contactosDisponibles(s));
+          m.senalado = !objetivo && sen.includes(c); m.visto = !!objetivo;
           const x = d6(s);
           m.contacto = c.nombre; m.dadoInterroga = x;
           const conNino = s.nino && !s.nino.perdido && s.nino.con === c.id;
@@ -824,6 +838,8 @@
             m.txt = `Interroga a ${c.nombre} (relación ${c.rel}; saca ${x}): no dice nada. Se lo llevan ${P.interrogaDias} días.`;
           }
           if (conNino) m.txt += " Tenía a tu hijo.";
+          if (m.visto) m.txt = `Un alguacil te vio con ${c.nombre}. ` + m.txt;
+          else if (m.senalado) m.txt = `Va a por quien estuvo contigo. ` + m.txt;
           break;
         }
         case "Ronda":
@@ -866,6 +882,7 @@
     add("Ronda", false, null);
     for (let i = 2; i <= n; i++) { const dado = d6(s); add(R.MOVIMIENTOS[dado - 1], i === 3, dado); }
     if (d >= P.escaladaDesde) { const dado = d6(s); add(R.MOVIMIENTOS[dado - 1], false, dado, true); }
+    (s.hoy.vistosJuntos || []).forEach((id) => { const c = s.contactos.find((x) => x.id === id); if (c && disponible(s, c)) add("Interrogatorio", false, null, false, c); });
     s.ultimaAutoridad = { dia: d, atencion: at, movimientos: movs };
     diaActual(s).autoridad = { atencion: at, movimientos: movs.map((m) => m.txt) };
     s.fase = "autoridad";

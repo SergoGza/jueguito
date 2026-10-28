@@ -60,7 +60,7 @@
     termo: ["Termómetro", "Cómo te clasifica la autoridad, de −3 a +3. Hacia arriba: +1 sospechoso, +2 vagabundo, +3 reincidente (solo si ya te han detenido alguna vez: antes no pasas de +2). Hacia abajo: −1 pobre conocido, −2 con licencia (solo con el examen del cura, y solo naturales) y −3 recogido (te encierran y la partida acaba; solo pasa en el hospital). Sin licencia no bajas de −1. El termómetro no mata solo: decide el castigo si te detienen."],
     tb: ["Te buscan", `Cuánto te tiene fichado la justicia. Cuando llega a ${P.tbMax}, te detienen. El castigo depende del termómetro: con 0 o menos, reprensión; con +1, azotes; con +2, trabajo forzado o marca; con +3, la horca. Después de cada detención ya te conocen: empieza en el número de veces que te han detenido (hasta 3).`],
     muralla: ["La muralla", "El puente y el arrabal están fuera de la muralla; el resto de sitios, dentro. Para pasar de un lado a otro tienes que cruzar la puerta en el puente, donde la guardia vigila a los forasteros. Si la autoridad cierra la puerta, sin licencia no entras. Para dormir en el arrabal tienes que estar fuera."],
-    red: ["Tu red", "Los pobres que conoces. Compartir o preguntar sube la relación; negar comida a quien te la pide, la baja. Con relación 2: puedes dormir con esa persona (si vive de tu lado de la muralla), te encubre si te ve hurtar y, si mueres, no mueres solo. Con relación 3: si te falta pan, te da una ración. Pero la autoridad interroga a tu gente: con relación baja, te venden. Y enferman, desaparecen o mueren. Solo puedes delatar a alguien de tu red, y lo pierdes."],
+    red: ["Tu red", "Los pobres que conoces. Juntarte con alguien (cualquier dado sirve) o compartir sube la relación; negar comida a quien te la pide, la baja. Con relación 2: puedes dormir con esa persona (si vive de tu lado de la muralla), te encubre si te ve hurtar y, si mueres, no mueres solo. Con relación 3: si te falta pan, te da una ración. Pero juntarse se ve: quien estuvo contigo queda señalado esa noche, y si la autoridad interroga, va a por esa persona (si os vio un alguacil, la interroga seguro). Con relación baja, te vende; si aguanta, se la llevan dos días. Y enferman, desaparecen o mueren. Solo puedes delatar a alguien de tu red, y lo pierdes."],
     hospital: ["Hospital", "Solo admite enfermos (cuerpo 5 o menos). Cada vez que te curan o duermes allí, te apuntan en el libro. A la tercera, te recogen: entras en la institución y la partida acaba."],
     nino: ["Tu hijo", R.AYUDA.find((x) => x[0] === "Tu hijo (viuda)")[1]],
     licencia: ["Licencia", "Con el termómetro en −2 tienes licencia para pedir: el cura te la da si apruebas el examen (solo naturales). La pierdes en cuanto el termómetro sube de −2, por ejemplo si un alguacil te ve hacer algo sospechoso. Para recuperarla, otro examen."],
@@ -89,10 +89,12 @@
   }
 
   function htmlRed() {
-    if (!s || !s.contactos.length) return `<h2>Tu red</h2><p>Todavía no conoces a nadie. Compartir o preguntar en el convento, la ribera o el mesón te pone en contacto con otros pobres.</p><p class="muted small">${esc(AYUDA_METRO.red[1])}</p>`;
+    if (!s || !s.contactos.length) return `<h2>Tu red</h2><p>Todavía no conoces a nadie. Juntarte con alguien o compartir en el convento, la ribera o el mesón te pone en contacto con otros pobres.</p><p class="muted small">${esc(AYUDA_METRO.red[1])}</p>`;
     let h = `<h2>Tu red</h2><table class="t"><tr><th>Persona</th><th>Relación</th><th>Estado</th></tr>`;
     s.contactos.forEach((c) => {
-      const est = c.estado ? { muerto: "Ha muerto", traidor: "Te vendió", delatado: "Lo delataste" }[c.estado] : (c.ausenteHasta && c.ausenteHasta >= s.dia ? (c.ausenteMotivo === "enfermo" ? "Enfermo" : "Detenido") + " hasta el día " + c.ausenteHasta : (c.lado === "fuera" ? "Vive en el arrabal" : "Vive en la ciudad"));
+      let est = c.estado ? { muerto: "Ha muerto", traidor: "Te vendió", delatado: "Lo delataste" }[c.estado] : (c.ausenteHasta && c.ausenteHasta >= s.dia ? (c.ausenteMotivo === "enfermo" ? "Enfermo" : "Detenido") + " hasta el día " + c.ausenteHasta : (c.lado === "fuera" ? "Vive en el arrabal" : "Vive en la ciudad"));
+      if (!c.estado && s.hoy && (s.hoy.vistosJuntos || []).includes(c.id)) est += ". Os vio un alguacil: esta noche lo interrogarán";
+      else if (!c.estado && s.hoy && (s.hoy.senalados || []).includes(c.id)) est += ". Señalado hoy: si interrogan, irán a por esta persona";
       h += `<tr><td>${c.estado ? "<s>" + esc(c.nombre) + "</s>" : esc(c.nombre)}</td><td>${c.estado ? "—" : c.rel}</td><td>${esc(est)}</td></tr>`;
     });
     return h + `</table><p class="muted small">${esc(AYUDA_METRO.red[1])}</p>`;
@@ -420,7 +422,7 @@
     let h = `<h2>Noche del día ${s.dia}</h2>` + vNocheResumen();
     if (ui.castigoRes) h += `<div class="card malo"><p><b>${esc(ui.castigoRes.tipo)}.</b> ${esc(ui.castigoRes.txt)}</p></div>`;
     h += `<div class="card"><h3>Mientras duermes, la autoridad mueve ficha</h3>
-      <p class="small">Su atención de hoy es <b>${a.atencion}</b>: suma 1 por cada vez que te vio un alguacil o la guardia, 2 por cada hurto que alguien vio, 1 por cada delación y 1 si la ronda te encontró en un pórtico. Con 0-2 hace un movimiento; con 3-5, dos; con 6 o más, tres, y el tercero es fuerte. Desde el pregón de expulsión (día ${P.escaladaDesde}), uno más cada noche, te vea o no.</p>
+      <p class="small">Su atención de hoy es <b>${a.atencion}</b>: suma 1 por cada vez que te vio un alguacil o la guardia, 2 por cada hurto que alguien vio, 1 por cada delación y 1 si la ronda te encontró en un pórtico. Con 0-2 hace un movimiento; con 3-5, dos; con 6 o más, tres, y el tercero es fuerte. Desde el pregón de expulsión (día ${P.escaladaDesde}), uno más cada noche, te vea o no. Si interroga, va a por quien estuvo contigo ese día; si un alguacil te vio con alguien, lo interroga seguro.</p>
       <ul class="lista">${a.movimientos.map((m) => `<li>${esc(m.txt)}</li>`).join("")}</ul></div>`;
     h += `<button class="btn primary" data-act="amanece">Amanece: día ${s.dia + 1}</button>`;
     return h;
@@ -585,7 +587,7 @@
     dado(d) { ui.dado = +d.i; render(); },
     hacer() {
       const a = R.ACCIONES[ui.accion];
-      const eleccion = { sitio: ui.sitio, accion: ui.accion, dado: a.dado ? ui.dado : null, contacto: ["compartir", "preguntar", "delatar"].includes(ui.accion) ? ui.contacto : null };
+      const eleccion = { sitio: ui.sitio, accion: ui.accion, dado: a.dado ? ui.dado : null, contacto: ["compartir", "juntarse", "delatar"].includes(ui.accion) ? ui.contacto : null };
       const rolls = E.tirar(s, eleccion);
       prepararResultado(eleccion, rolls);
       persistir(); render();

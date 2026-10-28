@@ -105,7 +105,7 @@
         f("Cerrado: pedir −1.", -1, "P"),
         f("Cerrado: pedir −1.", -1, "P"),
         f("Cerrado: pedir −1.", -1, "P"),
-        f("Abierto: rumores, compartir, delatar (red).", 0, "P R"),
+        f("Abierto: rumores, juntarse, compartir, delatar (red).", 0, "P R"),
       ],
     },
   ];
@@ -200,7 +200,7 @@
       "Otro pobre": E(0, 0, "", 0, 0, "nada"),
       Beneficencia: E(0, 0, "", 0, 0, "nada"),
       Fraile: E(0, 0, "", 0, 0, "nada"),
-      Autoridad: E(1, 0, "", 0, 0, "juntarse con vagabundos: +1"),
+      Autoridad: E(1, 0, "", 0, 0, "juntarse con vagabundos: +1, y esta noche interroga seguro a quien está contigo"),
     },
     "Delatar": {
       Nadie: E(0, 0, "", 0, 0, "nadie más te ha visto"),
@@ -227,19 +227,19 @@
     descansar: { nombre: "Descansar", dado: true, testigo: true, desc: "Esconderte y recuperarte: +1 de cuerpo si nadie te ve. Con un dado bajo, el hambre no te deja descansar. Si te ven tirado, cuenta como vagancia." },
     curarse: { nombre: "Curarse", dado: true, testigo: false, desc: "Solo admiten enfermos (cuerpo 5 o menos). +2 de cuerpo si el dado no es bajo, pero te apuntan en el libro (−1). A la tercera vez que te apuntan, o si entras con cuerpo 2 o menos, te recogen y no sales." },
     examen: { nombre: "Pedir licencia", dado: true, testigo: false, desc: "El cura te examina. Solo para naturales de la ciudad. Hace falta un dado bueno. Si apruebas, pasas a pobre con licencia (−2): limosna segura en tu parroquia, pero si te ven pedir fuera, la pierdes." },
-    compartir: { nombre: "Compartir", dado: true, testigo: true, desc: "Das una ración (o una moneda si no tienes) a alguien de tu red o a alguien nuevo: sube la relación y te cuenta algo (+1 rumor)." },
-    preguntar: { nombre: "Preguntar", dado: true, testigo: true, desc: "Hablar con alguien. Si el dado no es bajo, te cuenta algo (+1 rumor) y sube la relación." },
+    compartir: { nombre: "Compartir", dado: true, testigo: true, desc: "Das una ración (o una moneda si no tienes) a alguien de tu red o a alguien nuevo: sube la relación y te cuenta algo (+1 rumor). Como al juntarte, esa persona queda señalada esta noche." },
+    juntarse: { nombre: "Juntarte con alguien", dado: true, testigo: true, desc: "Pasar el rato con otros pobres. Cualquier dado sirve: os acercáis (relación +1); con un dado no bajo, además te cuenta algo (+1 rumor). Pero esa persona queda señalada: si esta noche la autoridad interroga, irá a por ella; y si os ve un alguacil, la interrogará seguro." },
     delatar: { nombre: "Delatar", dado: true, testigo: true, desc: "Vender a alguien de tu red al alguacil: 2 monedas y −1, pero lo pierdes. La autoridad toma nota (atención +1). Si otro pobre te ve, se corre la voz: el resto de tu red te baja la relación y alguien se vengará." },
     lavar: { nombre: "Lavar ropa en la ribera", dado: true, testigo: true, desc: "Lavar ropa ajena en el Tormes. Si el dado no es bajo, te dan ropa y te pagan. En la ribera, a tercia y a sexta. Si te ven trabajar, te tienen por pobre honrada (−1)." },
     cruzar: { nombre: "Cruzar la puerta", dado: false, testigo: true, desc: "Entrar o salir de la ciudad. No gasta dado, pero ocupa la franja. La guardia vigila a los forasteros." },
   };
-  const COD_ACC = { P: ["pedir"], T: ["trabajar"], H: ["hurtar"], D: ["descansar"], C: ["curarse"], E: ["examen"], R: ["compartir", "preguntar", "delatar"], X: ["cruzar"], L: ["lavar"] };
+  const COD_ACC = { P: ["pedir"], T: ["trabajar"], H: ["hurtar"], D: ["descansar"], C: ["curarse"], E: ["examen"], R: ["compartir", "juntarse", "delatar"], X: ["cruzar"], L: ["lavar"] };
 
   const PARAMS = {
     jornalUmbral: 4, jornalPaga: 3, delatarPaga: 2, delatarT: -1, compartirCoste: 1,
     curarUmbral: 3, curarC: 2, curarT: -1, recogidoCuerpo: 2, descansarC: 1, descansarUmbral: 3, hambreC: -2,
     tretaUmbral: 4, tretaBonus: 1, catalogadaExam: 1, licMin: 1, licPrima: 1, limosnaPub: 2,
-    sitioLimosna: "catedral", preguntarUmbral: 3, rivalUmbral: 2, delatorUmbral: 2, delatorUmbralRed: 1,
+    sitioLimosna: "catedral", juntarseRumor: 3, rivalUmbral: 2, delatorUmbral: 2, delatorUmbralRed: 1,
     tbMax: 6, examenGenUmbral: 2, examenGenFuerte: 3, tfCuerpo: -1, tfDias: 3, aten2: 3, aten3: 6,
     pregonInicio: 3, pregonVence: 10, pregonDias: 3, rondaDias: 2,
     // v0.2
@@ -340,7 +340,7 @@
   const MOVIMIENTOS = ["Ronda", "Interrogatorio", "Cerrar la puerta", "Pregón", "Examen general", "Limosna pública"];
   const MOV_DESC = {
     "Ronda": "Manda una ronda donde más te vieron: durante dos días, el resultado más bajo del dado de testigo de ese sitio pasa a ser «Alguacil». Las rondas se acumulan.",
-    "Interrogatorio": "Detiene a alguien de tu red y le pregunta por ti. Si vuestra relación es baja, te vende (Te buscan +2). Si aguanta, se lo llevan dos días.",
+    "Interrogatorio": "Detiene a alguien de tu red y le pregunta por ti. Si ese día te juntaste con alguien, va a por esa persona. Si vuestra relación es baja, te vende (Te buscan +2). Si aguanta, se lo llevan dos días.",
     "Cerrar la puerta": "Mañana no se entra en la ciudad desde fuera sin licencia.",
     "Pregón": "Pregona una norma nueva para los próximos días.",
     "Examen general": "Mañana el cura examina a todos los pobres con licencia: pueden perderla.",
@@ -382,15 +382,15 @@
     ["Termómetro", "Cómo te clasifica la autoridad, de −3 a +3. Hacia arriba: sospechoso, vagabundo y reincidente (+3, solo si ya te han detenido antes). Hacia abajo: pobre conocido, con licencia y, al final, recogido (te encierran en una institución y la partida acaba). Sin licencia no bajas de −1. El termómetro no mata solo: decide el castigo si te detienen."],
     ["Tu hijo (viuda)", "La viuda va con su hijo. Con él al lado, la limosna en moneda rinde +2 (si lo dejas con alguien, no). Tiene su propio cuerpo (0 a 5) y come cada noche: si no hay pan para los dos, eliges quién come. Bajo techo y comido se recupera; las tormentas y las fiebres le afectan aparte. Si está muy débil (1 o menos) y estás dentro de la muralla, el cura se lo lleva a los niños de la doctrina, salvo que alguien de tu red (relación 2 o más) lo esconda. Si te detienen, se lo llevan, salvo que alguien de tu red se quede con él. Al amanecer puedes dejarlo con alguien de tu red: cada noche le das una ración o su precio, y si no puedes, la relación baja. Si interrogan a quien lo cuida, lo pierdes."],
     ["Te buscan", "Cuando llega a 6, te detienen. El castigo depende del termómetro: con 0 o menos, reprensión; con +1, azotes; con +2, trabajo forzado o marca; con +3, la horca. Después, ya te conocen: «Te buscan» empieza en el número de veces que te han detenido (hasta 3)."],
-    ["La autoridad", "Cada noche juega según lo que vio: manda rondas a donde más te vieron, interroga a tu gente, cierra la puerta, pregona normas, examina a los pobres o reparte limosna pública. Desde el pregón de expulsión (día 3) aprieta más: un movimiento extra cada noche, te vea o no. Lo que hace lo ves al amanecer."],
+    ["La autoridad", "Cada noche juega según lo que vio: manda rondas a donde más te vieron, interroga a tu gente (primero, a quien estuvo contigo ese día), cierra la puerta, pregona normas, examina a los pobres o reparte limosna pública. Desde el pregón de expulsión (día 3) aprieta más: un movimiento extra cada noche, te vea o no. Lo que hace lo ves al amanecer."],
     ["Sucesos", "Cada amanecer pasa algo en la ciudad: fiebres, tormentas, subidas del pan, redadas, repartos de pan o muertes. No los controlas."],
     ["Fingir", "Al amanecer puedes gastar un dado en preparar una treta (llagas, ceguera, falso peregrino…). Ese dado es su calidad para todo el día: te dan más y te tienen por impedido, pero si te examina la beneficencia o el cura y su dado iguala tu calidad, te descubren."],
-    ["Red y rumores", "Puedes compartir o preguntar a otros pobres. Con relación 2 puedes dormir con alguien, te encubre si te ve robar y no mueres solo. Con relación 3, si te falta pan, te da una ración. Pero la autoridad interroga a tu gente: con relación baja, te venden. Te pedirán comida, enfermarán, desaparecerán o morirán: una red de una sola persona no aguanta. Un rumor sirve para repetir un dado de testigo."],
+    ["Red y rumores", "Puedes juntarte con otros pobres (cualquier dado sirve) o compartir con ellos. Con relación 2 puedes dormir con alguien, te encubre si te ve robar y no mueres solo. Con relación 3, si te falta pan, te da una ración. Pero juntarse se ve: quien estuvo contigo queda señalado esa noche. Si la autoridad interroga, va a por esa persona, y si os vio un alguacil, la interroga seguro. Con relación baja, te vende; si aguanta, se la llevan dos días. Las relaciones nuevas son las que más venden. Además te pedirán comida, enfermarán, desaparecerán o morirán: una red de una sola persona no aguanta. Un rumor sirve para repetir un dado de testigo."],
     ["La muralla", "El puente y el arrabal están fuera. Si duermes fuera, para entrar tienes que cruzar la puerta, donde la guardia vigila a los forasteros. Si la autoridad cierra la puerta, sin licencia te quedas fuera."],
   ];
 
   const RULES = {
-    version: "0.3b", CONFIG, FRANJAS, FRANJA_DESC, SITIOS, TESTIGOS, CATEGORIA, TESTIGO_DESC, CATS, EFECTOS, ACCIONES, COD_ACC,
+    version: "0.4", CONFIG, FRANJAS, FRANJA_DESC, SITIOS, TESTIGOS, CATEGORIA, TESTIGO_DESC, CATS, EFECTOS, ACCIONES, COD_ACC,
     PARAMS, PEDIR_DADO, HURTAR_DADO, DADOS_CUERPO, CALENDARIO, MODS, PERSONAJES, TRETAS, DORMIR, CLASIF,
     MOVIMIENTOS, MOV_DESC, PREGONES, NOMBRES, AYUDA, SUCESOS,
   };

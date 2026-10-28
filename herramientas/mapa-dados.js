@@ -16,7 +16,7 @@ function rinde(s, sid, acc, v) {
     case "descansar": return v >= P.descansarUmbral ? "+1 cuerpo si nadie te ve" : "";
     case "curarse": return v >= P.curarUmbral ? "+2 cuerpo (solo enfermo, te apuntan)" : "";
     case "examen": return v >= (p.difExamen || 99) ? "licencia" : "";
-    case "preguntar": return v >= P.preguntarUmbral ? "rumor y relación" : "";
+    case "juntarse": return v >= P.juntarseRumor ? "relación y rumor (te señala)" : "relación (te señala)";
     case "compartir": return "rumor y relación, pagando 1 ración";
     case "delatar": return "2 mon., pierdes a esa persona";
   }
@@ -39,7 +39,7 @@ function mapa(pjid, conLicencia) {
           const r = rinde(s, st.id, a.id, v);
           if (!r) continue;
           porV[v] = true;
-          if (!["compartir", "delatar"].includes(a.id)) { porVsinRed[v] = true; filas[v].usos.add(`${a.id} en ${st.corto || st.id} (${R.FRANJAS[f]}): ${r}`); }
+          if (!["compartir", "delatar", "juntarse"].includes(a.id)) { porVsinRed[v] = true; filas[v].usos.add(`${a.id} en ${st.corto || st.id} (${R.FRANJAS[f]}): ${r}`); }
         }
       });
     });
@@ -53,7 +53,7 @@ for (const p of R.PERSONAJES) {
     console.log(`\n=== ${p.nombre}${lic ? " · con licencia" : ""} · día ${DIA} ===`);
     const m = mapa(p.id, lic);
     for (let v = 1; v <= 6; v++) {
-      console.log(`${v}: franjas con algún uso ${m[v].franjas}/5 · sin contar delatar ni compartir ${m[v].sinRed}/5`);
+      console.log(`${v}: franjas con algún uso ${m[v].franjas}/5 · sin contar la red ${m[v].sinRed}/5`);
       if (v <= 3) [...m[v].usos].slice(0, 14).forEach((u) => console.log("     " + u));
     }
   }

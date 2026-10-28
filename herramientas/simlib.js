@@ -1,7 +1,9 @@
 // El bot de las simulaciones. Lo usan sim.js, calib.js, ingresos.js, ninostats.js y dados.js.
 // Políticas: "azar" (elige al azar), "prudente" (ganancia esperada menos riesgo) y "egoista" (prudente que nunca da de comer al niño).
 // BOT=viejo reproduce el bot de la v0.3b, con sus dos fallos (probar el examen con cualquier dado y «trabajar» sin que le
-// contraten solo para que le vean) y gastando siempre el dado más alto.
+// contraten solo para que le vean) y gastando siempre el dado más alto. (Con las reglas de la v0.4 ya no da las cifras de
+// la v0.3b, porque las reglas han cambiado; sirve para comparar bots sobre las mismas reglas.)
+// RED=no hace que el bot no se junte con nadie y DELATAR=no, que no delate nunca (para medir cuánto aporta cada cosa).
 // Ganchos opcionales (cuarto argumento de jugar) para medir sin copiar el bot: amanecer(s), treta(s, v),
 // franja({ s, libres, opciones, vmax, best, bs }), accion({ s, el, dado, v, o }), finFranjas(s).
 module.exports = (E, R) => { const P = R.PARAMS;
@@ -28,15 +30,36 @@ function check(s, where) {
 // valor esperado de riesgo de una acción en un sitio (heurística prudente)
 function riesgo(s, sid, acc) {
   const pv = E.previewTestigos(s, sid, acc);
-  if (!pv) return { t: 0, tb: 0, det: 0 };
+  if (!pv) return { t: 0, tb: 0, det: 0, alg: 0 };
   const g = E.grupoEfecto(s, sid, acc);
-  let t = 0, tb = 0, det = 0;
+  let t = 0, tb = 0, det = 0, alg = 0;
   pv.forEach((f) => {
     const ef = R.EFECTOS[g][R.CATEGORIA[f.testigo]];
     t += (ef.t * f.caras.length) / 6; tb += (ef.tb * f.caras.length) / 6;
-    if (acc === "hurtar" && R.CATEGORIA[f.testigo] === "Autoridad") det += f.caras.length / 6;
+    if (R.CATEGORIA[f.testigo] === "Autoridad") { alg += f.caras.length / 6; if (acc === "hurtar") det += f.caras.length / 6; }
   });
-  return { t, tb, det };
+  return { t, tb, det, alg };
+}
+
+// con quién se junta el bot: con quien más relación tiene de su lado de la muralla (para llegar pronto a 2, que da techo);
+// si no tiene a nadie así, con alguien nuevo
+function contactoRed(s) {
+  const lado = s.fuera ? "fuera" : "dentro";
+  const cs = E.contactosDisponibles(s).filter((c) => c.lado === lado && c.rel < 4).sort((a, b) => b.rel - a.rel);
+  return cs.length ? cs[0] : null;
+}
+// valor de subir la relación con c (null = alguien nuevo) menos el riesgo de dejarle señalado esa noche
+function valorRed(s, op, c, r) {
+  if (process.env.RED === "no") return -1;
+  const rel = c ? c.rel : 0;
+  const lado = c ? c.lado : op.sitio === "puente" ? "fuera" : "dentro";
+  let val = rel <= 1 ? 1.5 : rel === 2 ? 0.8 : 0.3; // con 2, techo cada noche; con 3, pan si te falta
+  if (lado !== (s.fuera ? "fuera" : "dentro")) val *= 0.4; // no podrá dormir con esa persona
+  if (s.dia >= R.CALENDARIO.length) val *= 0.3; // último día: la relación ya casi no sirve
+  const peso = s.tb >= 4 ? 4 : s.tb >= 2 ? 2 : 1;
+  const pVende = Math.max(0, P.interrogaBase - (rel + 1)) / 6;
+  const pInterroga = (s.dia >= P.escaladaDesde ? 2 : 1) / 6 + r.alg; // al azar, o seguro si os ve un alguacil
+  return val - Math.min(1, pInterroga) * pVende * 2 * peso;
 }
 
 // lo que el bot espera sacar de una acción con el dado v (en monedas o su equivalente)
@@ -50,9 +73,15 @@ function ganancia(s, op, v, r) {
     case "descansar": return s.cuerpo < 9 && v >= P.descansarUmbral ? 1.5 : 0;
     case "curarse": return s.cuerpo <= 2 || E.licencia(s) ? -50 : s.cuerpo <= 6 && v >= P.curarUmbral ? 2 : 0;
     case "examen": return VIEJO || v >= (E.pj(s).difExamen || 99) ? 6 : -1;
-    case "preguntar": return v >= P.preguntarUmbral ? 0.8 : 0;
+    case "juntarse": return valorRed(s, op, op.contacto, r);
     case "compartir": return s.raciones > 1 ? 0.6 : -1;
-    case "delatar": return 1;
+    case "delatar": {
+      if (process.env.DELATAR === "no") return -1;
+      if (VIEJO) return 1;
+      // 2 monedas, menos lo que vale la persona que pierdes: a quien da techo o pan no se le vende
+      const c = op.contacto;
+      return !c ? -1 : 1 - (c.rel >= 2 ? 1.5 : c.rel === 1 ? 0.4 : 0);
+    }
     case "cruzar": return s.fuera ? 1 : -1;
   }
   return 0;
@@ -69,8 +98,7 @@ function rinde(s, op, v) {
     case "descansar": return v >= P.descansarUmbral ? 1 : 0;
     case "curarse": return v >= P.curarUmbral ? 1 : 0;
     case "examen": return v >= (E.pj(s).difExamen || 99) ? 1 : 0;
-    case "preguntar": return v >= P.preguntarUmbral ? 1 : 0;
-    default: return 1; // compartir y delatar: cualquier dado da lo mismo
+    default: return 1; // juntarse, compartir y delatar: el bot gasta el dado más bajo
   }
 }
 
@@ -120,6 +148,8 @@ function jugar(personaje, seed, politica, hooks) {
         // prudente: puntúa ganancia esperada menos riesgo
         let best = null, bs = -1e9;
         opciones.forEach((op) => {
+          if (op.accion === "juntarse") op.contacto = contactoRed(s);
+          if (op.accion === "delatar" && !VIEJO) op.contacto = E.contactosDisponibles(s).filter((c) => !(s.nino && s.nino.con === c.id)).sort((a, b) => a.rel - b.rel)[0] || null;
           const r = riesgo(s, op.sitio, op.accion);
           const g = ganancia(s, op, vmax, r);
           const peso = s.tb >= 4 ? 4 : s.tb >= 2 ? 2 : 1;
@@ -147,7 +177,13 @@ function jugar(personaje, seed, politica, hooks) {
           }
         }
       }
-      const eleccion = { sitio: el.sitio, accion: el.accion, dado, contacto: ac.red ? (el.accion === "delatar" ? pick(E.contactosDisponibles(s), rnd).id : (E.contactosDisponibles(s).length && rnd() < 0.7 ? pick(E.contactosDisponibles(s), rnd).id : "nuevo")) : null };
+      let contacto = null;
+      if (ac.red) {
+        if (el.accion === "delatar") contacto = !VIEJO && politica !== "azar" && el.contacto ? el.contacto.id : pick(E.contactosDisponibles(s), rnd).id;
+        else if (el.accion === "juntarse" && politica !== "azar") contacto = el.contacto ? el.contacto.id : "nuevo";
+        else contacto = E.contactosDisponibles(s).length && rnd() < 0.7 ? pick(E.contactosDisponibles(s), rnd).id : "nuevo";
+      }
+      const eleccion = { sitio: el.sitio, accion: el.accion, dado, contacto };
       const rolls = E.tirar(s, eleccion);
       let o = E.resolver(s, eleccion, rolls);
       if (s.rumores > 0 && o.testigo && (o.dTB > 0 || o.dT > 0)) { E.gastarRumor(s); rolls.w = E.d6(s); o = E.resolver(s, eleccion, rolls); eleccion.rumorGastado = true; }
@@ -183,4 +219,4 @@ function jugar(personaje, seed, politica, hooks) {
   return s;
 }
 
-return { jugar, riesgo, ganancia, rinde, check }; };
+return { jugar, riesgo, ganancia, rinde, check, contactoRed }; };

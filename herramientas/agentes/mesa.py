@@ -271,10 +271,14 @@ def main(a):
             m.abrir("?semilla=" + urllib.parse.quote(semilla) if semilla else "")
             m.pg.fill("#nombre", nombre)
             m.pg.click("[data-act=empezar]")
+            ficha = m.pg.evaluate("""(id) => { const p = window.RULES.PERSONAJES.find((x) => x.id === id);
+              return [`TU PERSONAJE: ${p.nombre} (${p.origen}, ${p.cuerpoTipo})`, p.resumen, ...p.claves.map((c) => "- " + c)]; }""", pj)
+            ficha = "\n".join(ficha)
             m.pg.click(f"[data-act=elegirPj][data-id={pj}]")
             m.guardar()
             est = m.estado()
             (carpeta / "partida.json").write_text(json.dumps({"personaje": pj, "semilla": semilla, "nombre": nombre, "version": est["version"] if est else None, "empezada": datetime.now().isoformat(timespec="seconds")}, ensure_ascii=False, indent=1), encoding="utf-8")
+            print(ficha + "\n(Es lo que se ve al elegir personaje.)\n")
             print(m.pantalla())
         return
     carpeta = Path(a[1])

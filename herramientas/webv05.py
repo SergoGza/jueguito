@@ -33,6 +33,11 @@ try:
         ok("pregón en marcha: Te buscan +2" in texto(pg), "la tabla de testigos avisa del pregón")
         pg.screenshot(path=f"{OUT}/v05_pregon_testigos.png", full_page=True)
 
+        # 1b) con una ronda, el 1 pasa a alguacil: la tabla dice «1 y 6», no «1-6»
+        pg.evaluate("""() => { const L = window.__LV, s = L.s; s.autoridad.rondas.push({ sitio: 'plaza', desde: s.dia, hasta: s.dia, peso: 1 }); L.render(); }""")
+        celdas = pg.eval_on_selector_all("td.caras", "els => els.map(e => e.textContent)")
+        ok(any(" y " in c for c in celdas) and "1-6" not in celdas, f"la tabla de testigos no junta caras sueltas ({celdas})")
+
         # 2) mozo echado de la ciudad: insignia y puerta cerrada para él
         pg.evaluate("""() => { const s = window.__LV.s; s.fuera = true; s.vetadoHasta = 6; window.__LV.ui.sitio = null; window.__LV.ui.accion = null; window.__LV.render(); }""")
         ok("Te han echado: no puedes entrar hasta el día 7" in texto(pg), "insignia de expulsión")

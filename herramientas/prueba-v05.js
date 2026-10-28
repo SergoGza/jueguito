@@ -110,3 +110,44 @@ f = (() => {
 assert(f.final.tipo === "Sin el niño" && f.nino.perdido && /hospital de niños/.test(E.textoFinal(f)), "si el niño se queda a 0 la última noche, llega sin él");
 const mo = partida("mozo", 10); mo.raciones = 1; E.acabarDia(mo); E.dormir(mo, { dormir: "portico", compra: 0 });
 assert(mo.final.tipo === "Sobrevive", "al mozo no le afecta");
+
+// ---------------------------------------------------------------- v0.5a: claridad
+// 7) lo que no es tu oficio sale, pero dice por qué no
+const vo = partida("viuda", 2);
+const trab = E.accionesEn(vo, "plaza").find((a) => a.id === "trabajar");
+assert(trab && !trab.ok && /no te contratan de peón/.test(trab.motivo), "a la viuda el jornal le sale desactivado y dice por qué");
+const mo7 = partida("mozo", 2); mo7.franja = 1;
+const lav = E.accionesEn(mo7, "puente").find((a) => a.id === "lavar");
+assert(lav && !lav.ok && /no es el tuyo/.test(lav.motivo), "al mozo, lavar ropa le sale desactivado y dice por qué");
+// 8) topes del termómetro
+const so8 = partida("soldado", 2); so8.termo = 2;
+const wAlg8 = caraDe(so8, "plaza", "Alguacil");
+const o8 = accion(so8, "plaza", "pedir", 2, wAlg8);
+assert(o8.dT > 0 && o8.lineas.some((l) => /ya está en \+2: sin haberte detenido nunca, no pasa de ahí/.test(l)), "si el termómetro está en el tope, el resultado lo dice");
+const mo8 = partida("mozo", 2); mo8.termo = -1;
+const o8b = accion(mo8, "convento", "pedir", 2, caraDe(mo8, "convento", "Fraile"));
+assert(o8b.dT < 0 && o8b.lineas.some((l) => /Fuera de la lista, el termómetro no baja de −1/.test(l)), "fuera de la lista, el suelo del −1 se explica");
+// 9) en la lista, la tabla avisa de que subir el termómetro te saca
+const vl = partida("viuda", 2); vl.termo = -2;
+const filaAlg = E.previewTestigos(vl, "plaza", "descansar").find((x) => x.testigo === "Alguacil");
+assert(filaAlg && /sales de la lista/.test(filaAlg.efecto), "en la lista, descansar con un alguacil mirando avisa de que te saca");
+// 10) de noche, quién de tu red vive al otro lado
+const t10 = partida("mozo", 2);
+t10.contactos.push({ id: "a", nombre: "María la Roja", rel: 3, lado: "fuera", desde: 1 });
+E.acabarDia(t10);
+const red10 = E.opcionesNoche(t10).find((x) => x.id === "red");
+assert(!red10.ok && /María la Roja vive en el arrabal/.test(red10.motivo), "dice quién de tu red vive al otro lado de la muralla");
+// 11) interrogar a alguien que no estaba señalado lo explica
+const orig = R.MOVIMIENTOS.slice();
+R.MOVIMIENTOS.splice(0, 6, "Interrogatorio", "Interrogatorio", "Interrogatorio", "Interrogatorio", "Interrogatorio", "Interrogatorio");
+let bien = 0, vistos = 0;
+for (let seed = 1; seed <= 60; seed++) {
+  const t = partida("soldado", 4, seed);
+  t.contactos.push({ id: "a", nombre: "A", rel: 3, lado: "dentro", desde: 1 });
+  t.hoy.senalados = []; t.hoy.vistosJuntos = [];
+  E.acabarDia(t); E.dormir(t, { dormir: "portico", compra: 0 });
+  if (t.fase !== "autoridad") continue;
+  t.ultimaAutoridad.movimientos.filter((m) => m.tipo === "Interrogatorio").forEach((m) => { vistos++; if (/nadie estaba señalado, así que va a por alguien de tu red\./i.test(m.txt)) bien++; });
+}
+R.MOVIMIENTOS.splice(0, 6, ...orig);
+assert(vistos > 10 && bien === vistos, `sin señalados, el interrogatorio lo explica (${bien}/${vistos})`);

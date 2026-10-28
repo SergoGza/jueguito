@@ -217,7 +217,7 @@
       "Otro pobre": E(0, 0, "", 0, 0, "nada"),
       Beneficencia: E(0, 0, "", 0, 0, "nada"),
       Fraile: E(0, 0, "", 0, 0, "nada"),
-      Autoridad: E(0, 0, "FORASTERO", 1, 0, "te para la guardia: +1 si eres forastero"),
+      Autoridad: E(0, 0, "FORASTERO", 1, 0, "te para la guardia: termómetro +1 si eres forastero"),
     },
   };
 
@@ -286,7 +286,7 @@
     { dia: 7, fecha: "Domingo 7 de junio", que: "Misa mayor: pedir +1 a prima en la parroquia y la catedral. No hay mercado ni obras: ni jornal ni hurto en la plaza.", pan: 6 },
     { dia: 8, fecha: "Lunes 8 de junio", que: "Día corriente. El pan sigue subiendo.", pan: 7 },
     { dia: 9, fecha: "Martes 9 de junio", que: "Día de mercado: la plaza rinde +1 más a tercia y sexta. El pan, más caro que nunca.", pan: 7 },
-    { dia: 10, fecha: "Miércoles 10 de junio", que: "Vence el pregón: el forastero al que vea un alguacil o la guardia dentro de la muralla queda detenido. Si llegas a la noche, sobrevives.", pan: 8 },
+    { dia: 10, fecha: "Miércoles 10 de junio", que: "Vence el pregón: el forastero al que vea un alguacil o la guardia dentro de la muralla queda detenido. Si pasas esta noche, sobrevives: todavía hay que comer y dormir.", pan: 8 },
   ];
   // día, sitio, franja, mod pedir, hurtar (1 permite / −1 prohíbe), mod hurtar, prohíbe jornal, alguacil extra
   const MODS = [
@@ -393,15 +393,15 @@
     ["La lista de pobres", "La orden de pobres prohíbe pedir y mantiene a los pobres examinados. Solo entran los naturales: el cura examina en tu parroquia a tercia y hace falta un dado bueno. En la lista no se pide. Cada día que cumplas con la parroquia (cualquier dado sirve), esa noche te dan tu ración, y al niño, si está contigo, media: una ración más cada dos noches que cumplas. Si te ven pedir la beneficencia, el cura o un alguacil, te borran: esa noche no hay ración y para volver hay que pasar otro examen. Los frailes no denuncian a nadie, ni en la sopa del convento. El examen general de la autoridad también puede sacarte."],
     ["Tu hijo (viuda)", "La viuda va con su hijo. Con él al lado, la limosna en moneda rinde +2 (si lo dejas con alguien, no). Tiene su propio cuerpo (0 a 5) y come cada noche: si no hay pan para los dos, eliges quién come. Bajo techo y comido se recupera; las tormentas y las fiebres le afectan aparte. Si está muy débil (1 o menos) y estás dentro de la muralla, el cura se lo lleva a los niños de la doctrina, salvo que alguien de tu red (relación 2 o más) lo esconda. Si te detienen, se lo llevan, salvo que alguien de tu red se quede con él. Al amanecer puedes dejarlo con alguien de tu red: cada noche le das una ración o su precio, y si no puedes, la relación baja. Si interrogan a quien lo cuida, lo pierdes."],
     ["Te buscan", "Cuando llega a 6, te detienen. El castigo depende del termómetro: con 0 o menos, reprensión; con +1, azotes; con +2, trabajo forzado o marca; con +3, la horca. Después, ya te conocen: «Te buscan» empieza en el número de veces que te han detenido (hasta 3)."],
-    ["La autoridad", "Cada noche juega según lo que vio: manda rondas a donde más te vieron, interroga a tu gente (primero, a quien estuvo contigo ese día), cierra la puerta, pregona normas, examina a los pobres o reparte limosna pública. Desde el pregón de expulsión (día 3) aprieta más: un movimiento extra cada noche, te vea o no. Y busca a los forasteros: hasta que vence el pregón, si un alguacil ve a un forastero dentro de la muralla, Te buscan +2; si lo detienen, lo sacan de la ciudad y la guardia no le deja entrar en 3 días (al impedido, desde la segunda detención). El día que vence, al forastero que vean dentro lo detienen. Lo que hace lo ves al amanecer."],
+    ["La autoridad", "Cada noche juega según lo que vio: manda rondas a donde más te vieron, interroga a tu gente (primero, a quien estuvo contigo ese día; si no, a cualquiera), cierra la puerta, pregona normas, examina a los pobres o reparte limosna pública. Desde el pregón de expulsión (día 3) aprieta más: un movimiento extra cada noche, te vea o no. Y busca a los forasteros: hasta que vence el pregón, si un alguacil ve a un forastero dentro de la muralla, Te buscan +2; si lo detienen, lo sacan de la ciudad y la guardia no le deja entrar en 3 días (al impedido, desde la segunda detención). El día que vence, al forastero que vean dentro lo detienen. Lo que hace lo ves al amanecer."],
     ["Sucesos", "Cada amanecer pasa algo en la ciudad: fiebres, tormentas, subidas del pan, redadas, repartos de pan o muertes. No los controlas."],
     ["Fingir", "Al amanecer puedes gastar un dado en preparar una treta (llagas, ceguera, falso peregrino…). Ese dado es su calidad para todo el día: te dan más y te tienen por impedido, pero si te examina la beneficencia o el cura y su dado iguala tu calidad, te descubren."],
-    ["Red y rumores", "Puedes juntarte con otros pobres (cualquier dado sirve) o compartir con ellos. Con relación 2, te encubre si te ve robar y no mueres solo. Con relación 3, puedes dormir en su casa (si vive de tu lado de la muralla) y, si te falta pan, te da una ración. Pero juntarse se ve: quien estuvo contigo queda señalado esa noche. Si la autoridad interroga, va a por esa persona, y si os vio un alguacil, la interroga seguro. Con relación baja, te vende; si aguanta, se la llevan dos días. Las relaciones nuevas son las que más venden. Además te pedirán comida, enfermarán, desaparecerán o morirán: una red de una sola persona no aguanta. Un rumor sirve para repetir un dado de testigo."],
+    ["Red y rumores", "Puedes juntarte con otros pobres (cualquier dado sirve) o compartir con ellos. Con relación 2, te encubre si te ve robar y no mueres solo. Con relación 3, puedes dormir en su casa (si vive de tu lado de la muralla) y, si te falta pan, te da una ración. Pero juntarse se ve: quien estuvo contigo queda señalado esa noche. Si la autoridad interroga, va a por esa persona (si no hay nadie señalado, a cualquiera de tu red), y si os vio un alguacil, la interroga seguro. Con relación baja, te vende; si aguanta, se la llevan dos días. Las relaciones nuevas son las que más venden. Además te pedirán comida, enfermarán, desaparecerán o morirán: una red de una sola persona no aguanta. Un rumor sirve para repetir un dado de testigo."],
     ["La muralla", "El puente y el arrabal están fuera. Si duermes fuera, para entrar tienes que cruzar la puerta, donde la guardia vigila a los forasteros. Si la autoridad cierra la puerta, te quedas fuera, salvo que estés en la lista. Si te han echado de la ciudad, la guardia no te deja entrar hasta que pasen los días."],
   ];
 
   const RULES = {
-    version: "0.5", CONFIG, FRANJAS, FRANJA_DESC, SITIOS, TESTIGOS, CATEGORIA, TESTIGO_DESC, CATS, EFECTOS, ACCIONES, COD_ACC,
+    version: "0.5a", CONFIG, FRANJAS, FRANJA_DESC, SITIOS, TESTIGOS, CATEGORIA, TESTIGO_DESC, CATS, EFECTOS, ACCIONES, COD_ACC,
     PARAMS, PEDIR_DADO, HURTAR_DADO, DADOS_CUERPO, CALENDARIO, MODS, PERSONAJES, TRETAS, DORMIR, CLASIF,
     MOVIMIENTOS, MOV_DESC, PREGONES, NOMBRES, AYUDA, SUCESOS,
   };

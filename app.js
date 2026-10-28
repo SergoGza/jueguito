@@ -60,7 +60,7 @@
     termo: ["Termómetro", "Cómo te clasifica la autoridad, de −3 a +3. Hacia arriba: +1 sospechoso, +2 vagabundo, +3 reincidente (solo si ya te han detenido alguna vez: antes no pasas de +2). Hacia abajo: −1 pobre conocido, −2 en la lista de pobres (solo con el examen del cura, y solo naturales) y −3 recogido (te encierran y la partida acaba; solo pasa en el hospital). Fuera de la lista no bajas de −1. El termómetro no mata solo: decide el castigo si te detienen."],
     tb: ["Te buscan", `Cuánto te tiene fichado la justicia. Cuando llega a ${P.tbMax}, te detienen. El castigo depende del termómetro: con 0 o menos, reprensión; con +1, azotes; con +2, trabajo forzado o marca; con +3, la horca. Después de cada detención ya te conocen: empieza en el número de veces que te han detenido (hasta 3).`],
     muralla: ["La muralla", "El puente y el arrabal están fuera de la muralla; el resto de sitios, dentro. Para pasar de un lado a otro tienes que cruzar la puerta en el puente, donde la guardia vigila a los forasteros. Si la autoridad cierra la puerta, solo entran los de la lista. Estar en el puente no es salir: sigues de tu lado hasta que cruzas. Para dormir en el arrabal tienes que estar fuera. Desde el pregón de expulsión (día 3), al forastero que detienen lo sacan de la ciudad y la guardia no le deja entrar en unos días (al impedido, desde la segunda detención)."],
-    red: ["Tu red", "Los pobres que conoces. Juntarte con alguien (cualquier dado sirve) o compartir sube la relación; negar comida a quien te la pide, la baja. Con relación 2: te encubre si te ve hurtar, puede cuidar de un niño y, si mueres, no mueres solo. Con relación 3: puedes dormir en su casa (si vive de tu lado de la muralla) y, si te falta pan, te da una ración. Pero juntarse se ve: quien estuvo contigo queda señalado esa noche, y si la autoridad interroga, va a por esa persona (si os vio un alguacil, la interroga seguro). Con relación baja, te vende; si aguanta, se la llevan dos días. Y enferman, desaparecen o mueren. Solo puedes delatar a alguien de tu red, y lo pierdes."],
+    red: ["Tu red", "Los pobres que conoces. Juntarte con alguien (cualquier dado sirve) o compartir sube la relación; negar comida a quien te la pide, la baja. Con relación 2: te encubre si te ve hurtar, puede cuidar de un niño y, si mueres, no mueres solo. Con relación 3: puedes dormir en su casa (si vive de tu lado de la muralla) y, si te falta pan, te da una ración. Pero juntarse se ve: quien estuvo contigo queda señalado esa noche, y si la autoridad interroga, va a por esa persona (si os vio un alguacil, la interroga seguro; si no hay nadie señalado, va a por cualquiera de tu red). Con relación baja, te vende; si aguanta, se la llevan dos días. Y enferman, desaparecen o mueren. Solo puedes delatar a alguien de tu red, y lo pierdes."],
     hospital: ["Hospital", "Solo admite enfermos (cuerpo 5 o menos). Cada vez que te curan o duermes allí, te apuntan en el libro. A la tercera, te recogen: entras en la institución y la partida acaba. Al impedido, que es el pobre que buscan, lo recogen a la segunda."],
     nino: ["Tu hijo", R.AYUDA.find((x) => x[0] === "Tu hijo (viuda)")[1]],
     licencia: ["La lista de pobres", R.AYUDA.find((x) => x[0] === "La lista de pobres")[1]],
@@ -124,6 +124,7 @@
     for (let i = 1; i <= P.tbMax; i++) pips += `<span class="pip ${i <= s.tb ? "on" : ""}"></span>`;
     const b = [];
     b.push(`<span class="badge" data-act="metro" data-k="muralla">${s.fuera ? "Fuera de la muralla" : "Dentro de la muralla"}</span>`);
+    if (E.pj(s).forastero) b.push(`<span class="badge" data-act="metro" data-k="muralla">Forastero</span>`);
     if (s.nino) {
       const n = s.nino, cuida = n.con ? s.contactos.find((c) => c.id === n.con) : null;
       if (n.perdido) b.push(`<span class="badge mal" data-act="metro" data-k="nino">Se han llevado a tu hijo</span>`);
@@ -139,7 +140,7 @@
     if (s.apuntes) b.push(`<span class="badge mal" data-act="metro" data-k="hospital">Apuntado en el hospital: ${s.apuntes} de ${E.hospVeces(s)}</span>`);
     if (s.monedas > P.dineroUmbral) b.push(`<span class="badge mal" data-act="metro" data-k="monedas">Llevas demasiado dinero encima</span>`);
     const red = E.contactosDisponibles(s);
-    b.push(`<span class="badge" data-act="red">Red: ${red.length ? red.map((c) => esc(c.nombre.split(" ")[0]) + " " + c.rel).join(", ") : "nadie"}${s.contactos.length > red.length ? " (+" + (s.contactos.length - red.length) + " que no están)" : ""}</span>`);
+    b.push(`<span class="badge" data-act="red">Red: ${red.length ? red.map((c) => esc(c.nombre.split(" ")[0]) + " " + c.rel + (c.lado === "fuera" ? " (arrabal)" : "")).join(", ") : "nadie"}${s.contactos.length > red.length ? " (+" + (s.contactos.length - red.length) + " que no están)" : ""}</span>`);
     return `<div class="estado">
         <button class="chip ${s.cuerpo <= 2 ? "alerta" : ""}" data-act="metro" data-k="cuerpo">Cuerpo<b>${s.cuerpo}</b>${dadosMan} dados</button>
         <button class="chip" data-act="metro" data-k="monedas">Monedas<b>${s.monedas}</b>pan a ${E.precioPan(s)}</button>
@@ -225,6 +226,14 @@
       <button class="btn secundario" data-act="inicio">Volver</button></main>`;
   }
 
+  // [1, 6] → «1 y 6»; [1, 2, 5, 6] → «1-2 y 5-6»; [2, 3, 4] → «2-4»
+  function carasTxt(caras) {
+    const tramos = [];
+    caras.slice().sort((a, b) => a - b).forEach((c) => { const u = tramos[tramos.length - 1]; if (u && c === u[1] + 1) u[1] = c; else tramos.push([c, c]); });
+    const t = tramos.map(([a, b]) => (a === b ? String(a) : `${a}-${b}`));
+    return t.length > 1 ? t.slice(0, -1).join(", ") + " y " + t[t.length - 1] : t[0];
+  }
+
   // ---------------------------------------------------------------- amanecer
   // qué le hace el pregón de expulsión al forastero, según las reglas en vigor
   function avisoPregon() {
@@ -239,7 +248,7 @@
     const c = E.cal(s.dia);
     const aut = E.resumenAutoridad(s, s.dia);
     const pe = E.pregonExpulsion(s.dia);
-    let h = `<h2>${esc(c.fecha)}</h2><p>${esc(c.que)} <span class="muted">Pan a ${c.pan} la ración.</span></p>`;
+    let h = `<h2>${esc(c.fecha)}</h2><p>${esc(c.que)} <span class="muted">Pan a ${E.precioPan(s)} la ración.</span></p>`;
     if (pe) h += `<p class="small"><b>${esc(pe)}</b>${E.pj(s).forastero ? " " + avisoPregon() : ""}</p>`;
     if (s.dia === 1 && !load(LS.intro, false)) {
       h += `<div class="card aviso"><h3>Cómo va un día</h3><ol class="lista small">
@@ -332,14 +341,14 @@
         const pv = E.previewTestigos(s, ui.sitio, ui.accion);
         if (pv) {
           h += `<p class="paso">Quién te puede ver aquí</p><p class="muted small">Se tira un dado de testigo. Según lo que salga:</p><table class="t">`;
-          pv.forEach((f) => { h += `<tr><td class="caras">${f.caras.length === 1 ? f.caras[0] : f.caras[0] + "-" + f.caras[f.caras.length - 1]}</td><td><b>${esc(f.testigo)}</b>: ${esc(f.efecto)}</td></tr>`; });
+          pv.forEach((f) => { h += `<tr><td class="caras">${esc(carasTxt(f.caras))}</td><td><b>${esc(f.testigo)}</b>: ${esc(f.efecto)}</td></tr>`; });
           h += `</table>`;
           if (s.venganza) h += `<p class="small" style="color:var(--bad)">Si te ve otro pobre, puede ser el que delataste: te delatará (Te buscan +2).</p>`;
         } else h += `<p class="muted small">Esta acción no tira dado de testigo.</p>`;
         if (a.red) {
           h += `<p class="paso">3. ${ui.accion === "delatar" ? "¿A quién delatas?" : "¿Con quién?"}</p>`;
           if (ui.accion !== "delatar") h += `<button class="btn ${ui.contacto === "nuevo" ? "sel" : ""}" data-act="contacto" data-id="nuevo"><span class="t">Con alguien nuevo</span></button>`;
-          E.contactosDisponibles(s).forEach((c) => { h += `<button class="btn ${ui.contacto === c.id ? "sel" : ""}" data-act="contacto" data-id="${c.id}"><span class="t">${esc(c.nombre)}</span><span class="d">Relación ${c.rel}${ui.accion === "delatar" ? " · lo perderás" : ""}</span></button>`; });
+          E.contactosDisponibles(s).forEach((c) => { h += `<button class="btn ${ui.contacto === c.id ? "sel" : ""}" data-act="contacto" data-id="${c.id}"><span class="t">${esc(c.nombre)}</span><span class="d">Relación ${c.rel} · vive ${c.lado === "fuera" ? "en el arrabal" : "en la ciudad"}${ui.accion === "delatar" ? " · lo perderás" : ""}</span></button>`; });
         }
         if (a.dado) {
           h += `<p class="paso">${a.red ? "4" : "3"}. ¿Qué dado usas?</p>`;

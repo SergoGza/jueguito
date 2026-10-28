@@ -303,7 +303,6 @@
     let ids = [];
     fr.acts.forEach((c) => ids.push(...R.COD_ACC[c]));
     const oficios = p.oficios || ["peon"];
-    ids = ids.filter((id) => (id !== "trabajar" || oficios.includes("peon")) && (id !== "lavar" || oficios.includes("lavar")));
     if (m.hurtar > 0 && !ids.includes("hurtar")) ids.push("hurtar");
     const libres = s.dados.filter((d) => !d.usado).length;
     return ids.map((id) => {
@@ -312,6 +311,8 @@
       if (a.dado && libres === 0) { ok = false; motivo = "No te quedan dados."; }
       if (id === "hurtar" && m.hurtar < 0) { ok = false; motivo = "Hoy no hay gentío para hurtar aquí."; }
       if (id === "trabajar" && m.sinJornal) { ok = false; motivo = "Hoy no hay jornal."; }
+      if (id === "trabajar" && !oficios.includes("peon")) { ok = false; motivo = "A ti no te contratan de peón: tu oficio es lavar ropa."; }
+      if (id === "lavar" && !oficios.includes("lavar")) { ok = false; motivo = "Lavar ropa es oficio de lavanderas: no es el tuyo."; }
       if (id === "examen") {
         if (p.forastero) { ok = false; motivo = "Solo para naturales de la ciudad: eres forastero."; }
         else if (licencia(s)) { ok = false; motivo = "Ya estás en la lista."; }
@@ -402,7 +403,9 @@
     for (let w = 1; w <= 6; w++) {
       const t = testigoPara(s, sid, s.franja, w, {});
       const f = filas.find((x) => x.testigo === t);
-      if (f) f.caras.push(w); else filas.push({ testigo: t, caras: [w], efecto: R.EFECTOS[grupo][R.CATEGORIA[t]].txt + (R.CATEGORIA[t] === "Autoridad" && persigue(s, sid) ? `; y eres forastero con el pregón en marcha: Te buscan +${P.pregonPersigue}` : "") });
+      const ef = R.EFECTOS[grupo][R.CATEGORIA[t]];
+      const sacaDeLista = licencia(s) && grupo !== "Pedir estando en la lista" && (ef.t > 0 || ef.at > 0);
+      if (f) f.caras.push(w); else filas.push({ testigo: t, caras: [w], efecto: ef.txt + (R.CATEGORIA[t] === "Autoridad" && persigue(s, sid) ? `; y eres forastero con el pregón en marcha: Te buscan +${P.pregonPersigue}` : "") + (sacaDeLista ? "; si te sube el termómetro, sales de la lista" : "") });
     }
     return filas;
   }
@@ -570,6 +573,11 @@
       o.vistoJuntos = o.cat === "Autoridad";
       o.lineas.push(o.vistoJuntos ? `Os ha visto un alguacil: esta noche interrogará a ${o.nombre}.` : `Queda señalado quien estuvo contigo: si esta noche la autoridad interroga, irá a por ${o.nombre}.`);
     }
+    if (!o.borrado && o.dT > 0 && s.termo >= techo(s)) o.lineas.push(`El termómetro ya está en ${signo(s.termo)}${(s.detenciones || 0) > 0 ? ", el máximo" : ": sin haberte detenido nunca, no pasa de ahí"}.`);
+    if (!o.borrado && o.dT < 0) {
+      const suelo = s.marca ? 1 : licencia(s) ? -2 : -1;
+      if (s.termo <= suelo) o.lineas.push(s.marca ? "Estás marcado: el termómetro no baja de +1." : licencia(s) ? "En la lista no bajas más: el −3 es que te recojan, y solo pasa en el hospital." : "Fuera de la lista, el termómetro no baja de −1.");
+    }
     if (o.venganzaNueva) o.lineas.push("Otro pobre te ha visto: se corre la voz. El resto de tu red te baja la relación (−1) y alguien se vengará la próxima vez que te vea otro pobre.");
     if (o.detenido) o.lineas.push("TE DETIENEN. " + o.motivoDet + " La jornada se acaba.");
     return o;
@@ -734,7 +742,11 @@
       if (d.lado !== "ambos" && d.lado !== lado) { o.ok = false; o.motivo = lado === "fuera" ? "Estás fuera de la muralla." : "Estás dentro de la muralla: para dormir en el arrabal tienes que haber salido antes por la puerta."; }
       if (d.id === "red") {
         const c = mejorContacto(s, lado, techoRel());
-        if (!c) { o.ok = false; o.motivo = `Necesitas relación ${techoRel()} o más con alguien de tu red que viva de este lado de la muralla.`; }
+        if (!c) {
+          o.ok = false; o.motivo = `Necesitas relación ${techoRel()} o más con alguien de tu red que viva de este lado de la muralla.`;
+          const otros = contactosDisponibles(s).filter((x) => x.rel >= techoRel() && x.lado !== lado);
+          if (otros.length) o.motivo += ` ${otros.map((x) => x.nombre).join(" y ")} ${otros.length === 1 ? "vive" : "viven"} ${lado === "dentro" ? "en el arrabal" : "en la ciudad"}.`;
+        }
         else { o.con = c.nombre; o.nombre = "Con " + c.nombre; }
       }
       if (o.coste > s.monedas) { o.ok = false; o.motivo = `Cuesta ${o.coste} monedas y no las tienes.`; }
@@ -912,6 +924,7 @@
           if (conNino) m.txt += " Tenía a tu hijo.";
           if (m.visto) m.txt = `Un alguacil te vio con ${c.nombre}. ` + m.txt;
           else if (m.senalado) m.txt = `Va a por quien estuvo contigo. ` + m.txt;
+          else m.txt = `Nadie estaba señalado, así que va a por alguien de tu red. ` + m.txt;
           break;
         }
         case "Ronda":

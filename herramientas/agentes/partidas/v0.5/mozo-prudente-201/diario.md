@@ -1,0 +1,49 @@
+- Día 1 · Prima · [DECIDO] Con el 6 trabajo a jornal en la plaza en vez de pedir en misa: gano 3 monedas sin que me tengan por mendigo, aunque ocupa tercia también.
+- Día 1 · Sexta · [DECIDO] Con un 3 no llego a la sopa; prefiero juntarme con alguien en el convento, donde nadie peligroso mira, antes que pedir sin sacar nada.
+- Día 1 · Nona · [DECIDO] Descanso en la ribera (4 de 6 sin testigos) para subir a 9 y tener 5 dados; me vio un alguacil y gasté el rumor para borrarlo, al menos me libré de la sospecha.
+- Día 1 · Vísperas · [DECIDO] Pedir en la catedral con 5 monedas encima me podía marcar; prefiero juntarme otra vez con Pedro en el mesón para llegar a relación 2 y recuperar un rumor.
+- Día 1 · autoridad · [DECIDO] Duermo en el pórtico y compro una ración en vez de pagar el mesón: pierdo 1 de cuerpo pero guardo pan para mañana y no me quedo sin nada.
+- Día 2 · Prima · [OBVIO] Con 2 monedas y el pan a 3, trabajo a jornal en la plaza con el 4 y guardo el 5.
+- Día 2 · Sexta · [DECIDO] Uso el 5 en la sopa del convento para una ración en vez de pedir en la plaza; salió el alguacil de la ronda y gasté el rumor, me salvó otra vez.
+- Día 2 · Nona · [OBVIO] Con el último 3 intento descansar en la ribera para recuperar cuerpo; me vio otro pobre y no descansé.
+- Día 2 · autoridad · [DECIDO] Pago el mesón con las 5 monedas en vez del pórtico: no pierdo cuerpo, me libro de fiebres y rondas y gano un rumor, aunque mañana empiezo sin dinero.
+- Día 3 · Tercia · [NADA] En prima pedir me exponía al cura, la beneficencia o un alguacil (soy forastero, +2), y descansar junto a la puerta era casi seguro que me viera la guardia; no hago nada.
+- Día 3 · Tercia · [NO ENTIENDO] La ribera dice «lavanderas (lavar ropa)» pero al mozo no le sale el botón de lavar; esperaba poder ganar algo ahí. Descanso con el 3 y subo a 7.
+- Día 3 · Sexta · [DECIDO] Con un 3 no llego a la sopa; vuelvo a descansar en la ribera en vez de pedir en la plaza vigilada. Subo a 8.
+- Día 3 · Nona · [DECIDO] Con el 2 no puedo descansar; me junto con alguien nuevo en la ribera (Catalina) porque Pedro está con fiebres y necesito más gente.
+- Día 3 · autoridad · [DECIDO] Me quedo en el pórtico en vez de salir al arrabal: salir y volver a entrar me ponía dos veces delante de la guardia como forastero. Me pilló la ronda igualmente.
+- Día 4 · amanecer · [DECIDO] Le doy a Catalina la ración de la cofradía en vez de guardarla: hoy tengo buenos dados para la sopa y prefiero tenerla a relación 2. No finjo.
+- Día 4 · Prima · [DECIDO] Pido en el convento a prima (frailes, sin alguaciles) en vez de esperar a la procesión de la catedral, que paga más pero está llena de alguaciles.
+- Día 4 · Tercia · [NO ENTIENDO] En la catedral la tabla de testigos pone «1-6 Alguacil» y luego 2, 3-4 y 5 aparte; supongo que quiere decir el 1 y el 6, pero parece que todo es alguacil. No me arriesgo y pido con el 6 en el convento.
+- Día 4 · Sexta · [OBVIO] Sopa del convento con un 5: ración asegurada para esta noche.
+- Día 4 · Vísperas · [DECIDO] En nona no hago nada para guardar el último 5 y juntarme con Pedro en vísperas, a ver si llego a relación 3 y duermo bajo techo.
+- Día 4 · autoridad · [DECIDO] Duermo con Pedro (relación 3) y gasto las 4 monedas en pan para tener reserva; no pierdo cuerpo y nadie me ve.
+- Día 5 · amanecer · [DECIDO] Vuelvo a dar mi ración a Catalina: vive en el arrabal y con relación 3 podré dormir fuera de la muralla cuando venza el pregón. Hoy el 6 irá a la sopa.
+- Día 5 · Prima · [NADA] Con 3, 2 y 1 no saco nada a prima, y el jornal con el 6 me deja a 3 monedas con el pan a 4 y con un tercio de alguacil; guardo el 6 para la sopa.
+- Día 5 · Tercia · [NADA] Descansar en cualquier pórtico o en la ribera con ronda es casi seguro que me vean; dejo pasar tercia.
+- Día 5 · Sexta · [OBVIO] Sopa con el 6: me asegura la cena de hoy.
+- Día 5 · Nona · [NADA] En nona todo está muerto o vigilado y solo tengo dados bajos; espero al mesón.
+- Día 5 · Vísperas · [DECIDO] Me junto con Pedro en el mesón y no con alguien nuevo: ya es de confianza y si lo interrogan no me vende; saco un rumor.
+- Día 5 · autoridad · [OBVIO] Con tormenta y sin dinero, duermo en casa de Pedro: bajo techo y gratis.
+- Día 6 · Prima · [DECIDO] Con el convento lleno de alguaciles, trabajo a jornal con el 5 y guardo el 6 para las sobras; salió alguacil y lo borré con un rumor.
+- Día 6 · Sexta · [DECIDO] Descanso con el 3 en la ribera en vez de ir a la sopa con media ronda de alguaciles; me vio otro pobre y no gasto el último rumor en eso.
+- Día 6 · Nona · [DECIDO] Con el 1 me junto con Catalina en la ribera en vez de con alguien nuevo: no quiero señalar a un desconocido que me pueda vender.
+- Día 6 · Vísperas · [DECIDO] Pido sobras en la plaza con el 6 aunque hay un tercio de alguacil, porque con el pan a 6 una ración vale más que todo mi jornal; salió bien.
+- Día 6 · autoridad · [OBVIO] Duermo con Pedro y como una de mis dos raciones; con el pan a 6 no compro nada.
+- Día 7 · Prima · [DECIDO] Misa mayor: pido en la catedral con el 5 y no con un 6, que da lo mismo; saco 4 monedas y me mira la beneficencia, lo acepto sin gastar el rumor.
+- Día 7 · Tercia · [OBVIO] Sin jornal ni mercado, descanso en la ribera con el 3: subo a 8.
+- Día 7 · Sexta · [DECIDO] Sopa con un 6 aunque hay un tercio de alguacil, en vez de pedir en las Escuelas por un par de monedas: una ración vale más con el pan a 6. Salió bien.
+- Día 7 · Nona · [DECIDO] Uso el último 6 para descansar en la ribera y llegar a 9 (cinco dados) en vez de juntarme en el mesón por un rumor.
+- Día 7 · autoridad · [DECIDO] Compro una ración a 6 con lo que pedí en vez de guardar monedas: el pan no deja de subir y llevar 7 encima es peligroso. Duermo con Pedro.
+- Día 8 · Prima · [DECIDO] Con el 3 me junto con Pedro en el convento en vez de pedir: las monedas no llegan al pan a 8 y prefiero rumores para cruzar la puerta el día 9.
+- Día 8 · Tercia · [DECIDO] Me junto con Catalina en la ribera por otro rumor; me vio un alguacil y gasté un rumor para que no la interroguen, la necesito para dormir fuera el día 9.
+- Día 8 · Sexta · [OBVIO] Sopa con un 5 en el convento sin ronda: ya tengo 3 raciones, suficiente hasta el final.
+- Día 8 · Nona · [DECIDO] Descanso con el 5 en la ribera; salió alguacil y gasté otro rumor para no traer una ronda al arrabal, donde pienso pasar los últimos días.
+- Día 8 · Vísperas · [DECIDO] Salgo por la puerta ya el día 8 en vez de esperar al 9: tengo pan hasta el final y fuera no me cuenta el pregón; pasé sin que me parara la guardia.
+- Día 8 · autoridad · [OBVIO] Fuera de la muralla duermo con Catalina: bajo techo y sin pagar. Se han llevado a Pedro por juntarme con él, y eso duele.
+- Día 9 · Prima · [NADA] Fuera de la muralla a prima solo está la ribera con la guardia en la puerta; no hago nada.
+- Día 9 · Tercia · [DECIDO] Descanso en la ribera con un 3 para llegar a 10 antes de dos noches al raso; salió el alguacil de la ronda y gasté mi último rumor.
+- Día 9 · Sexta · [NADA] Tengo 2, 3, 3 y 6, pero ya estoy a 10 de cuerpo, tengo pan para dos noches y las monedas no llegan al pan a 7; en la ribera con ronda cualquier cosa solo me arriesga. Acabo el día.
+- Día 9 · autoridad · [OBVIO] Catalina tiene fiebres y Pedro está preso: solo me queda dormir al raso en el arrabal y comer una de mis dos raciones.
+- Día 10 · Prima · [OBVIO] Vence el pregón y Catalina ha muerto; me quedo fuera de la muralla sin hacer nada, con una ración para la noche, y acabo el día.
+- Día 10 · fin · [OBVIO] Última noche al raso en el arrabal con mi última ración; me cogieron las fiebres pero llego vivo.

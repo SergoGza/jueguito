@@ -1,0 +1,52 @@
+- Día 1 · amanecer · [DECIDO] Finjo llagas con el 4 en vez de con un 2: prefiero que no me descubran aunque pida con dados flojos.
+- Día 1 · Prima · [DECIDO] Pido en la catedral con el 3 por la misa (+1) en vez de la parroquia; me dan 3 y ya llevo demasiado dinero.
+- Día 1 · Tercia · [DECIDO] Con un 2 prefiero compartir mi ración con alguien nuevo en el puente (rumor seguro) antes que pedir con 5 monedas encima.
+- Día 1 · Sexta · [DECIDO] Último 2 a pedir en el mercado (+1) y no en escuelas ni convento, que daban poco o nada; tenía un rumor por si salía alguacil. Salió nadie, +2.
+- Día 1 · noche · [DECIDO] Mesón (5) más pan no me llega con 7; duermo en el pórtico y compro 2 raciones para guardar una.
+- Día 2 · amanecer · [DECIDO] Finjo con el 6 y no con el 5: hay redada y quiero que la beneficencia casi nunca me descubra; pediré con el 5 y el 3 en el mercado.
+- Día 2 · Prima · [NO ENTIENDO] En la tabla de testigos de la parroquia pone «1-6 Alguacil» y luego 2 vecinos y 3-5 cura; supongo que es el 1 y el 6, pero parece un rango.
+- Día 2 · Prima · [DECIDO] Pido con el 5 en la parroquia (misa +1) y no en el mercado, que con la redada tiene media tabla de alguaciles. Salió el cura y no me pilló.
+- Día 2 · Tercia · [DECIDO] Pido con el 3 en el mercado (+2 hoy) aceptando la redada; salió alguacil y gasté el rumor para repetir, salvado. Llevo 9 monedas.
+- Día 2 · Vísperas · [DECIDO] Con el 1 comparto ración con Inés en el mesón en vez de juntarme: me da rumor aunque el dado sea malo y la subo a relación 2. (Por error dejé pasar la sexta sin mirar.)
+- Día 2 · noche · [DECIDO] Mesón y una ración (8 de 9 monedas) en vez de pórtico: no pierdo cuerpo, gano rumor y no duermo al raso con dinero.
+- Día 3 · amanecer · [OBVIO] Ha muerto Inés y ahora soy forastero buscado; finjo con el 6 para que el cura o la beneficencia no me pillen y pido con los dos 5.
+- Día 3 · Prima · [DECIDO] Pido con un 5 en la parroquia; salió alguacil (+3 te buscan por forastero) y gasté rumor: salió el cura y no me descubrió.
+- Día 3 · Tercia · [DECIDO] Uso el 1 para juntarme con alguien nuevo en el puente (Gil) en vez de gastarlo pidiendo, que no daría nada; necesito red tras morir Inés.
+- Día 3 · Sexta · [DECIDO] Sopa del convento con el 5 porque allí no hay alguaciles; un pobre me delató (+1) pero guardo el rumor para cuando salga alguacil, que cuesta +3.
+- Día 3 · noche · [DECIDO] Mesón con las 5 monedas y como la ración de la sopa; mejor que pórtico, que me quita cuerpo y tiene ronda.
+- Día 4 · amanecer · [NO ENTIENDO] El texto del día dice «Pan a 4 la ración» y arriba pone pan a 5 (escasea el trigo, +1); no sé si la subida ya está sumada en el 4 o no.
+- Día 4 · amanecer · [DECIDO] Sin raciones no puedo dar a Gil. Finjo con el 5 y guardo los dos 4 para pedir en la procesión (+2).
+- Día 4 · Prima · [DECIDO] Gasto el 2 pidiendo en la misa de la parroquia en vez de guardarlo para juntarme: con el pan a 5 necesito monedas. +2.
+- Día 4 · Tercia · [DECIDO] Pido con un 4 en la catedral por la procesión (+2) y no en la plaza, que tiene más alguaciles; salió alguacil, gasté rumor y la beneficencia no me descubrió.
+- Día 4 · Sexta · [DECIDO] Con el último 4 descanso en la ribera en vez de pedir otra vez: no llego al mesón (12) y prefiero no bajar de 4 dados tras el pórtico. Salió alguacil, gasté el último rumor y descansé.
+- Día 4 · noche · [OBVIO] El mesón cuesta 7 y tengo 6: pórtico y una ración a 5.
+- Día 5 · Prima · [DECIDO] Hoy no finjo: con 1-6-1 la treta con un 1 me descubriría seguro y con el 6 no podría pedir. Pido con el 6 en la parroquia y no en la catedral (limosna pública pero media tabla de alguaciles). +4.
+- Día 5 · Tercia · [DECIDO] Con un 1 comparto una moneda con alguien nuevo (Ana) en vez de juntarme: así gano rumor, que me ha salvado ya cuatro veces de alguaciles.
+- Día 5 · Sexta · [DECIDO] Me junto con Ana con el último 1 para subirla a relación 2; vio un alguacil y gasté el rumor para que no la interroguen seguro.
+- Día 5 · Nona · [DECIDO] Salgo por la puerta para dormir en el arrabal en vez del pórtico: allí no pasa la ronda y como forastero prefiero estar fuera.
+- Día 5 · noche · [OBVIO] Arrabal y una ración con mis 4 monedas.
+- Día 6 · amanecer · [NO ENTIENDO] Otra vez el texto dice «Pan a 6» y arriba pone pan a 7. Además han catalogado mis llagas aunque nadie me descubrió nunca; no sé por qué.
+- Día 6 · amanecer · [DECIDO] No finjo: con 2-4-3 una treta de 2 o 3 me la descubren casi seguro y las llagas están catalogadas; necesito el 4 para la sopa y el 3 para pedir.
+- Día 6 · Prima · [DECIDO] Entro por la puerta a prima aunque la guardia mira mucho: dentro están la sopa y el hospital, que es lo que necesito hoy. Pasé sin que me vieran.
+- Día 6 · Tercia · [DECIDO] Pedir hoy da poco y el mercado tiene muchos alguaciles; uso el 3 en juntarme con Ana (relación 3 y rumor) para tener casa y pan si me falta.
+- Día 6 · Sexta · [OBVIO] Sopa del convento con el 4: ya tengo la ración de esta noche con el pan a 7.
+- Día 6 · Vísperas · [DECIDO] Con el 2 me junto otra vez con Ana en el mesón en vez de con alguien nuevo: si interrogan esta noche, mejor que vayan a por alguien que no me venda.
+- Día 6 · noche · [DECIDO] Duermo en el hospital y no en el pórtico: +2 de cuerpo para volver a 4 dados, aunque me apunten una vez. Ana vive fuera y no puedo ir a su casa.
+- Día 7 · Prima · [DECIDO] Con las llagas catalogadas cambio a falso peregrino con el 5; pido en la misa mayor con el 3, que ya da «bastante», y guardo los 4 para la sopa y otra petición.
+- Día 7 · Tercia · [DECIDO] Pido con un 4 en la catedral a tercia en vez de ir a las escuelas; la beneficencia me examinó y la treta aguantó. Solo +2.
+- Día 7 · Sexta · [OBVIO] Sopa con el otro 4: ración para esta noche; el fraile además me tiene por pobre de Cristo.
+- Día 7 · Nona · [DECIDO] Salgo de la ciudad a nona para dormir en el arrabal: el mesón cuesta 8 y el pórtico tiene ronda; además el pregón vence pronto y fuera no me suma por forastero.
+- Día 7 · noche · [DECIDO] Compro otra ración con las 6 monedas para guardarla en vez de dormir con dinero al raso, que me lo pueden robar.
+- Día 8 · Tercia · [NO ENTIENDO] La ribera dice «lavanderas (lavar ropa)» pero no me sale el botón de lavar; supongo que el mozo no puede, pero no lo pone.
+- Día 8 · Tercia · [DECIDO] Puerta cerrada, fiebres y 2 dados: no finjo (fuera pedir rinde poco) y me salto la prima porque la guardia ve a quien descansa; descanso en la ribera a tercia.
+- Día 8 · Tercia · [OBVIO] Descanso y nadie me ve: cuerpo 5.
+- Día 8 · Sexta · [DECIDO] Segundo 4 también a descansar en vez de juntarme con alguien nuevo o pedir fuera: prefiero llegar a mañana con 3 dados. Cuerpo 6.
+- Día 8 · noche · [OBVIO] Fuera y sin dinero: arrabal y como la ración guardada.
+- Día 9 · Tercia · [DECIDO] Con dos 2 no finjo: ni pidiendo llego al pan a 7 y con un 2 el hambre no deja descansar. Pienso entrar luego para dormir en el hospital.
+- Día 9 · Tercia · [DECIDO] Uso un 2 para juntarme con alguien nuevo (Antón) en el puente: es lo único que un 2 me da hoy, y Ana y Gil están con fiebres.
+- Día 9 · Sexta · [DECIDO] Me junto otra vez con Antón para subirlo a 2; salió alguacil, gasté mi último rumor y volvió a salir alguacil. Mala suerte.
+- Día 9 · Nona · [DECIDO] Entro a nona para dormir en el hospital: fuera, al raso y sin pan, amanecería con cuerpo 1 y otra fiebre me mata; aunque mañana vence el pregón y estaré dentro.
+- Día 9 · noche · [OBVIO] Hospital: sin pan pierdo 2 pero me curan 2; el pórtico me dejaría en 1.
+- Día 10 · amanecer · [DECIDO] Último día: con un 5 podría fingir y pedir, pero si un alguacil o la guardia me ve dentro me detienen y con llegar a la noche ya sobrevivo. No finjo y me quedo quieto, sin cruzar la puerta.
+- Día 10 · Prima · [NADA] Tengo un 5 y un 3, pero cualquier acción dentro de la muralla tira testigo y hoy un alguacil me detiene; acabo el día sin usarlos.
+- Día 10 · noche · [OBVIO] El hospital me recogería a la tercera; pórtico aunque me quede en cuerpo 1 y me arriesgue a la ronda.

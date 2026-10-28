@@ -1,0 +1,47 @@
+- Día 1 · amanecer · [DECIDO] Finjo llagas con el 5 y guardo los dos 6 para pedir; con dos raciones que comer y 2 monedas necesito sacar mucho hoy.
+- Día 1 · Prima · [DECIDO] Pido en la catedral con un 6 en misa en vez de la parroquia, por el +1 de misa; salió bien, 7 monedas.
+- Día 1 · Tercia · [DECIDO] Miré hurtar en la plaza pero con alguacil en 5-6 era jugarse al niño; lavé ropa con el 6, seguro pero solo 2 monedas.
+- Día 1 · Sexta · [DECIDO] Con el 1 sobrante compartí mi ración con Catalina en vez de juntarme: me sobran monedas y así gano rumor seguro.
+- Día 1 · noche · [DECIDO] Mesón (5) y dos raciones (6): me quedo a cero pero bajo techo, sin riesgo de robo ni ronda y el niño se recupera; el pórtico me dejaba pan de sobra pero con riesgos.
+- Día 2 · Prima · [OBVIO] Dados malos (2 1 3 1) y Catalina muerta: no finjo con un 1 y gasto un 1 en juntarme con Perico en el convento.
+- Día 2 · Tercia · [OBVIO] Pido en la plaza en día de mercado con el 3, el mejor sitio y hora para un dado flojo; 5 monedas.
+- Día 2 · Sexta · [DECIDO] Volví a pedir en la plaza con el 2 aunque ya había pedido allí; salió alguacil y gasté un rumor para repetir, que salvó la jugada.
+- Día 2 · Vísperas · [DECIDO] En el mesón pude delatar a Perico por 2 monedas y pagarme la cama, pero preferí darle una moneda: relación 2 y un rumor valen más que una noche bajo techo.
+- Día 2 · autoridad · [OBVIO] Pórtico y dos raciones: no llegaba al mesón; noche tranquila, pierdo 1 de cuerpo.
+- Día 3 · Prima · [DECIDO] No finjo con dados de 4 y pido en la catedral en misa; salió alguacil otra vez y gasté rumor; solo 4 monedas.
+- Día 3 · Tercia · [DECIDO] Lavé ropa con el 4 en vez de pedir: llevo más de 4 monedas y pedir me podía marcar como fingidora; con esto ya tengo el pan de la noche.
+- Día 3 · Sexta · [DECIDO] Pedir con el 2 daba poco y arriesgaba el termómetro; me junté con Lucía para ampliar la red; salió alguacil y gasté el último rumor.
+- Día 3 · Vísperas · [OBVIO] Con el 1 me junto con Perico en el mesón para llegar a relación 3 y dormir en su casa.
+- Día 3 · autoridad · [OBVIO] Duermo gratis en casa de Perico y gasto las 8 monedas en dos raciones.
+- Día 4 · Prima · [DECIDO] No finjo (con un 4 la beneficencia me pillaría la mitad de las veces) y pido en la parroquia con el 3 para guardar el 6 y los 4 para la procesión del Corpus.
+- Día 4 · Tercia · [DECIDO] Pido en la plaza con el 6 en plena procesión aunque el alguacil sale en casi todo el dado; descarté hurtar porque me detienen en el acto. Salió bien: 8 monedas.
+- Día 4 · Sexta · [DECIDO] Con un 4 prefiero la sopa del convento (una ración, testigos tranquilos) a pedir en la catedral del Corpus llena de alguaciles y con 12 monedas encima.
+- Día 4 · Vísperas · [OBVIO] Me junto con Perico con el 4 para recuperar la relación 3 que perdí al no darle pan, y saco un rumor.
+- Día 4 · noche · [DECIDO] Duermo en casa de Perico y compro 3 raciones para guardar 2: prefiero pan en la bolsa a monedas que me delatan al pedir.
+- Día 5 · Prima · [DECIDO] Le doy pan a Perico para no perder su casa; pido con un 2 en la limosna pública de la catedral sabiendo que me iban a ver seguro: 5 monedas y termómetro +1.
+- Día 5 · Tercia · [OBVIO] Lavo ropa con el 4: 2 monedas seguras, ya llego al pan de la noche.
+- Día 5 · Sexta · [DECIDO] Con el 2 la sopa no llega; me junto con Lucía para tener una segunda persona de confianza además de Perico.
+- Día 5 · Vísperas · [OBVIO] El 1 no sirve para pedir: otra vez con Lucía en el mesón, ya relación 3.
+- Día 5 · autoridad · [OBVIO] Casa de Perico otra vez y una ración; guardo 3 monedas.
+- Día 6 · Prima · [DECIDO] Fingí mal de corazón con el 5 y pedí con el 6 en la catedral: la beneficencia me descubrió, gasté el rumor y salió alguacil. 7 monedas pero ya soy vagabunda (+2).
+- Día 6 · Tercia · [DECIDO] Con 10 monedas y ya vagabunda no me atrevo a pedir en la plaza; lavo ropa con el 4, que si me ven trabajando hasta me baja el termómetro.
+- Día 6 · Sexta · [DECIDO] Con el 2 pido en el convento solo por si me ve un fraile y me baja el termómetro; salió la beneficencia, no me pilló, pero las 12 monedas lo anularon.
+- Día 6 · autoridad · [DECIDO] Casa de Perico y compro 2 raciones a 6 para guardar una y no ir cargada de monedas mañana.
+- Día 7 · Prima · [DECIDO] Finjo llagas con el 6 para que me descubran solo con un 6 y que cura o beneficencia me bajen el termómetro; pido en la parroquia en misa mayor con un 5: 7 monedas.
+- Día 7 · Tercia · [DECIDO] Lavo con el 3 (no hay plaza en domingo y la catedral tiene ronda) y guardo el 5 para la sopa, que con el pan a 7 vale más que monedas.
+- Día 7 · Sexta · [OBVIO] Sopa del convento con el 5: una ración, pero otro pobre me delató (te buscan 2).
+- Día 7 · autoridad · [DECIDO] Con dos raciones ya para cenar, compro una más a 7 para mañana en vez de guardar 9 monedas que pesan al pedir.
+- Día 8 · Prima · [DECIDO] Vuelvo a fingir llagas con el 6 y pido en la parroquia con un 3, guardando el 4 para la sopa; 5 monedas y nadie me vio.
+- Día 8 · Tercia · [DECIDO] Me la juego en la limosna pública de la catedral con el 3 en vez de lavar: necesito monedas para los dos últimos días con el pan a 7. Saco 6 pero me ve el alguacil (te buscan 3).
+- Día 8 · Sexta · [OBVIO] Sopa con el 4: ración, pero otro pobre me vuelve a delatar; te buscan 4 de 6, mañana toca esconderse.
+- Día 8 · autoridad · [OBVIO] Casa de Perico, cenamos las dos raciones y compro una para mañana; me quedan 6 monedas.
+- Día 9 · amanecer · [DECIDO] Con te buscan 4 no finjo (si me descubren son +2 y me detienen) y no pido donde haya alguaciles: hoy lavo ropa y voy a la sopa.
+- Día 9 · Tercia · [OBVIO] Lavo ropa con el 4 en la ribera, donde el alguacil no me puede hacer daño: 2 monedas.
+- Día 9 · Sexta · [DECIDO] Me arriesgo a la sopa con el 5 en vez de lavar otra vez: salió el alguacil de la ronda y ya estoy a 5 de 6. A partir de aquí, nada que pueda ver un alguacil.
+- Día 9 · Nona · [NADA] Me quedan un 5 y un 1, pero descansar o pedir tienen alguacil en el 6 y uno más me detiene; no lo gasto.
+- Día 9 · autoridad · [OBVIO] Casa de Perico y compro una ración para mañana; de noche interrogan a Perico, no me vende pero se lo llevan dos días.
+- Día 10 · amanecer · [OBVIO] Último día con redada y te buscan 5 de 6: cualquier acción tiene alguacil en el 1 y me detendría. No hago nada; basta con llegar a la noche.
+- Día 10 · Prima · [DECIDO] Salgo por la puerta para dormir en el arrabal, sin rondas, en vez de jugarme la ronda del pórtico; me vio el alguacil pero como no soy forastera no pasó nada.
+- Día 10 · Tercia · [OBVIO] Lavar ropa es lo único que no me sube el te buscan aunque me vea el alguacil; lavo con el 3.
+- Día 10 · Sexta · [OBVIO] Lavo con el 6; el alguacil me ve trabajar y hasta me baja a sospechosa. Los dados que quedan (2 y 1) no los toco.
+- Día 10 · noche · [DECIDO] Solo hay una ración y el pan a 8: come el niño y yo pierdo 2 de cuerpo; duermo en el arrabal, sin rondas.

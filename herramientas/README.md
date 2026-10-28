@@ -4,7 +4,8 @@ Nada de esto lo necesita el juego: sirve para probar y equilibrar las reglas.
 
 - `simlib.js`: el bot. Lo usan todas las simulaciones. Políticas `azar`, `prudente` y `egoista`. Admite ganchos para medir cosas sin copiar el bot (ver la cabecera del archivo).
 - `sim.js [N]`: juega N partidas por personaje con el bot al azar y el prudente, comprueba invariantes y saca porcentajes. `node herramientas/sim.js 1500`
-- `calib.js [N]`: prueba combinaciones de palancas (definidas arriba del archivo) sin tocar `rules.js` (se aplican encima de las reglas actuales). `COMBOS="techoNoCura+pan1;pedirDuro" node herramientas/calib.js 600`. Con `POL=azar`, usa el bot al azar.
+- `calib.js [N]`: prueba combinaciones de palancas (definidas arriba del archivo) sin tocar `rules.js` (se aplican encima de las reglas actuales). `COMBOS="persigue2+expSuave3+techo3;pan1" node herramientas/calib.js 600`. Con `POL=azar`, usa el bot al azar. De la viuda da la supervivencia con el niño, que es su victoria desde la v0.5.
+- `causas.js`: de qué muere cada personaje, cuántas veces le detienen y si le echaron de la ciudad, con las palancas que se pasen: `PALANCAS='{"pregonPersigue":2,"expulsionDias":3}' node herramientas/causas.js`.
 - `dados.js [N]`: dados muertos y decisiones. Qué pasa con cada dado según su valor y cuántas franjas tienen algo que decidir. `node herramientas/dados.js 2000`
 - `mapa-dados.js`: qué puede sacar cada valor de dado en cada franja de un día, sin contar riesgos. `DIA=4 node herramientas/mapa-dados.js`
 - `red.js [N]`: qué hace el bot con la red: cuántas veces se junta, a qué relación llega, cuántas noches duerme con alguien, cuántos interrogatorios hay y cuántas veces le venden.
@@ -20,7 +21,7 @@ Nada de esto lo necesita el juego: sirve para probar y equilibrar las reglas.
 
 Ve todos los riesgos y no finge salvo que se pida (`FINGIR=auto|siempre|4|5`). Para cada acción gasta el dado más bajo que rinde lo mismo que el más alto.
 
-Desde la v0.4 usa la red: se junta con quien más relación tiene de su lado de la muralla (para llegar pronto a relación 2, que da techo), descuenta el riesgo de dejar a esa persona señalada y solo delata a quien no le da techo ni pan. `RED=no` hace que no se junte con nadie y `DELATAR=no`, que no delate nunca: sirven para medir cuánto aporta cada cosa. Desde la v0.4b entra en la lista de pobres si puede, cumple cada día y solo pide estando en ella si la ganancia compensa el riesgo de que le borren; `LISTA=no` hace que no entre nunca.
+Desde la v0.4 usa la red: se junta con quien más relación tiene de su lado de la muralla (para llegar pronto a relación 2, que da techo), descuenta el riesgo de dejar a esa persona señalada y solo delata a quien no le da techo ni pan. `RED=no` hace que no se junte con nadie y `DELATAR=no`, que no delate nunca: sirven para medir cuánto aporta cada cosa. Con la viuda, el niño come primero salvo que ella muriera de hambre esa noche (su victoria es llegar los dos). Desde la v0.4b entra en la lista de pobres si puede, cumple cada día y solo pide estando en ella si la ganancia compensa el riesgo de que le borren; `LISTA=no` hace que no entre nunca.
 
 Desde el 27 de octubre de 2026 tiene corregidos dos fallos de la v0.3b:
 - probaba el examen de licencia con cualquier dado, así que la viuda suspendía una y otra vez y le subía el termómetro;

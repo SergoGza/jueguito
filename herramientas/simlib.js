@@ -40,6 +40,8 @@ function riesgo(s, sid, acc) {
     if (R.CATEGORIA[f.testigo] === "Autoridad") { alg += f.caras.length / 6; if (acc === "hurtar") det += f.caras.length / 6; }
     if (R.CATEGORIA[f.testigo] === "Beneficencia") ben += f.caras.length / 6;
   });
+  // el pregón que persigue a los forasteros (palanca de calibración)
+  if (P.pregonPersigue && E.pj(s).forastero && !E.licencia(s) && s.dia >= P.pregonInicio && s.dia < P.pregonVence && sid !== "puente") tb += alg * P.pregonPersigue;
   return { t, tb, det, alg, ben };
 }
 
@@ -77,7 +79,7 @@ function ganancia(s, op, v, r) {
       return E.licencia(s) && !VIEJO ? g - (r.ben + r.alg) * valorLista(s) : g;
     }
     case "cumplir": return s.hoy.cumplido ? -1 : E.precioPan(s);
-    case "trabajar": return v + E.pj(s).modJornal >= P.jornalUmbral ? 3 : 0;
+    case "trabajar": return v + E.pj(s).modJornal >= E.umbralJornal(s) ? 3 : 0;
     case "lavar": return v >= P.lavarUmbral ? 2 : 0;
     case "hurtar": return 2.5 - r.det * 20;
     case "descansar": return s.cuerpo < 9 && v >= P.descansarUmbral ? 1.5 : 0;
@@ -90,7 +92,8 @@ function ganancia(s, op, v, r) {
       if (VIEJO) return 1;
       // 2 monedas, menos lo que vale la persona que pierdes: a quien da techo o pan no se le vende
       const c = op.contacto;
-      return !c ? -1 : 1 - (c.rel >= 2 ? 1.5 : c.rel === 1 ? 0.4 : 0);
+      const paga = c && c.rel <= 1 && P.delatarDesconocido !== undefined && P.delatarDesconocido !== null ? P.delatarDesconocido : P.delatarPaga;
+      return !c ? -1 : paga / 2 - (c.rel >= 2 ? 1.5 : c.rel === 1 ? 0.4 : 0);
     }
     case "cruzar": return s.fuera ? 1 : -1;
   }
@@ -102,7 +105,7 @@ function rinde(s, op, v) {
   const fr = E.sitio(op.sitio).franjas[s.franja];
   switch (op.accion) {
     case "pedir": return fr.pedirDa === "racion" ? (v >= fr.umbral ? 1 : 0) : E.monedasPedir(s, op.sitio, v);
-    case "trabajar": return v + E.pj(s).modJornal >= P.jornalUmbral ? 1 : 0;
+    case "trabajar": return v + E.pj(s).modJornal >= E.umbralJornal(s) ? 1 : 0;
     case "lavar": return v >= P.lavarUmbral ? 1 : 0;
     case "hurtar": { const ev = Math.min(6, v + (E.modsDe(s.dia, op.sitio, s.franja).modHurtar || 0)); return R.HURTAR_DADO[ev - 1]; }
     case "descansar": return v >= P.descansarUmbral ? 1 : 0;
@@ -214,7 +217,8 @@ function jugar(personaje, seed, politica, hooks) {
       const nec = E.racionesNecesarias(s);
       const falta = Math.max(0, nec + (s.nino && s.nino.con ? 1 : 0) - s.raciones - E.racionLista(s));
       const compra = Math.min(falta + (politica === "azar" ? 0 : (s.monedas - op.coste >= pan * (falta + 2) ? 1 : 0)), Math.floor((s.monedas - op.coste) / pan));
-      const comeNino = politica === "azar" ? rnd() < 0.5 : politica === "egoista" ? false : (s.nino ? s.nino.cuerpo <= 2 || s.cuerpo >= 5 : true);
+      // la viuda gana si llegan los dos (v0.5): el niño come primero, salvo que ella muriera de hambre esa noche
+      const comeNino = politica === "azar" ? rnd() < 0.5 : politica === "egoista" ? false : VIEJO ? (s.nino ? s.nino.cuerpo <= 2 || s.cuerpo >= 5 : true) : (s.nino ? s.cuerpo + P.hambreC > 0 : true);
       E.dormir(s, { dormir: op.id, compra: Math.max(0, compra), comeNino });
       if (s.termo !== -2) s._examen = false;
     } else if (s.fase === "autoridad") {

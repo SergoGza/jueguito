@@ -1,0 +1,14 @@
+{
+ "final": {
+  "tipo": "Sobrevive",
+  "dia": 10,
+  "causa": "Llegó a la noche del día 10.",
+  "acompanado": "Lucía la Viuda"
+ },
+ "encuesta": {
+  "dolio": "Juntarme con la gente sabiendo que cada uno con quien pasaba el rato acababa interrogado y preso dos días, y elegir cada día entre entrar a la ciudad a por la sopa arriesgando la detención por forastero o quedarme fuera sin comida.",
+  "sobro": "Los días con dados bajos fuera de la muralla, en los que solo podía pedir o descansar con la guardia delante, y las franjas de vísperas en el arrabal sin nada que hacer.",
+  "falto": "No supe que era forastero (ni impedido) hasta que la guardia me paró al cruzar, eché de menos poder juntarme o compartir en el arrabal a vísperas donde vive mi gente, y no entendí por qué no podía lavar ropa en la ribera si el sitio lo anuncia.",
+  "otros": "La red funciona y emociona (Diego compartiendo su pan la última noche), pero las tablas de testigos que ponen «1-6 Alguacil» junto a «2-4 Nadie» confunden."
+ }
+}

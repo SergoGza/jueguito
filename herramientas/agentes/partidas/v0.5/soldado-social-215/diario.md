@@ -1,0 +1,52 @@
+- Día 1 · amanecer · [DECIDO] No finjo hoy aunque el falso cautivo me da +1; prefiero guardar los cuatro dados para pedir y juntarme con otros pobres.
+- Día 1 · Prima · [DECIDO] Entre pedir en misa con el 6 o el jornal en la plaza, cojo el jornal: un dado me cubre dos franjas y saco 3 monedas.
+- Día 1 · Sexta · [DECIDO] Con 5 monedas no quiero pedir donde haya alguaciles; voy a la sopa del convento con el 4, donde solo miran frailes y pobres.
+- Día 1 · Nona · [DECIDO] En el convento a nona no había pobres; me voy a la ribera y me junto con un recién llegado con el 5 para sacar también un rumor.
+- Día 1 · Vísperas · [DECIDO] Con el 2 podía compartir con alguien nuevo o con Diego; elijo a Diego para llegar a relación 2 y que me encubra.
+- Día 1 · noche · [DECIDO] Mesón (me deja a cero) o pórtico comprando pan; elijo pórtico y compro una ración para mañana, perder 1 de cuerpo aún no me quita dados.
+- Día 2 · amanecer · [DECIDO] Diego me pide comida y solo tengo una ración; se la doy para subir a relación 3 y poder dormir en su casa, y hoy trabajo para el pan.
+- Día 2 · Prima · [OBVIO] Tengo un 6 a prima y me falta pan: jornal en la plaza otra vez.
+- Día 2 · Sexta · [DECIDO] Sopa del convento con el 4 en vez de pedir en la plaza de mercado: hay ronda en el convento pero en la plaza hay más alguaciles y llevo 5 monedas.
+- Día 2 · Nona · [DECIDO] Me junto con alguien nuevo para ensanchar la red en vez de con Diego; me ve un alguacil y el rumor para repetir vuelve a sacar alguacil.
+- Día 2 · Vísperas · [NO ENTIENDO] Al cruzar la puerta descubro que soy forastero; nada al empezar me lo decía y lo esperaba ver en algún marcador antes de salir.
+- Día 2 · autoridad · [DECIDO] Duermo en casa de Diego en el arrabal bajo techo y compro pan; Pedro, recién conocido, me vende al alguacil y me suben Te buscan a 3.
+- Día 3 · Prima · [NADA] A prima en el puente solo podía descansar o pedir, y en ambos la guardia me vería casi seguro; no hago nada y espero a la ribera.
+- Día 3 · Tercia · [NO ENTIENDO] En la ribera no me sale lavar ropa aunque el sitio dice lavanderas, y la tabla de testigos pone «1-6 Alguacil» y «2-4 Nadie» a la vez; entiendo que es el 1 y el 6.
+- Día 3 · Tercia · [DECIDO] Fuera de la muralla solo puedo pedir o juntarme; pido con el 6 en el puente porque necesito monedas para el pan de mañana.
+- Día 3 · Sexta · [NO ENTIENDO] Gasto un rumor para repetir el testigo y vuelve a salir exactamente el mismo número, ya van tres veces; no sé si de verdad se repite el dado.
+- Día 3 · Nona · [DECIDO] Lucía va a ser interrogada esta noche; en vez de conocer a otro, me junto otra vez con ella para subir la relación a 2 y que aguante.
+- Día 3 · Vísperas · [NADA] Solo me queda un 1 y en el puente a vísperas no hay nada que hacer con él; cierro el día.
+- Día 3 · autoridad · [OBVIO] Fuera de la muralla y sin casa de nadie, duermo en el arrabal y compro una ración; Lucía aguanta el interrogatorio pero se la llevan.
+- Día 4 · Prima · [DECIDO] Con cuerpo 5, fiebres y sin red, entro en la ciudad para la sopa del convento y dormir en el hospital, aunque como forastero me arriesgo a los alguaciles.
+- Día 4 · Tercia · [DECIDO] Pedir con el 6 en la catedral en Corpus daría bastante, pero un alguacil me llevaría a Te buscan 6; lo guardo para la sopa del convento y no hago nada a tercia.
+- Día 4 · Sexta · [OBVIO] Sopa del convento con el 6: ración segura y sin alguaciles a la vista.
+- Día 4 · Vísperas · [NADA] A nona solo tenía dos unos y ningún sitio donde sirvieran sin exponerme; no hago nada.
+- Día 4 · Vísperas · [DECIDO] Con mi red fuera (Diego enfermo, Lucía presa) me junto con alguien nuevo a la puerta del convento, donde no hay alguaciles, aunque una relación nueva pueda venderme.
+- Día 4 · autoridad · [DECIDO] Hospital en vez de pórtico: recupero 2 de cuerpo y bajo el termómetro a 0, aunque ya solo me queda una entrada antes de que me recojan.
+- Día 5 · Prima · [DECIDO] Pido con el 6 en la misa de la parroquia en vez del jornal de la plaza: aquí hay menos alguaciles; saco 4 monedas y el cura me ve impedido.
+- Día 5 · Tercia · [DECIDO] Salgo de la ciudad a tercia para pasar la tarde con Diego y dormir en su casa bajo techo, en vez de quedarme dentro y dormir en un pórtico.
+- Día 5 · Sexta · [DECIDO] Me junto con alguien nuevo y no con Diego, para no señalar a quien me da techo esta noche.
+- Día 5 · Nona · [OBVIO] Martín va a quedar señalado; me junto otra vez con él con el 2 para que llegue a relación 2 y aguante si lo interrogan.
+- Día 5 · autoridad · [OBVIO] Duermo con Diego bajo techo y compro una ración para tener dos guardadas.
+- Día 6 · Prima · [DECIDO] Con el pan a 6 entro a la ciudad para la sopa del convento; pruebo el rumor al cruzar y esta vez el testigo sí cambia, aunque sigue siendo guardia.
+- Día 6 · Tercia · [DECIDO] Pido con el 6 en la parroquia en vez del jornal de la catedral, porque el jornal me quitaría la sopa del mediodía, que con el pan a 6 vale más.
+- Día 6 · Sexta · [DECIDO] Sopa del convento con el 5 pese a la ronda; sale alguacil y me detendrían, gasto un rumor y me salvo por los pelos.
+- Día 6 · Nona · [OBVIO] Salgo a nona, que hay menos guardia que a vísperas, para dormir con Diego.
+- Día 6 · Vísperas · [NADA] Fuera a vísperas solo hay pedir o descansar con un 2 y un 1, y no puedo juntarme ni compartir con mi gente aunque viven aquí.
+- Día 6 · autoridad · [OBVIO] Duermo con Diego sin comprar pan, ya tengo tres raciones; por la noche interrogan a Diego, aguanta y se lo llevan dos días.
+- Día 7 · amanecer · [DECIDO] Con dados 1 1 2 2 no saco nada pidiendo; hoy me quedo fuera para juntarme con Lucía o Martín y tener otra casa donde dormir ahora que se han llevado a Diego.
+- Día 7 · Tercia · [DECIDO] Me junto con Lucía para llegar a relación 3 y dormir en su casa; me ve el alguacil, pero guardo mi último rumor para algo peor.
+- Día 7 · Sexta · [NADA] Con 1, 2 y 2 no puedo descansar (el hambre no deja) ni pedir, y juntarme otra vez en el puente con la ronda es casi seguro que me vea un alguacil; acabo el día.
+- Día 7 · autoridad · [OBVIO] Duermo en casa de Lucía bajo techo y no compro pan a 6; a ella también se la llevan, cada persona con la que me junto acaba presa.
+- Día 8 · amanecer · [DECIDO] Solo me queda una ración y el pan a 7; entro a la ciudad a tercia para la sopa del convento en vez de quedarme fuera a juntarme con Martín, porque me falta comida para las últimas noches.
+- Día 8 · Tercia · [NADA] A prima fuera de la muralla no había nada útil con mis dados; espero a tercia para cruzar, que hay menos guardia.
+- Día 8 · Sexta · [OBVIO] Sopa del convento con el 5: ya tengo dos raciones.
+- Día 8 · Nona · [DECIDO] Salgo a nona y dormiré en el arrabal en vez de quedarme dentro a juntarme con Juana y dormir en un pórtico: fuera la ronda no me sube Te buscan.
+- Día 8 · autoridad · [OBVIO] Sin nadie de relación 3 libre, duermo al raso en el arrabal y como; no compro pan a 7.
+- Día 9 · Tercia · [DECIDO] En el puente hoy todo testigo es alguacil; aun así me junto con Martín para llegar a relación 3 y tener otra casa y otro pan de reserva, sabiendo que lo interrogarán.
+- Día 9 · Sexta · [NADA] Me quedan un 5 y un 2, pero fuera solo puedo pedir en el puente, donde hoy me vería un alguacil seguro, y dentro está la redada; acabo el día.
+- Día 9 · autoridad · [OBVIO] Duermo con Diego y me como la última ración; Martín aguanta el interrogatorio y se lo llevan.
+- Día 10 · Tercia · [DECIDO] Último día: me quedo fuera de la muralla y paso la mañana con Lucía en vez de no hacer nada; ya no me pueden subir el termómetro y solo necesito llegar a la noche.
+- Día 10 · Sexta · [DECIDO] Con un 2 me junto con Diego, que me ha dado techo tantas noches, antes que con alguien nuevo.
+- Día 10 · Nona · [DECIDO] Con el último 2 me junto con Juana para subirla a 2; nos ve un alguacil y el rumor no lo arregla, solo se puede repetir una vez.
+- Día 10 · fin · [OBVIO] Última noche en casa de Diego; no tengo pan ni me llega para comprarlo a 9, y él comparte su ración conmigo.

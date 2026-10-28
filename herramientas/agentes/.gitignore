@@ -1,3 +1,4 @@
 partidas/**/perfil/
 partidas/**/ui.json
 .chromium
+__pycache__/

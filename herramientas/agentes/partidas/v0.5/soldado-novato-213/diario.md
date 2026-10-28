@@ -1,0 +1,61 @@
+- Día 1 · amanecer · [DECIDO] Podía fingir de falso cautivo, que me da +1, o no fingir. Prefiero no gastar un dado el primer día sin saber cómo va pedir normal.
+- Día 1 · Prima · [DECIDO] Quería trabajar a jornal en la plaza pero con ningún dado me contrataban; me fui a pedir a la parroquia con el 3 por la misa. Me dieron 2 monedas.
+- Día 1 · Tercia · [DECIDO] Dudé entre el mercado (más limosna pero alguacil 5-6) y Escuelas (menos alguacil); fui a Escuelas con el 5 y saqué 2. Ahora sale 'Llevas demasiado dinero encima' con 6 monedas y no sé qué me hace.
+- Día 1 · Sexta · [OBVIO] Sopa del convento con el 4: el 2 no llegaba. Me dieron una ración y el fraile me tiene por pobre de Cristo.
+- Día 1 · Nona · [DECIDO] Con solo un 2 pedir no daba casi nada; preferí juntarme con alguien en el puente para tener conocidos. Ahora conozco a Martín de Toro.
+- Día 1 · noche · [DECIDO] Pórtico gratis pero pierdo cuerpo y puede pasar la ronda, o mesón por 5 sin perder nada y con rumor. Como tengo 2 raciones, gasto en el mesón y no compro pan.
+- Día 2 · Prima · [DECIDO] Con el 6 podía pedir en misa o trabajar de peón; elegí trabajar porque me contrataban. Solo 3 monedas por dos franjas y un 6: esperaba más de 'te pagan bien'.
+- Día 2 · Sexta · [DECIDO] Mercado con +2 hoy o sopa del convento con el 4; elegí la sopa porque una ración vale más que 'algo' y allí el alguacil solo sale con 1. Salió bien.
+- Día 2 · Nona · [OBVIO] El 1 no sirve para pedir, así que lo gasto en juntarme en el puente; conozco a Pedro el Navarro. Guardo el 3 para vísperas.
+- Día 2 · Vísperas · [DECIDO] Con el 3 en vísperas, la catedral (+1 por el oficio) daba 'algo' y la parroquia 'poco'; fui a la catedral. La beneficencia me vio y le parecí impedido, cosa que no esperaba siendo soldado sano.
+- Día 2 · noche · [DECIDO] Otra vez mesón en vez de pórtico: prefiero no perder cuerpo ni toparme con la ronda, y tengo ración para cenar.
+- Día 3 · amanecer · [DECIDO] Con 4 6 6 6 podía pedir con los cuatro o fingir con el 4 y pedir con los tres 6; finjo falso cautivo (calidad 5) porque es mi oficio y los 6 rendirán más.
+- Día 3 · Prima · [NO ENTIENDO] En la catedral la tabla de testigos pone '1-6 Alguacil' y luego 2, 3-4 y 5 con otros testigos; supongo que quiere decir 1 y 6, pero leído así parece que todo es alguacil.
+- Día 3 · Prima · [DECIDO] Parroquia o catedral para pedir en misa con un 6; la catedral tenía más alguacil por la ronda, así que parroquia. Me vio el cura pero no me descubrió: 5 monedas.
+- Día 3 · Tercia · [DECIDO] Plaza con +1 o Escuelas con menos alguacil; fui a Escuelas con un 6 fingiendo y saqué 4 monedas. Ya llevo 10 y me avisa de que es demasiado.
+- Día 3 · Nona · [NO ENTIENDO] El fraile y el cura me dan −1 de termómetro según el texto, pero el marcador se queda en −1 desde el primer día; no sé si hay un tope o si no cuenta dos veces.
+- Día 3 · Nona · [OBVIO] Último 6 a la sopa del convento: una ración segura. Ya no me quedan dados para nona ni vísperas.
+- Día 3 · noche · [OBVIO] Con tormenta y 10 monedas, mesón y una ración de reserva; dormir al raso hoy era perder 2 de cuerpo.
+- Día 4 · amanecer · [DECIDO] Con 1 2 2 1 no merece la pena fingir: una treta de 2 o 3 la descubre cualquiera. Empiezo sin treta.
+- Día 4 · Prima · [DECIDO] Un 1 no da nada pidiendo; lo uso para juntarme con Pedro en el convento y subir a relación 2, a ver si llego a 3 para dormir con él.
+- Día 4 · Tercia · [DECIDO] En Corpus la plaza y la catedral daban +2 pero con alguacil a la mitad; probé la plaza con un 2. Salió alguacil y gasté un rumor para repetir: salvado, 3 monedas.
+- Día 4 · Sexta · [DECIDO] Repetí la jugada en la catedral con el otro 2 confiando en los rumores; salió alguacil dos veces y ya solo se puede repetir una. Te buscan 3 y sospechoso, y además me castigan por llevar 5 monedas. Mala idea.
+- Día 4 · Nona · [OBVIO] Con el último 1 me junto con Pedro en el puente: llego a relación 3 para dormir con él gratis. Salió alguacil otra vez y gasté mi último rumor.
+- Día 4 · noche · [DECIDO] Quería dormir con Pedro pero no vive de este lado de la muralla; entre pórtico con ronda (ya me buscan 3) y mesón por 6, pago el mesón y recupero un rumor.
+- Día 5 · amanecer · [DECIDO] Con 5 2 3 6 finjo falso cautivo con el 5 (calidad 6, difícil de pillar) en vez de pedir a pelo, porque el día 3 fingiendo saqué mucho más.
+- Día 5 · Prima · [OBVIO] El 6 a la misa de la parroquia fingiendo; el cura miró y no me pilló. 5 monedas y bajo a desconocido.
+- Día 5 · Tercia · [DECIDO] Escuelas con el 3 fingiendo; salió el alguacil del Estudio y me detenían (Te buscan 6). Gasté el último rumor y me libré. Ya no me atrevo a pedir dentro de la muralla.
+- Día 5 · Sexta · [DECIDO] Con el 2 podía juntarme o compartir con Pedro; compartí mi ración porque me da un rumor seguro para repetir testigos, y el pan lo compro esta noche.
+- Día 5 · Nona · [DECIDO] Salgo de la ciudad por la puerta en nona: dentro cualquier alguacil me detiene, y fuera puedo dormir con Pedro gratis. Me preocupa no poder volver a entrar.
+- Día 5 · noche · [OBVIO] Fuera solo puedo dormir en la ribera o con Pedro; duermo con Pedro gratis y gasto las 8 monedas en 2 raciones para no llevar dinero encima.
+- Día 6 · amanecer · [DECIDO] Pedro me pide comida: con 1 ración, 0 monedas y el pan a 6 no le doy nada; me duele, pero con relación 3 aún puedo dormir con él.
+- Día 6 · Prima · [NADA] En prima fuera de la muralla solo hay el puente con la guardia mirando (4-6) y un 3 da 'poco'; no hago nada.
+- Día 6 · Tercia · [DECIDO] Pedir en el puente con estos dados no da nada; me junto con Pedro con un 3 para recuperar relación y sacar un rumor.
+- Día 6 · Sexta · [DECIDO] Con el otro 3 conozco a alguien nuevo (Gil el Romero) en vez de volver con Pedro, para tener más red y otro rumor. Ya tengo 3 rumores.
+- Día 6 · Nona · [OBVIO] El 1 solo vale para juntarme: otra vez con Gil, relación 2.
+- Día 6 · Vísperas · [NADA] En vísperas me queda un 2 y fuera solo puedo pedir (nada) o descansar con el cuerpo lleno; no entro para no dormir en un pórtico.
+- Día 6 · noche · [OBVIO] Duermo con Pedro gratis y como mi última ración; mañana no tengo nada y el pan está a 6.
+- Día 7 · amanecer · [OBVIO] Gil me pide comida y no tengo ninguna ración: no le doy nada, baja la relación.
+- Día 7 · amanecer · [DECIDO] Sin comida ni dinero tengo que entrar en la ciudad. No finjo: necesito el 5 para la sopa del convento, que es la ración segura.
+- Día 7 · Prima · [DECIDO] Entrar en prima tiene guardia o alguacil en 5 de 6; espero a tercia, que en el puente suele estar más tranquilo, aunque pierda la misa mayor.
+- Día 7 · Tercia · [DECIDO] Al entrar me paró la guardia (+1 termómetro). Podía gastar un rumor, pero lo guardo para cuando un alguacil me pueda detener.
+- Día 7 · Sexta · [OBVIO] Sopa del convento con el 5: ya tengo la ración de esta noche.
+- Día 7 · Nona · [DECIDO] Salgo en nona en vez de pedir con el 3 dentro y dormir en un pórtico con tormenta. Otra vez la guardia con un 6; esta vez gasté un rumor y pasé.
+- Día 7 · noche · [NADA] En vísperas fuera de la muralla solo había pedir o descansar; con 3, 2 y 1 no servía. Duermo con Pedro y como la sopa del convento.
+- Día 8 · amanecer · [DECIDO] Puerta cerrada, sin comida y con 4 6 6 6: solo me queda pedir en el puente. Finjo falso cautivo con el 4 (allí no hay cura que me examine) para sacar más con los 6.
+- Día 8 · Prima · [NADA] En prima en el puente me ve seguro alguacil o guardia (1-6); no pido y espero a tercia.
+- Día 8 · Tercia · [OBVIO] Pido en el puente con un 6 fingiendo: 3 monedas y no me vio el alguacil. El pan está a 7, necesito más.
+- Día 8 · Sexta · [DECIDO] Otro 6 en el puente aunque el alguacil vigila 4 de cada 6; me vio, gasté un rumor y volvió a salir 6. Te buscan 4, pero ya tengo 6 monedas.
+- Día 8 · Nona · [DECIDO] Me arriesgué con el último 6 para llegar al pan a 7; el alguacil me vio dos veces seguidas aun gastando el último rumor. Te buscan 5: un fallo más y me detienen.
+- Día 8 · noche · [OBVIO] Pedro tiene fiebres y no puedo dormir con él: solo me queda la ribera al raso. Compro una ración a 7 y me quedan 2 monedas.
+- Día 9 · Prima · [NADA] Te buscan 5 y en el puente siempre hay alguien mirando (en prima 5 de 6); ni pedir ni descansar compensa, y aunque pidiera no llego a las 7 monedas del pan. No hago nada en prima.
+- Día 9 · Tercia · [DECIDO] Pedir con el 5 daba 'poco' y con alguacil 1-2 me detienen; juntarme no sube Te buscan, así que conozco a Francisca la Morena y gano un rumor. Quiero llegar a relación 3 para dormir bajo techo.
+- Día 9 · Sexta · [OBVIO] Sigo con Francisca con el 5; nos vio un alguacil y gasté el rumor para que no la interroguen esta noche. Relación 2.
+- Día 9 · Nona · [OBVIO] Último dado con Francisca: relación 3. Otra vez alguacil, otra vez gasté el rumor que acababa de ganar.
+- Día 9 · noche · [OBVIO] Duermo con Francisca bajo techo y además comparte su pan conmigo; no esperaba que la red diera de comer.
+- Día 10 · amanecer · [OBVIO] Francisca ha muerto en la ribera y Pedro me pide pan que no tengo. Hoy solo quiero llegar a la noche fuera de la muralla, sin fingir ni pedir.
+- Día 10 · Prima · [NADA] En prima en el puente solo hay pedir o descansar con guardia mirando; con Te buscan 5 no me la juego.
+- Día 10 · Tercia · [DECIDO] En vez de no hacer nada me junto con Pedro (no sube Te buscan) para tener relación de sobra y que esta noche me acoja y quizá me dé pan. Salió alguacil y repetí con rumor.
+- Día 10 · Sexta · [OBVIO] Otra vez con Pedro con el 3: relación 5 y otro rumor, sin alguacil.
+- Día 10 · Nona · [OBVIO] El 1 también con Pedro; nos vio el alguacil y al repetir salió otro 6, así que interrogarán a Pedro esta noche.
+- Día 10 · noche · [OBVIO] Última noche con Pedro bajo techo y comparte su pan; la ribera solo me quitaría cuerpo.

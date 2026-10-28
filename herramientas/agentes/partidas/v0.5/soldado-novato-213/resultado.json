@@ -1,0 +1,14 @@
+{
+ "final": {
+  "tipo": "Sobrevive",
+  "dia": 10,
+  "causa": "Llegó a la noche del día 10.",
+  "acompanado": "Pedro el Navarro"
+ },
+ "encuesta": {
+  "dolio": "Negarle el pan a Pedro el día 6 teniendo una ración, y al día siguiente ver que Francisca, que había compartido su pan conmigo, amanecía muerta en la ribera.",
+  "sobro": "Los días fuera de la muralla con la puerta cerrada: solo había el puente, todo vigilado, y me pasaba franjas enteras sin hacer nada o juntándome solo para sobrevivir.",
+  "falto": "No entendí por qué el termómetro no bajaba de −1 con el fraile y el cura, ni qué significa '1-6 Alguacil' en las tablas, y no supe hasta la pantalla final que mi soldado era cojo (por eso parecía impedido); eché de menos saber qué pasa si llegas a Te buscan 6 o te quedas sin comer.",
+  "otros": "El dado de testigo sacó 6 una y otra vez y los rumores para repetirlo me salvaron varias detenciones; sin ellos no habría llegado."
+ }
+}

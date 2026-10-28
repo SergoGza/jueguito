@@ -1,0 +1,41 @@
+- Día 1 · amanecer · [DECIDO] Con dos seises, gasto uno en llagas fingidas de calidad 6 (difícil que me descubran) y guardo el otro para pedir en misa; los unos no sirven para pedir.
+- Día 1 · Prima · [OBVIO] Pido en misa de la catedral con el 6 y la treta: 7 monedas y la beneficencia no me descubre.
+- Día 1 · Tercia · [DECIDO] Con un 1 no puedo pedir; me junto con alguien nueva en el arrabal (Francisca) para empezar red, mejor que descansar con un dado bajo.
+- Día 1 · Sexta · [OBVIO] Último dado es un 1: vuelvo a juntarme con Francisca para subir a relación 2 y que me encubra.
+- Día 1 · noche · [DECIDO] Entre mesón (techo pero me quedo sin reserva) y pórtico, elijo pórtico y gasto las 9 monedas en 3 raciones: guardo 2 para mañana y no me pueden robar.
+- Día 2 · amanecer · [DECIDO] Dados flojos (1 3 1 3). Finjo mal de corazón con un 3 aunque sea fácil de descubrir, y guardo el otro 3 para pedir en la plaza en día de mercado.
+- Día 2 · Prima · [OBVIO] Muerta Francisca, me junto con un 1 con Antón en el convento para rehacer la red; solo me veía un fraile.
+- Día 2 · Tercia · [OBVIO] Pido con el 3 en la plaza en día de mercado, sin beneficencia que me descubra: 5 monedas.
+- Día 2 · Sexta · [OBVIO] El último 1 lo gasto en juntarme otra vez con Antón: relación 2.
+- Día 2 · autoridad · [DECIDO] Con 5 monedas y la cena ya cubierta, pago el mesón en vez del pórtico: no pierdo cuerpo (sigo con 4 dados), el niño se recupera y gano un rumor, aunque me quedo sin nada.
+- Día 3 · Prima · [DECIDO] Finjo llagas con el 6 y, como con treta hasta el 3 rinde bastante, gasto el 3 en la misa de la parroquia y guardo 5 y 4. Salió bien: 5 monedas.
+- Día 3 · Tercia · [OBVIO] Pido con el 4 en la plaza a tercia: 5 monedas más y no me ve nadie.
+- Día 3 · Sexta · [DECIDO] Con el 5 dudé entre la sopa del convento y juntarme con Antón; elijo juntarme para llegar a relación 3 y dormir gratis bajo techo en su casa. Además me cuenta un rumor.
+- Día 3 · autoridad · [OBVIO] Duermo gratis en casa de Antón y gasto 9 monedas en 3 raciones: cena hecha y 2 guardadas.
+- Día 4 · Prima · [DECIDO] Finjo con el 6 y pido con el 3 en la parroquia; me vio un alguacil y gasté un rumor en repetir: salió el cura, que no me descubrió. Guardo el 4 para la procesión del Corpus.
+- Día 4 · Tercia · [DECIDO] Para el 4 en la procesión comparé plaza y catedral: la catedral tenía menos alguaciles y la beneficencia no puede con mi treta de 6. 6 monedas.
+- Día 4 · Sexta · [OBVIO] El 1 no sirve para pedir; me junto con alguien nuevo (Lucía) en el arrabal para no depender solo de Antón.
+- Día 4 · autoridad · [OBVIO] Otra noche en casa de Antón; compro 2 raciones para tener 2 de reserva y me quedo con 4 monedas, justo para no parecer sospechosa.
+- Día 5 · Prima · [DECIDO] Le doy una ración a Lucía porque con tres seises hoy podré comprar pan; finjo llagas con un 6.
+- Día 5 · Prima · [DECIDO] Pido con un 6 en la limosna pública de la catedral (9 monedas) aunque la mitad de testigos eran alguaciles; me vio uno y gasté el rumor: salió la beneficencia y no me descubrió.
+- Día 5 · Tercia · [DECIDO] Con el 3 dudé entre descansar en la ribera y juntarme con Lucía; me junto: relación 3 y un rumor, y descansar hoy con redada era jugársela.
+- Día 5 · Sexta · [DECIDO] El último 6: entre sopa del convento (una ración) y pedir en Escuelas (monedas), elijo Escuelas: 6 monedas; la beneficencia no me pilla pero me apunta por llevar dinero.
+- Día 5 · autoridad · [DECIDO] Con 19 monedas pago mesón y 3 raciones en vez de dormir gratis con Antón: gano un rumor y no llevo dinero encima que me delate al pedir mañana.
+- Día 6 · Prima · [DECIDO] Finjo con el 6 y pido con el 5 en la parroquia: 6 monedas, pero me ve un alguacil y al repetir con un rumor sale otro alguacil. Mala suerte.
+- Día 6 · Tercia · [DECIDO] Con el 3 elijo lavar ropa en vez de descansar o pedir, porque hoy hay redada y lavar no tiene riesgo; solo me dan 2 monedas, poco.
+- Día 6 · Sexta · [DECIDO] Con el 4 elijo la sopa del convento antes que Escuelas: misma ganancia en pan y menos alguaciles. Me delató otro pobre y repetí con el último rumor.
+- Día 6 · autoridad · [NO ENTIENDO] Dormí en casa de Antón sin haber estado con él de día y aun así lo interrogaron, sacó 1 y me vendió (Te buscan +2) teniendo relación 3; esperaba que solo fueran a por quien estuvo conmigo.
+- Día 7 · Tercia · [DECIDO] Finjo con el 6 y pido con el 5 en la misa mayor: 7 monedas, pero otro alguacil. Ya voy en Te buscan 4 y Sospechosa, sin rumores para repetir.
+- Día 7 · Tercia · [NADA] Me quedan dos unos: no sirven para pedir ni para lavar, y juntarme con alguien nuevo es arriesgar que lo interroguen y me venda; con Te buscan 4 no me la juego.
+- Día 7 · autoridad · [DECIDO] Sin red, elijo mesón (8 monedas) antes que pórtico: la ronda me subiría a Te buscan 5. Me quedo sin pan de reserva pero gano un rumor.
+- Día 8 · Prima · [DECIDO] Finjo con el 6 y pido con el 3 en el convento, donde casi todos los testigos son frailes o pobres: 4 monedas y la beneficencia no me descubre. Con Te buscan 4 evito la parroquia y la catedral, que están llenas de alguaciles.
+- Día 8 · Tercia · [OBVIO] Pido con el 5 en Escuelas, donde hay menos alguaciles: 5 monedas sin testigos.
+- Día 8 · Sexta · [DECIDO] No me llega para mesón y pan a 7, así que salgo por la puerta para dormir en el arrabal: allí no pasa la ronda, que con Te buscan 4 me pondría al borde. Dejo el 1 sin usar.
+- Día 8 · autoridad · [DECIDO] Solo llega para una ración a 7: como yo para no bajar a 2 dados y el niño pasa hambre (5 a 3). Duele, pero mañana necesito los dados para darle de comer.
+- Día 9 · Tercia · [NADA] Puerta cerrada y fuera de la muralla. Finjo de peregrino con el 1 (aquí no hay beneficencia que me examine), pero en prima pedir en el puente tenía la guardia mirando en 4-6: no hago nada.
+- Día 9 · Tercia · [DECIDO] Pedir en el puente daba poco y con un tercio de alguaciles; lavar ropa no tiene riesgo y con ninguna de las dos llego a dos raciones, así que lavo: 2 monedas.
+- Día 9 · Sexta · [OBVIO] Vuelvo a lavar ropa con el otro 3: 2 monedas más, sin riesgo.
+- Día 9 · autoridad · [DECIDO] Una sola ración otra vez: esta noche come el niño, que ya pasó hambre ayer y a 1 se lo llevaría el cura. Yo bajo a 3 de cuerpo y 2 dados.
+- Día 10 · Prima · [DECIDO] Último día: si llego a la noche sobrevivo. Finjo de peregrino con el 2, porque en el puente no hay beneficencia que me descubra y como mucho subiría a Te buscan 5. En prima no hago nada porque la guardia vigila la puerta.
+- Día 10 · Tercia · [DECIDO] Pido con el 3 en el puente: solo 2 monedas y me delata otro pobre; repito con el rumor y sale un alguacil, peor aún (Sospechosa). Quedo en Te buscan 5 y ya no me muevo.
+- Día 10 · fin · [NO ENTIENDO] Al amanecer ponía «Si llegas a la noche, sobrevives» y por eso no busqué pan; pero la noche del día 10 contó el hambre y el raso y morí con cuerpo 3. Esperaba que la partida acabara al llegar a la noche.

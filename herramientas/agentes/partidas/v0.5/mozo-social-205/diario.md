@@ -1,0 +1,55 @@
+- Día 1 · Prima · [DECIDO] Entre pedir en misa o trabajar en la plaza, trabajo con un 4 y guardo el 6; me pagan 3 y los vecinos me ven trabajar.
+- Día 1 · Sexta · [DECIDO] En el convento podía pedir sopa con el 6 o juntarme; me junto con un 4 con María la Rubia para empezar a tener gente.
+- Día 1 · Nona · [DECIDO] Con el 2 no saco nada pidiendo, así que vuelvo a juntarme con María en la ribera para llegar a relación 2.
+- Día 1 · Vísperas · [DECIDO] Dudé entre pedir sobras en la plaza (alguaciles y llevo 5 monedas) o el mesón; me junto otra vez con María y llego a relación 3 para dormir en su casa.
+- Día 1 · noche · [DECIDO] Duermo con María (gratis y bajo techo) en vez de pórtico o mesón, y compro una ración de reserva para no ir con 5 monedas.
+- Día 2 · Prima · [NO ENTIENDO] La tabla de testigos de la plaza decía '1-6 Alguacil', luego '3 Vecinos' y '4 Otro pobre'; esperaba rangos que no se pisaran. Trabajo con el 4 igualmente y cobro 3.
+- Día 2 · Sexta · [DECIDO] Podía pedir sopa o juntarme otra vez con María; prefiero conocer a alguien nuevo porque una red de una persona no aguanta. Conozco a Perico el Tuerto.
+- Día 2 · Nona · [DECIDO] Descanso en la ribera para subir a cuerpo 9 y tener 5 dados; me ve un alguacil pero gasto un rumor, repito y salgo bien.
+- Día 2 · Vísperas · [DECIDO] En el mesón me junto con Perico (a relación 2) en vez de con María; nos ve un alguacil, repito con rumor y vuelve a salir alguacil, así que interrogarán a Perico.
+- Día 2 · noche · [OBVIO] Duermo otra vez en casa de María y compro una ración de reserva.
+- Día 3 · Prima · [DECIDO] Soy forastero y cada alguacil me cuesta +2; en vez de pedir en misa me junto en el convento, donde no hay alguaciles, y conozco a Ana de Ledesma.
+- Día 3 · Tercia · [DECIDO] Trabajo en las obras de la catedral con un 4 (3 monedas) aunque hay riesgo de alguacil; sale alguacil y lo borro con un rumor.
+- Día 3 · Nona · [DECIDO] A nona el convento no tiene pobres; en la ribera elijo juntarme con Ana (relación 2) en vez de alguien nuevo, para que tenga una segunda casa.
+- Día 3 · Vísperas · [DECIDO] En vísperas me vuelvo a juntar con Ana en el convento (sin alguaciles) y llego a relación 3; me sobra el 2.
+- Día 3 · autoridad · [OBVIO] Ana vive fuera, así que duermo con María y compro una ración. Por la noche se llevan a Ana dos días aunque no me vende.
+- Día 4 · Prima · [DECIDO] María está con fiebres y no puedo juntarme sin poner a alguien en peligro; pido en la misa de mi parroquia con un 5 y me dan 3 monedas sin testigos.
+- Día 4 · Tercia · [DECIDO] Aprovecho la procesión del Corpus y pido en la catedral con un 6: 5 monedas; sale alguacil y lo cambio con un rumor. Con 10 monedas no vuelvo a pedir hoy.
+- Día 4 · Sexta · [DECIDO] Con María enferma no tengo techo dentro, así que salgo por la puerta para dormir en el arrabal y alejarme de los alguaciles que buscan forasteros.
+- Día 4 · Nona · [DECIDO] En la ribera podía descansar o juntarme; me junto con alguien nuevo con el 6 porque mi gente no está. Conozco a Inés de Zamora.
+- Día 4 · Vísperas · [NADA] En vísperas en el puente solo me quedan dos 2: ni descansar ni pedir rinden y no hay gente para compartir, así que acabo el día.
+- Día 4 · noche · [OBVIO] Fuera de la muralla solo me queda el arrabal; compro dos raciones para guardar pan y quedarme con 2 monedas y que no me roben.
+- Día 5 · Tercia · [NADA] A prima en el puente la guardia ve a la mitad: descansar o pedir ahí solo me traía problemas, así que no hago nada.
+- Día 5 · Tercia · [DECIDO] Entre juntarme con Inés o descansar, descanso con un 4 para volver a cuerpo 9; sale alguacil, repito con rumor y descanso.
+- Día 5 · Sexta · [OBVIO] Gasto el 1 en juntarme con Inés, que para eso cualquier dado sirve; sube a relación 2.
+- Día 5 · Nona · [DECIDO] Vuelvo a juntarme con Inés con un 4 en vez de buscar gente nueva: con relación 3 quizá pueda dormir en su casa fuera de la muralla.
+- Día 5 · Vísperas · [NADA] Pedir en el puente a vísperas con la guardia mirando la mitad de las veces no compensa por un par de monedas; guardo el 5 sin usar.
+- Día 5 · noche · [OBVIO] Duermo en casa de Inés, fuera de la muralla y bajo techo; no compro pan porque tengo dos raciones.
+- Día 6 · Prima · [DECIDO] El pan está a 7 y fuera no gano nada; entro en la ciudad para la sopa del convento y las sobras de la plaza. La guardia me para (+1) y no gasto rumor porque casi todo el dado es guardia o alguacil.
+- Día 6 · Tercia · [DECIDO] Pido en la plaza a tercia con un 6 (mercado +1) en vez de ir a juntarme; me dan 4 monedas sin que me vea nadie peligroso.
+- Día 6 · Sexta · [OBVIO] Con un 5 pido la sopa del convento: una ración más, que con el pan a 7 vale oro.
+- Día 6 · Nona · [NADA] En la ribera la mitad del dado es alguacil y mi gente ya está a relación 3; juntarme ahora solo los pondría en peligro, así que paso la nona.
+- Día 6 · Vísperas · [DECIDO] Entre el mesón con mi gente o las sobras de la plaza, voy a las sobras con un 5: otra ración y nadie me ve.
+- Día 6 · noche · [OBVIO] Duermo con María, que ya está bien; tengo 3 raciones y no compro con el pan a 7.
+- Día 7 · Prima · [OBVIO] Es misa mayor: pido en la parroquia con el 6 y me dan 5 monedas.
+- Día 7 · Tercia · [NADA] A tercia, domingo, no hay obras ni pobres en el convento; con mis dados bajos no hay nada que valga la pena.
+- Día 7 · Sexta · [OBVIO] Con el 4 pido la sopa del convento: otra ración sin testigos.
+- Día 7 · Nona · [NADA] A nona solo tengo 2, 2 y 3: pedir no da y la ribera está llena de alguaciles, así que espero a vísperas.
+- Día 7 · Vísperas · [DECIDO] Me sobra pan y dinero, así que comparto una ración con Ana en el convento en vez de guardarla; sube a relación 4.
+- Día 7 · noche · [NO ENTIENDO] Esta noche no me deja dormir con María (relación 3) y sí con Ana, que el día 3 no salía; no sé dónde vive cada una ni por qué cambia. Duermo con Ana y compro una ración.
+- Día 8 · Prima · [DECIDO] María ha muerto en la ribera. Pido en la misa con un 3 para asegurar el pan de los últimos días; el cura me ve válido y con dinero (+2) y gasto un rumor para borrarlo.
+- Día 8 · Tercia · [DECIDO] Muerta María, busco gente nueva en la ribera en vez de trabajar en las obras; conozco a Martín de Toro.
+- Día 8 · Sexta · [DECIDO] Dudo entre la sopa del convento y Martín; el pan de los últimos días ya lo puedo comprar esta noche, así que me junto otra vez con Martín para que no me venda si lo interrogan.
+- Día 8 · Nona · [OBVIO] Tercera vez con Martín, con un 3, y llega a relación 3.
+- Día 8 · Vísperas · [DECIDO] Podría ir por las sobras de la plaza con el 5, pero la mitad del dado es alguacil y el pan lo puedo comprar; mejor no arriesgar y acabar el día.
+- Día 8 · autoridad · [OBVIO] Duermo con Ana y gasto mis 7 monedas en una ración: con eso tengo pan para las dos noches que quedan.
+- Día 9 · Prima · [DECIDO] Ana también ha muerto. Pido en la misa con un 5 para tener algo con que compartir con Inés; me ve un alguacil y lo borro con un rumor.
+- Día 9 · Tercia · [DECIDO] Día de mercado: pido en la plaza con el otro 5 y saco 4 monedas; con 7 puedo comprar la ración que voy a darle a Inés.
+- Día 9 · Sexta · [DECIDO] Con dos muertos en mi red, comparto una ración con Inés en la ribera en vez de guardarla; la repondré comprando esta noche.
+- Día 9 · Nona · [OBVIO] Mañana vence el pregón y no me pueden ver dentro: salgo por la puerta a nona, que es cuando menos guardia hay.
+- Día 9 · Vísperas · [NADA] En el puente a vísperas la guardia mira casi siempre; no merece la pena descansar ni pedir con lo que me queda.
+- Día 9 · autoridad · [OBVIO] Duermo con Inés fuera de la muralla y compro la ración de mañana con las 7 monedas.
+- Día 10 · Prima · [NADA] Último día, fuera de la muralla y con ronda en el puente (1 a 3 alguacil); tengo la ración de esta noche, así que no hago nada en prima.
+- Día 10 · Tercia · [DECIDO] Querría pasar el último día con Inés, pero en la ribera cuatro de seis caras son alguacil y la interrogarían; prefiero no señalarla y no hago nada.
+- Día 10 · Sexta · [NADA] Fuera solo está la ribera con la ronda encima y ya tengo la cena; acabo el día sin gastar los dados que quedan.
+- Día 10 · noche · [OBVIO] Última noche con Inés, bajo techo y con mi última ración.

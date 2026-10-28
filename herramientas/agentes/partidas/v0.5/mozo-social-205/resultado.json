@@ -1,0 +1,14 @@
+{
+ "final": {
+  "tipo": "Sobrevive",
+  "dia": 10,
+  "causa": "Llegó a la noche del día 10.",
+  "acompanado": "Inés de Zamora"
+ },
+ "encuesta": {
+  "dolio": "Juntarme con mi gente me costó: a Perico lo vio un alguacil y me vendió, y desde el pregón cada vez que estaba con alguien sabía que esa noche lo podían interrogar y llevárselo dos días, así que cuidar a la red era también ponerla en peligro.",
+  "sobro": "En los últimos días, fuera de la muralla, la ribera estaba siempre llena de rondas y guardia y pasé muchas franjas sin usar los dados, sin nada que hacer más que esperar.",
+  "falto": "No entendí por qué una noche no me dejaba dormir con María (al amanecer supe que había muerto) ni dónde vive cada uno de la red; las tablas de testigo con '1-6 Alguacil' por encima de otros números me confundían; y eché de menos algún trabajo para el mozo fuera de la muralla.",
+  "otros": "María y Ana murieron de un día para otro sin aviso ni ocasión de ayudarlas; me habría gustado que la red pidiera comida o avisara de que estaba mal para poder cuidarla, como promete la ayuda."
+ }
+}

@@ -56,6 +56,8 @@
   const umbralJornal = (s) => (P.jornalDias ? P.jornalDias[Math.min(s.dia, P.jornalDias.length) - 1] : P.jornalUmbral);
   const techoRel = () => P.techoRel || 2;
   // palanca: al impedido lo recogen antes (el encierro es su castigo)
+  // palanca: a partir de qué detención echan de la ciudad al forastero (puede ser distinta para el impedido)
+  const desdeExpulsion = (s) => (pj(s).impedido && P.expulsionDesdeImpedido ? P.expulsionDesdeImpedido : P.expulsionDesde || 1);
   const hospVeces = (s) => P.hospitalVeces - (P.recogeImpedido && pj(s).impedido ? 1 : 0);
   function alAzar(s, lista) { return lista.length ? lista[Math.floor(rand(s) * lista.length)] : null; }
 
@@ -678,7 +680,7 @@
     } else { tipo = "Horca"; txt = "Te condenan a la horca."; }
     s.detenciones = (s.detenciones || 0) + 1;
     const conf = s.monedas; s.monedas = 0;
-    s.tb = Math.min(P.reincidenciaMax, s.detenciones); s.fuera = !!(P.expulsionDias && pj(s).forastero && s.dia >= P.pregonInicio && s.detenciones >= (P.expulsionDesde || 1)); d.castigado = true; s.hoy.castigo = tipo;
+    s.tb = Math.min(P.reincidenciaMax, s.detenciones); s.fuera = !!(P.expulsionDias && pj(s).forastero && s.dia >= P.pregonInicio && s.detenciones >= desdeExpulsion(s)); d.castigado = true; s.hoy.castigo = tipo;
     if (ninoConmigo(s) && tipo !== "Horca") {
       const c = puedeCuidar(s).sort((a, b) => b.rel - a.rel)[0];
       if (c) { s.nino.con = c.id; txt += ` ${c.nombre} se queda con tu hijo mientras tanto.`; }
@@ -688,7 +690,7 @@
     diaActual(s).castigo = { motivo: d.motivo, termo: t, tipo, noche: d.noche, txt };
     if (tipo === "Horca") { terminar(s, "Horca", `Detenido con el termómetro en +3. ${d.motivo}`); return { tipo, txt }; }
     // palanca suave: tras el pregón, al forastero detenido lo sacan de la muralla y no le dejan entrar unos días
-    if (P.expulsionDias && pj(s).forastero && s.dia >= P.pregonInicio && !s.final && s.detenciones >= (P.expulsionDesde || 1)) {
+    if (P.expulsionDias && pj(s).forastero && s.dia >= P.pregonInicio && !s.final && s.detenciones >= desdeExpulsion(s)) {
       s.vetadoHasta = s.dia + P.expulsionDias; s.fueraTrasCastigo = true;
       txt += ` Eres forastero y ya ha salido el pregón: te sacan de la ciudad y la guardia no te dejará entrar hasta el día ${s.vetadoHasta + 1}.`;
       diaActual(s).castigo.txt = txt;

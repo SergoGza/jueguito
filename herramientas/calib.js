@@ -36,6 +36,7 @@ const L = {
   expSuave3: (R) => { R.PARAMS.expulsionDias = 3; },
   expSuave4: (R) => { R.PARAMS.expulsionDias = 4; },
   expSegunda: (R) => { R.PARAMS.expulsionDesde = 2; },             // la expulsión suave, solo a partir de la segunda detención
+  expSegundaImpedido: (R) => { R.PARAMS.expulsionDesdeImpedido = 2; }, // al impedido, a la segunda; al válido, a la primera
   masPobres: (R) => { R.PARAMS.masPobresDesde = 4; },              // llegan pobres de los pueblos: desde el día 4, pedir −1
   masPobres6: (R) => { R.PARAMS.masPobresDesde = 6; },
   recogeImpedido: (R) => { R.PARAMS.recogeImpedido = true; },      // al impedido el hospital lo recoge a la segunda vez que lo apuntan

@@ -1,0 +1,54 @@
+- Día 1 · amanecer · [DECIDO] Finjo de falso cautivo con un 3 (calidad 4 por ser soldado) en vez de guardar los cuatro dados; me quedan 6, 3 y 4 para pedir y quiero que cada limosna rinda más.
+- Día 1 · Prima · [DECIDO] Pido en la catedral con el 6 en misa de prima en vez de guardarlo; sale bien, 5 monedas y la beneficencia no me pilla.
+- Día 1 · Tercia · [DECIDO] Miré hurtar en el mercado (un tercio de alguacil que te detiene, no compensa) y pedir allí con 7 monedas encima; preferí juntarme en la ribera para hacer red. Me vio un alguacil y van a interrogar a Perico.
+- Día 1 · Sexta · [OBVIO] Sopa del convento con el 4: ración segura y casi sin riesgo.
+- Día 1 · noche · [DECIDO] Entre mesón (5 monedas, sin perder cuerpo) y pórtico comprando un pan, elijo pórtico: me quedo con 4 monedas y 2 raciones a cambio de 1 de cuerpo y un tercio de ronda.
+- Día 1 · autoridad · [NO ENTIENDO] Perico me vendió (Te buscan +2) y ahora la red dice 'nadie (+1 que no están)': no sé si Perico sigue siendo de mi red o se lo han llevado aunque me vendiera.
+- Día 2 · amanecer · [DECIDO] Dados 1 4 2 3 y redada: no finjo, una treta de calidad 2 o 3 la descubre cualquiera de la beneficencia.
+- Día 2 · Prima · [NADA] En prima todo tiene alguacil o guardia por la redada y la ronda, y con 4 no me contratan; dejo pasar la franja.
+- Día 2 · Tercia · [DECIDO] Pido en el mercado con el 2 (día de mercado, rinde igual que el 3 o el 4) aceptando la mitad de alguacil porque tenía un rumor para repetir; salió otro pobre que no habló, +2 monedas.
+- Día 2 · Sexta · [OBVIO] Sopa del convento con el 4, el 3 no llegaba; otra ración.
+- Día 2 · Nona · [DECIDO] Descanso en la ribera con el 3 en vez de guardarlo; salió alguacil pero gasté el rumor y repetí: +1 de cuerpo sin castigo.
+- Día 2 · Vísperas · [DECIDO] Pensé compartir una ración en el mesón para hacer red, pero hay un tercio de alguacil y un recién conocido me vendería como Perico; con Te buscan 2 y el pregón mañana, no lo hago.
+- Día 2 · noche · [DECIDO] Mesón por 5 monedas en vez de pórtico: con 6 monedas al raso me pueden robar y la ronda me sube Te buscan; además gano un rumor.
+- Día 3 · amanecer · [DECIDO] Dados 3 1 2 3; finjo de cautivo con un 3 (calidad 4) en vez de pedir a pelo, a ver si la treta saca algo de los dados bajos.
+- Día 3 · Prima · [DECIDO] Pedí en la parroquia con el 2 y el cura me descubrió; repetí el testigo con el rumor y salió alguacil: Te buscan 5. Salió mal, el cura y el alguacil juntos eran la mitad de la tabla.
+- Día 3 · Tercia · [DECIDO] Con Te buscan 5, salgo por la puerta (1 de 6 de guardia) en vez de quedarme dentro: dentro no puedo pagar el mesón y el pórtico tiene ronda. No veo la opción de lavar ropa aunque la ribera la anuncia.
+- Día 3 · Sexta · [DECIDO] Pedí en la ribera con el 3 a sabiendas de que con Te buscan 5 cualquier testigo malo me detenía, prefiriendo eso a descansar; me delató otro pobre y me detienen con termómetro 0.
+- Día 3 · noche · [NO ENTIENDO] Me detuvieron fuera de la muralla y la reprensión me devuelve a mi parroquia, dentro; siendo forastero con el pregón esperaba que me dejaran fuera.
+- Día 4 · amanecer · [DECIDO] No finjo: el cautivo está catalogado y las otras tretas no tienen mi +1; con termómetro +1 no quiero que el cura me examine.
+- Día 4 · Prima · [DECIDO] Pido en el convento en prima con un 3 y no en la catedral: aquí rinde poco pero los frailes bajan el termómetro y no hay alguacil. Salió fraile: termómetro a 0.
+- Día 4 · Tercia · [NADA] En tercia de Corpus la catedral tiene un tercio de alguacil y otro de beneficencia que me ve válido, el convento no da nada y descansar en la parroquia sale 1 de 6; no hago nada.
+- Día 4 · Sexta · [OBVIO] Sopa del convento con el 4: ración y sin testigos.
+- Día 4 · Nona · [NADA] En nona descansar en la catedral sale 1 de 6 y en la ribera hay ronda; no hago nada.
+- Día 4 · Vísperas · [DECIDO] Pido en el convento a vísperas con el 3 antes que juntarme en el mesón con el 2; me vio la beneficencia y me tomó por impedido sin fingir, termómetro −1.
+- Día 4 · noche · [OBVIO] Pórtico: el mesón cuesta 6 y tengo 2, y no salí por la puerta; no compro pan porque tengo 2 raciones.
+- Día 5 · amanecer · [DECIDO] Dados 6 4 2 3 con redada: no finjo para no gastar el 6; lo quiero para pedir en misa y el 4 para la sopa.
+- Día 5 · Prima · [DECIDO] Pido en misa de la catedral con el 6 aceptando un tercio de alguacil; sale beneficencia que me ve impedido y +4 monedas.
+- Día 5 · Tercia · [NADA] Con la redada y la ronda en el convento, la sopa tiene un tercio de alguacil (Te buscan +3) y con 6 monedas encima me tendrían por fingidor; paso el resto del día quieto.
+- Día 5 · noche · [DECIDO] Mesón con las 6 monedas en vez de pórtico y pan: así sigo con cuerpo 7 y cuatro dados mañana y gano un rumor, aunque me quedo sin raciones.
+- Día 6 · Prima · [DECIDO] Con 1 2 1 1 y sin pan no puedo pedir nada útil; gasto los unos en juntarme varias veces con la misma persona para llegar a relación 3 y que me dé techo y pan. Empiezo con Lucía en el convento.
+- Día 6 · Tercia · [DECIDO] Me junto otra vez con Lucía en la ribera (allí el alguacil no me suma Te buscan por forastero); salió alguacil y repetí con el rumor: relación 2 sin castigo.
+- Día 6 · Sexta · [OBVIO] Tercera vez con Lucía en la ribera: relación 3, esta noche puedo dormir en su casa.
+- Día 6 · Nona · [NADA] Con el 2 en nona no saco nada pidiendo y juntarme otra vez con Lucía arriesga que un alguacil la haga interrogar; acabo el día.
+- Día 6 · noche · [OBVIO] Duermo en casa de Lucía y ella me da su pan; sin monedas y con el pan a 6 no había otra.
+- Día 6 · autoridad · [NO ENTIENDO] Lucía aguantó el interrogatorio y no me vendió, pero se la llevan dos días: me quedo sin casa justo por haberla tratado; esperaba que callar la salvara.
+- Día 7 · amanecer · [DECIDO] Dados 6 5 4 2 y misa mayor: no finjo, los frailes y la beneficencia ya me ven impedido sin treta y prefiero usar el 6 en misa y el 4 en la sopa.
+- Día 7 · Prima · [DECIDO] Pido en la parroquia (misa mayor) con el 6 en vez de la catedral, que tiene ronda; el cura me ve impedido y saco 5 monedas.
+- Día 7 · Tercia · [DECIDO] Pido en la ribera con el 5 (poco, pero sin el +2 de forastero) para llegar a las 6 monedas del pan; +1 moneda sin testigos.
+- Día 7 · Sexta · [OBVIO] Sopa del convento con el 4; la beneficencia me ve impedido pero me cuenta como fingidor por llevar 6 monedas, se queda igual.
+- Día 7 · noche · [DECIDO] Compro un pan con las 6 monedas y duermo en el pórtico: guardo la ración para mañana y así no llevo dinero que me roben; el mesón no llega.
+- Día 8 · amanecer · [DECIDO] Dados 5 4 6 con redada y el convento lleno de rondas: no finjo y voy a pedir en misa de la parroquia con el 6, aunque hay un tercio de alguacil; el pan está a 7 y no tengo nada.
+- Día 8 · Prima · [DECIDO] Pedí en la parroquia con el 6 y salió alguacil por la redada: +4 monedas pero Te buscan 4. Otro alguacil dentro me detiene, así que decido salir de la ciudad y quedarme fuera hasta el final.
+- Día 8 · Tercia · [OBVIO] Cruzo la puerta y salgo; nadie me para.
+- Día 8 · Sexta · [DECIDO] Fuera de la muralla pedir rinde poco; prefiero juntarme con alguien nuevo en la ribera para llegar a relación 3 mañana y tener techo fuera. Conozco a Martín de Toro y gano un rumor.
+- Día 8 · Nona · [DECIDO] Me junto otra vez con Martín con el 5 en vez de pedir; salió alguacil, repetí con el rumor recién ganado y quedó en nada. Martín 2.
+- Día 8 · noche · [OBVIO] Duermo en el arrabal, es lo único que tengo fuera; como mi ración y guardo las 4 monedas.
+- Día 9 · amanecer · [OBVIO] Martín me pide comida y no tengo ninguna ración; no puedo darle nada aunque me baje la relación.
+- Día 9 · Prima · [NADA] En prima en el puente no se puede juntar y la guardia ve a quien descansa; espero a tercia.
+- Día 9 · Tercia · [DECIDO] Con tormenta esta noche y sin pan, gasto el día en juntarme con Martín (vive en el arrabal) en vez de pedir: a relación 3 me da techo y una ración. Ahora relación 2.
+- Día 9 · Sexta · [OBVIO] Segunda vez con Martín con el 4: relación 3 y otro rumor.
+- Día 9 · Nona · [DECIDO] Uso el 2 en juntarme otra vez con Martín en vez de con Lucía, que vive dentro: relación 4 para que aguante si esta noche me da pan.
+- Día 9 · noche · [OBVIO] Duermo en casa de Martín con la tormenta y me da su pan; al raso perdería 2 de cuerpo más el hambre.
+- Día 10 · amanecer · [NADA] Último día con 2 2 2, fuera de la muralla y con la ronda en el puente; pedir con un 2 fuera no da nada y basta con llegar a la noche, así que no hago nada.
+- Día 10 · noche · [OBVIO] Última noche en casa de Martín, que vuelve a darme pan; no tengo para el de 8.

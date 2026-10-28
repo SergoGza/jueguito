@@ -58,6 +58,8 @@
   // palanca: al impedido lo recogen antes (el encierro es su castigo)
   // palanca: a partir de qué detención echan de la ciudad al forastero (puede ser distinta para el impedido)
   const desdeExpulsion = (s) => (pj(s).impedido && P.expulsionDesdeImpedido ? P.expulsionDesdeImpedido : P.expulsionDesde || 1);
+  // desde el pregón y hasta que vence, la autoridad busca a los forasteros que ve dentro de la muralla
+  const persigue = (s, sid) => !!(P.pregonPersigue && pj(s).forastero && !licencia(s) && s.dia >= P.pregonInicio && s.dia < P.pregonVence && sid !== "puente");
   const hospVeces = (s) => P.hospitalVeces - (P.recogeImpedido && pj(s).impedido ? 1 : 0);
   function alAzar(s, lista) { return lista.length ? lista[Math.floor(rand(s) * lista.length)] : null; }
 
@@ -400,7 +402,7 @@
     for (let w = 1; w <= 6; w++) {
       const t = testigoPara(s, sid, s.franja, w, {});
       const f = filas.find((x) => x.testigo === t);
-      if (f) f.caras.push(w); else filas.push({ testigo: t, caras: [w], efecto: R.EFECTOS[grupo][R.CATEGORIA[t]].txt });
+      if (f) f.caras.push(w); else filas.push({ testigo: t, caras: [w], efecto: R.EFECTOS[grupo][R.CATEGORIA[t]].txt + (R.CATEGORIA[t] === "Autoridad" && persigue(s, sid) ? `; y eres forastero con el pregón en marcha: Te buscan +${P.pregonPersigue}` : "") });
     }
     return filas;
   }
@@ -531,7 +533,7 @@
     }
     o.dT += wT; o.dTB += wTB;
     // palanca: desde el pregón, la autoridad busca a los forasteros que ve dentro de la muralla
-    if (P.pregonPersigue && p.forastero && !lic && o.cat === "Autoridad" && s.dia >= P.pregonInicio && s.dia < P.pregonVence && sid !== "puente") {
+    if (o.cat === "Autoridad" && persigue(s, sid)) {
       o.dTB += P.pregonPersigue; o.persigue = true;
     }
     if (accion === "pedir" && s.monedas > P.dineroUmbral && (o.cat === "Autoridad" || o.cat === "Beneficencia")) { o.dT += 1; o.fingidorDinero = true; }
@@ -710,6 +712,14 @@
     const extra = P.listaNinoCada && ninoConmigo(s) && ((s.mediasNino || 0) + 1) % P.listaNinoCada === 0 ? 1 : 0;
     return P.listaRacion + extra;
   }
+  // lo que dice el cura por la noche (lo usan el motor y la interfaz)
+  function lineaLista(s, deLista) {
+    if (!deLista) return licencia(s) && s.hoy && !s.hoy.forzado ? "Hoy no has cumplido con la parroquia: no hay ración de la lista." : "";
+    if (!(P.listaNinoCada && ninoConmigo(s))) return `Has cumplido: el cura te da tu ración de la lista (+${deLista}).`;
+    if (deLista > P.listaRacion) return `Has cumplido: el cura te da tu ración de la lista y la del niño (+${deLista}). Al niño le dan media: una ración cada ${P.listaNinoCada} noches que cumplas.`;
+    const faltan = P.listaNinoCada - (((s.mediasNino || 0) + 1) % P.listaNinoCada);
+    return `Has cumplido: el cura te da tu ración de la lista (+${deLista}). Al niño le dan media: ${faltan === 1 ? "la próxima noche que cumplas" : "dentro de " + faltan + " noches que cumplas"}, otra ración para él.`;
+  }
   function racionesNecesarias(s) { return s.hoy.forzado ? 0 : pj(s).raciones + (ninoConmigo(s) ? 1 : 0); }
 
   function opcionesNoche(s) {
@@ -788,9 +798,9 @@
     const necMadre = s.hoy.forzado ? 0 : pj(s).raciones;
     const necNino = ninoConmigo(s) && !s.hoy.forzado ? 1 : 0;
     const deLista = racionLista(s);
+    const lin = lineaLista(s, deLista);
+    if (lin) o.lineas.push(lin);
     if (deLista && P.listaNinoCada && ninoConmigo(s)) s.mediasNino = (s.mediasNino || 0) + 1;
-    if (deLista) o.lineas.push(`Has cumplido: el cura te da tu ración de la lista (+${deLista}).`);
-    else if (licencia(s) && !s.hoy.forzado) o.lineas.push("Hoy no has cumplido con la parroquia: no hay ración de la lista.");
     let disp = s.raciones + compra + deLista, prest = 0;
     if (disp < necMadre + necNino) {
       const amigo = contactosDisponibles(s).filter((c) => c.rel >= P.prestamoRel).sort((a, b) => b.rel - a.rel)[0];
@@ -856,7 +866,17 @@
     if (s.cuerpo <= 0) { terminar(s, "Muerte", "Murió de hambre y debilidad."); return; }
     s.tiempos[s.dia].fin = ahora();
     diaActual(s).fin = snapshot(s);
-    if (s.dia >= R.CALENDARIO.length) { terminar(s, "Sobrevive", "Llegó a la noche del día " + s.dia + "."); return; }
+    if (s.dia >= R.CALENDARIO.length) {
+      // la viuda gana si llegan los dos: el niño con ella o en casa de alguien de su red
+      const n = s.nino;
+      if (n && !n.perdido) {
+        const c = n.con ? s.contactos.find((x) => x.id === n.con) : null;
+        if (n.cuerpo <= 0) perderNino(s, "El niño enferma gravemente. Se lo llevan al hospital de niños y no te dejan verlo.");
+        else if (n.con && (!c || c.estado)) perderNino(s, `${c ? c.nombre : "Quien cuidaba de tu hijo"} ya no está. La autoridad encuentra al niño y se lo lleva a los niños de la doctrina.`);
+      }
+      if (n && n.perdido) { terminar(s, "Sin el niño", "Llegó a la noche del día " + s.dia + ", pero sin su hijo."); return; }
+      terminar(s, "Sobrevive", "Llegó a la noche del día " + s.dia + "."); return;
+    }
     turnoAutoridad(s);
   }
 
@@ -963,7 +983,7 @@
     const p = pj(s);
     const con = f.acompanado;
     const n = s.nino;
-    const hijo = !n ? "" : n.perdido ? " Tu hijo está en manos de la institución." : n.con ? ` ${(s.contactos.find((c) => c.id === n.con) || {}).nombre || "Alguien"} cuida de tu hijo.` : ["Horca", "Muerte"].includes(f.tipo) ? " Tu hijo se queda solo en Salamanca." : f.tipo === "Recogido" ? " A tu hijo lo llevan a los niños de la doctrina." : " Tu hijo sigue contigo.";
+    const hijo = !n || f.tipo === "Sin el niño" ? "" : n.perdido ? " Tu hijo está en manos de la institución." : n.con ? ` ${(s.contactos.find((c) => c.id === n.con) || {}).nombre || "Alguien"} cuida de tu hijo.` : ["Horca", "Muerte"].includes(f.tipo) ? " Tu hijo se queda solo en Salamanca." : f.tipo === "Recogido" ? " A tu hijo lo llevan a los niños de la doctrina." : " Tu hijo sigue contigo.";
     return textoFinalBase(s, f, p, con) + hijo;
   }
   function textoFinalBase(s, f, p, con) {
@@ -973,6 +993,10 @@
       case "Expulsado": return `Te echan de Salamanca el día ${f.dia}, con la espalda abierta y un pregón detrás. Otra ciudad, otro pregón.`;
       case "Recogido": return `Te recogen el día ${f.dia}. Comerás todos los días, rezarás a sus horas y no volverás a salir. La piedad también encierra.`;
       case "Sobrevive": return `Llegas a la noche del día ${f.dia}. Sigues siendo pobre, pero sigues ${p.id === "viuda" ? "viva" : "vivo"}${p.forastero ? " y nadie te ha echado de la ciudad todavía" : ""}. La siega aún no ha empezado: el prototipo acaba aquí.`;
+      case "Sin el niño": {
+        const donde = s.nino && /hospital/.test(s.nino.motivo || "") ? "Está en el hospital de niños y no te dejan verlo" : "Está con los niños de la doctrina: le enseñarán a rezar y lo pondrán a servir";
+        return `Llegas a la noche del día ${f.dia}. Sigues viva, pero sin tu hijo. ${donde}. Has salvado a uno de los dos.`;
+      }
       case "Abandono": return `Dejas la partida el día ${f.dia}.`;
       default: return "";
     }
@@ -1057,7 +1081,7 @@
     grupoEfecto, ganancia, previewTestigos, testigoPara, tirar, resolver, aplicar, gastarRumor, pasarFranja, acabarDia,
     castigoPendiente, aplicarCastigo, textoCastigo, opcionesNoche, dormir, precioPan, racionesNecesarias, turnoAutoridad,
     siguienteDia, abandonar, textoFinal, informe, resumenCorto, minutosPorDia, catalogada, puertaCerrada,
-    responderFavor, contactosDisponibles, disponible, monedasPedir, racionLista, umbralJornal, ninoConmigo, dejarNino, recogerNino, puedeCuidar, techo,
+    responderFavor, contactosDisponibles, disponible, monedasPedir, racionLista, lineaLista, hospVeces, umbralJornal, ninoConmigo, dejarNino, recogerNino, puedeCuidar, techo,
   };
   root.ENGINE = ENGINE;
   if (typeof module !== "undefined" && module.exports) module.exports = ENGINE;

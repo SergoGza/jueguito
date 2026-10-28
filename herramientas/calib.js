@@ -55,10 +55,10 @@ function corre(combo, pjid, pol) {
   const fin = {}; let cu = 0, ns = 0, conNino = 0;
   for (let i = 0; i < N; i++) {
     const s = jugar(pjid, i + 1, pol); fin[s.final.tipo] = (fin[s.final.tipo] || 0) + 1;
-    if (s.final.tipo === "Sobrevive") { ns++; cu += s.cuerpo; if (s.nino && !s.nino.perdido) conNino++; }
+    if (["Sobrevive", "Sin el niño"].includes(s.final.tipo)) { ns++; cu += s.cuerpo; if (s.nino && !s.nino.perdido) conNino++; }
   }
   const pc = (k) => Math.round((100 * (fin[k] || 0)) / N);
-  return { sob: pc("Sobrevive"), conNino: Math.round((100 * conNino) / N), horca: pc("Horca"), muerte: pc("Muerte"), rec: pc("Recogido"), exp: pc("Expulsado"), cu: ns ? (cu / ns).toFixed(1) : "-" };
+  return { sob: Math.round((100 * ns) / N), conNino: Math.round((100 * conNino) / N), horca: pc("Horca"), muerte: pc("Muerte"), rec: pc("Recogido"), exp: pc("Expulsado"), cu: ns ? (cu / ns).toFixed(1) : "-" };
 }
 for (const combo of combos) {
   const out = ["mozo", "viuda", "soldado"].map((p) => { const r = corre(combo, p, process.env.POL || "prudente"); return p === "viuda" ? `viuda ${r.conNino}% con niño (${r.sob}% ella; m${r.muerte} r${r.rec})` : `${p} ${r.sob}% (h${r.horca} m${r.muerte} r${r.rec}${r.exp ? " e" + r.exp : ""})`; });

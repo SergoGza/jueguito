@@ -84,7 +84,7 @@
     {
       id: "hospital", nombre: "Hospital", corto: "Hospital", dentro: true,
       desc: "Te curan, pero te apuntan. Quien entra muy débil ya no sale.",
-      franjas: [0, 1, 2, 3, 4].map(() => f("Curarse (solo enfermos: cuerpo 5 o menos): +2 de cuerpo si el dado no es bajo, pero te apuntan (−1). A la tercera vez, o con cuerpo 2 o menos, te recogen.", 0, "P C")),
+      franjas: [0, 1, 2, 3, 4].map(() => f("Curarse (solo enfermos: cuerpo 5 o menos): +2 de cuerpo si el dado no es bajo, pero te apuntan (−1). A la tercera vez (al impedido, a la segunda), o con cuerpo 2 o menos, te recogen.", 0, "P C")),
     },
     {
       id: "puente", nombre: "Puente y arrabal", corto: "Puente", dentro: false, ambos: true,
@@ -226,7 +226,7 @@
     trabajar: { nombre: "Trabajar a jornal", dado: true, testigo: true, desc: "Hacer de peón. Con un dado bueno te contratan y te pagan bien por el día. Ocupa también la franja siguiente. Antes de la siega hay poco trabajo: solo contratan a primera hora en la plaza (prima) y en las obras de la catedral (tercia)." },
     hurtar: { nombre: "Hurtar", dado: true, testigo: true, desc: "Robar entre el gentío. Con un dado bajo fallas y te ven; cuanto más alto, más sacas. Si te ve un alguacil, te detienen en el acto." },
     descansar: { nombre: "Descansar", dado: true, testigo: true, desc: "Esconderte y recuperarte: +1 de cuerpo si nadie te ve. Con un dado bajo, el hambre no te deja descansar. Si te ven tirado, cuenta como vagancia." },
-    curarse: { nombre: "Curarse", dado: true, testigo: false, desc: "Solo admiten enfermos (cuerpo 5 o menos). +2 de cuerpo si el dado no es bajo, pero te apuntan en el libro (−1). A la tercera vez que te apuntan, o si entras con cuerpo 2 o menos, te recogen y no sales." },
+    curarse: { nombre: "Curarse", dado: true, testigo: false, desc: "Solo admiten enfermos (cuerpo 5 o menos). +2 de cuerpo si el dado no es bajo, pero te apuntan en el libro (−1). A la tercera vez que te apuntan (al impedido, a la segunda), o si entras con cuerpo 2 o menos, te recogen y no sales." },
     examen: { nombre: "Entrar en la lista", dado: true, testigo: false, desc: "El cura te examina. Solo para naturales de la ciudad. Hace falta un dado bueno. Si apruebas, entras en la lista de pobres de la orden (−2): ya no puedes pedir, pero cada día que cumplas en tu parroquia te darán una ración por la noche. Si te ven pedir la beneficencia, el cura o un alguacil, te borran." },
     cumplir: { nombre: "Cumplir con la parroquia", dado: true, testigo: true, desc: "Oír misa, confesarte, presentarte al cura. Solo para quien está en la lista. Cualquier dado sirve. Si has cumplido y nadie de los que llevan la lista te ha visto pedir, esta noche te dan una ración (la tuya: el niño no cuenta)." },
     compartir: { nombre: "Compartir", dado: true, testigo: true, desc: "Das una ración (o una moneda si no tienes) a alguien de tu red o a alguien nuevo: sube la relación y te cuenta algo (+1 rumor). Como al juntarte, esa persona queda señalada esta noche." },
@@ -263,6 +263,14 @@
     techoSinDetencion: 2,  // sin detenciones previas el termómetro no pasa de +2: «reincidente» es quien ya ha sido detenido
     lavarUmbral: 3, lavarPaga: 2, ninoPedir: 2, mesonExtra: 2,
     ninoCuerpo0: 4, ninoMax: 5, ninoHambre: -2, ninoDebil: 1, ninoFiebre: 3,
+    // v0.5: el paquete «mixto» de calibración (ver herramientas/calib.js). Cada personaje pierde a su manera:
+    // al vagabundo válido lo echan, al impedido lo encierran, a la viuda le quitan al hijo.
+    pregonPersigue: 2,         // desde el pregón y hasta que vence, si un alguacil ve a un forastero dentro de la muralla: Te buscan +2
+    expulsionDias: 3,          // desde el pregón, al forastero detenido lo sacan de la muralla y no le dejan entrar en 3 días
+    expulsionDesdeImpedido: 2, // al impedido, a partir de la segunda detención (al válido, desde la primera)
+    techoRel: 3,               // para dormir en casa de alguien de tu red hace falta relación 3
+    listaNinoCada: 2,          // en la lista, media ración por el niño: una más cada dos noches que cumplas con él
+    recogeImpedido: true,      // al impedido, el hospital lo recoge a la segunda vez que lo apuntan
   };
   const PEDIR_DADO = [0, 0, 1, 1, 2, 3];   // dado 1..6
   const HURTAR_DADO = [0, 0, 2, 2, 4, 4];
@@ -271,7 +279,7 @@
   const CALENDARIO = [
     { dia: 1, fecha: "Lunes 1 de junio de 1545", que: "Empieza la partida.", pan: 3 },
     { dia: 2, fecha: "Martes 2 de junio", que: "Día de mercado: la plaza rinde +1 más a tercia y sexta.", pan: 3 },
-    { dia: 3, fecha: "Miércoles 3 de junio", que: "Se pregona la expulsión de los forasteros: tienen siete días para irse.", pan: 3 },
+    { dia: 3, fecha: "Miércoles 3 de junio", que: "Se pregona la expulsión de los forasteros: tienen siete días para irse. Hasta entonces, los alguaciles los buscan, y al que detengan lo sacan de la ciudad.", pan: 3 },
     { dia: 4, fecha: "Jueves 4 de junio", que: "Corpus Christi. Procesión de tercia a sexta: pedir +2 en la catedral y la plaza, se puede hurtar entre el gentío (+1) y hay más alguaciles. Es fiesta: no hay jornal.", pan: 4 },
     { dia: 5, fecha: "Viernes 5 de junio", que: "Día corriente. El pan ha subido.", pan: 4 },
     { dia: 6, fecha: "Sábado 6 de junio", que: "Día corriente. El pan vuelve a subir.", pan: 6 },
@@ -296,21 +304,21 @@
       forastero: true, impedido: false, raciones: 1, modJornal: 0, difExamen: null, oficios: ["peon"], nino: false,
       termo0: 0, cuerpo0: 8, monedas0: 2, raciones0: 1, tretaOficio: null, bonusTreta: 0,
       resumen: "Sin trabajo tras una mala cosecha. Puede trabajar a jornal, pero no puede entrar en la lista de pobres: para la ley es un vago. Para que le den limosna tiene que fingir.",
-      claves: ["Forastero: no puede entrar en la lista de pobres", "Válido: la beneficencia le mira mal si pide", "Buen peón: jornal sin penalización"],
+      claves: ["Forastero: no puede entrar en la lista de pobres", "Desde el pregón (día 3), si le detienen le sacan de la ciudad 3 días", "Válido: la beneficencia le mira mal si pide", "Buen peón: jornal sin penalización"],
     },
     {
       id: "viuda", nombre: "Viuda con un hijo pequeño", origen: "Natural de Salamanca", cuerpoTipo: "Válida, con cargas",
       forastero: false, impedido: false, raciones: 1, modJornal: -1, difExamen: 4, oficios: ["lavar"], nino: true,
       termo0: -1, cuerpo0: 8, monedas0: 2, raciones0: 1, tretaOficio: null, bonusTreta: 0,
-      resumen: "Conocida en su parroquia: puede entrar en la lista de pobres del cura (allí no se pide, pero dan una ración al día a quien cumple). Va con su hijo pequeño, que tiene su propio cuerpo y come cada noche. Con el niño al lado da más pena: la limosna en moneda rinde +2. Si el niño enferma o a ella la detienen, la autoridad puede llevárselo. No trabaja de peón, pero puede lavar ropa en la ribera.",
-      claves: ["Natural: puede entrar en la lista de pobres (examen a tercia, con un dado bueno)", "Va con su hijo: dos bocas cada noche", "Si no hay pan para los dos, eliges quién come", "Con el niño al lado, la limosna rinde +2 monedas", "Lava ropa en la ribera a tercia y sexta", "Empieza como pobre conocida (−1)"],
+      resumen: "Conocida en su parroquia: puede entrar en la lista de pobres del cura (allí no se pide, pero dan una ración al día a quien cumple, y media por el niño). Va con su hijo pequeño, que tiene su propio cuerpo y come cada noche. Solo gana si llegan los dos. Con el niño al lado da más pena: la limosna en moneda rinde +2. Si el niño enferma o a ella la detienen, la autoridad puede llevárselo. No trabaja de peón, pero puede lavar ropa en la ribera.",
+      claves: ["Gana si llega al día 10 con su hijo (o con él en casa de alguien de su red)", "Natural: puede entrar en la lista de pobres (examen a tercia, con un dado bueno)", "Va con su hijo: dos bocas cada noche", "Si no hay pan para los dos, eliges quién come", "Con el niño al lado, la limosna rinde +2 monedas", "Lava ropa en la ribera a tercia y sexta", "Empieza como pobre conocida (−1)"],
     },
     {
       id: "soldado", nombre: "Soldado licenciado y cojo", origen: "Forastero", cuerpoTipo: "Impedido",
       forastero: true, impedido: true, raciones: 1, modJornal: -2, difExamen: null, oficios: ["peon"], nino: false,
       termo0: 0, cuerpo0: 8, monedas0: 2, raciones0: 1, tretaOficio: "Falso cautivo", bonusTreta: 1,
       resumen: "Da lástima sin fingir, pero es forastero y no puede entrar en la lista de pobres. Le cuesta que le contraten. Conoce tretas de soldado.",
-      claves: ["Impedido: la beneficencia le tiene por pobre verdadero", "Forastero: no puede entrar en la lista de pobres", "Jornal −2", "+1 al fingir falso cautivo"],
+      claves: ["Impedido: la beneficencia le tiene por pobre verdadero", "Impedido: el hospital le recoge a la segunda vez que le apuntan", "Forastero: no puede entrar en la lista de pobres", "Desde el pregón (día 3), a la segunda detención le sacan de la ciudad 3 días", "Jornal −2", "+1 al fingir falso cautivo"],
     },
   ];
 
@@ -330,9 +338,9 @@
     { id: "meson", nombre: "Mesón", lado: "dentro", coste: 2, c: 0, t: 0, tb: 0, rumor: 1, riesgo: 0, rc: 0, rt: 0, rtb: 0,
       costePan: true, riesgoTxt: "", desc: "Cuesta una ración de pan más 2 monedas. Duermes bajo techo (no pierdes cuerpo) y oyes un rumor (+1)." },
     { id: "hospital", nombre: "Hospital", lado: "dentro", coste: 0, c: 2, t: -1, tb: 0, rumor: 0, riesgo: 0, rc: 0, rt: 0, rtb: 0,
-      riesgoTxt: "", desc: "Gratis. Solo admiten enfermos (cuerpo 5 o menos). +2 de cuerpo, pero te apuntan en el libro (−1). A la tercera vez que te apuntan, o si entras con cuerpo 2 o menos, te recogen." },
+      riesgoTxt: "", desc: "Gratis. Solo admiten enfermos (cuerpo 5 o menos). +2 de cuerpo, pero te apuntan en el libro (−1). A la tercera vez que te apuntan (al impedido, a la segunda), o si entras con cuerpo 2 o menos, te recogen." },
     { id: "red", nombre: "Con alguien de tu red", lado: "ambos", coste: 0, c: 0, t: 0, tb: 0, rumor: 0, riesgo: 0, rc: 0, rt: 0, rtb: 0,
-      riesgoTxt: "", desc: "Gratis. Duermes bajo techo (no pierdes cuerpo) y nadie te ve. Necesitas relación 2 o más con alguien que viva de tu lado de la muralla." },
+      riesgoTxt: "", desc: "Gratis. Duermes bajo techo (no pierdes cuerpo) y nadie te ve. Hace falta relación 3." },
     { id: "carcel", nombre: "Cárcel", lado: "ambos", coste: 0, c: 0, t: 0, tb: 0, rumor: 0, riesgo: 0, rc: 0, rt: 0, rtb: 0,
       riesgoTxt: "", desc: "Te han detenido." },
   ];
@@ -374,7 +382,7 @@
     "Francisca la Morena", "Gil el Romero", "Teresa la Larga", "Alonso el Pelado", "Ana de Ledesma"];
 
   const AYUDA = [
-    ["De qué va", "Eres un pobre en Salamanca, en junio de 1545. La autoridad acaba de decidir quién merece limosna y quién es un vagabundo. Tienes que llegar vivo al día 10 sin que te ahorquen, sin morir de hambre y sin que te encierren. Nadie sale de pobre."],
+    ["De qué va", "Eres un pobre en Salamanca, en junio de 1545. La autoridad acaba de decidir quién merece limosna y quién es un vagabundo. Tienes que llegar vivo al día 10 sin que te ahorquen, sin morir de hambre y sin que te encierren. La viuda, además, tiene que llegar con su hijo: sin él sobrevive, pero no gana. Nadie sale de pobre."],
     ["El día", "Cada día tiene un amanecer, cinco franjas (prima, tercia, sexta, nona y vísperas), la noche y el turno de la autoridad. En cada franja eliges un sitio y una acción."],
     ["Cuerpo y dados", "El cuerpo (0 a 10) es tu salud. Cada mañana decide cuántos dados tiras: 9-10, cinco; 7-8, cuatro; 5-6, tres; 3-4, dos; 1-2, uno. Cada acción gasta un dado y su valor es lo bien que te sale. Tú eliges qué dado va a cada acción. A 0 de cuerpo, mueres."],
     ["Comer", "Cada noche comes una ración (la viuda, dos). Si te falta, pierdes 2 de cuerpo por ración. El pan se compra de noche y sube de precio cada pocos días. Solo puedes guardar 2 raciones de una noche a otra: el resto se pone duro o te lo quitan, así que lo que te sobre, mejor compártelo."],
@@ -382,18 +390,18 @@
     ["Dinero", "Un pobre con dinero es sospechoso. Si llevas más de 4 monedas y te ven pedir un alguacil o la beneficencia, te tienen por fingidor (+1). Si duermes al raso con más de 4, te pueden robar la mitad y pegarte (−1 de cuerpo). Si te detienen, te lo quitan todo."],
     ["Testigos", "Cada acción tira un dado de testigo: decide quién te ve. Vecinos, otros pobres, la beneficencia, frailes o alguaciles. Cada uno te mira a su manera y eso mueve tu termómetro."],
     ["Termómetro", "Cómo te clasifica la autoridad, de −3 a +3. Hacia arriba: sospechoso, vagabundo y reincidente (+3, solo si ya te han detenido antes). Hacia abajo: pobre conocido, en la lista y, al final, recogido (te encierran en una institución y la partida acaba). Fuera de la lista no bajas de −1. El termómetro no mata solo: decide el castigo si te detienen."],
-    ["La lista de pobres", "La orden de pobres prohíbe pedir y mantiene a los pobres examinados. Solo entran los naturales: el cura examina en tu parroquia a tercia y hace falta un dado bueno. En la lista no se pide. Cada día que cumplas con la parroquia (cualquier dado sirve), esa noche te dan una ración: la tuya, el niño no cuenta. Si te ven pedir la beneficencia, el cura o un alguacil, te borran: esa noche no hay ración y para volver hay que pasar otro examen. Los frailes no denuncian a nadie, ni en la sopa del convento. El examen general de la autoridad también puede sacarte."],
+    ["La lista de pobres", "La orden de pobres prohíbe pedir y mantiene a los pobres examinados. Solo entran los naturales: el cura examina en tu parroquia a tercia y hace falta un dado bueno. En la lista no se pide. Cada día que cumplas con la parroquia (cualquier dado sirve), esa noche te dan tu ración, y al niño, si está contigo, media: una ración más cada dos noches que cumplas. Si te ven pedir la beneficencia, el cura o un alguacil, te borran: esa noche no hay ración y para volver hay que pasar otro examen. Los frailes no denuncian a nadie, ni en la sopa del convento. El examen general de la autoridad también puede sacarte."],
     ["Tu hijo (viuda)", "La viuda va con su hijo. Con él al lado, la limosna en moneda rinde +2 (si lo dejas con alguien, no). Tiene su propio cuerpo (0 a 5) y come cada noche: si no hay pan para los dos, eliges quién come. Bajo techo y comido se recupera; las tormentas y las fiebres le afectan aparte. Si está muy débil (1 o menos) y estás dentro de la muralla, el cura se lo lleva a los niños de la doctrina, salvo que alguien de tu red (relación 2 o más) lo esconda. Si te detienen, se lo llevan, salvo que alguien de tu red se quede con él. Al amanecer puedes dejarlo con alguien de tu red: cada noche le das una ración o su precio, y si no puedes, la relación baja. Si interrogan a quien lo cuida, lo pierdes."],
     ["Te buscan", "Cuando llega a 6, te detienen. El castigo depende del termómetro: con 0 o menos, reprensión; con +1, azotes; con +2, trabajo forzado o marca; con +3, la horca. Después, ya te conocen: «Te buscan» empieza en el número de veces que te han detenido (hasta 3)."],
-    ["La autoridad", "Cada noche juega según lo que vio: manda rondas a donde más te vieron, interroga a tu gente (primero, a quien estuvo contigo ese día), cierra la puerta, pregona normas, examina a los pobres o reparte limosna pública. Desde el pregón de expulsión (día 3) aprieta más: un movimiento extra cada noche, te vea o no. Lo que hace lo ves al amanecer."],
+    ["La autoridad", "Cada noche juega según lo que vio: manda rondas a donde más te vieron, interroga a tu gente (primero, a quien estuvo contigo ese día), cierra la puerta, pregona normas, examina a los pobres o reparte limosna pública. Desde el pregón de expulsión (día 3) aprieta más: un movimiento extra cada noche, te vea o no. Y busca a los forasteros: hasta que vence el pregón, si un alguacil ve a un forastero dentro de la muralla, Te buscan +2; si lo detienen, lo sacan de la ciudad y la guardia no le deja entrar en 3 días (al impedido, desde la segunda detención). El día que vence, al forastero que vean dentro lo detienen. Lo que hace lo ves al amanecer."],
     ["Sucesos", "Cada amanecer pasa algo en la ciudad: fiebres, tormentas, subidas del pan, redadas, repartos de pan o muertes. No los controlas."],
     ["Fingir", "Al amanecer puedes gastar un dado en preparar una treta (llagas, ceguera, falso peregrino…). Ese dado es su calidad para todo el día: te dan más y te tienen por impedido, pero si te examina la beneficencia o el cura y su dado iguala tu calidad, te descubren."],
-    ["Red y rumores", "Puedes juntarte con otros pobres (cualquier dado sirve) o compartir con ellos. Con relación 2 puedes dormir con alguien, te encubre si te ve robar y no mueres solo. Con relación 3, si te falta pan, te da una ración. Pero juntarse se ve: quien estuvo contigo queda señalado esa noche. Si la autoridad interroga, va a por esa persona, y si os vio un alguacil, la interroga seguro. Con relación baja, te vende; si aguanta, se la llevan dos días. Las relaciones nuevas son las que más venden. Además te pedirán comida, enfermarán, desaparecerán o morirán: una red de una sola persona no aguanta. Un rumor sirve para repetir un dado de testigo."],
-    ["La muralla", "El puente y el arrabal están fuera. Si duermes fuera, para entrar tienes que cruzar la puerta, donde la guardia vigila a los forasteros. Si la autoridad cierra la puerta, te quedas fuera, salvo que estés en la lista."],
+    ["Red y rumores", "Puedes juntarte con otros pobres (cualquier dado sirve) o compartir con ellos. Con relación 2, te encubre si te ve robar y no mueres solo. Con relación 3, puedes dormir en su casa (si vive de tu lado de la muralla) y, si te falta pan, te da una ración. Pero juntarse se ve: quien estuvo contigo queda señalado esa noche. Si la autoridad interroga, va a por esa persona, y si os vio un alguacil, la interroga seguro. Con relación baja, te vende; si aguanta, se la llevan dos días. Las relaciones nuevas son las que más venden. Además te pedirán comida, enfermarán, desaparecerán o morirán: una red de una sola persona no aguanta. Un rumor sirve para repetir un dado de testigo."],
+    ["La muralla", "El puente y el arrabal están fuera. Si duermes fuera, para entrar tienes que cruzar la puerta, donde la guardia vigila a los forasteros. Si la autoridad cierra la puerta, te quedas fuera, salvo que estés en la lista. Si te han echado de la ciudad, la guardia no te deja entrar hasta que pasen los días."],
   ];
 
   const RULES = {
-    version: "0.4b", CONFIG, FRANJAS, FRANJA_DESC, SITIOS, TESTIGOS, CATEGORIA, TESTIGO_DESC, CATS, EFECTOS, ACCIONES, COD_ACC,
+    version: "0.5", CONFIG, FRANJAS, FRANJA_DESC, SITIOS, TESTIGOS, CATEGORIA, TESTIGO_DESC, CATS, EFECTOS, ACCIONES, COD_ACC,
     PARAMS, PEDIR_DADO, HURTAR_DADO, DADOS_CUERPO, CALENDARIO, MODS, PERSONAJES, TRETAS, DORMIR, CLASIF,
     MOVIMIENTOS, MOV_DESC, PREGONES, NOMBRES, AYUDA, SUCESOS,
   };

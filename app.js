@@ -59,9 +59,9 @@
     rumores: ["Rumores", "Lo que te cuentan otros pobres. Cuando te vea un testigo, puedes gastar un rumor para repetir el dado de testigo (sabías por dónde pasaba la ronda)."],
     termo: ["Termómetro", "Cómo te clasifica la autoridad, de −3 a +3. Hacia arriba: +1 sospechoso, +2 vagabundo, +3 reincidente (solo si ya te han detenido alguna vez: antes no pasas de +2). Hacia abajo: −1 pobre conocido, −2 en la lista de pobres (solo con el examen del cura, y solo naturales) y −3 recogido (te encierran y la partida acaba; solo pasa en el hospital). Fuera de la lista no bajas de −1. El termómetro no mata solo: decide el castigo si te detienen."],
     tb: ["Te buscan", `Cuánto te tiene fichado la justicia. Cuando llega a ${P.tbMax}, te detienen. El castigo depende del termómetro: con 0 o menos, reprensión; con +1, azotes; con +2, trabajo forzado o marca; con +3, la horca. Después de cada detención ya te conocen: empieza en el número de veces que te han detenido (hasta 3).`],
-    muralla: ["La muralla", "El puente y el arrabal están fuera de la muralla; el resto de sitios, dentro. Para pasar de un lado a otro tienes que cruzar la puerta en el puente, donde la guardia vigila a los forasteros. Si la autoridad cierra la puerta, solo entran los de la lista. Estar en el puente no es salir: sigues de tu lado hasta que cruzas. Para dormir en el arrabal tienes que estar fuera."],
-    red: ["Tu red", "Los pobres que conoces. Juntarte con alguien (cualquier dado sirve) o compartir sube la relación; negar comida a quien te la pide, la baja. Con relación 2: puedes dormir con esa persona (si vive de tu lado de la muralla), te encubre si te ve hurtar y, si mueres, no mueres solo. Con relación 3: si te falta pan, te da una ración. Pero juntarse se ve: quien estuvo contigo queda señalado esa noche, y si la autoridad interroga, va a por esa persona (si os vio un alguacil, la interroga seguro). Con relación baja, te vende; si aguanta, se la llevan dos días. Y enferman, desaparecen o mueren. Solo puedes delatar a alguien de tu red, y lo pierdes."],
-    hospital: ["Hospital", "Solo admite enfermos (cuerpo 5 o menos). Cada vez que te curan o duermes allí, te apuntan en el libro. A la tercera, te recogen: entras en la institución y la partida acaba."],
+    muralla: ["La muralla", "El puente y el arrabal están fuera de la muralla; el resto de sitios, dentro. Para pasar de un lado a otro tienes que cruzar la puerta en el puente, donde la guardia vigila a los forasteros. Si la autoridad cierra la puerta, solo entran los de la lista. Estar en el puente no es salir: sigues de tu lado hasta que cruzas. Para dormir en el arrabal tienes que estar fuera. Desde el pregón de expulsión (día 3), al forastero que detienen lo sacan de la ciudad y la guardia no le deja entrar en unos días (al impedido, desde la segunda detención)."],
+    red: ["Tu red", "Los pobres que conoces. Juntarte con alguien (cualquier dado sirve) o compartir sube la relación; negar comida a quien te la pide, la baja. Con relación 2: te encubre si te ve hurtar, puede cuidar de un niño y, si mueres, no mueres solo. Con relación 3: puedes dormir en su casa (si vive de tu lado de la muralla) y, si te falta pan, te da una ración. Pero juntarse se ve: quien estuvo contigo queda señalado esa noche, y si la autoridad interroga, va a por esa persona (si os vio un alguacil, la interroga seguro). Con relación baja, te vende; si aguanta, se la llevan dos días. Y enferman, desaparecen o mueren. Solo puedes delatar a alguien de tu red, y lo pierdes."],
+    hospital: ["Hospital", "Solo admite enfermos (cuerpo 5 o menos). Cada vez que te curan o duermes allí, te apuntan en el libro. A la tercera, te recogen: entras en la institución y la partida acaba. Al impedido, que es el pobre que buscan, lo recogen a la segunda."],
     nino: ["Tu hijo", R.AYUDA.find((x) => x[0] === "Tu hijo (viuda)")[1]],
     licencia: ["La lista de pobres", R.AYUDA.find((x) => x[0] === "La lista de pobres")[1]],
     treta: ["Treta", "La has preparado al amanecer. Durante todo el día pides con ella. Si la preparaste con un dado bueno y no está catalogada, te dan más y te tienen por impedido. Pero si te ve la beneficencia o el cura, te pueden descubrir: cuanto mejor la preparaste, más difícil; si está catalogada, más fácil."],
@@ -133,9 +133,10 @@
     if (s.marca) b.push(`<span class="badge mal" data-act="metro" data-k="termo">Marcado</span>`);
     if (s.treta) b.push(`<span class="badge" data-act="metro" data-k="treta">Treta: ${esc(s.treta.nombre)} (${s.treta.calidad})${s.treta.catalogada ? ", catalogada" : ""}</span>`);
     if (s.venganza) b.push(`<span class="badge mal" data-act="metro" data-k="red">Alguien quiere vengarse</span>`);
+    if (s.fuera && s.vetadoHasta && s.dia <= s.vetadoHasta) b.push(`<span class="badge mal" data-act="metro" data-k="muralla">Te han echado: no puedes entrar hasta el día ${s.vetadoHasta + 1}</span>`);
     if (s.tf > 0) b.push(`<span class="badge mal">Trabajo forzado: ${plural(s.tf, "día", "días")}</span>`);
     if (s.detenciones) b.push(`<span class="badge mal" data-act="metro" data-k="tb">Te conocen: ${plural(s.detenciones, "detención", "detenciones")}</span>`);
-    if (s.apuntes) b.push(`<span class="badge mal" data-act="metro" data-k="hospital">Apuntado en el hospital: ${s.apuntes} de ${P.hospitalVeces}</span>`);
+    if (s.apuntes) b.push(`<span class="badge mal" data-act="metro" data-k="hospital">Apuntado en el hospital: ${s.apuntes} de ${E.hospVeces(s)}</span>`);
     if (s.monedas > P.dineroUmbral) b.push(`<span class="badge mal" data-act="metro" data-k="monedas">Llevas demasiado dinero encima</span>`);
     const red = E.contactosDisponibles(s);
     b.push(`<span class="badge" data-act="red">Red: ${red.length ? red.map((c) => esc(c.nombre.split(" ")[0]) + " " + c.rel).join(", ") : "nadie"}${s.contactos.length > red.length ? " (+" + (s.contactos.length - red.length) + " que no están)" : ""}</span>`);
@@ -225,12 +226,21 @@
   }
 
   // ---------------------------------------------------------------- amanecer
+  // qué le hace el pregón de expulsión al forastero, según las reglas en vigor
+  function avisoPregon() {
+    if (s.dia >= P.pregonVence) return "Eres forastero: hoy no te pueden ver dentro de la muralla.";
+    const det = s.detenciones || 0, desde = E.pj(s).impedido && P.expulsionDesdeImpedido ? P.expulsionDesdeImpedido : P.expulsionDesde || 1;
+    const partes = [];
+    if (P.pregonPersigue) partes.push(`si un alguacil te ve dentro de la muralla, Te buscan +${P.pregonPersigue}`);
+    if (P.expulsionDias) partes.push(det + 1 >= desde ? `si te detienen, te sacan de la ciudad y no te dejan entrar en ${P.expulsionDias} días` : `a la ${desde}ª detención te sacarán de la ciudad ${P.expulsionDias} días`);
+    return `Eres forastero: ${partes.length ? "hasta que venza, " + partes.join("; ") + ". " : ""}El día que vence no te pueden ver dentro de la muralla.`;
+  }
   function vAmanecer() {
     const c = E.cal(s.dia);
     const aut = E.resumenAutoridad(s, s.dia);
     const pe = E.pregonExpulsion(s.dia);
     let h = `<h2>${esc(c.fecha)}</h2><p>${esc(c.que)} <span class="muted">Pan a ${c.pan} la ración.</span></p>`;
-    if (pe) h += `<p class="small"><b>${esc(pe)}</b>${E.pj(s).forastero ? " Eres forastero: ese día no te pueden ver dentro de la muralla." : ""}</p>`;
+    if (pe) h += `<p class="small"><b>${esc(pe)}</b>${E.pj(s).forastero ? " " + avisoPregon() : ""}</p>`;
     if (s.dia === 1 && !load(LS.intro, false)) {
       h += `<div class="card aviso"><h3>Cómo va un día</h3><ol class="lista small">
         <li>Al amanecer ves tus dados. Cada acción del día gasta uno y su valor es lo bien que te sale.</li>
@@ -402,7 +412,7 @@
       h += `<button class="btn ${ui.noche === x.id ? "sel" : ""}" data-act="noche" data-id="${x.id}" ${x.ok ? "" : "disabled"}><span class="t">${esc(x.nombre)}</span><span class="d">${esc(x.desc)}</span>
         ${x.riesgos.map((r) => `<span class="${/Cuidado/.test(r) ? "no" : "n"}">${esc(r)}</span>`).join("")}${x.ok ? "" : `<span class="no">${esc(x.motivo)}</span>`}</button>`;
     });
-    h += `<p class="paso">2. Pan</p><p class="small">La ración cuesta ${pan} ${pan === 1 ? "moneda" : "monedas"} hoy. ${nec ? `Esta noche necesitas ${plural(nec, "ración", "raciones")} y tienes ${s.raciones}.` : "Esta noche no comes por tu cuenta."}${deLista ? ` El cura te da tu ración de la lista (+${deLista}): has cumplido.` : E.licencia(s) && !s.hoy.forzado ? " Hoy no has cumplido con la parroquia: no hay ración de la lista." : ""}</p>
+    h += `<p class="paso">2. Pan</p><p class="small">La ración cuesta ${pan} ${pan === 1 ? "moneda" : "monedas"} hoy. ${nec ? `Esta noche necesitas ${plural(nec, "ración", "raciones")} y tienes ${s.raciones}.` : "Esta noche no comes por tu cuenta."}${E.lineaLista(s, deLista) ? " " + esc(E.lineaLista(s, deLista)) : ""}</p>
       <div class="stepper"><button data-act="compra" data-d="-1" aria-label="Comprar una menos">−</button><span class="v">${ui.compra}</span><button data-act="compra" data-d="1" aria-label="Comprar una más">+</button>
       <span class="small muted">compras ${plural(ui.compra, "ración", "raciones")} · te quedan ${s.monedas - coste - ui.compra * pan} monedas</span></div>`;
     const sobran = s.raciones + ui.compra + deLista - nec - P.hatillo;
@@ -413,7 +423,7 @@
     if (faltan && conNino && faltan < nec) {
       h += `<p class="paso">3. No hay pan para los dos: ¿quién come?</p>
         <button class="btn ${ui.comeNino ? "sel" : ""}" data-act="comeNino" data-d="1"><span class="t">Come el niño</span><span class="d">Tú pierdes ${-P.hambreC} de cuerpo${s.cuerpo + P.hambreC <= 0 ? ", y morirías" : ""}.</span></button>
-        <button class="btn ${!ui.comeNino ? "sel" : ""}" data-act="comeNino" data-d="0"><span class="t">Comes tú</span><span class="d">El niño pierde ${-P.ninoHambre} de su cuerpo (tiene ${s.nino.cuerpo}).${s.nino.cuerpo + P.ninoHambre <= 0 ? " Se quedaría a 0: al amanecer se lo llevan al hospital de niños y lo pierdes." : s.nino.cuerpo + P.ninoHambre <= P.ninoDebil ? " Quedará muy débil: dentro de la muralla, el cura se lo puede llevar." : ""}</span></button>
+        <button class="btn ${!ui.comeNino ? "sel" : ""}" data-act="comeNino" data-d="0"><span class="t">Comes tú</span><span class="d">El niño pierde ${-P.ninoHambre} de su cuerpo (tiene ${s.nino.cuerpo}).${s.nino.cuerpo + P.ninoHambre <= 0 ? " Se quedaría a 0: " + (s.dia >= R.CALENDARIO.length ? "se lo llevan al hospital de niños y llegas sin él al final." : "al amanecer se lo llevan al hospital de niños y lo pierdes.") : s.nino.cuerpo + P.ninoHambre <= P.ninoDebil ? " Quedará muy débil: dentro de la muralla, el cura se lo puede llevar." : ""}</span></button>
         <p class="muted small">Si alguien de tu red con relación 3 o más está disponible, os dará una ración y puede que no haga falta elegir.</p>`;
     } else if (faltan && amigo) h += `<p class="small">Te ${faltan === 1 ? "falta 1 ración" : "faltan " + faltan + " raciones"}, pero ${esc(amigo.nombre)} compartirá su pan contigo: una ración (vuestra relación baja 1).</p>`;
     else if (faltan) h += `<p class="small" style="color:var(--bad)">${conNino ? "No hay pan para ninguno de los dos: tú pierdes " + (-P.hambreC) + " de cuerpo y el niño " + (-P.ninoHambre) + "." : `Te ${faltan === 1 ? "faltará 1 ración" : "faltarán " + faltan + " raciones"}: perderás ${faltan * -P.hambreC} de cuerpo${s.cuerpo + faltan * P.hambreC <= 0 ? ", y morirías" : ""}.`}</p>`;
@@ -446,7 +456,7 @@
   function vFin() {
     const f = s.final, p = E.pj(s);
     const enc = s.encuesta || {};
-    const titulos = { Horca: "La horca", Muerte: "Has muerto", Recogido: "Te han recogido", Sobrevive: "Sobrevives", Abandono: "Partida abandonada" };
+    const titulos = { Horca: "La horca", Muerte: "Has muerto", Recogido: "Te han recogido", Expulsado: "Te han echado", Sobrevive: "Sobrevives", "Sin el niño": "Sobrevives sin tu hijo", Abandono: "Partida abandonada" };
     let h = `<main class="wrap"><h1>${esc(titulos[f.tipo] || f.tipo)}</h1>`;
     if (ui.nocheRes) h += vNocheResumen();
     if (ui.castigoRes) h += `<div class="card malo"><p><b>${esc(ui.castigoRes.tipo)}.</b> ${esc(ui.castigoRes.txt)}</p></div>`;

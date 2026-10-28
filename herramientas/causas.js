@@ -11,7 +11,7 @@ for (const pj of ["mozo", "soldado", "viuda"]) {
   const c = {}; let expulsado = 0, muerteTrasExp = 0, detenido = 0;
   for (let i = 0; i < N; i++) {
     const s = jugar(pj, i + 1, "prudente");
-    let k = s.final.tipo; if (k === "Sobrevive" && s.nino && s.nino.perdido) k = "Sobrevive sin el niño";
+    const k = s.final.tipo;
     c[k] = (c[k] || 0) + 1;
     if (s.vetadoHasta) { expulsado++; if (s.final.tipo === "Muerte") muerteTrasExp++; }
     if (s.detenciones) detenido++;

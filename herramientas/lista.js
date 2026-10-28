@@ -21,7 +21,7 @@ function medir(lista) {
   };
   for (let i = 0; i < N; i++) {
     const s = jugar("viuda", i + 1, "prudente", hooks);
-    if (s.final.tipo === "Sobrevive") { t.sob++; if (s.nino && !s.nino.perdido) t.sobConNino++; }
+    if (["Sobrevive", "Sin el niño"].includes(s.final.tipo)) { t.sob++; if (s.final.tipo === "Sobrevive") t.sobConNino++; }
     if (s.final.tipo === "Muerte") t.muerte++;
     if (s.nino && s.nino.perdido) t.ninoPerdido++;
     let entro = false;

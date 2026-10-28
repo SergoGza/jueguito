@@ -4,7 +4,7 @@ Nada de esto lo necesita el juego: sirve para probar y equilibrar las reglas.
 
 - `simlib.js`: el bot. Lo usan todas las simulaciones. Políticas `azar`, `prudente` y `egoista`. Admite ganchos para medir cosas sin copiar el bot (ver la cabecera del archivo).
 - `sim.js [N]`: juega N partidas por personaje con el bot al azar y el prudente, comprueba invariantes y saca porcentajes. `node herramientas/sim.js 1500`
-- `calib.js [N]`: prueba combinaciones de palancas (definidas arriba del archivo) sin tocar `rules.js` (se aplican encima de las reglas actuales). `COMBOS="persigue2+expSuave3+techo3;pan1" node herramientas/calib.js 600`. Con `POL=azar`, usa el bot al azar. De la viuda da la supervivencia con el niño, que es su victoria desde la v0.5.
+- `calib.js [N]`: prueba combinaciones de palancas (definidas arriba del archivo) sin tocar `rules.js` (se aplican encima de las reglas actuales; desde la v0.5, el paquete «mixto» ya está en `rules.js`, así que `base` es la v0.5). `COMBOS="persigue2+expSuave3+techo3;pan1" node herramientas/calib.js 600`. Con `POL=azar`, usa el bot al azar. De la viuda da la supervivencia con el niño, que es su victoria desde la v0.5.
 - `causas.js`: de qué muere cada personaje, cuántas veces le detienen y si le echaron de la ciudad, con las palancas que se pasen: `PALANCAS='{"pregonPersigue":2,"expulsionDias":3}' node herramientas/causas.js`.
 - `dados.js [N]`: dados muertos y decisiones. Qué pasa con cada dado según su valor y cuántas franjas tienen algo que decidir. `node herramientas/dados.js 2000`
 - `mapa-dados.js`: qué puede sacar cada valor de dado en cada franja de un día, sin contar riesgos. `DIA=4 node herramientas/mapa-dados.js`
@@ -12,10 +12,12 @@ Nada de esto lo necesita el juego: sirve para probar y equilibrar las reglas.
 - `prueba-red.js`: prueba dirigida de juntarse y señalar (v0.4). Debe salir todo «ok».
 - `lista.js [N]`: la lista de pobres (v0.4b) con la viuda: si entra, cuántas raciones saca, cuántas veces la borran, cuánto lava y qué le pasa al niño. Compara el bot que entra en la lista con el que no entra nunca.
 - `prueba-lista.js`: prueba dirigida de la lista (v0.4b). Debe salir todo «ok».
+- `prueba-v05.js`: prueba dirigida de la v0.5 (pregón que persigue, expulsión, techo con relación 3, media ración, hospital y final de la viuda). Debe salir todo «ok».
 - `ingresos.js`: de dónde sale el dinero y el cuerpo por día jugado, por personaje.
 - `ninostats.js`: qué le pasa al niño de la viuda según cómo juegue el bot.
 - `webtest.py PJ TEMA SEMILLA`: juega una partida entera en el navegador (Playwright, móvil 390x844) y comprueba el informe, el historial y el service worker. `python3 herramientas/webtest.py viuda dark 1`
 - `webnino.py`: prueba dirigida de la interfaz del niño.
+- `webv05.py`: prueba dirigida de la interfaz de la v0.5 (avisos del pregón, expulsión, media ración, techo y final de la viuda). Deja capturas en `capturas/v05_*.png`.
 
 ## El bot prudente
 

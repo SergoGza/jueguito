@@ -561,7 +561,9 @@
       E.abandonar(s); persistir(); render();
     },
     elegirPj(d) {
-      s = E.nuevaPartida({ jugador: load(LS.jugador, "Anónimo"), personaje: d.id, catalogo: load(LS.catalogo, []) });
+      // ?semilla=N fija los dados (lo usan las herramientas de prueba para repetir partidas); sin ella, al azar
+      const sem = new URLSearchParams(location.search).get("semilla");
+      s = E.nuevaPartida({ jugador: load(LS.jugador, "Anónimo"), personaje: d.id, catalogo: load(LS.catalogo, []), seed: sem !== null && sem !== "" && !isNaN(+sem) ? +sem : undefined });
       resetUI(); ui.nocheRes = null; ui.castigoRes = null; ui.pantalla = "juego"; persistir(); render();
     },
     nueva() { ui.pantalla = "inicio"; render(); },

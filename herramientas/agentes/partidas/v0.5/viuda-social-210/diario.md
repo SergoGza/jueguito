@@ -1,0 +1,56 @@
+- Día 1 · Prima · [DECIDO] Entre pedir en misa y juntarme en el convento, me junto con un pobre nuevo con el 3 para empezar red y guardo el 6 para tercia.
+- Día 1 · Tercia · [DECIDO] Dudé entre examinarme para la lista con el 6 o pedir en el mercado con el niño; pedí porque con el +2 del niño saco más que una ración y salió bien: 6 monedas sin testigos.
+- Día 1 · Sexta · [DECIDO] Podía pedir sopa con un dado malo o compartir; compartí mi ración con Antón con el 1 para subirle a relación 2, que me guarde al niño si pasa algo.
+- Día 1 · Nona · [DECIDO] Con el último dado, un 2, podía conocer a alguien nuevo o subir a Antón; subí a Antón a 3 para poder dormir bajo techo con el niño.
+- Día 1 · noche · [OBVIO] Duermo con Antón bajo techo y gratis, y compro las 2 raciones que necesitamos el niño y yo.
+- Día 2 · amanecer · [OBVIO] Antón me pide comida pero no tengo ni una ración; no le doy y baja a 2. Me fastidia porque ayer le di la mía.
+- Día 2 · Prima · [DECIDO] Entre pedir en misa (el cura podría tenerme por válida) o juntarme, me junto con alguien nuevo con el 2: una red de uno no aguanta. Conozco a María la Rubia.
+- Día 2 · Tercia · [DECIDO] Día de mercado: el 6 en la plaza a tercia en vez de en misa. Me dan 7 monedas y solo me ven vecinos.
+- Día 2 · Sexta · [DECIDO] Podía pedir sopa con el 5 o recuperar a Antón; me junté con él con el 3 para volver a relación 3 y tener techo esta noche, que hay tormenta.
+- Día 2 · Nona · [DECIDO] El 5 lo podía usar para pedir más, pero ya tenía para el pan; me junté con María en el puente y sube a 2.
+- Día 2 · autoridad · [DECIDO] Con 9 monedas compro 3 raciones en vez de 2 para guardar una por si Antón o María me piden mañana, y duermo con Antón por la tormenta.
+- Día 3 · Prima · [NO ENTIENDO] En la catedral la tabla de testigos pone «1-6 Alguacil» y luego 2, 3-4 y 5 con otros; supongo que quiere decir el 1 y el 6, no del 1 al 6.
+- Día 3 · Prima · [DECIDO] La beneficencia me vio válida (+1, termómetro a 0). No gasto rumor para repetir: con la redada era más fácil que saliera alguacil y fuera peor.
+- Día 3 · Tercia · [DECIDO] Con el 5 lavé ropa en la ribera en vez de pedir otra vez: quería bajar el termómetro y no arriesgar con la redada. Solo pagan 2 monedas, pedir con el niño rinde mucho más.
+- Día 3 · Sexta · [OBVIO] Con el 1, que no sirve para pedir, me junto con María: sube a 3 y ya tengo dos casas donde dormir.
+- Día 3 · Nona · [DECIDO] Último dado, un 2: podía subir más a Antón o a María, pero prefiero una tercera persona; conozco a Martín de Toro en el puente.
+- Día 3 · autoridad · [OBVIO] María no sale como sitio para dormir (vivirá fuera); duermo con Antón y compro 2 para quedarme con una de reserva.
+- Día 4 · Prima · [DECIDO] Pedí en misa con el 5 y el cura me vio válida; gasté un rumor en repetir el testigo porque casi todo lo demás era mejor, y salieron vecinos: termómetro de vuelta a 0.
+- Día 4 · Tercia · [DECIDO] Pedí en la catedral con el 6 en la procesión; salió alguacil, repetí con rumor y salió beneficencia: igual +2 por válida y por llevar 7 monedas. Ahora soy Vagabundo con 14 monedas; no esperaba que el dinero de la propia limosna contara ya.
+- Día 4 · Sexta · [DECIDO] Con el otro 6 podía pedir en la plaza con la procesión o lavar; lavé para no cargar más dinero y por si un alguacil me veía trabajar. No me vio nadie: 2 monedas.
+- Día 4 · Nona · [OBVIO] Me sobra dinero y no tengo ración que guardar para Antón; con el 2 le comparto la mía y sube a 4.
+- Día 4 · autoridad · [DECIDO] Podía guardar monedas o gastarlas: compro 4 raciones con las 16 monedas, cenamos y me quedan 2 guardadas; así no llevo dinero encima mañana.
+- Día 5 · Prima · [DECIDO] Antón ha muerto y me quedo sin techo dentro. Antes que pedir en misa, uso el 3 para conocer a alguien nuevo en el convento: Perico el Tuerto.
+- Día 5 · Tercia · [DECIDO] Siendo Vagabundo y sin Antón, entre pedir en la plaza o examinarme, me examino con un 4: apruebo y paso de +2 a −2 de golpe. Pierdo el +2 del niño al pedir, pero gano ración diaria y seguridad.
+- Día 5 · Sexta · [DECIDO] Entre lavar por 2 monedas o cuidar la red, me junto con Perico (que era nuevo y es de los que venden) y sube a 2.
+- Día 5 · Nona · [OBVIO] Cumplo con la parroquia con el 4 para que esta noche me den la ración de la lista.
+- Día 5 · noche · [NO ENTIENDO] Salí de la muralla para dormir con María (relación 3) porque dentro no aparecía, y fuera tampoco: dice que nadie de mi red vive de este lado. No sé dónde vive María ni si tiene casa; esperaba que la pantalla me lo dijera antes de cruzar.
+- Día 5 · autoridad · [OBVIO] Sin dinero para el mesón y sin casa de la red fuera, duermo al raso en el arrabal; pierdo 1 de cuerpo. Se llevan a Perico por estar conmigo.
+- Día 6 · Prima · [DECIDO] Fuera solo podía pedir (y me borrarían) o descansar con casi todo en contra; vuelvo a entrar por la puerta en prima sin gastar dado.
+- Día 6 · Tercia · [OBVIO] Cumplo en la parroquia con el 1, que no vale para otra cosa.
+- Día 6 · Sexta · [DECIDO] Pedí sopa en el convento con un 6 aunque la beneficencia podía borrarme; salió beneficencia y gasté un rumor: salió fraile y sigo en la lista con la ración. Con el pan a 6 la sopa valía el riesgo.
+- Día 6 · Nona · [DECIDO] Con el 3 me junto con Martín, que vive en el arrabal, en vez de con María: así tendré casa a los dos lados de la muralla.
+- Día 6 · Vísperas · [DECIDO] En el mesón podía compartir o juntarme; me junto con Martín (gratis, sin gastar ración con el pan a 6) y sube a 3.
+- Día 6 · autoridad · [OBVIO] Duermo con María bajo techo; con la lista nos dan dos raciones y guardo las otras dos.
+- Día 7 · amanecer · [DECIDO] Martín me pide comida y tengo 2 raciones: se la doy aunque el pan está a 7, porque es mi casa fuera de la muralla. Sube a 4.
+- Día 7 · Prima · [OBVIO] Cumplo a prima con el 4 y me quito la parroquia de encima.
+- Día 7 · Tercia · [DECIDO] En la lista no puedo pedir en la limosna pública de la catedral; lavo con un 5 en la ribera por 2 monedas, poco pero sin riesgo.
+- Día 7 · Sexta · [DECIDO] Otra vez sopa con el 5 y otra vez la beneficencia; repito con rumor y queda en otro pobre que no me delata. Los rumores me están salvando la lista.
+- Día 7 · Nona · [OBVIO] Con el 6 que me queda me junto con María, mi casa dentro; sube a 4.
+- Día 7 · autoridad · [OBVIO] Duermo con María; por la noche se la llevan dos días por haber estado conmigo. Cada vez que me junto con alguien, lo pagan ellos.
+- Día 8 · amanecer · [DECIDO] Martín vuelve a pedir y me queda una sola ración; se la doy confiando en la ración de la lista y la del niño esta noche, y en que Martín me dará pan si falta. Sube a 5.
+- Día 8 · Prima · [OBVIO] Cumplo a prima con el 1.
+- Día 8 · Tercia · [DECIDO] Lavo con un 4 en vez de pedir sopa: el convento tiene ronda y la mitad de los testigos me borrarían de la lista.
+- Día 8 · Sexta · [OBVIO] Segunda colada, 2 monedas más; ya llevo 6.
+- Día 8 · Nona · [NO ENTIENDO] Al juntarme con Perico me vio un alguacil y me sacó de la lista, pero la tabla de testigos solo decía «+1 y esta noche interroga»; no avisaba de que juntarse estando en la lista te borra. Lo arreglé con un rumor.
+- Día 8 · autoridad · [DECIDO] Podía salir a dormir con Martín al arrabal o quedarme con Perico, que vive dentro y ya está a 3; me quedo dentro para no gastar franjas en la puerta.
+- Día 9 · Prima · [OBVIO] Cumplo a prima con un 2.
+- Día 9 · Tercia · [DECIDO] Lavo con el 3 y guardo el 6; me ve un alguacil trabajando, pero el termómetro no baja de −2. Ya tengo 8 monedas, justo una ración.
+- Día 9 · Sexta · [DECIDO] Sopa con el 6 en vez de juntarme: sale fraile y gano una ración que me sobra para compartir.
+- Día 9 · Nona · [OBVIO] Comparto con Perico la ración de la sopa con el 2: es quien me da techo esta noche. Sube a 4.
+- Día 9 · autoridad · [OBVIO] Duermo con Perico y gasto las 8 monedas en la ración que falta para el niño.
+- Día 10 · Prima · [OBVIO] Último día: cumplo a prima con un 2 para asegurar la ración de esta noche.
+- Día 10 · Tercia · [DECIDO] En tercia no había sitio seguro para juntarme (puente con ronda); lavo con un 5 por 2 monedas, que el alguacil allí no me hace daño.
+- Día 10 · Sexta · [OBVIO] María ha vuelto; me junto con ella en el convento, donde nadie denuncia. Sube a 5.
+- Día 10 · Vísperas · [DECIDO] Con el último 5 podía pedir sobras en la plaza (y arriesgar la lista) o juntarme; me junto con Perico en el mesón para despedir el día con mi gente.
+- Día 10 · noche · [NO ENTIENDO] Para dormir solo me ofrece a María, aunque Perico también vive en la ciudad y está a 5; parece que sale una sola casa y no puedo elegir. Duermo con María.

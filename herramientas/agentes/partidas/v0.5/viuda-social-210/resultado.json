@@ -1,0 +1,14 @@
+{
+ "final": {
+  "tipo": "Sobrevive",
+  "dia": 10,
+  "causa": "Llegó a la noche del día 10.",
+  "acompanado": "María la Rubia"
+ },
+ "encuesta": {
+  "dolio": "Me costó darle a Martín mi última ración el día 8 con el pan a 7, y antes, apuntarme a la lista y renunciar al +2 del niño al pedir, que era lo que mejor me daba de comer.",
+  "sobro": "Desde que entré en la lista los días se repetían (cumplir con el dado malo, lavar por 2 monedas que no llegan ni a media ración, juntarme), y lavar con el pan a 7-8 parecía no servir para nada.",
+  "falto": "No supe dónde vivía cada uno de mi red hasta abrir el marcador (crucé la puerta para dormir con María y no pude), de noche solo me ofrecía una casa aunque tenía dos, y nadie avisaba de que juntarse visto por un alguacil te borra de la lista.",
+  "otros": "Los rumores para repetir testigo me salvaron la lista tres veces y se sienten casi obligatorios; que Antón muriera y se llevaran a María y a Perico por estar conmigo hizo que la red pesara de verdad."
+ }
+}

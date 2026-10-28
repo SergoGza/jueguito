@@ -1,0 +1,54 @@
+- Día 1 · amanecer · [DECIDO] Finjo falso cautivo con un 6 en vez de guardarlo para pedir en misa; soy soldado y es mi oficio, y con calidad alta es más difícil que me descubran.
+- Día 1 · Prima · [DECIDO] Pido en misa de la catedral con el 6 en vez de ir al convento; la misa da +1 y quería sacar el máximo de la treta.
+- Día 1 · Tercia · [DECIDO] Con 7 monedas no quería pedir más y que me tomaran por fingidor, así que gasté el 4 en juntarme con alguien nuevo en el puente para tener red y un rumor.
+- Día 1 · Sexta · [DECIDO] El 2 no daba para sopa ni para descansar; elegí subir a Antón a relación 2 para que me encubra en vez de conocer a alguien nuevo.
+- Día 1 · noche · [DECIDO] Mesón por 5 en vez de pórtico con pan de reserva: no pierdo cuerpo, evito la ronda y el robo, aunque mañana amanezco sin raciones.
+- Día 2 · amanecer · [DECIDO] Vuelvo a fingir cautivo con el 6 y no con el 4: hay redada y prefiero que la beneficencia casi no pueda descubrirme aunque pida con dado peor.
+- Día 2 · Prima · [DECIDO] Gasté el 1 en conocer a Francisca en el convento; me vio un alguacil y gasté un rumor para repetir, y salió otro pobre.
+- Día 2 · Tercia · [NO ENTIENDO] En la plaza la tabla de testigos dice '1-6 Alguacil' y luego '2-3 Vecinos' y '4 Otro pobre'; supongo que son el 1, 5 y 6, pero parece que cualquier dado es alguacil.
+- Día 2 · Tercia · [DECIDO] Pedí en la plaza con el 4 por ser día de mercado aunque había más alguaciles que en las Escuelas; me vio uno, repetí con el último rumor y volvió a salir alguacil.
+- Día 2 · Sexta · [DECIDO] Con el 2 me junté con Antón en vez de pedir otra vez en el mercado con 6 monedas encima; ya tiene relación 3 y quizá pueda dormir en su casa.
+- Día 2 · noche · [DECIDO] No me llega para mesón y cena, y Antón vive en el arrabal; duermo en el pórtico y gasto las 6 monedas en 2 raciones para no llevar dinero que me roben.
+- Día 3 · Prima · [DECIDO] Fingí con un 6 y pedí con el otro 6 en la parroquia en vez de la catedral: allí el cura me examina pero con treta 6 casi nunca me descubre y me baja el termómetro.
+- Día 3 · Tercia · [DECIDO] Quiero subir a Francisca a 3 para dormir en su casa dentro de la muralla; en el puente hay un tercio de alguacil, así que paso la tercia sin hacer nada y me guardo los dados para el convento y el mesón.
+- Día 3 · Sexta · [OBVIO] Me junto con Francisca en la puerta del convento con el 3: sube a 2 y gano un rumor.
+- Día 3 · Vísperas · [DECIDO] En nona no hice nada para guardar el 2 para el mesón, donde el riesgo de alguacil es menor que en el puente.
+- Día 3 · Vísperas · [OBVIO] Me junto con Francisca en el mesón con el 2: ya tiene relación 3.
+- Día 3 · noche · [DECIDO] Duermo gratis en casa de Francisca en vez del mesón y compro una ración para guardar 2 y bajar a 2 monedas.
+- Día 4 · Prima · [DECIDO] Finjo con el 4 (queda en calidad 5) y guardo el 3 para la procesión del Corpus; en prima no pido con el 2 porque arriesgo alguacil o cura por casi nada.
+- Día 4 · Tercia · [DECIDO] Pedí con el 3 en la procesión; la beneficencia me descubrió y gasté el rumor para repetir, pero salió alguacil y quedé peor: Te buscan 4 y vagabundo.
+- Día 4 · Sexta · [DECIDO] Con Te buscan 4 y forastero, dentro cualquier alguacil me detiene; salgo por la puerta en sexta para vivir en el arrabal con Antón aunque pierda la sopa.
+- Día 4 · Nona · [DECIDO] No me junto con nadie: con el pregón la autoridad interroga cada noche a quien estuvo conmigo, y si se llevan a Antón me quedo sin techo; descansar con 1 o 2 no sirve.
+- Día 4 · noche · [OBVIO] Duermo en casa de Antón, bajo techo con la tormenta, y compro una ración para quedarme con 2 monedas.
+- Día 4 · autoridad · [NO ENTIENDO] No me junté con nadie para proteger a Antón, pero lo interrogaron igual y se lo llevaron; ¿cuenta dormir en su casa como estar con él? Esperaba que no lo señalaran.
+- Día 5 · Prima · [DECIDO] Finjo con el 4, pero en prima la guardia vigila el puente la mitad de las veces; no pido ni descanso y espero a tercia.
+- Día 5 · Tercia · [DECIDO] Pedí con el 3 en el puente en vez de descansar, para aprovechar la treta ya pagada; solo saqué 1 moneda.
+- Día 5 · Sexta · [NADA] Me quedan un 2 y un 1 fuera de la muralla: pedir no da nada, descansar no se puede y juntarme con alguien nuevo me arriesga a que me venda esta noche.
+- Día 5 · noche · [OBVIO] Solo puedo dormir al raso en el arrabal; no compro pan porque tengo 2 raciones y 3 monedas no llegan.
+- Día 6 · amanecer · [DECIDO] Le doy mi única ración a Francisca en vez de negársela: sube a 4 y pienso dormir en su casa, donde si me falta pan me da una.
+- Día 6 · amanecer · [DECIDO] Hoy no finjo aunque es mi estilo: con Te buscan 4, si la beneficencia me descubre me detienen; prefiero ir a la sopa del convento sin treta.
+- Día 6 · Prima · [DECIDO] En prima la guardia para a los forasteros 4 de cada 6 veces; espero a tercia para cruzar.
+- Día 6 · Tercia · [NO ENTIENDO] Al cruzar, la guardia me para y dice '+1 si eres forastero', pero no se mueve ningún marcador; no sé si es termómetro (ya estoy en +2) o atención de la autoridad.
+- Día 6 · Sexta · [DECIDO] Pido sopa en el convento con el 4 y no con el 5; aquí a sexta no había alguaciles en la tabla y me dan una ración.
+- Día 6 · Nona · [NADA] Dentro de la muralla cualquier sitio con alguacil me puede llevar a la detención; descansar en la parroquia solo sale bien con un 1 de testigo, así que guardo el 5 y el 1 y acabo el día.
+- Día 6 · noche · [OBVIO] Duermo en casa de Francisca y como la ración de la sopa; el pan a 7 no lo puedo pagar.
+- Día 7 · amanecer · [OBVIO] Francisca me pide comida y no tengo ninguna ración; no le doy nada y baja a 3.
+- Día 7 · amanecer · [DECIDO] Finjo con el 5 (calidad 6) para que, si me ve la beneficencia en la sopa, me tenga por impedido; el 4 lo guardo para la sopa.
+- Día 7 · Prima · [DECIDO] Pido con el 2 en el convento y no en la parroquia con misa mayor: rinde menos pero allí no hay alguaciles y el fraile me puede bajar el termómetro.
+- Día 7 · Tercia · [DECIDO] La limosna pública de la catedral tienta (+2), pero miran alguaciles; guardo el 4 para la sopa y no hago nada en tercia.
+- Día 7 · Sexta · [OBVIO] Sopa del convento con el 4: una ración para esta noche; un rival me vio pero no me delató.
+- Día 7 · noche · [OBVIO] Otra noche en casa de Francisca comiendo la ración de la sopa; guardo las 4 monedas.
+- Día 8 · amanecer · [OBVIO] Francisca vuelve a pedirme comida y no tengo; baja a 2 y esta noche no podría dormir en su casa si no la recupero.
+- Día 8 · amanecer · [DECIDO] No finjo: necesito el 5 para la sopa y el 3 para juntarme con Francisca, y una treta con el 2 se descubre fácil y con Te buscan 4 me detendrían.
+- Día 8 · Prima · [DECIDO] Me junto con Francisca en el convento con el 3 en vez de con el 2, para ganar también un rumor que me sirva si en la sopa sale alguacil.
+- Día 8 · Prima · [DECIDO] En tercia no hago nada: el 2 no da para nada útil sin riesgo de alguacil.
+- Día 8 · Sexta · [DECIDO] Un rival me delata en la sopa (Te buscan 5); no gasto el rumor porque repetir tiene un sexto de alguacil y eso sería la detención ya; prefiero no moverme más.
+- Día 8 · Nona · [NADA] Con Te buscan 5 cualquier testigo malo me hunde y con el 2 no saco nada; acabo el día y me voy a casa de Francisca.
+- Día 8 · noche · [OBVIO] Duermo con Francisca bajo techo y como la ración de la sopa; el pórtico con tormenta y ronda me llevaría a la detención.
+- Día 9 · Prima · [DECIDO] Finjo con el 5 por costumbre y salgo de la ciudad en prima: mañana vence el pregón y Antón, que vive en el arrabal, ya ha vuelto; las otras veces la guardia no me subió Te buscan.
+- Día 9 · Tercia · [DECIDO] Pido con el 6 y la treta en el puente en vez de descansar: arriesgo un alguacil, pero necesito monedas para el pan de la última noche; saco 3.
+- Día 9 · Tercia · [NADA] Solo me queda un 2: no da ni para pedir ni para descansar, y juntarme con Antón lo señalaría esta noche.
+- Día 9 · noche · [DECIDO] Duermo en casa de Antón y compro la ración con las 7 monedas en vez de guardarlas esperando que él me dé pan; no sé si me la daría.
+- Día 10 · amanecer · [OBVIO] Antón me pide comida y no tengo nada; no le doy.
+- Día 10 · Prima · [DECIDO] Último día: con Te buscan 5 y ronda en el puente, cualquier acción me puede detener; no finjo ni pido y dejo pasar el día hasta la noche aunque tengo un 6.
+- Día 10 · noche · [OBVIO] Antón bajó a 2 y no puedo dormir en su casa; duermo al raso en el arrabal y Francisca me comparte su pan.

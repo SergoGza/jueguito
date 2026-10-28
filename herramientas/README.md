@@ -9,6 +9,8 @@ Nada de esto lo necesita el juego: sirve para probar y equilibrar las reglas.
 - `mapa-dados.js`: qué puede sacar cada valor de dado en cada franja de un día, sin contar riesgos. `DIA=4 node herramientas/mapa-dados.js`
 - `red.js [N]`: qué hace el bot con la red: cuántas veces se junta, a qué relación llega, cuántas noches duerme con alguien, cuántos interrogatorios hay y cuántas veces le venden.
 - `prueba-red.js`: prueba dirigida de juntarse y señalar (v0.4). Debe salir todo «ok».
+- `lista.js [N]`: la lista de pobres (v0.4b) con la viuda: si entra, cuántas raciones saca, cuántas veces la borran, cuánto lava y qué le pasa al niño. Compara el bot que entra en la lista con el que no entra nunca.
+- `prueba-lista.js`: prueba dirigida de la lista (v0.4b). Debe salir todo «ok».
 - `ingresos.js`: de dónde sale el dinero y el cuerpo por día jugado, por personaje.
 - `ninostats.js`: qué le pasa al niño de la viuda según cómo juegue el bot.
 - `webtest.py PJ TEMA SEMILLA`: juega una partida entera en el navegador (Playwright, móvil 390x844) y comprueba el informe, el historial y el service worker. `python3 herramientas/webtest.py viuda dark 1`
@@ -18,7 +20,7 @@ Nada de esto lo necesita el juego: sirve para probar y equilibrar las reglas.
 
 Ve todos los riesgos y no finge salvo que se pida (`FINGIR=auto|siempre|4|5`). Para cada acción gasta el dado más bajo que rinde lo mismo que el más alto.
 
-Desde la v0.4 usa la red: se junta con quien más relación tiene de su lado de la muralla (para llegar pronto a relación 2, que da techo), descuenta el riesgo de dejar a esa persona señalada y solo delata a quien no le da techo ni pan. `RED=no` hace que no se junte con nadie y `DELATAR=no`, que no delate nunca: sirven para medir cuánto aporta cada cosa.
+Desde la v0.4 usa la red: se junta con quien más relación tiene de su lado de la muralla (para llegar pronto a relación 2, que da techo), descuenta el riesgo de dejar a esa persona señalada y solo delata a quien no le da techo ni pan. `RED=no` hace que no se junte con nadie y `DELATAR=no`, que no delate nunca: sirven para medir cuánto aporta cada cosa. Desde la v0.4b entra en la lista de pobres si puede, cumple cada día y solo pide estando en ella si la ganancia compensa el riesgo de que le borren; `LISTA=no` hace que no entre nunca.
 
 Desde el 27 de octubre de 2026 tiene corregidos dos fallos de la v0.3b:
 - probaba el examen de licencia con cualquier dado, así que la viuda suspendía una y otra vez y le subía el termómetro;

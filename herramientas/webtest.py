@@ -101,9 +101,9 @@ try:
                 pg.locator("[data-act=castigo]").first.click()
             elif f == "noche":
                 shot(f"noche_d{st['dia']}", True)
-                # a veces cambia de sitio para dormir
+                # desde la v0.4b no hay sitio elegido por defecto: si no hay ninguno, elige uno; si lo hay, a veces cambia
                 ops = pg.locator("[data-act=noche]:not([disabled])")
-                if ops.count() > 1 and random.random() < 0.4:
+                if ops.count() and (not pg.locator("[data-act=noche].sel").count() or (ops.count() > 1 and random.random() < 0.4)):
                     ops.nth(random.randrange(ops.count())).click()
                 cn = pg.locator("[data-act=comeNino]")
                 if cn.count():

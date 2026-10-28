@@ -43,7 +43,7 @@ function medir(pjid) {
     },
     accion({ el, v, o }) {
       if (v === null) return;
-      const sirve = o.dM > 0 || o.dR > 0 || o.dC > 0 || o.rumor > 0 || (o.relacion && o.relacion.delta > 0) || o.contratado || o.fijarT === -2 || o.dT < 0;
+      const sirve = o.dM > 0 || o.dR > 0 || o.dC > 0 || o.rumor > 0 || (o.relacion && o.relacion.delta > 0) || o.contratado || o.fijarT === -2 || o.dT < 0 || o.cumple;
       (sirve ? st.sirve : st.balde)[v]++;
       if (sirve && v <= 2) { const k = `${el.accion} con ${v}`; st.usosBajos[k] = (st.usosBajos[k] || 0) + 1; }
     },

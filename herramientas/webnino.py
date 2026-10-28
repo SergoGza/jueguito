@@ -21,6 +21,7 @@ try:
         pg.click("[data-act=acabarDia]")
         pg.evaluate("""() => { const s = window.__LV.s; s.raciones = 1; s.monedas = 0; s.contactos[0].rel = 2; window.__LV.render(); }""")
         pg.screenshot(path=f"{OUT}/nino_noche.png", full_page=True)
+        pg.click("[data-act=noche][data-id=portico]")
         pg.click("[data-act=comeNino][data-d='0']")
         pg.click("[data-act=dormir]")
         pg.screenshot(path=f"{OUT}/nino_noche_res.png", full_page=True)

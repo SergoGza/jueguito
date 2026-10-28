@@ -4,6 +4,7 @@
 // contraten solo para que le vean) y gastando siempre el dado más alto. (Con las reglas de la v0.4 ya no da las cifras de
 // la v0.3b, porque las reglas han cambiado; sirve para comparar bots sobre las mismas reglas.)
 // RED=no hace que el bot no se junte con nadie y DELATAR=no, que no delate nunca (para medir cuánto aporta cada cosa).
+// LISTA=no hace que no entre nunca en la lista de pobres (v0.4b); por defecto entra si puede.
 // Ganchos opcionales (cuarto argumento de jugar) para medir sin copiar el bot: amanecer(s), treta(s, v),
 // franja({ s, libres, opciones, vmax, best, bs }), accion({ s, el, dado, v, o }), finFranjas(s).
 module.exports = (E, R) => { const P = R.PARAMS;
@@ -30,15 +31,16 @@ function check(s, where) {
 // valor esperado de riesgo de una acción en un sitio (heurística prudente)
 function riesgo(s, sid, acc) {
   const pv = E.previewTestigos(s, sid, acc);
-  if (!pv) return { t: 0, tb: 0, det: 0, alg: 0 };
+  if (!pv) return { t: 0, tb: 0, det: 0, alg: 0, ben: 0 };
   const g = E.grupoEfecto(s, sid, acc);
-  let t = 0, tb = 0, det = 0, alg = 0;
+  let t = 0, tb = 0, det = 0, alg = 0, ben = 0;
   pv.forEach((f) => {
     const ef = R.EFECTOS[g][R.CATEGORIA[f.testigo]];
     t += (ef.t * f.caras.length) / 6; tb += (ef.tb * f.caras.length) / 6;
     if (R.CATEGORIA[f.testigo] === "Autoridad") { alg += f.caras.length / 6; if (acc === "hurtar") det += f.caras.length / 6; }
+    if (R.CATEGORIA[f.testigo] === "Beneficencia") ben += f.caras.length / 6;
   });
-  return { t, tb, det, alg };
+  return { t, tb, det, alg, ben };
 }
 
 // con quién se junta el bot: con quien más relación tiene de su lado de la muralla (para llegar pronto a 2, que da techo);
@@ -62,17 +64,25 @@ function valorRed(s, op, c, r) {
   return val - Math.min(1, pInterroga) * pVende * 2 * peso;
 }
 
+// lo que vale seguir en la lista: la ración de esta noche (si aún no te han borrado) y las de los días que tardarías en volver
+function valorLista(s) { return E.precioPan(s) * Math.min(3, R.CALENDARIO.length - s.dia + 1); }
+
 // lo que el bot espera sacar de una acción con el dado v (en monedas o su equivalente)
 function ganancia(s, op, v, r) {
   const fr = E.sitio(op.sitio).franjas[s.franja];
   switch (op.accion) {
-    case "pedir": return fr.pedirDa === "racion" ? (v >= fr.umbral ? 2.5 : 0) : E.monedasPedir(s, op.sitio, v);
+    case "pedir": {
+      const g = fr.pedirDa === "racion" ? (v >= fr.umbral ? 2.5 : 0) : E.monedasPedir(s, op.sitio, v);
+      // en la lista, pedir es una apuesta: si te ven la beneficencia, el cura o un alguacil, te borran
+      return E.licencia(s) && !VIEJO ? g - (r.ben + r.alg) * valorLista(s) : g;
+    }
+    case "cumplir": return s.hoy.cumplido ? -1 : E.precioPan(s);
     case "trabajar": return v + E.pj(s).modJornal >= P.jornalUmbral ? 3 : 0;
     case "lavar": return v >= P.lavarUmbral ? 2 : 0;
     case "hurtar": return 2.5 - r.det * 20;
     case "descansar": return s.cuerpo < 9 && v >= P.descansarUmbral ? 1.5 : 0;
     case "curarse": return s.cuerpo <= 2 || E.licencia(s) ? -50 : s.cuerpo <= 6 && v >= P.curarUmbral ? 2 : 0;
-    case "examen": return VIEJO || v >= (E.pj(s).difExamen || 99) ? 6 : -1;
+    case "examen": return process.env.LISTA === "no" ? -1 : VIEJO || v >= (E.pj(s).difExamen || 99) ? 6 : -1;
     case "juntarse": return valorRed(s, op, op.contacto, r);
     case "compartir": return s.raciones > 1 ? 0.6 : -1;
     case "delatar": {
@@ -98,7 +108,7 @@ function rinde(s, op, v) {
     case "descansar": return v >= P.descansarUmbral ? 1 : 0;
     case "curarse": return v >= P.curarUmbral ? 1 : 0;
     case "examen": return v >= (E.pj(s).difExamen || 99) ? 1 : 0;
-    default: return 1; // juntarse, compartir y delatar: el bot gasta el dado más bajo
+    default: return 1; // juntarse, compartir, delatar y cumplir: el bot gasta el dado más bajo
   }
 }
 
@@ -202,7 +212,7 @@ function jugar(personaje, seed, politica, hooks) {
       else op = ops.filter((x) => !x.peligro).sort((a, b) => (b.c - b.coste * 0.3 - b.riesgo * 0.5) - (a.c - a.coste * 0.3 - a.riesgo * 0.5))[0] || ops[0];
       const pan = E.precioPan(s);
       const nec = E.racionesNecesarias(s);
-      const falta = Math.max(0, nec + (s.nino && s.nino.con ? 1 : 0) - s.raciones);
+      const falta = Math.max(0, nec + (s.nino && s.nino.con ? 1 : 0) - s.raciones - E.racionLista(s));
       const compra = Math.min(falta + (politica === "azar" ? 0 : (s.monedas - op.coste >= pan * (falta + 2) ? 1 : 0)), Math.floor((s.monedas - op.coste) / pan));
       const comeNino = politica === "azar" ? rnd() < 0.5 : politica === "egoista" ? false : (s.nino ? s.nino.cuerpo <= 2 || s.cuerpo >= 5 : true);
       E.dormir(s, { dormir: op.id, compra: Math.max(0, compra), comeNino });

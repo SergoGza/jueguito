@@ -54,16 +54,16 @@
   // ---------------------------------------------------------------- ayudas
   const AYUDA_METRO = {
     cuerpo: ["Cuerpo", "Tu salud y tu fuerza, de 0 a 10. Cada mañana decide cuántos dados tiras: 9-10, cinco; 7-8, cuatro; 5-6, tres; 3-4, dos; 1-2, uno. A 0, mueres. Dormir al raso cuesta 1 cada noche. Bajo techo no lo pierdes, pero no se recupera solo: sube descansando sin que te vean (si el dado no es bajo) o curándote en el hospital. Baja con el hambre, el raso, las fiebres, los robos y los azotes."],
-    monedas: ["Monedas", "Para comprar pan y pagar el mesón (cuesta una ración más 2 monedas). Ojo: un pobre con dinero es sospechoso. Con más de 4 monedas encima, si te ven pedir un alguacil o la beneficencia, te tienen por fingidor (+1); si duermes al raso, te pueden robar la mitad y pegarte; y si te detienen, te lo quitan todo."],
+    monedas: ["Monedas", "Para comprar pan y pagar el mesón (cuesta lo que una ración más 2 monedas, y la cena no va incluida). Ojo: un pobre con dinero es sospechoso. Con más de 4 monedas encima, si te ven pedir un alguacil o la beneficencia, te tienen por fingidor (+1); si duermes al raso, te pueden robar la mitad y pegarte; y si te detienen, te lo quitan todo."],
     raciones: ["Raciones", "Cada noche comes una; si llevas a tu hijo, él también come una. Si te falta, pierdes 2 de cuerpo por cada ración que falte. Se compran de noche al precio del pan de ese día, que va subiendo. Solo puedes guardar 2 de una noche a otra: lo que sobre se pierde, así que mejor compártelo. La sopa del convento y las sobras del mercado dan raciones."],
     rumores: ["Rumores", "Lo que te cuentan otros pobres. Cuando te vea un testigo, puedes gastar un rumor para repetir el dado de testigo (sabías por dónde pasaba la ronda)."],
-    termo: ["Termómetro", "Cómo te clasifica la autoridad, de −3 a +3. Hacia arriba: +1 sospechoso, +2 vagabundo, +3 reincidente (solo si ya te han detenido alguna vez: antes no pasas de +2). Hacia abajo: −1 pobre conocido, −2 con licencia (solo con el examen del cura, y solo naturales) y −3 recogido (te encierran y la partida acaba; solo pasa en el hospital). Sin licencia no bajas de −1. El termómetro no mata solo: decide el castigo si te detienen."],
+    termo: ["Termómetro", "Cómo te clasifica la autoridad, de −3 a +3. Hacia arriba: +1 sospechoso, +2 vagabundo, +3 reincidente (solo si ya te han detenido alguna vez: antes no pasas de +2). Hacia abajo: −1 pobre conocido, −2 en la lista de pobres (solo con el examen del cura, y solo naturales) y −3 recogido (te encierran y la partida acaba; solo pasa en el hospital). Fuera de la lista no bajas de −1. El termómetro no mata solo: decide el castigo si te detienen."],
     tb: ["Te buscan", `Cuánto te tiene fichado la justicia. Cuando llega a ${P.tbMax}, te detienen. El castigo depende del termómetro: con 0 o menos, reprensión; con +1, azotes; con +2, trabajo forzado o marca; con +3, la horca. Después de cada detención ya te conocen: empieza en el número de veces que te han detenido (hasta 3).`],
-    muralla: ["La muralla", "El puente y el arrabal están fuera de la muralla; el resto de sitios, dentro. Para pasar de un lado a otro tienes que cruzar la puerta en el puente, donde la guardia vigila a los forasteros. Si la autoridad cierra la puerta, sin licencia no entras. Para dormir en el arrabal tienes que estar fuera."],
+    muralla: ["La muralla", "El puente y el arrabal están fuera de la muralla; el resto de sitios, dentro. Para pasar de un lado a otro tienes que cruzar la puerta en el puente, donde la guardia vigila a los forasteros. Si la autoridad cierra la puerta, solo entran los de la lista. Estar en el puente no es salir: sigues de tu lado hasta que cruzas. Para dormir en el arrabal tienes que estar fuera."],
     red: ["Tu red", "Los pobres que conoces. Juntarte con alguien (cualquier dado sirve) o compartir sube la relación; negar comida a quien te la pide, la baja. Con relación 2: puedes dormir con esa persona (si vive de tu lado de la muralla), te encubre si te ve hurtar y, si mueres, no mueres solo. Con relación 3: si te falta pan, te da una ración. Pero juntarse se ve: quien estuvo contigo queda señalado esa noche, y si la autoridad interroga, va a por esa persona (si os vio un alguacil, la interroga seguro). Con relación baja, te vende; si aguanta, se la llevan dos días. Y enferman, desaparecen o mueren. Solo puedes delatar a alguien de tu red, y lo pierdes."],
     hospital: ["Hospital", "Solo admite enfermos (cuerpo 5 o menos). Cada vez que te curan o duermes allí, te apuntan en el libro. A la tercera, te recogen: entras en la institución y la partida acaba."],
     nino: ["Tu hijo", R.AYUDA.find((x) => x[0] === "Tu hijo (viuda)")[1]],
-    licencia: ["Licencia", "Con el termómetro en −2 tienes licencia para pedir: el cura te la da si apruebas el examen (solo naturales). La pierdes en cuanto el termómetro sube de −2, por ejemplo si un alguacil te ve hacer algo sospechoso. Para recuperarla, otro examen."],
+    licencia: ["La lista de pobres", R.AYUDA.find((x) => x[0] === "La lista de pobres")[1]],
     treta: ["Treta", "La has preparado al amanecer. Durante todo el día pides con ella. Si la preparaste con un dado bueno y no está catalogada, te dan más y te tienen por impedido. Pero si te ve la beneficencia o el cura, te pueden descubrir: cuanto mejor la preparaste, más difícil; si está catalogada, más fácil."],
   };
 
@@ -111,7 +111,10 @@
     </div></header>`;
   }
 
+  // En la pantalla de resultado, la cabecera enseña ya cómo quedarás al pulsar «Seguir».
+  function estadoVisible() { return ui.pend && ui.pend.vista ? ui.pend.vista : s; }
   function vEstado() {
+    const s = estadoVisible();
     const nec = E.racionesNecesarias(s);
     const dadosMan = E.dadosPorCuerpo(s.cuerpo);
     let termo = "";
@@ -126,7 +129,7 @@
       if (n.perdido) b.push(`<span class="badge mal" data-act="metro" data-k="nino">Se han llevado a tu hijo</span>`);
       else b.push(`<span class="badge ${n.cuerpo <= 2 ? "mal" : ""}" data-act="metro" data-k="nino">Tu hijo: cuerpo ${n.cuerpo} de ${P.ninoMax}${cuida ? ", con " + esc(cuida.nombre.split(" ")[0]) : ""}</span>`);
     }
-    if (E.licencia(s)) b.push(`<span class="badge bien" data-act="metro" data-k="licencia">Con licencia</span>`);
+    if (E.licencia(s)) b.push(`<span class="badge bien" data-act="metro" data-k="licencia">En la lista${s.hoy && !s.hoy.forzado ? (s.hoy.cumplido ? ": hoy has cumplido" : ": hoy aún no has cumplido") : ""}</span>`);
     if (s.marca) b.push(`<span class="badge mal" data-act="metro" data-k="termo">Marcado</span>`);
     if (s.treta) b.push(`<span class="badge" data-act="metro" data-k="treta">Treta: ${esc(s.treta.nombre)} (${s.treta.calidad})${s.treta.catalogada ? ", catalogada" : ""}</span>`);
     if (s.venganza) b.push(`<span class="badge mal" data-act="metro" data-k="red">Alguien quiere vengarse</span>`);
@@ -160,8 +163,8 @@
       const bueno = k === "termo" || k === "tb" ? d < 0 : d > 0;
       out.push(`<span class="cambio ${bueno ? "mas" : "menos"}">${l} ${sg(d)}${k === "termo" ? " → " + esc(clasif(b.termo)) : ""}</span>`);
     });
-    if (a.termo !== -2 && b.termo === -2) out.push(`<span class="cambio mas">Consigues la licencia</span>`);
-    if (a.termo === -2 && b.termo !== -2 && b.termo !== -3) out.push(`<span class="cambio menos">Pierdes la licencia</span>`);
+    if (a.termo !== -2 && b.termo === -2) out.push(`<span class="cambio mas">Entras en la lista</span>`);
+    if (a.termo === -2 && b.termo !== -2 && b.termo !== -3) out.push(`<span class="cambio menos">Sales de la lista</span>`);
     if (typeof a.nino === "number" && b.nino === "perdido") out.push(`<span class="cambio menos">Se llevan a tu hijo</span>`);
     else if (typeof a.nino === "number" && typeof b.nino === "number" && a.nino !== b.nino) out.push(`<span class="cambio ${b.nino > a.nino ? "mas" : "menos"}">Tu hijo ${sg(b.nino - a.nino)}</span>`);
     if (a.ninoCon !== b.ninoCon && b.nino !== "perdido") out.push(`<span class="cambio">${b.ninoCon ? "El niño se queda con otra persona" : "El niño vuelve contigo"}</span>`);
@@ -227,7 +230,7 @@
     const aut = E.resumenAutoridad(s, s.dia);
     const pe = E.pregonExpulsion(s.dia);
     let h = `<h2>${esc(c.fecha)}</h2><p>${esc(c.que)} <span class="muted">Pan a ${c.pan} la ración.</span></p>`;
-    if (pe) h += `<p class="small"><b>${esc(pe)}</b>${E.pj(s).forastero ? " Eres forastero: ese día no te pueden ver dentro de la muralla sin licencia." : ""}</p>`;
+    if (pe) h += `<p class="small"><b>${esc(pe)}</b>${E.pj(s).forastero ? " Eres forastero: ese día no te pueden ver dentro de la muralla." : ""}</p>`;
     if (s.dia === 1 && !load(LS.intro, false)) {
       h += `<div class="card aviso"><h3>Cómo va un día</h3><ol class="lista small">
         <li>Al amanecer ves tus dados. Cada acción del día gasta uno y su valor es lo bien que te sale.</li>
@@ -339,7 +342,7 @@
         h += `<button class="btn primary" data-act="hacer" ${listo ? "" : "disabled"}>${listo ? "Hacerlo" : "Elige un dado"}</button>`;
       }
     }
-    h += `<div class="fila-btns"><button class="btn secundario" data-act="pasar">No hacer nada en ${esc(fr.toLowerCase())}</button><button class="btn secundario" data-act="acabarDia">Acabar el día</button></div>`;
+    h += `<div class="fila-btns"><button class="btn secundario" data-act="pasar">No hacer nada en ${esc(fr.toLowerCase())}${s.franja === 4 ? ": se acaba el día" : ""}</button><button class="btn secundario" data-act="acabarDia">Acabar el día</button></div>`;
     return h;
   }
 
@@ -353,8 +356,10 @@
     h += `<p class="grande">${esc(o.resultado)}</p>`;
     o.lineas.forEach((l) => { h += `<p>${esc(l)}</p>`; });
     const rel = o.relacion && o.relacion.delta ? [[`Relación con ${o.nombre} ${sg(o.relacion.delta)}`, o.relacion.delta > 0]] : [];
+    if (o.cumple) rel.push(["Has cumplido: esta noche te toca tu ración", true]);
     h += cambiosHtml(antes, despues, rel) + `</div>`;
-    if (o.testigo && s.rumores > 0 && !eleccion.rumorGastado) {
+    const danino = o.dT > 0 || o.dTB > 0 || o.detenido || o.borrado || o.descubierta || o.venganzaNueva || (o.accion === "descansar" && o.cat !== "Nadie");
+    if (o.testigo && danino && s.rumores > 0 && !eleccion.rumorGastado) {
       h += `<button class="btn secundario" data-act="rumor">Gastar un rumor y repetir el dado de testigo (tienes ${s.rumores})</button>`;
     }
     h += `<button class="btn primary" data-act="seguir">${o.detenido ? (E.pj(s).id === "viuda" ? "Te llevan detenida" : "Te llevan detenido") : "Seguir"}</button>`;
@@ -369,8 +374,11 @@
     h += `<h2>Te han detenido</h2><div class="card malo"><p>${esc(c.motivo)}</p>
       <p>Tu termómetro está en <b>${sg(c.termo)} (${esc(c.clasificacion)})</b>. El castigo es: <b>${esc(c.texto)}</b>.</p></div>`;
     if (c.eleccion) {
+      const hambre = c.noche ? 0 : Math.max(0, E.pj(s).raciones - s.raciones) * -P.hambreC;
+      const queda = s.cuerpo - hambre + P.tfDias * P.tfCuerpo;
+      const avisoTf = queda <= 0 ? `<span class="no">¡Cuidado! Con tu cuerpo (${s.cuerpo})${hambre ? ` y sin pan para esta noche` : ""}, no saldrías vivo del trabajo forzado.</span>` : queda <= 2 ? `<span class="n">Saldrías con cuerpo ${queda}.</span>` : "";
       h += `<p>Eliges tú:</p>
-        <button class="btn" data-act="castigo" data-e="trabajo"><span class="t">Trabajo forzado</span><span class="d">${P.tfDias} días sin acciones, −1 de cuerpo cada día. No necesitas comer.</span></button>
+        <button class="btn" data-act="castigo" data-e="trabajo"><span class="t">Trabajo forzado</span><span class="d">${P.tfDias} días sin acciones, −1 de cuerpo cada día. No necesitas comer.</span>${avisoTf}</button>
         <button class="btn" data-act="castigo" data-e="marca"><span class="t">Marca</span><span class="d">Sigues libre, pero el termómetro ya no bajará de +1. Otra detención, y estarás más cerca de la horca.</span></button>`;
     } else h += `<button class="btn primary" data-act="castigo" data-e="">${c.termo >= 3 ? "Seguir" : "Aceptar el castigo"}</button>`;
     return h;
@@ -379,44 +387,48 @@
   function vNoche() {
     const ops = E.opcionesNoche(s);
     const pan = E.precioPan(s), nec = E.racionesNecesarias(s);
-    if (!ui.noche || !ops.some((x) => x.id === ui.noche && x.ok)) ui.noche = (ops.find((x) => x.ok && !x.peligro) || ops.find((x) => x.ok) || {}).id || null;
+    const okOps = ops.filter((x) => x.ok);
+    if (!ui.noche || !okOps.some((x) => x.id === ui.noche)) ui.noche = okOps.length === 1 ? okOps[0].id : null;
     const op = ops.find((x) => x.id === ui.noche);
     const coste = op ? op.coste : 0;
     const maxCompra = Math.max(0, Math.floor((s.monedas - coste) / pan));
-    if (ui.compra === null) ui.compra = Math.min(maxCompra, Math.max(0, nec - s.raciones));
+    const deLista = E.racionLista(s);
+    if (ui.compra === null) ui.compra = Math.min(maxCompra, Math.max(0, nec - s.raciones - deLista));
     ui.compra = Math.min(ui.compra, maxCompra);
     let h = `<h2>Noche del día ${s.dia}</h2>`;
     if (ui.castigoRes) h += `<div class="card malo"><p><b>${esc(ui.castigoRes.tipo)}.</b> ${esc(ui.castigoRes.txt)}</p></div>`;
-    h += `<p class="paso">1. ¿Dónde duermes?</p>`;
+    h += `<p class="paso">1. ¿Dónde duermes?</p>${ui.noche ? "" : `<p class="small">Elige dónde pasas la noche.</p>`}`;
     ops.forEach((x) => {
       h += `<button class="btn ${ui.noche === x.id ? "sel" : ""}" data-act="noche" data-id="${x.id}" ${x.ok ? "" : "disabled"}><span class="t">${esc(x.nombre)}</span><span class="d">${esc(x.desc)}</span>
         ${x.riesgos.map((r) => `<span class="${/Cuidado/.test(r) ? "no" : "n"}">${esc(r)}</span>`).join("")}${x.ok ? "" : `<span class="no">${esc(x.motivo)}</span>`}</button>`;
     });
-    h += `<p class="paso">2. Pan</p><p class="small">La ración cuesta ${pan} ${pan === 1 ? "moneda" : "monedas"} hoy. ${nec ? `Esta noche necesitas ${plural(nec, "ración", "raciones")} y tienes ${s.raciones}.` : "Esta noche no comes por tu cuenta."}</p>
+    h += `<p class="paso">2. Pan</p><p class="small">La ración cuesta ${pan} ${pan === 1 ? "moneda" : "monedas"} hoy. ${nec ? `Esta noche necesitas ${plural(nec, "ración", "raciones")} y tienes ${s.raciones}.` : "Esta noche no comes por tu cuenta."}${deLista ? ` El cura te da tu ración de la lista (+${deLista}): has cumplido.` : E.licencia(s) && !s.hoy.forzado ? " Hoy no has cumplido con la parroquia: no hay ración de la lista." : ""}</p>
       <div class="stepper"><button data-act="compra" data-d="-1" aria-label="Comprar una menos">−</button><span class="v">${ui.compra}</span><button data-act="compra" data-d="1" aria-label="Comprar una más">+</button>
       <span class="small muted">compras ${plural(ui.compra, "ración", "raciones")} · te quedan ${s.monedas - coste - ui.compra * pan} monedas</span></div>`;
-    const sobran = s.raciones + ui.compra - nec - P.hatillo;
+    const sobran = s.raciones + ui.compra + deLista - nec - P.hatillo;
     if (sobran > 0) h += `<p class="small" style="color:var(--warn)">Solo puedes guardar ${P.hatillo} raciones de una noche a otra: perderás ${plural(sobran, "ración", "raciones")}. Mejor compártelas de día.</p>`;
-    const faltan = Math.max(0, nec - s.raciones - ui.compra);
+    const faltan = Math.max(0, nec - s.raciones - ui.compra - deLista);
+    const amigo = E.contactosDisponibles(s).filter((c) => c.rel >= P.prestamoRel).sort((a, b) => b.rel - a.rel)[0];
     const conNino = E.ninoConmigo(s) && nec > 0;
     if (faltan && conNino && faltan < nec) {
       h += `<p class="paso">3. No hay pan para los dos: ¿quién come?</p>
         <button class="btn ${ui.comeNino ? "sel" : ""}" data-act="comeNino" data-d="1"><span class="t">Come el niño</span><span class="d">Tú pierdes ${-P.hambreC} de cuerpo${s.cuerpo + P.hambreC <= 0 ? ", y morirías" : ""}.</span></button>
         <button class="btn ${!ui.comeNino ? "sel" : ""}" data-act="comeNino" data-d="0"><span class="t">Comes tú</span><span class="d">El niño pierde ${-P.ninoHambre} de su cuerpo (tiene ${s.nino.cuerpo}).${s.nino.cuerpo + P.ninoHambre <= 0 ? " Se quedaría a 0: al amanecer se lo llevan al hospital de niños y lo pierdes." : s.nino.cuerpo + P.ninoHambre <= P.ninoDebil ? " Quedará muy débil: dentro de la muralla, el cura se lo puede llevar." : ""}</span></button>
         <p class="muted small">Si alguien de tu red con relación 3 o más está disponible, os dará una ración y puede que no haga falta elegir.</p>`;
-    } else if (faltan) h += `<p class="small" style="color:var(--bad)">${conNino ? "No hay pan para ninguno de los dos: tú pierdes " + (-P.hambreC) + " de cuerpo y el niño " + (-P.ninoHambre) + "." : `Te ${faltan === 1 ? "faltará 1 ración" : "faltarán " + faltan + " raciones"}: perderás ${faltan * -P.hambreC} de cuerpo${s.cuerpo + faltan * P.hambreC <= 0 ? ", y morirías" : ""}.`}</p>`;
+    } else if (faltan && amigo) h += `<p class="small">Te ${faltan === 1 ? "falta 1 ración" : "faltan " + faltan + " raciones"}, pero ${esc(amigo.nombre)} compartirá su pan contigo: una ración (vuestra relación baja 1).</p>`;
+    else if (faltan) h += `<p class="small" style="color:var(--bad)">${conNino ? "No hay pan para ninguno de los dos: tú pierdes " + (-P.hambreC) + " de cuerpo y el niño " + (-P.ninoHambre) + "." : `Te ${faltan === 1 ? "faltará 1 ración" : "faltarán " + faltan + " raciones"}: perderás ${faltan * -P.hambreC} de cuerpo${s.cuerpo + faltan * P.hambreC <= 0 ? ", y morirías" : ""}.`}</p>`;
     if (s.nino && !s.nino.perdido && s.nino.con && !s.hoy.forzado) {
       const c = s.contactos.find((x) => x.id === s.nino.con);
       h += `<p class="small">Tu hijo duerme con ${esc(c.nombre)}. Le darás una ración${s.raciones + ui.compra >= 1 ? "" : ` o ${pan} monedas`} por cuidarlo${s.raciones + ui.compra < 1 && s.monedas - coste - ui.compra * pan < pan ? "; no te llega, así que la relación bajará" : ""}.</p>`;
     }
-    h += `<button class="btn primary" data-act="dormir" ${op && op.ok ? "" : "disabled"}>Dormir</button>`;
+    h += `<button class="btn primary" data-act="dormir" ${op && op.ok ? "" : "disabled"}>${op ? "Dormir" : "Elige dónde duermes"}</button>`;
     return h;
   }
 
   function vNocheResumen() {
     if (!ui.nocheRes) return "";
     const { o, antes, despues } = ui.nocheRes;
-    return `<div class="card"><h3>Esta noche: ${esc(o.nombre)}</h3>${o.lineas.filter((l) => l !== "Pierdes la licencia.").map((l) => `<p>${esc(l)}</p>`).join("")}${cambiosHtml(antes, despues)}</div>`;
+    return `<div class="card"><h3>Esta noche: ${esc(o.nombre)}</h3>${o.lineas.filter((l) => l !== "Sales de la lista.").map((l) => `<p>${esc(l)}</p>`).join("")}${cambiosHtml(antes, despues)}</div>`;
   }
 
   function vAutoridad() {
@@ -649,7 +661,7 @@
     const o = E.resolver(s, eleccion, rolls);
     const copia = JSON.parse(JSON.stringify(s));
     E.aplicar(copia, JSON.parse(JSON.stringify(eleccion)), JSON.parse(JSON.stringify(o)));
-    ui.pend = { eleccion, rolls, o, antes, despues: E.snapshot(copia) };
+    ui.pend = { eleccion, rolls, o, antes, despues: E.snapshot(copia), vista: copia };
   }
 
   document.addEventListener("click", (ev) => {

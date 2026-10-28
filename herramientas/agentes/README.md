@@ -16,7 +16,7 @@ Desde Claude Code, abierto en la raíz del repositorio:
 
 Las semillas son fijas, así que dos versiones del juego se comparan con los mismos dados. Cada partida queda en `partidas/v<versión>/<personaje>-<estilo>-<semilla>/` con su `diario.md`, `informe.txt` (el mismo informe que mandan los testers) y `resultado.json`. El resumen de la tanda, en `partidas/v<versión>/RESUMEN.md`.
 
-Hace falta Python con Playwright y Chromium: `pip install playwright` y `python -m playwright install chromium`. Si `herramientas/webtest.py` funciona, ya está.
+Hace falta Python con Playwright y un Chromium. `bash herramientas/agentes/preparar.sh` lo deja listo (el comando `/agentes` lo ejecuta al empezar): instala Playwright si falta y, si el Chromium de Playwright no se puede bajar, como pasa en las sesiones en la nube de Claude Code (claude.ai/code o la pestaña Code del móvil), usa el del paquete npm `@sparticuz/chromium` y apunta su ruta en `.chromium`, que la mesa lee. `python3 herramientas/agentes/mesa.py comprobar` dice si la mesa arranca.
 
 ## Las piezas
 

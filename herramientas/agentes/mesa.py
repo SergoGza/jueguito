@@ -13,6 +13,7 @@ Uso (desde la raíz del repositorio):
   python3 herramientas/agentes/mesa.py diario <carpeta> "<etiqueta> texto"
   python3 herramientas/agentes/mesa.py encuesta <carpeta> "<dolió>" "<sobraba>" "<faltó>" ["<otros>"]
   python3 herramientas/agentes/mesa.py estado <carpeta>
+  python3 herramientas/agentes/mesa.py comprobar     (abre el navegador y la app, y dice si funciona)
 
 personaje: mozo, viuda o soldado. En «pulsar», un número es siempre el botón con ese número en la lista de la
 pantalla actual; «dado:4» pulsa el dado que vale 4; un texto pulsa el primer botón disponible cuyo título empiece por
@@ -35,6 +36,9 @@ ORIGEN = "http://liber.local/"
 FUERA = {"menu", "tema", "inicio", "historial", "instalar", "abandonar", "abandonarDesdeInicio", "nueva",
          "descargar", "compartir", "copiar", "hDescargar", "hCompartir", "hCopiar", "empezar", "elegirPj"}
 ETIQUETAS = ("[DECIDO]", "[OBVIO]", "[NADA]", "[NO ENTIENDO]")
+# Si el Chromium de Playwright no se puede descargar (en la nube de Claude Code, su servidor no está en la lista de
+# dominios), preparar.sh deja aquí la ruta de otro Chromium.
+CHROMIUM = RAIZ / "herramientas" / "agentes" / ".chromium"
 AYUDA = {"ayuda", "metro", "red"}  # abren explicaciones: van al final de la lista
 
 
@@ -48,6 +52,14 @@ def servir(route):
         route.fulfill(status=404, body="")
 
 
+def opciones_navegador():
+    if CHROMIUM.is_file():
+        ruta = CHROMIUM.read_text().strip()
+        if ruta and Path(ruta).is_file():
+            return {"executable_path": ruta, "args": ["--no-sandbox", "--no-zygote"]}
+    return {}
+
+
 class Mesa:
     def __init__(self, carpeta):
         self.carpeta = Path(carpeta)
@@ -57,7 +69,7 @@ class Mesa:
         self.pw = sync_playwright().start()
         self.ctx = self.pw.chromium.launch_persistent_context(
             str(self.carpeta / "perfil"), headless=True, viewport={"width": 390, "height": 844},
-            service_workers="block", locale="es-ES")
+            service_workers="block", locale="es-ES", **opciones_navegador())
         self.ctx.route(ORIGEN + "**", servir)
         self.pg = self.ctx.pages[0] if self.ctx.pages else self.ctx.new_page()
         self.pg.on("dialog", self._dialogo)
@@ -225,7 +237,23 @@ def momento(est):
     return f"Día {est['dia']} · {'fin' if f == 'fin' else f}"
 
 
+def comprobar():
+    import tempfile
+    with tempfile.TemporaryDirectory() as d:
+        try:
+            with Mesa(d) as m:
+                m.pg.goto(ORIGEN + "index.html")
+                m.pg.wait_for_selector("#nombre", timeout=20000)
+        except Exception as e:  # noqa: BLE001
+            print("La mesa no arranca:", str(e).splitlines()[0] if str(e) else repr(e))
+            sys.exit(1)
+    print("ok: el navegador abre la app" + (" (Chromium de " + CHROMIUM.read_text().strip() + ")" if opciones_navegador() else ""))
+
+
 def main(a):
+    if a[:1] == ["comprobar"]:
+        comprobar()
+        return
     if len(a) < 2 or a[0] not in ("nueva", "ver", "pulsar", "diario", "encuesta", "estado"):
         print(__doc__)
         sys.exit(1)

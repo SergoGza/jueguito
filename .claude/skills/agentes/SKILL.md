@@ -11,7 +11,7 @@ Lanzas agentes `jugador-liber` que juegan la app real con `herramientas/agentes/
 
 ## 1. Comprobaciones
 
-- `python3 -c "from playwright.sync_api import sync_playwright"`. Si falla, di a Sergio que instale Playwright (`pip install playwright` y `python -m playwright install chromium`) y para.
+- `bash herramientas/agentes/preparar.sh`. Instala Playwright si falta y comprueba que el navegador abre la app; si el Chromium de Playwright no se puede bajar (pasa en las sesiones en la nube de Claude Code), usa uno de npm. Si acaba con error, enséñale a Sergio el mensaje y para.
 - Versión del juego: `grep -o 'version: "[^"]*"' rules.js` → por ejemplo `0.4`. Las partidas van en `herramientas/agentes/partidas/v<versión>/`.
 
 ## 2. Las partidas de la tanda
@@ -35,6 +35,8 @@ No le des más contexto sobre el juego ni sobre las reglas: tiene que jugar sin 
 ## 4. Juntar
 
 Cuando acaben todas: `python3 herramientas/agentes/resumen.py v<versión>`. Escribe `RESUMEN.md` en la carpeta de la versión y lo imprime.
+
+Después haz commit de `herramientas/agentes/partidas/v<versión>/` (solo esa carpeta; los perfiles del navegador ya están excluidos) y súbelo a la rama en la que estés. Dile a Sergio el nombre de la rama: así puede leer los diarios desde otra conversación.
 
 Enseña a Sergio:
 - La tabla de finales y etiquetas por personaje y estilo.

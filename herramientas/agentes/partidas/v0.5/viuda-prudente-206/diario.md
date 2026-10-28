@@ -1,0 +1,51 @@
+- Día 1 · amanecer · [DECIDO] No finjo: podría gastar un dado en una treta, pero me arriesgo a que me descubran y prefiero guardar los dos 6 para el examen del cura y pedir.
+- Día 1 · Prima · [DECIDO] Pedí en la catedral con el 4 en vez de en la parroquia, porque allí el cura me ve la mitad de las veces; me vio la beneficencia y subí a 0, pero saqué 4 monedas.
+- Día 1 · Tercia · [DECIDO] Entré en la lista con un 6: pierdo pedir, que me dio bien, pero me protege y me dan ración cada día que cumpla; me parece lo más seguro con el niño.
+- Día 1 · Sexta · [DECIDO] Lavé ropa con el otro 6 en vez de pedir: lavar casi nunca te ve nadie que importe y en la lista pedir me podría borrar; solo me dieron 2 monedas.
+- Día 1 · Nona · [OBVIO] Cumplí en la parroquia con el 2, que no servía para otra cosa, y así esta noche me dan ración.
+- Día 1 · noche · [DECIDO] Duermo en el mesón por 5 y compro 1 ración en vez del pórtico gratis: no quiero perder cuerpo ni que me pille la ronda o me roben con 8 monedas, y bajo techo el niño se repone.
+- Día 2 · Prima · [OBVIO] Cumplí a prima con el 1, el peor dado, para asegurar la ración de esta noche y la del niño.
+- Día 2 · Tercia · [DECIDO] Lavé con el 3 y no con el 5, porque la pantalla decía que con los dos me daban ropa; guardo el 5 por si sirve para otra cosa. Pagan 2 igual.
+- Día 2 · Sexta · [DECIDO] Entre la sopa del convento (una ración, pero si me ve la beneficencia me borran de la lista) y lavar otra vez por 2 monedas, elegí lavar: no me juego la lista por una ración.
+- Día 2 · Nona · [DECIDO] Con el 5 descansé en la ribera en vez de juntarme con un recién llegado: prefiero subir cuerpo a 9 que señalar a alguien y que me vendan.
+- Día 2 · autoridad · [DECIDO] Sin dinero para el mesón, salí y dormí en el arrabal en vez del pórtico: prefiero arriesgar fiebres a que me encuentre la ronda; compré una ración por si sube el pan.
+- Día 3 · Prima · [DECIDO] Descansar en el puente a prima era malo (guardia y alguaciles por la redada), así que gasté la franja en volver a entrar en la ciudad sin usar dado.
+- Día 3 · Tercia · [NO ENTIENDO] La tabla de testigos pone «1-6 Alguacil» cuando la redada hace que el 1 sea alguacil; leí que del 1 al 6 todo era alguacil hasta ver que había más filas. Lavé con un 4 igualmente.
+- Día 3 · Sexta · [OBVIO] Lavé otra vez con el otro 4 para juntar las 5 monedas del mesón.
+- Día 3 · Nona · [OBVIO] Cumplí en la parroquia a nona; la ración de esta noche es lo que me sostiene.
+- Día 3 · Vísperas · [DECIDO] Me sobraba un 6 a vísperas: descansar en la catedral no servía (siempre te ve alguien) y juntarme en el mesón tenía un tercio de alguacil por la redada; lo dejo sin usar.
+- Día 3 · autoridad · [OBVIO] Con 5 monedas justas pagué el mesón: bajo techo no pierdo cuerpo y me llevo un rumor; las raciones me llegaban sin comprar.
+- Día 4 · Prima · [DECIDO] Me borraron de la lista en el examen general, así que aproveché a pedir en misa de la catedral con un 6 antes de volver a examinarme; saqué 6 monedas sin que me viera nadie de peso.
+- Día 4 · Tercia · [DECIDO] Volví a examinarme con un 6 en vez de pedir en la procesión del Corpus: daba +2 pero había más alguaciles, y la lista me da ración y me baja el termómetro.
+- Día 4 · Sexta · [OBVIO] Lavé ropa con el 3: 2 monedas sin riesgo para la lista.
+- Día 4 · Nona · [OBVIO] Cumplí con el último dado para la ración de esta noche.
+- Día 4 · autoridad · [DECIDO] Mesón a 6 en vez de pórtico y comprar pan: me quedo con 2 monedas pero sin perder cuerpo ni arriesgar ronda o robo.
+- Día 5 · Prima · [DECIDO] Con dados 1 1 2 6 los unos no sirven para pedir ni lavar; usé un 1 para juntarme con Gil en el convento, donde a prima no hay alguaciles, para tener a alguien con techo más adelante.
+- Día 5 · Tercia · [OBVIO] Me volví a examinar con el único 6; sin lista hoy no tenía cómo cenar los dos.
+- Día 5 · Sexta · [DECIDO] Lavar con un 2 no da ropa; preferí juntarme otra vez con Gil en el convento, sin alguaciles, y ya estamos en relación 2.
+- Día 5 · Nona · [OBVIO] Cumplí con el otro 1 para la ración de la noche.
+- Día 5 · autoridad · [NADA] Quería salir al arrabal pero acabé el día antes de cruzar la puerta y solo quedaba el pórtico; sin dinero para el mesón, dormí al raso y salió bien.
+- Día 6 · Prima · [OBVIO] Gil ha muerto y el pan está a 6; cumplí a prima con el 1 para asegurar la cena de los dos.
+- Día 6 · Tercia · [OBVIO] Lavé con el 3, que sirve para lavar y para poco más.
+- Día 6 · Sexta · [OBVIO] Lavé otra vez con un 6; con el pan a 6 cada moneda cuenta.
+- Día 6 · Nona · [DECIDO] Descansé con el último 6 en la ribera; me vio otro pobre y gasté un rumor para repetir, porque el cuerpo es lo que me da dados.
+- Día 6 · autoridad · [DECIDO] El mesón ya cuesta 8 y no llego; dormí en el arrabal y gasté las 6 monedas en una ración para mañana, así no me roban y tengo la cena asegurada.
+- Día 7 · Prima · [OBVIO] Estaba fuera de la muralla y me perdí el pan de la cofradía; usé prima para volver a entrar sin gastar dado.
+- Día 7 · Tercia · [OBVIO] Lavé con el 4 porque los unos no dan ropa.
+- Día 7 · Sexta · [DECIDO] A sexta descansar en la parroquia o la catedral era casi seguro que me vieran; cumplí con un 1 y guardo el 6 para descansar a nona en la ribera, que me hace más falta que 2 monedas.
+- Día 7 · Nona · [NO ENTIENDO] Al descansar me vio un alguacil y me sacó de la lista; la tabla solo decía vagancia +1 y Te buscan +1, no que perdía la lista. Gasté un rumor, repetí y descansé.
+- Día 7 · autoridad · [DECIDO] Otra vez arrabal en vez de pórtico: si la ronda me pilla en el pórtico me sacan de la lista, y las fiebres solo quitan cuerpo.
+- Día 8 · Prima · [OBVIO] Prima para entrar otra vez en la ciudad: sin cruzar no puedo cumplir en la parroquia.
+- Día 8 · Tercia · [OBVIO] Lavé con el 5; necesito juntar 7 para la ración de pasado mañana.
+- Día 8 · Sexta · [OBVIO] Lavé con un 6; ya tengo 6 monedas, aunque el pan a 7 no me deja comprar y duermo con más de 4 encima.
+- Día 8 · Nona · [OBVIO] Cumplí con el 2 para la ración mía y la del niño esta noche.
+- Día 8 · autoridad · [DECIDO] Arrabal otra vez, aun con 6 monedas encima y riesgo de robo; el pórtico sumaba el riesgo de la ronda y el mesón a 9 no llegaba.
+- Día 9 · Tercia · [OBVIO] Prima para entrar en la ciudad; con tormenta esta noche quiero juntar las 9 monedas del mesón.
+- Día 9 · Tercia · [OBVIO] Lavé con un 3: 8 monedas.
+- Día 9 · Sexta · [DECIDO] Lavé otra vez en vez de ir a la sopa del convento: con la sopa comíamos los dos pero dormía en la tormenta; con 10 monedas pago el mesón.
+- Día 9 · Nona · [OBVIO] Cumplí con el 6, el último dado, para tener la ración de la lista.
+- Día 9 · autoridad · [DECIDO] Mesón con tormenta en vez de pórtico con pan: solo me llegaba para una cosa; elegí techo y que comiera el niño, y yo pasé hambre (cuerpo 4).
+- Día 10 · Tercia · [NADA] Último día, redada y solo dos dados (1 y 6); a prima no había nada seguro que hacer y lo dejé pasar.
+- Día 10 · Tercia · [OBVIO] Me examiné otra vez con el 6: el examen no tira testigo, así que es lo único sin riesgo que me devuelve la ración.
+- Día 10 · Sexta · [OBVIO] Cumplí con el 1 y ya no me quedan dados; solo falta llegar a la noche.
+- Día 10 · fin · [OBVIO] Última noche en el pórtico: el mesón costaba 10 y el hospital me habría recogido por estar en la lista. Llegamos los dos.

@@ -1,0 +1,14 @@
+{
+ "final": {
+  "tipo": "Sobrevive",
+  "dia": 10,
+  "causa": "Llegó a la noche del día 10.",
+  "acompanado": null
+ },
+ "encuesta": {
+  "dolio": "La noche de la tormenta: solo me llegaba para el mesón o para el pan, y elegí techo y que comiera el niño mientras yo pasaba hambre.",
+  "sobro": "Lavar ropa siempre paga 2 sea cual sea el dado, y casi todos los días acabaron siendo cruzar la puerta, lavar dos veces y cumplir; se hizo repetitivo.",
+  "falto": "No entendí por qué el examen general me sacaba de la lista tantas noches seguidas sin que yo hiciera nada, ni que un alguacil viéndome descansar me borrara (la tabla no lo decía); y la tabla «1-6 Alguacil» de la redada confunde.",
+  "otros": "Con el pan subiendo hasta 8 y el mesón a 10, al final la lista era lo único que me daba de comer; la red no me dio tiempo a hacerla porque Gil murió al día siguiente."
+ }
+}

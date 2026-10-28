@@ -1,0 +1,46 @@
+- Día 1 · Prima · [DECIDO] Con el 6 podía pedir en misa o trabajar a jornal en la plaza; trabajo porque paga 3 monedas y me deja como pobre conocido.
+- Día 1 · Sexta · [DECIDO] Hurtar con un 3 en la plaza tenía un tercio de alguacil; prefiero juntarme en el convento con el 3 para tener red y un rumor.
+- Día 1 · Nona · [DECIDO] Con el 1 podía juntarme con alguien nuevo o con Antón; subo a Antón a 2 para que me encubra si hurto más adelante.
+- Día 1 · Vísperas · [DECIDO] En el mesón podía conocer a alguien nuevo o subir a Antón a 3; elijo Antón para poder dormir bajo su techo.
+- Día 1 · noche · [OBVIO] Duermo con Antón gratis bajo techo y compro una ración para guardar y bajar de 4 monedas.
+- Día 2 · Prima · [DECIDO] Trabajo en la plaza con el 4 en vez del 6, porque los dos me contratan y guardo el 6 para otra cosa; pagan igual, 3 monedas.
+- Día 2 · Prima · [NO ENTIENDO] Con la ronda en la plaza, la tabla de testigos ponía «1-6 Alguacil» y luego «2-3 Vecinos»; parece que todo es alguacil, supongo que quería decir 1 y 5-6.
+- Día 2 · Sexta · [DECIDO] Con el 6 podía pedir en la plaza en día de mercado o ir a la sopa; la plaza tiene ronda y llevo 5 monedas, así que voy a la sopa y saco una ración.
+- Día 2 · Nona · [OBVIO] Antón ha muerto y me he quedado sin red; me junto con alguien nuevo en el puente con el 3 y conozco a Juana la Ronca.
+- Día 2 · Vísperas · [DECIDO] Me junto otra vez con Juana en vez de alguien nuevo para subirla a 2; me vio un alguacil y gasté un rumor para repetir y que no la interroguen.
+- Día 2 · noche · [DECIDO] Mesón por 5 monedas o pórtico gratis comprando pan; elijo pórtico porque con 7 de cuerpo sigo con 4 dados y me quedan 2 raciones y 2 monedas.
+- Día 3 · Prima · [DECIDO] Soy forastero y los alguaciles me suman el doble; en vez de pedir en misa comparto la ración sobrante con Juana en el convento, donde no hay alguaciles, y gano un rumor.
+- Día 3 · Tercia · [DECIDO] Con el 6 podía hurtar en la plaza en hora de mercado o trabajar en las obras; la plaza tiene ronda con alguacil casi seguro, así que trabajo en la catedral.
+- Día 3 · Nona · [OBVIO] Con un 2 solo sirve juntarse; en el puente conozco a Perico el Tuerto para que mi red no sea de una sola persona.
+- Día 3 · Vísperas · [OBVIO] Último dado, un 2: me junto con Perico en el mesón para subirlo a 2.
+- Día 3 · noche · [DECIDO] Juana vive fuera y no puedo dormir con ella; entre pórtico y mesón pago el mesón, porque bajar a 6 de cuerpo me quitaría un dado.
+- Día 3 · noche · [NO ENTIENDO] No sabía de qué lado de la muralla vive Juana hasta que intenté dormir con ella; esperaba verlo en la red antes de subirla a 3.
+- Día 4 · amanecer · [DECIDO] No finjo: solo tengo dos dados buenos y prefiero gastarlos los dos pidiendo en la procesión antes que uno en una treta de la que no sé cuánto rinde.
+- Día 4 · Prima · [OBVIO] En prima solo tengo sentido para un 1: me junto con Perico en el convento y lo subo a 3.
+- Día 4 · Tercia · [DECIDO] Pido en la catedral con el 6 (procesión y limosna pública) en vez de la plaza, que tenía más alguaciles; saco 7 monedas pero me ve un alguacil dos veces y ya me buscan 4 de 6.
+- Día 4 · Sexta · [OBVIO] Con el 5 voy a la sopa del convento, sitio sin alguaciles; me dan una ración.
+- Día 4 · Nona · [DECIDO] Con 4 de 6 en Te buscan, salgo de la muralla en vez de quedarme dentro: fuera el alguacil no me suma por forastero y Juana y Perico viven en el arrabal.
+- Día 4 · Vísperas · [NADA] Me queda un 1 en el puente: pedir no da nada, descansar no funciona con el hambre y la guardia me sumaría Te buscan; acabo el día.
+- Día 4 · noche · [OBVIO] Duermo con Juana gratis bajo techo y compro una ración para guardar dos y bajar de 4 monedas.
+- Día 5 · Prima · [NADA] Hay redada y estoy fuera; en el puente a prima la guardia lo ve todo, así que no hago nada y guardo los dados buenos para la ribera.
+- Día 5 · Tercia · [DECIDO] Fuera no puedo lavar ni trabajar; pido con el 6 en el puente arriesgando un alguacil. Me vio, repetí con un rumor y me delató otro pobre: ya me buscan 5 de 6.
+- Día 5 · Tercia · [NO ENTIENDO] El puente dice «Ribera: lavanderas (lavar ropa)» pero al mozo no le sale la acción de lavar; esperaba poder hacerla o que dijera que no es para mí.
+- Día 5 · Sexta · [DECIDO] Podía descansar o juntarme; descansar me puede costar la detención si me ve un alguacil y juntarme fuera no suma Te buscan, así que me junto con Juana y gano un rumor.
+- Día 5 · Nona · [DECIDO] Me junto con Perico por otro rumor; me ve un alguacil, repito y vuelve a salir alguacil: esta noche interrogan a Perico.
+- Día 5 · Vísperas · [NADA] Me queda un 5 en vísperas pero fuera solo hay pedir o descansar con la guardia mirando, y otro testigo me detendría; acabo el día.
+- Día 5 · noche · [OBVIO] Duermo con Juana y gasto 4 monedas en pan: si me detienen me lo quitan todo, mejor tenerlo en raciones.
+- Día 6 · amanecer · [DECIDO] Juana me pide comida: le doy una ración aunque el pan está a 6, porque su casa es lo único que me libra de dormir al raso y no quiero que baje de 3.
+- Día 6 · Prima · [NADA] Me buscan 5 de 6, solo tengo un dado bueno y entrar por la puerta tiene 4 de 6 de que me pare la guardia; fuera todo lo que hago puede acabar en detención con azotes, así que paso el día escondido.
+- Día 6 · noche · [OBVIO] Duermo con Juana y como mi última ración; no me llega para pan.
+- Día 7 · Tercia · [OBVIO] Juana me vuelve a pedir comida y no tengo ninguna ración: no le doy nada y baja a 4. Perico ha muerto.
+- Día 7 · Tercia · [DECIDO] Con la puerta cerrada y sin pan, me arriesgo a descansar en la ribera (un tercio de alguacil, con rumores para repetir) en vez de quedarme quieto; me sale bien y subo a 8.
+- Día 7 · Sexta · [DECIDO] Vuelvo a descansar en vez de juntarme con alguien nuevo, porque con 9 de cuerpo mañana tiro 5 dados; sale bien.
+- Día 7 · Nona · [DECIDO] Tercer descanso con el 4 para llegar a 10 de cuerpo y aguantar noches sin pan; sale bien otra vez.
+- Día 7 · noche · [OBVIO] Duermo con Juana; no tengo pan y ella comparte el suyo, aunque la relación baja a 3.
+- Día 8 · Tercia · [DECIDO] Pensé entrar a por la sopa o hacerme amigo nuevo para dormir bajo techo, pero hoy hay redada: la puerta me para 5 de 6 veces y en el puente el alguacil sale con 3 de 6. Con 10 de cuerpo aguanto el hambre fuera, así que no hago nada.
+- Día 8 · noche · [OBVIO] Solo me queda el arrabal al raso y sin pan; duermo allí.
+- Día 9 · Tercia · [DECIDO] Con la puerta cerrada, descanso con el 4 (tenía rumores para repetir si salía alguacil) en vez de pedir fuera, que no da ni para pan a 7; subo a 7.
+- Día 9 · Tercia · [NADA] Me quedan dos 1: solo valdrían para juntarme con un desconocido, y si nos ve un alguacil lo interrogan y me pueden detener con azotes; lo dejo.
+- Día 9 · noche · [OBVIO] Otra noche al raso en el arrabal sin pan; no hay otra.
+- Día 10 · amanecer · [OBVIO] Último día: si llego a la noche sobrevivo, así que me quedo quieto fuera de la muralla con el 6 sin usar; no merece la pena ningún testigo.
+- Día 10 · noche · [OBVIO] Juana ha vuelto: duermo con ella y comparte su pan.

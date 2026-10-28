@@ -1,0 +1,14 @@
+{
+ "final": {
+  "tipo": "Sobrevive",
+  "dia": 10,
+  "causa": "Llegó a la noche del día 10.",
+  "acompanado": "Juana la Ronca"
+ },
+ "encuesta": {
+  "dolio": "Pedir en la catedral el día del Corpus sabiendo que había media probabilidad de alguacil: saqué 7 monedas pero me quedé en 5 de 6 de Te buscan y eso me ató las manos el resto de la partida; también me dolió dar a Juana una de mis dos raciones con el pan a 6.",
+  "sobro": "Los días 6 a 10 fuera de la muralla con Te buscan en 5: pasé días enteros sin usar dados porque cualquier testigo me detenía, la puerta me paraba 5 de cada 6 veces y pedir fuera daba 2 monedas con el pan a 7.",
+  "falto": "No entendí que el puente anuncie lavar ropa y el mozo no pueda, ni la tabla de testigos que pone «1-6 Alguacil» cuando hay ronda; eché de menos saber dónde vive cada persona de la red antes de subirla a 3 y alguna forma de bajar Te buscan o de ganarse el pan fuera de la muralla.",
+  "otros": "Hasta el día 3 no supe que era forastero, y para entonces ya había planeado todo como si viviera dentro; las muertes de Antón y Perico y el interrogatorio de Juana me dejaron sin techo justo cuando más lo necesitaba, y eso sí se sintió como ser pobre."
+ }
+}

@@ -151,7 +151,7 @@
     return `<div class="dados">${s.dados.map((d, i) => `<button class="dado ${d.usado ? "usado" : ""} ${sel === i ? "sel" : ""}" ${d.usado || !clic ? "disabled" : `data-act="${clic}" data-i="${i}"`} aria-label="Dado ${d.v}">${d.v}</button>`).join("")}</div>`;
   }
 
-  function cambiosHtml(a, b) {
+  function cambiosHtml(a, b, extra) {
     const items = [["monedas", "Monedas"], ["raciones", "Raciones"], ["cuerpo", "Cuerpo"], ["termo", "Termómetro"], ["tb", "Te buscan"], ["rumores", "Rumores"]];
     const out = [];
     items.forEach(([k, l]) => {
@@ -166,6 +166,7 @@
     else if (typeof a.nino === "number" && typeof b.nino === "number" && a.nino !== b.nino) out.push(`<span class="cambio ${b.nino > a.nino ? "mas" : "menos"}">Tu hijo ${sg(b.nino - a.nino)}</span>`);
     if (a.ninoCon !== b.ninoCon && b.nino !== "perdido") out.push(`<span class="cambio">${b.ninoCon ? "El niño se queda con otra persona" : "El niño vuelve contigo"}</span>`);
     if (a.fuera !== b.fuera) out.push(`<span class="cambio">${b.fuera ? "Ahora estás fuera de la muralla" : "Ahora estás dentro de la muralla"}</span>`);
+    (extra || []).forEach(([txt, bueno]) => out.push(`<span class="cambio ${bueno ? "mas" : "menos"}">${esc(txt)}</span>`));
     return out.length ? `<div class="cambios">${out.join("")}</div>` : `<p class="muted small">Nada cambia.</p>`;
   }
 
@@ -351,7 +352,8 @@
     else if (o.w) h += `<p class="small">Dado de testigo: <span class="dado mini">${o.w}</span></p>`;
     h += `<p class="grande">${esc(o.resultado)}</p>`;
     o.lineas.forEach((l) => { h += `<p>${esc(l)}</p>`; });
-    h += cambiosHtml(antes, despues) + `</div>`;
+    const rel = o.relacion && o.relacion.delta ? [[`Relación con ${o.nombre} ${sg(o.relacion.delta)}`, o.relacion.delta > 0]] : [];
+    h += cambiosHtml(antes, despues, rel) + `</div>`;
     if (o.testigo && s.rumores > 0 && !eleccion.rumorGastado) {
       h += `<button class="btn secundario" data-act="rumor">Gastar un rumor y repetir el dado de testigo (tienes ${s.rumores})</button>`;
     }

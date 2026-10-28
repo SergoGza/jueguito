@@ -23,11 +23,14 @@ python3 herramientas/agentes/mesa.py nueva <personaje> <carpeta> <semilla> "Agen
 
 Después, en cada paso:
 
-- `python3 herramientas/agentes/mesa.py pulsar <carpeta> <n>` pulsa el botón `[n]` de la última lista y te enseña la pantalla nueva. No hace falta llamar a `ver` después.
-- También puedes pulsar por texto: `pulsar <carpeta> "Convento"` pulsa el primer botón cuyo título empiece así. Puedes encadenar varios por texto (`pulsar <carpeta> "Convento" "Juntarte"`); por número, solo uno cada vez, porque la numeración cambia con cada pantalla.
+- `python3 herramientas/agentes/mesa.py pulsar <carpeta> <n>` pulsa el botón `[n]` de la lista de la pantalla actual y te enseña la pantalla nueva. No llames a `ver` después: ya la tienes.
+- Un número es siempre el botón con ese número en la lista actual. Para elegir un dado por su valor, usa `dado:4`.
+- También puedes pulsar por texto: `pulsar <carpeta> "Convento"` pulsa el primer botón cuyo título empiece así.
+- **Encadena los pasos que ya tienes decididos**, por texto y con `dado:N`, nunca con números: `pulsar <carpeta> "Convento" "Juntarte" "dado:1" "Hacerlo"`. Gasta mucho menos que ir de uno en uno. Si algo de la cadena falla, la mesa dice qué llegó a pulsar y dónde paró.
 - `python3 herramientas/agentes/mesa.py ver <carpeta>` vuelve a enseñar la pantalla si la necesitas.
-- La pantalla trae al final `=== LO QUE PUEDES PULSAR ===`. Lo marcado `[–]` no está disponible y dice por qué; `← elegido` es lo que está seleccionado. Lo que va bajo `--- ayuda ---` abre explicaciones y no gasta nada: la ventana sale arriba y se cierra sola con tu siguiente orden.
+- La pantalla trae al final `=== LO QUE PUEDES PULSAR ===` con el título de cada botón; el detalle está arriba, en la propia pantalla. Lo marcado `[–]` no está disponible y dice por qué; `← elegido` es lo que está seleccionado. La línea «Ayuda» abre explicaciones y no gasta nada: la ventana sale sola y se cierra con tu siguiente orden. La ayuda completa («Cómo se juega») es larga: ábrela al principio si quieres y luego solo para dudas concretas (los marcadores explican cada cosa en corto).
 - Si la app pide confirmación (por ejemplo, acabar el día con dados sin usar), la mesa la acepta y te lo dice.
+- Tras cada acción sale una pantalla de resultado con «Seguir». Los marcadores de arriba se actualizan al pulsar «Seguir», no antes.
 
 ## Tu diario
 

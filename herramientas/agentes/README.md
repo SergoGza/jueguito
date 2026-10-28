@@ -12,6 +12,8 @@ Desde Claude Code, abierto en la raíz del repositorio:
 - `/agentes completa`: 15 partidas, 3 personajes × 5 estilos (prudente, arriesgado, novato, fingidor, social). Para los momentos importantes, por ejemplo antes de que pruebe el juego otra gente.
 - `/agentes uno viuda social 214`: una sola partida.
 
+**Coste.** Una partida completa son unas 300 órdenes a la mesa y gasta del orden de medio millón de tokens del modelo (la primera prueba, sin las mejoras de la mesa para encadenar pasos, gastó 157.000 en dos días). La tanda de prueba ronda el millón y medio y la completa puede pasar de los siete millones: lánzala solo en los momentos importantes.
+
 Las semillas son fijas, así que dos versiones del juego se comparan con los mismos dados. Cada partida queda en `partidas/v<versión>/<personaje>-<estilo>-<semilla>/` con su `diario.md`, `informe.txt` (el mismo informe que mandan los testers) y `resultado.json`. El resumen de la tanda, en `partidas/v<versión>/RESUMEN.md`.
 
 Hace falta Python con Playwright y Chromium: `pip install playwright` y `python -m playwright install chromium`. Si `herramientas/webtest.py` funciona, ya está.
@@ -23,7 +25,7 @@ Hace falta Python con Playwright y Chromium: `pip install playwright` y `python 
 - `../../.claude/skills/agentes/SKILL.md`: el comando `/agentes`, que lanza las partidas (como mucho 5 a la vez) y junta los resultados.
 - `resumen.py`: junta los diarios de una tanda.
 
-Para probar la mesa a mano: `python3 herramientas/agentes/mesa.py nueva mozo /tmp/prueba 101` y luego `pulsar /tmp/prueba <n>`.
+Para probar la mesa a mano: `python3 herramientas/agentes/mesa.py nueva mozo /tmp/prueba 101` y luego `pulsar /tmp/prueba <n>`. En `pulsar`, un número es el botón de la lista actual, `dado:4` elige el dado que vale 4 y un texto pulsa el primer botón cuyo título empiece así; se pueden encadenar varios (por texto y `dado:N`).
 
 ## El diario
 

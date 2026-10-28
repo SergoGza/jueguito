@@ -14,9 +14,9 @@ Uso (desde la raíz del repositorio):
   python3 herramientas/agentes/mesa.py encuesta <carpeta> "<dolió>" "<sobraba>" "<faltó>" ["<otros>"]
   python3 herramientas/agentes/mesa.py estado <carpeta>
 
-personaje: mozo, viuda o soldado. En «pulsar», un número es el botón de esa lista; un texto pulsa el primer botón
-disponible cuyo título empiece por él (si no hay, el primero cuyo título o descripción lo contenga), sin distinguir
-mayúsculas. Con varios, se pulsan en orden, cada uno sobre la pantalla
+personaje: mozo, viuda o soldado. En «pulsar», un número es siempre el botón con ese número en la lista de la
+pantalla actual; «dado:4» pulsa el dado que vale 4; un texto pulsa el primer botón disponible cuyo título empiece por
+él (si no hay, el primero cuyo título o descripción lo contenga), sin distinguir mayúsculas. Con varios, se pulsan en orden, cada uno sobre la pantalla
 que deja el anterior.
 """
 import json
@@ -102,7 +102,8 @@ class Mesa:
             const txt = (el.innerText || el.textContent || '').replace(/\\s*\\n\\s*/g, ' · ').replace(/\\s+/g, ' ').trim();
             const aria = el.getAttribute('aria-label');
             const nombre = txt.length <= 2 && aria ? `${aria} (${txt})` : txt || aria || el.dataset.act;
-            out.push({ idx: i, act: el.dataset.act, sel: el.classList.contains('sel'), txt: nombre, ok: !el.disabled && !el.hasAttribute('disabled') });
+            const dado = el.dataset.act === 'dado' || el.dataset.act === 'dadoTreta' ? (el.querySelector('.dado') || el).textContent.trim() : '';
+            out.push({ idx: i, act: el.dataset.act, dado, sel: el.classList.contains('sel'), txt: nombre, ok: !el.disabled && !el.hasAttribute('disabled') });
           });
           return { modal: !!modal, botones: out };
         }""", sorted(FUERA))
@@ -153,21 +154,29 @@ class Mesa:
         t = self.texto()
         lineas = []
         if t["modal"]:
-            lineas += ["=== VENTANA DE AYUDA (se cierra sola con tu siguiente orden) ===", t["modal"].removesuffix("Cerrar").strip(), "",
-                       "=== DEBAJO, LA PANTALLA DEL JUEGO ==="]
-        lineas += [t["app"], ""]
-        lineas.append("=== LO QUE PUEDES PULSAR ===")
+            lineas += ["=== VENTANA DE AYUDA (se cierra sola con tu siguiente orden; la pantalla del juego sigue igual que antes) ===",
+                       t["modal"].removesuffix("Cerrar").strip(), ""]
+        else:
+            lineas += [t["app"], ""]
+        lineas.append("=== LO QUE PUEDES PULSAR (el detalle de cada opción está arriba) ===")
         juego = [x for x in b["botones"] if x["act"] not in AYUDA]
         ayuda = [x for x in b["botones"] if x["act"] in AYUDA]
         n = 0
-        for x in juego + ayuda:
-            if x is (ayuda[0] if ayuda else None):
-                lineas.append("--- ayuda (explica, no gasta nada) ---")
+        for x in juego:
+            partes = x["txt"].split(" · ")
             if x["ok"]:
                 n += 1
-                lineas.append(f"[{n}] {x['txt']}" + ("  ← elegido" if x["sel"] else ""))
+                dado = f"  (dado {x['dado']})" if x.get("dado") else ""
+                lineas.append(f"[{n}] {partes[0]}{dado}" + ("  ← elegido" if x["sel"] else ""))
             else:
-                lineas.append(f"[–] {x['txt']} (no disponible)")
+                lineas.append(f"[–] {partes[0]} (no disponible: {partes[-1]})" if len(partes) > 1 else f"[–] {partes[0]} (no disponible)")
+        if ayuda:
+            items = []
+            for x in ayuda:
+                if x["ok"]:
+                    n += 1
+                    items.append(f"[{n}] {x['txt'].split(' · ')[0]}")
+            lineas.append("Ayuda (explica, no gasta nada): " + " · ".join(items))
         if self.dialogos:
             lineas += ["", "(Aviso de la app, aceptado: " + " | ".join(self.dialogos) + ")"]
         if self.errores:
@@ -181,7 +190,11 @@ class Mesa:
         orden = [x for x in b if x["act"] not in AYUDA] + [x for x in b if x["act"] in AYUDA]
         disponibles = [x for x in orden if x["ok"]]
         elegido = None
-        if str(objetivo).isdigit():
+        obj = str(objetivo).strip()
+        if obj.lower().startswith("dado:"):
+            v = obj.split(":", 1)[1].strip()
+            elegido = next((x for x in disponibles if x.get("dado") == v and not x["sel"]), None) or next((x for x in disponibles if x.get("dado") == v), None)
+        elif obj.isdigit():
             k = int(objetivo)
             if 1 <= k <= len(disponibles):
                 elegido = disponibles[k - 1]
@@ -192,9 +205,10 @@ class Mesa:
                        or next((x for x in disponibles if q in titulo(x)), None)
                        or next((x for x in disponibles if q in x["txt"].lower()), None))
         if not elegido:
-            raise SystemExit(f"No hay ningún botón disponible «{objetivo}». Usa «ver» para ver la lista.")
+            raise ValueError(f"no hay ningún botón disponible «{objetivo}»")
         self.pg.locator("#app [data-act]").nth(elegido["idx"]).click()
         self.pg.wait_for_timeout(50)
+        return elegido["txt"].split(" · ")[0]
 
     def estado(self):
         return self.pg.evaluate("""() => { const s = window.__LV.s; if (!s) return null;
@@ -245,9 +259,18 @@ def main(a):
         elif orden == "pulsar":
             if len(a) < 3:
                 raise SystemExit("Uso: pulsar <carpeta> <n o texto> [...]")
+            hechos, fallo = [], None
             for objetivo in a[2:]:
-                m.pulsar(objetivo)
+                try:
+                    hechos.append(f"«{objetivo}» → {m.pulsar(objetivo)}")
+                except ValueError as e:
+                    fallo = f"«{objetivo}»: {e}"
+                    break
             m.guardar()
+            if fallo:
+                print("ATENCIÓN: " + ("pulsado " + "; ".join(hechos) + ". " if hechos else "no se ha pulsado nada. ") + "Falló " + fallo + ". Lo que sigue no se ha pulsado.\n")
+            elif len(hechos) > 1:
+                print("Pulsado: " + "; ".join(hechos) + ".\n")
             print(m.pantalla())
         elif orden == "diario":
             linea = " ".join(a[2:]).strip()

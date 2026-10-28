@@ -1,0 +1,62 @@
+- Día 1 · Prima · [DECIDO] Fui a pedir a mi parroquia con un 4 porque tenía misa y daba +1; podía haber ido a la catedral pero la parroquia sonaba más segura. Me tocó el alguacil, mala suerte.
+- Día 1 · Tercia · [DECIDO] Pensé en pedir en el mercado pero el alguacil salía con 5-6, así que me fui a lavar ropa al río, que casi nadie mira. Solo 2 monedas, menos que pidiendo.
+- Día 1 · Sexta · [OBVIO] A mediodía, sopa del convento con el otro 5: una ración segura y ya tenemos para cenar los dos.
+- Día 1 · Nona · [DECIDO] Con el 2 que sobraba podía descansar o juntarme con alguien; me junté en el puente porque cualquier dado valía. Conocí a Diego el Zurdo.
+- Día 1 · noche · [DECIDO] Dudé entre el pórtico gratis y el mesón; con 8 monedas en el pórtico me podían robar y pasar la ronda, así que pagué el mesón y cenamos las 2 raciones que teníamos.
+- Día 2 · Prima · [DECIDO] Dados malos (4 3 1 1). Gasté un 1 en juntarme con Diego en el convento en vez de pedir, porque un 1 no da limosna y así subo la relación para dormir con él.
+- Día 2 · Tercia · [NO ENTIENDO] En el mercado la tabla de testigos ponía «1-6 Alguacil» y luego «2-3 Vecinos», «4 Otro pobre»; parecía que el alguacil salía siempre. Al repetir salió un 5 y también era alguacil, así que supongo que era 1, 5 y 6.
+- Día 2 · Tercia · [DECIDO] Entre escuelas (dan poco, alguacil 1 de 3) y mercado (dan bastante, alguacil la mitad) elegí mercado con el 4 porque el niño tiene que cenar. Me vio el alguacil y gasté el rumor en repetir, sin suerte.
+- Día 2 · Sexta · [DECIDO] Con el 3 la sopa del convento no llegaba, así que fui a lavar ropa: 2 monedas y si me ve el alguacil trabajando hasta me viene bien. Ya tengo 10 monedas, pan asegurado.
+- Día 2 · Vísperas · [NADA] En nona el convento no dejaba juntarse y con un 1 pedir no da nada; esperé a vísperas para ir al mesón.
+- Día 2 · Vísperas · [OBVIO] Con el último 1 me junté con Diego en el mesón para llegar a relación 3 y poder dormir con él gratis.
+- Día 2 · noche · [NO ENTIENDO] Subí a Diego a relación 3 para dormir con él y ahora resulta que no vive de este lado de la muralla; nada me avisó de dónde vivía hasta la noche.
+- Día 2 · noche · [DECIDO] El mesón más dos panes no me llegaba (11 de 10), así que pórtico con 2 raciones; me quedan 4 monedas y así no me roban.
+- Día 3 · Prima · [DECIDO] Tenía el 6 y el 3, y los dos daban «bastante» en la misa de la catedral; puse el 6 porque decían que rinde mucho. 6 monedas, pero la beneficencia me vio válida y ya me tienen por vagabunda.
+- Día 3 · Tercia · [DECIDO] Con el 3 suspendía para entrar en la lista, así que volví a lavar ropa; me vio el alguacil trabajando y bajé a sospechosa.
+- Día 3 · Sexta · [DECIDO] Con el 1 me junté con alguien nuevo en el convento (Alonso el Pelado) en vez de descansar, a ver si encuentro a alguien que viva dentro de la muralla.
+- Día 3 · Vísperas · [DECIDO] Con el 2 compartí con Alonso en el mesón en vez de no hacer nada, por el rumor. Salió el alguacil y vuelvo a vagabunda; esta vez no me dejó gastar el rumor para repetir.
+- Día 3 · noche · [DECIDO] Con 12 monedas me llega para mesón y dos panes; prefiero eso al pórtico porque soy vagabunda y la ronda me pillaría, y no pierdo cuerpo.
+- Día 3 · autoridad · [NO ENTIENDO] Alonso me vendió y Te buscan subió de 2 a 4 de golpe; no sé qué pasa al llegar a 6 ni cómo se baja, y en la red pone «+1 que no están» sin decir quién ni por qué.
+- Día 4 · amanecer · [DECIDO] Diego me pidió comida; le di mi única ración aunque el pan está a 4, porque es el único que me queda y si me detienen podría quedarse con el niño.
+- Día 4 · Prima · [DECIDO] Con Te buscan en 4 descarté la misa de la parroquia (alguacil con 6) y pedí en el convento con un 4, donde no sale alguacil. 3 monedas y el fraile me bajó a sospechosa.
+- Día 4 · Tercia · [DECIDO] Con Te buscan en 4 pensé en pedir en la procesión (+2) pero había alguacil del 1 al 3; preferí entrar en la lista con un 4, que no tira testigo y me deja como pobre de la lista. Ya no podré pedir.
+- Día 4 · Sexta · [DECIDO] La sopa del convento ya no puedo pedirla por estar en la lista, así que lavé ropa con un 4: 2 monedas para el pan del niño.
+- Día 4 · Nona · [OBVIO] Con el 5 cumplí en la parroquia para tener mi ración esta noche.
+- Día 4 · Vísperas · [DECIDO] Sin dados y sin dinero para el mesón, salí por la puerta a vísperas para dormir con Diego al otro lado en vez de en el pórtico, donde la ronda me subiría Te buscan.
+- Día 4 · autoridad · [DECIDO] Dormí con Diego (gratis, bajo techo) en vez de en la ribera al raso, y compré una ración para el niño porque la de la lista era solo mía.
+- Día 5 · amanecer · [NO ENTIENDO] Diego aparece muerto en la ribera la misma noche que dormí con él, y el examen general me borra de la lista; no sé si fue por mi culpa ni qué pasa con la media ración del niño que me debían.
+- Día 5 · Prima · [OBVIO] Amanecí fuera de la muralla; gasté prima en cruzar la puerta para poder ir a la parroquia y volver a la lista.
+- Día 5 · Tercia · [DECIDO] Dudé entre pedir con el 5 en el mercado o volver a la lista; con Te buscan en 4 volví a la lista, que no tira testigo. Ahora el termómetro bajó solo 1 aunque pone (−2): creo que el −2 es donde te deja.
+- Día 5 · Sexta · [OBVIO] Lavé ropa con un 3 para tener las 4 monedas del pan del niño.
+- Día 5 · Nona · [OBVIO] Cumplí en la parroquia con el 1, que para eso cualquier dado vale.
+- Día 5 · Vísperas · [DECIDO] Podía gastar el 3 en juntarme con alguien y dormir en el pórtico, o salir a dormir a la ribera sin rondas; salí, porque con Te buscan en 4 la ronda me da miedo.
+- Día 5 · noche · [OBVIO] Esta noche la lista da la ración del niño también, así que no compro pan y guardo las 4 monedas; duermo en la ribera.
+- Día 5 · autoridad · [NO ENTIENDO] Al bajar de cuerpo 7 a 6 paso de 4 dados a 3; no me había fijado en que el «(4 dados)» del cuerpo podía bajar, y nadie me avisó al elegir dormir al raso.
+- Día 6 · Prima · [OBVIO] Otra vez cruzar la puerta en prima para entrar; solo tengo 3 dados y el pan a 7, así que el plan es lavar dos veces y cumplir.
+- Día 6 · Tercia · [OBVIO] Lavé ropa con el 3: 6 monedas, aún me falta para el pan del niño a 7.
+- Día 6 · Sexta · [OBVIO] Segunda colada con el 4: ya tengo 8 monedas para el pan del niño.
+- Día 6 · Nona · [OBVIO] Cumplí con el 1 en la parroquia.
+- Día 6 · Vísperas · [DECIDO] Entre el pórtico (ronda) y la ribera (fiebres) volví a salir a la ribera: prefiero perder cuerpo que subir Te buscan.
+- Día 6 · noche · [OBVIO] Compro una ración a 7 para el niño; la mía la da la lista.
+- Día 6 · autoridad · [NO ENTIENDO] La atención de la autoridad fue 4 aunque solo lavé ropa y crucé la puerta; parece que el alguacil que me ve trabajar y la guardia que me para cuentan igual, y yo creía que trabajar era lo seguro.
+- Día 7 · Prima · [DECIDO] Hoy la lista da las dos raciones, así que no necesito dinero; crucé para entrar y pienso usar los dos 5 en descansar para recuperar cuerpo en vez de trabajar.
+- Día 7 · Tercia · [DECIDO] Miré descansar en parroquia, catedral y ribera; en todas casi siempre te ve alguien. Probé en la parroquia con un 5 y me vio el cura; no repetí con rumor porque podía salir el alguacil.
+- Día 7 · Sexta · [DECIDO] Descansar tenía las mismas pocas opciones, así que lavé ropa con el 5 para juntar el pan del niño de mañana.
+- Día 7 · Nona · [OBVIO] Cumplí con el 1 en la parroquia.
+- Día 7 · Vísperas · [DECIDO] Otra vez salgo a dormir a la ribera en vez del pórtico: pierdo cuerpo igual, pero sin ronda que me suba Te buscan.
+- Día 8 · Prima · [DECIDO] Solo 2 dados (2 y 6) y pan a 7. Pensé salir de la lista para pedir con el 6, pero hay redada y Te buscan está en 4; me quedo en la lista: entro, lavo con el 6 y cumplo con el 2, aunque el niño se quede sin pan esta noche.
+- Día 8 · Tercia · [NO ENTIENDO] Lavar ropa con un 6 paga lo mismo que con un 3 (2 monedas); esperaba que un dado alto rindiera más.
+- Día 8 · Sexta · [OBVIO] Cumplí con el 2 para tener mi ración.
+- Día 8 · Vísperas · [NADA] En nona no me quedaban dados; esperé a vísperas para salir por la puerta.
+- Día 8 · noche · [DECIDO] Solo había una ración: si comía el niño yo bajaba a cuerpo 1 tras dormir al raso; elegí comer yo y que el niño pierda 2 (de 5 a 3). Me dolió, pero si caigo yo él se queda solo.
+- Día 9 · Prima · [OBVIO] Cruzo la puerta en prima para poder cumplir; esta noche la lista da también la ración del niño.
+- Día 9 · Tercia · [DECIDO] Arriesgué: pedí en el mercado con un 5 estando en la lista para juntar para el mesón, contando con repetir con rumores. Salió alguacil dos veces: me borran, Te buscan 5, y además el dinero encima me subió el termómetro. Solo me dejó repetir una vez.
+- Día 9 · Tercia · [NO ENTIENDO] Tenía 2 rumores pero solo pude repetir el testigo una vez por acción; y lo de «llevas 5 monedas encima: fingidor (+1)» me pilló por sorpresa, el aviso de «demasiado dinero» no decía que subía el termómetro.
+- Día 9 · Sexta · [DECIDO] Con el último 5 dudé entre lavar ropa (2 monedas, sin riesgo) y la sopa del convento (una ración entera, con riesgo de que otro pobre me delate); fui a la sopa y salió bien, el fraile hasta me bajó el termómetro.
+- Día 9 · noche · [DECIDO] Ya fuera de la lista, el hospital vuelve a ser posible: duermo allí gratis (+2 de cuerpo) y compro una ración para que comamos los dos; el mesón no me llegaba con el pan.
+- Día 10 · amanecer · [DECIDO] Último día y Te buscan en 5: cualquier alguacil o rival me detiene. Descarto pedir aunque la catedral da +2; solo haré cosas sin riesgo, como lavar ropa.
+- Día 10 · Prima · [NO ENTIENDO] El mercado dice «Contratan peones para el jornal» pero no me sale ningún botón para trabajar; supongo que a la viuda no la contratan, pero no lo dice.
+- Día 10 · Prima · [NADA] En prima, con Te buscan en 5, nada era seguro: pedir arriesga alguacil y el jornal no me lo dan.
+- Día 10 · Tercia · [OBVIO] Lavé ropa con el 3: lo único sin riesgo de que me detengan.
+- Día 10 · Sexta · [OBVIO] Segunda colada con el 4: 8 monedas, justo una ración. El 1 que queda no sirve para nada seguro.
+- Día 10 · noche · [DECIDO] Última noche: hospital otra vez (gratis, +2) en vez del pórtico, que me podía costar la detención. Con una sola ración, esta vez come el niño; el hospital compensa lo que pierdo yo.

@@ -1,0 +1,49 @@
+- Día 1 · Prima · [DECIDO] Pedir en la parroquia rendía más pero el cura me podía tener por válido; elegí el convento por los frailes. Saqué 1 moneda pero otro pobre me delató (Te buscan 1).
+- Día 1 · Tercia · [DECIDO] Entre pedir y juntarme, me junté con alguien nuevo en el puente para tener red. Salió alguacil: termómetro +1 y van a interrogar a Francisca esta noche.
+- Día 1 · Sexta · [DECIDO] La sopa no se podía con un 3, así que me junté otra vez con Francisca en el convento, donde nadie denuncia, para subirle la relación a 2 antes de que la interroguen. Gané un rumor.
+- Día 1 · Vísperas · [OBVIO] Con un 2 solo valía juntarme otra vez con Francisca en el convento: relación 3, a ver si me deja dormir en su casa.
+- Día 1 · autoridad · [OBVIO] Solo podía dormir en el pórtico (Francisca vive en el arrabal y no había salido). Compré una ración para mañana. Me pilló la ronda: vagabundo y Te buscan 2; a Francisca se la llevan dos días.
+- Día 2 · Prima · [DECIDO] No me contrataban en la plaza con un 4; pedí en la parroquia con el 3 porque solo hay alguacil con un 6. Me dieron 2 monedas y el cura me tuvo por impedido: termómetro baja a +1.
+- Día 2 · Tercia · [DECIDO] Pedí en la plaza en día de mercado con el 2, que rendía igual que un 4; me arriesgaba al alguacil pero tenía un rumor de reserva. 2 monedas más, sin testigos malos.
+- Día 2 · Sexta · [OBVIO] Con un 4 en sexta, la sopa del convento daba una ración segura; me vio la beneficencia y me tuvo por impedido, termómetro a 0.
+- Día 2 · Nona · [DECIDO] Con el último 4 podía pedir en la catedral para pagar el mesón o descansar en la ribera; descansé para cuidar el cuerpo (vuelve a 8).
+- Día 2 · Vísperas · [DECIDO] Salí por la puerta en vísperas para dormir en el arrabal y no en el pórtico, porque anoche me pilló la ronda; la guardia no me paró.
+- Día 2 · autoridad · [DECIDO] Dormí en el arrabal (lo único posible fuera) y compré una ración de reserva en vez de guardar monedas para el mesón, por si sube el pan.
+- Día 3 · Prima · [DECIDO] Pedir en el puente a prima era casi seguro que me viera la guardia; preferí gastar la franja en entrar a la ciudad para buscar jornal con los 5. Entré sin que me pararan.
+- Día 3 · Tercia · [DECIDO] Con un 5 no me contrataban en la catedral; entre escuelas y parroquia pedí en la parroquia porque allí solo el 6 es alguacil y el cura me ve impedido. 2 monedas y termómetro −1.
+- Día 3 · Sexta · [OBVIO] Sopa del convento con el otro 5: una ración más. Ya tengo 3 raciones.
+- Día 3 · Nona · [NO ENTIENDO] En el puente la tabla de testigos pone «1-6 Alguacil» y luego «2-4 Nadie»; supongo que quiere decir el 1 y el 6, pero leído así parece que siempre es alguacil.
+- Día 3 · Nona · [DECIDO] Con dos 2 no podía descansar ni pedir; en vez de juntarme con un desconocido con alguacil cerca, salí de la ciudad a nona, que la guardia vigila menos que a vísperas.
+- Día 3 · Vísperas · [NADA] En vísperas fuera de la muralla con dos 2 no podía juntarme ni descansar ni sacar nada pidiendo; dejo pasar el día.
+- Día 3 · autoridad · [OBVIO] Dormí en el arrabal sin comprar pan porque ya tengo dos raciones guardadas. Cuerpo baja a 6 y mañana cierran la puerta.
+- Día 4 · Tercia · [DECIDO] Con la puerta cerrada solo tenía el puente, lleno de alguaciles; pedir o descansar arriesgaba Te buscan, juntarme con Francisca no. Me junté con el 4: relación 4 y un rumor.
+- Día 4 · Sexta · [DECIDO] Descansé con el 5 en la ribera aunque había ronda, porque subir a cuerpo 7 me da un dado más; me vio el alguacil y gasté un rumor para repetir: descansé.
+- Día 4 · Nona · [DECIDO] Con el 6 me junté otra vez con Francisca y no con alguien nuevo, porque los nuevos venden. Salió alguacil, gasté rumor y volvió a salir 1: la interrogarán esta noche.
+- Día 4 · autoridad · [OBVIO] Dormí en casa de Francisca, bajo techo y gratis; no compré pan porque a 4 no me llegaba. Se la vuelven a llevar dos días.
+- Día 5 · Tercia · [DECIDO] Con 4-1-1-1 y una sola ración, quiero la sopa del convento. Esperé a tercia para entrar porque a prima la guardia mira casi siempre.
+- Día 5 · Sexta · [OBVIO] Sopa con el 4: una ración, sin testigos. Ya tengo dos.
+- Día 5 · Nona · [DECIDO] Con tres 1 podía quedarme a juntarme con alguien nuevo en el convento y dormir en el pórtico, o salir; salí a nona para no arriesgar la ronda nocturna. Pasé sin que me vieran.
+- Día 5 · autoridad · [OBVIO] Dormí en el arrabal, lo único posible fuera, sin comprar pan caro. Me dieron fiebres: cuerpo 5.
+- Día 6 · Tercia · [DECIDO] Pan a 6, una ración y cuerpo 5: tengo que entrar a por la sopa y dormir en el hospital. Entré a tercia en vez de prima por la guardia; pasé limpio.
+- Día 6 · Sexta · [OBVIO] Sopa con el 4; me vio un fraile: ración y termómetro −1.
+- Día 6 · Vísperas · [DECIDO] Descansar dentro hoy era imposible (redada, siempre te ve alguien); usé el 3 para juntarme con alguien nuevo en el convento, con un rumor de reserva. Conocí a Ana de Ledesma y gané un rumor.
+- Día 6 · autoridad · [DECIDO] Entre el pórtico y el hospital elegí el hospital: gratis, bajo techo y +2 de cuerpo, aunque ya llevo 1 de 2 apuntes. Cuerpo 7.
+- Día 7 · amanecer · [DECIDO] Francisca ha muerto en la ribera. Ana me pidió comida: le di mi única ración para no quedarme sin nadie y que no me venda, confiando en sacar la sopa con el 5.
+- Día 7 · Prima · [OBVIO] Misa mayor en la parroquia: pedí con el 5 (rendía igual que el 6, que guardo para la sopa). 4 monedas y el cura me ve impedido.
+- Día 7 · Tercia · [OBVIO] Con un 1 solo servía juntarme; lo hice con Ana en el puente (allí el alguacil no suma Te buscan). Relación 3: esta noche puedo dormir en su casa dentro de la ciudad.
+- Día 7 · Sexta · [OBVIO] Sopa con el 6. Salió alguacil (Te buscan a 5) y gasté un rumor: el nuevo dado fue un pobre que no me delató. Me he librado por poco.
+- Día 7 · Nona · [DECIDO] Con el último 1 podía no hacer nada o juntarme otra vez con Ana en el puente; me junté para que aguante si la interrogan. Relación 4, nadie nos vio.
+- Día 7 · autoridad · [DECIDO] Dormí en casa de Ana en vez del pórtico y compré una ración a 6 para no ir con 7 monedas encima. Interrogaron a Ana, no dijo nada, pero se la llevan dos días.
+- Día 8 · amanecer · [NO ENTIENDO] Anoche se llevaron a Ana dos días tras interrogarla y esta mañana aparece muerta en la ribera; no sé si murió por el interrogatorio o es otro suceso. Es la segunda de mi red que muere.
+- Día 8 · Prima · [OBVIO] En la parroquia a prima con el 6 (el 4 lo guardo para la sopa): 4 monedas y otra vez impedido a ojos del cura.
+- Día 8 · Tercia · [DECIDO] Con el 3 no quise juntarme con alguien nuevo (con el pregón interrogan a quien estuvo conmigo y los nuevos venden); descansé en la ribera para llegar con cuerpo a las noches al raso. Cuerpo 8.
+- Día 8 · Sexta · [OBVIO] Sopa con el 4: segunda ración guardada; el pobre que me vio no me delató.
+- Día 8 · Nona · [DECIDO] Entre dormir en el pórtico para pedir mañana a prima o salir al arrabal, salí: prefiero no darle a la ronda otro Te buscan. Me paró la guardia (termómetro a 0) y guardé el rumor para algo peor.
+- Día 8 · autoridad · [OBVIO] Arrabal, sin comprar pan (a 7 no llego). Otra vez fiebres en la ribera: cuerpo 6.
+- Día 9 · Tercia · [DECIDO] Me faltan raciones para dos noches con el pan a 8: entro a tercia para la sopa en vez de quedarme fuera descansando con los 5.
+- Día 9 · Sexta · [OBVIO] Sopa con el 4, me vio un fraile: dos raciones para las dos noches que quedan.
+- Día 9 · Nona · [DECIDO] Descansar dentro solo salía con un 1 de seis; mejor salir ya, que mañana vence el pregón. Me paró la guardia (termómetro 0); guardo el rumor para mañana.
+- Día 9 · Vísperas · [NADA] En vísperas fuera de la muralla con dos 5: descansar era imposible (guardia o alguacil siempre) y pedir allí no compensa. Me quedan dos dados sin usar.
+- Día 9 · autoridad · [OBVIO] Arrabal otra vez, sin comprar pan a 8; noche tranquila, cuerpo 5 y me queda una ración para mañana.
+- Día 10 · amanecer · [OBVIO] Vence el pregón y el puente está lleno de alguaciles: no entro ni hago nada, tengo una ración para la noche. Acabo el día sin moverme.
+- Día 10 · fin · [OBVIO] Última noche en el arrabal comiendo mi ración guardada; sobrevivo con cuerpo 4 y Te buscan 2.

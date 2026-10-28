@@ -1,0 +1,14 @@
+{
+ "final": {
+  "tipo": "Sobrevive",
+  "dia": 10,
+  "causa": "Llegó a la noche del día 10.",
+  "acompanado": null
+ },
+ "encuesta": {
+  "dolio": "Darle a Ana mi única ración con el pan a 6 me costó, y al día siguiente apareció muerta igual que Francisca, así que la red no me sirvió de nada.",
+  "sobro": "Las franjas en que estaba fuera de la muralla sobraban: en el puente casi siempre había guardia o alguacil, no se podía descansar ni pedir y acababa dejando pasar el tiempo con dados sin usar.",
+  "falto": "No entendí la tabla de testigos que pone «1-6 Alguacil» y luego «2-4 Nadie», ni por qué a Ana, que estaba detenida, la encuentran muerta en la ribera; eché de menos poder ganar algo honrado siendo soldado, porque el jornal pedía un 6.",
+  "otros": "Como forastero prudente el juego se reduce a entrar a tercia, sopa a sexta y salir a nona; funciona, pero el soldado cojo vive casi solo de la sopa del convento."
+ }
+}

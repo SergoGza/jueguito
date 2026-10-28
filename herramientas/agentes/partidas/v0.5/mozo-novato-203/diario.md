@@ -1,0 +1,43 @@
+- Día 1 · Prima · [DECIDO] Podía pedir o trabajar; como mozo y con un 5, me fui a la plaza a jornal. Me pagaron 3 y el alguacil me vio trabajar, que parece que es bueno.
+- Día 1 · Sexta · [DECIDO] La sopa no salía con mis dados y pedir en la plaza traía alguacil; preferí juntarme con alguien en el puente con el 3. Conocí a Ana de Ledesma y saqué un rumor.
+- Día 1 · Nona · [DECIDO] En nona pedir daba -1 en todas partes; gasté el 1 en estar otra vez con Ana en vez de buscar a alguien nuevo, para afianzarla.
+- Día 1 · Vísperas · [DECIDO] Pedir en la catedral con un 2 daba poco y me podían ver la beneficencia o el alguacil siendo yo válido; me fui al mesón a conocer gente y conocí a Catalina.
+- Día 1 · noche · [DECIDO] El mesón me dejaba sin un real; duermo en el pórtico y compro una ración para mañana, así no llevo dinero de más que me roben.
+- Día 2 · Prima · [NO ENTIENDO] Volví a trabajar con el 5 y me vio el alguacil, que decía −1, pero el termómetro se quedó en −1 y no bajó a −2. No sé si hay un tope para un mozo.
+- Día 2 · Sexta · [DECIDO] Pedir en la plaza con un 2 me daba algo pero con la mitad de testigos en contra; fui al convento, donde nadie molesta, y subí a Ana a 3 para poder dormir con ella.
+- Día 2 · Nona · [NO ENTIENDO] En el puente la tabla de testigos pone «1-6 Alguacil» y luego «2-4 Nadie»; supongo que quiere decir el 1 y el 6, pero parece que todo es alguacil.
+- Día 2 · Nona · [NADA] En nona con dos doses: descansar no sale por hambre, pedir da −1 y juntarme en el puente arriesga alguacil; no hago nada.
+- Día 2 · Vísperas · [OBVIO] En vísperas me junté con Catalina a la puerta del convento, que es donde nadie da problemas.
+- Día 2 · noche · [NO ENTIENDO] Subí a Ana a relación 3 para dormir con ella y no me deja: dice que tiene que vivir de este lado de la muralla, pero en ningún sitio me dijeron dónde vive cada uno.
+- Día 2 · noche · [OBVIO] Otra vez pórtico y compro una ración, para no gastar todo en el mesón ni llevar demasiado dinero.
+- Día 3 · Prima · [DECIDO] Con el pregón soy forastero y el alguacil en la plaza me sumaba Te buscan +2, pero necesitaba el jornal; trabajé con el 5, salió alguacil y gasté mi rumor en repetir el testigo. Salió nadie.
+- Día 3 · Sexta · [DECIDO] Con el cuerpo en 6 quise descansar en la ribera con el 3 en vez de juntarme con Ana; me vio el alguacil tirado y me subió vagancia y Te buscan.
+- Día 3 · Nona · [NADA] Solo me queda un 2 y en nona todo da −1 o tiene alguacil; lo guardo para el mesón en vísperas.
+- Día 3 · Vísperas · [DECIDO] En el mesón me junté con alguien nuevo por si vivía dentro de la muralla en vez de con Ana; salió otro 6, alguacil, y ya me buscan 3 de 6. Mala racha.
+- Día 3 · noche · [DECIDO] Tengo 2 raciones, así que gasto las 5 monedas en el mesón: no pierdo cuerpo, me libro de la ronda con Te buscan en 3 y gano un rumor.
+- Día 4 · Tercia · [DECIDO] Sin dinero y sin jornal por el Corpus, pedí en la catedral con el 6 (la plaza tenía más alguaciles) contando con el rumor para repetir. Salió alguacil, repetí y volvió a salir 6: me detienen.
+- Día 4 · noche · [DECIDO] Entre trabajo forzado (3 días parado y −3 de cuerpo) y la marca, elegí la marca para seguir libre y con cuerpo; me quitan las 5 monedas y me echan fuera hasta el día 8.
+- Día 5 · Prima · [NADA] Fuera de la muralla solo tengo el puente, y en prima pedir allí es casi seguro que me vea la guardia o el alguacil; espero.
+- Día 5 · Tercia · [OBVIO] Sin pan ni monedas, pedí en la ribera con un 6: solo 2 monedas y un rival me delató.
+- Día 5 · Sexta · [OBVIO] Volví a pedir con el otro 6 para juntar las 4 monedas del pan; las conseguí, pero me vio el alguacil y ya soy Reincidente con Te buscan 3.
+- Día 5 · Nona · [NADA] Con un 2 y Reincidente, cualquier cosa en la ribera arriesga alguacil; acabo el día y me escondo.
+- Día 5 · noche · [OBVIO] Solo puedo dormir en la ribera; compro la ración con las 4 monedas.
+- Día 6 · Tercia · [DECIDO] Pedir con el 4 en la ribera no daba nada; entre juntarme con Ana o descansar, descansé para recuperar cuerpo y salió bien: cuerpo 5.
+- Día 6 · Sexta · [NADA] Solo me queda un 1; juntarme con Ana no me da nada que necesite ahora y arriesga que la interroguen. Acabo el día.
+- Día 6 · noche · [OBVIO] Duermo con Ana, que vive fuera: techo y me da pan, aunque baja la relación a 2. Me arrepiento de no haber gastado el 1 en juntarme con ella antes; no sabía que me daría de comer.
+- Día 7 · Tercia · [OBVIO] Sin comida y fuera de la ciudad, mi único pan es Ana: me junto con ella con el 6 aunque el puente está lleno de alguaciles. Salió bien, relación 2 y un rumor.
+- Día 7 · Sexta · [OBVIO] Otra vez con Ana, con el 5: ya está en 3 para dormir con ella esta noche.
+- Día 7 · Nona · [DECIDO] Con el 1 podía descansar (el hambre no deja) o subir a Ana a 4; la subí para que tras compartir su pan siga en 3 mañana.
+- Día 7 · noche · [OBVIO] Duermo con Ana y como de su pan; era el plan de todo el día.
+- Día 8 · Tercia · [DECIDO] Descansar en la ribera solo sale con un 4 y entrar a la ciudad por el hospital me expone a la guardia dos veces; prefiero seguir con Ana, que me da techo y pan.
+- Día 8 · Tercia · [DECIDO] Me junté con Ana con el 6 y nos vio un alguacil; gasté un rumor en repetir y volvió a salir alguacil. Esta noche la interrogan.
+- Día 8 · Sexta · [DECIDO] Como a Ana la iban a interrogar igual, me junté otra vez con el 5 para subirla a 5 y que no hable; volvió a verme el alguacil pero no gasto rumor, ya no cambia nada.
+- Día 8 · Nona · [DECIDO] El 2 no servía para pedir ni descansar; lo gasté en estar con Ana otra vez para que me sea fiel en el interrogatorio.
+- Día 8 · noche · [NO ENTIENDO] La última vez con Ana ponía «relación +1» pero sigue en 5; supongo que 5 es el tope, pero no lo dice. Duermo con ella, con tormenta no hay otra.
+- Día 9 · Tercia · [DECIDO] Sin Ana (se la llevaron) y sin pan, fuera no tengo nada; entro en la ciudad aunque me pare la guardia, para pedir en el mercado y dormir en el hospital.
+- Día 9 · Tercia · [DECIDO] Pedí en el mercado con un 5: 4 monedas, pero salió alguacil y me detenían; gasté un rumor y me libré.
+- Día 9 · Sexta · [DECIDO] Con el otro 5 podía volver a pedir en el mercado o ir a la sopa del convento; fui a la sopa porque allí no hay alguaciles. Me dieron una ración y el fraile me bajó el termómetro.
+- Día 9 · Vísperas · [DECIDO] Dejé pasar nona y gasté el 3 pidiendo en el oficio de la catedral para juntar dinero para mañana: 2 monedas, nadie malo me vio.
+- Día 9 · noche · [OBVIO] Duermo en el hospital: gratis, bajo techo, +2 de cuerpo y no me roban las 6 monedas; como la ración de la sopa.
+- Día 10 · Prima · [DECIDO] Hoy vence el pregón y me pillaron dentro; salir por la puerta es que me vea la guardia casi seguro y con 1 y 2 no saco nada. Prefiero no moverme en todo el día y llegar a la noche.
+- Día 10 · noche · [OBVIO] Solo me queda el pórtico; el pan está a 8 y tengo 6, así que paso hambre (−2 de cuerpo) pero llego vivo.

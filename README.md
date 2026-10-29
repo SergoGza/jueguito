@@ -30,7 +30,7 @@ Todo está en `rules.js` y la ayuda del juego lo explica.
 - **El día:** seis franjas (prima a completas) de seis ratos. Pedir ocupa una franja. Al acabar completas cierran la puerta de la muralla.
 - **El pan está dentro y los pobres duermen fuera, en la ribera** (en el puente no se puede dormir). Fuera de la muralla nadie da. Dentro, solo donde hay gente que no es pobre; si hay otros pobres pidiendo, os repartís lo que hay. Desde el día 6, el pan sube y la gente da menos.
 - **Lo que ves caduca.** La gente, los pobres y la ronda cambian al empezar cada franja. Lo demás lo sabes de cuando estuviste, y el mapa lo pinta más claro cuanto más viejo.
-- **Lo que recuerdas.** Un panel que hay que abrir guarda dónde y cuándo has visto a la ronda, por franjas, y dónde te ha parado. Es la forma de aprender su recorrido de costumbre, y lo que heredará el siguiente en el relevo.
+- **Lo que recuerdas** (botón «Recuerdos» de la cabecera). Un panel que hay que abrir guarda dónde y cuándo has visto a la ronda, por franjas, y dónde te ha parado. Es la forma de aprender su recorrido de costumbre, y lo que heredará el siguiente en el relevo.
 - **La ronda:** un recorrido de costumbre (plaza por la mañana, a sexta come, escuelas a nona, Rúa a vísperas, puerta al cerrar), desvíos al azar y, sobre todo, va donde avisan. Quien te ve pedir avisa; en la puerta, las Escuelas y San Martín, enseguida; en San Esteban, nadie.
   - Si te ve pedir, te detiene (con mucha gente, a veces no te ve). En B vigila todo su barrio, y el mapa lo pinta entero.
   - Si llegas a donde está, puede pararte: la primera vez te echa de la ciudad; si ya te conoce, te detiene.

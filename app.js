@@ -56,7 +56,7 @@
       <div class="top-row">
         <div class="top-title">Día ${s.dia} de ${R.DIAS} · ${esc(d.fecha)}<span>${esc(m.nombre)}${d.fiesta && d.tipo !== "domingo" ? " · " + esc(d.fiesta) : ""}</span></div>
         <div class="estado">${chips}</div>
-        <div class="top-btns"><button class="icon-btn" data-act="ayuda" aria-label="Cómo se juega">?</button>
+        <div class="top-btns">${s.fase === "dia" || s.fase === "amanecer" ? `<button class="icon-btn" data-act="recuerdo" aria-label="Lo que recuerdas">Recuerdos</button>` : ""}<button class="icon-btn" data-act="ayuda" aria-label="Cómo se juega">?</button>
         <button class="icon-btn" data-act="menu" aria-label="Menú">⋯</button></div>
       </div>
       ${barra}
@@ -104,7 +104,7 @@
     s.pedidoHoy.forEach((p) => (pedidos[p.lugar] = (pedidos[p.lugar] || 0) + 1));
     for (const l of R.LUGARES) {
       const m = s.memoria[l.id], ed = E.edad(s, m);
-      const op = [1, 0.75, 0.5, 0.35][ed.nivel];
+      const op = [1, 0.55, 0.4, 0.3][ed.nivel];
       const fill = m ? `var(--g${Math.max(0, Math.min(3, l.dentro ? m.da : 0))})` : "var(--surface)";
       const aqui = l.id === s.lugar;
       g += `<g class="nodo" data-mapa="${l.id}">`;
@@ -121,7 +121,7 @@
       g += `</g>`;
     }
     g += `</svg>`;
-    const ley = `<div class="leyenda" aria-hidden="true"><span><i style="background:var(--g3)"></i>mucha gente</span><span><i style="background:var(--g2)"></i>poca</span><span><i style="background:var(--g1)"></i>nadie que dé</span><span><i style="border-style:dashed"></i>sin ver</span><span style="color:var(--bad)">◆ ronda</span><span style="color:var(--bad)">◉ te vieron pedir hoy</span><span>Lo claro es lo visto hace rato.</span><span><b>Toca un sitio con borde discontinuo para ir.</b></span></div>`;
+    const ley = `<div class="leyenda" aria-hidden="true"><span><i style="background:var(--g3)"></i>mucha gente</span><span><i style="background:var(--g2)"></i>poca</span><span><i style="background:var(--g1)"></i>nadie que dé</span><span><i style="border-style:dashed"></i>sin ver</span><span style="color:var(--bad)">◆ ronda</span><span style="color:var(--bad)">◉ te vieron pedir hoy</span><span>••• otros pobres pidiendo</span><span>Lo que no ves ahora sale más claro: es de cuando lo viste y puede haber cambiado.</span><span><b>Toca un sitio con borde discontinuo para ir.</b></span></div>`;
     return `<div class="mapa">${g}${ley}</div>`;
   }
 
@@ -177,7 +177,7 @@
     else if (L[s.lugar].dentro) notas.push(`Te despiertas en un portal de ${L[s.lugar].nombre}.`);
     else notas.push("Te despiertas en la ribera.");
     h += `<div class="panel">${notas.map((x) => `<p>${esc(x)}</p>`).join("")}</div>`;
-    h += `<div class="btns">${btn("empezarDia", "Empezar el día", "", { cls: "primary" })}${s.dia > 1 ? btn("recuerdo", "Lo que recuerdas", "Dónde y cuándo has visto a la ronda", { cls: "secundario" }) : ""}</div></div>`;
+    h += `<div class="btns">${btn("empezarDia", "Empezar el día", "", { cls: "primary" })}</div></div>`;
     return h;
   }
 
@@ -268,7 +268,7 @@
     const o = E.opciones(s);
     const p = ui.pestana === "ciudad" ? "ciudad" : "acciones";
     let h = cabecera(true) + `<div class="juego pestana-${p}">`;
-    h += `<div class="col-mapa">${s.aviso ? `<p class="aviso ${s.aviso.tono || ""}">${esc(s.aviso.texto)}</p>` : ""}${mapa(o)}<div class="recuerdo-btn">${btn("recuerdo", "Lo que recuerdas", "dónde y cuándo has visto a la ronda", { cls: "secundario" })}</div><div class="barra-mapa">${barraAcciones(o)}</div></div>`;
+    h += `<div class="col-mapa">${s.aviso ? `<p class="aviso ${s.aviso.tono || ""}">${esc(s.aviso.texto)}</p>` : ""}${mapa(o)}<div class="barra-mapa">${barraAcciones(o)}</div></div>`;
     h += `<nav class="pestanas" aria-label="Paneles">
       <button class="pestana${p === "acciones" ? " act" : ""}" data-act="pestana" data-id="acciones">Aquí</button>
       <button class="pestana${p === "ciudad" ? " act" : ""}" data-act="pestana" data-id="ciudad">La ciudad</button></nav>`;

@@ -13,6 +13,8 @@
 //   veterano   conoce los horarios de la gente y el recorrido de costumbre de la ronda (lo que aprende un jugador en
 //              unas partidas). Elige adónde ir por lo que espera sacar menos el riesgo. Arriesga más.
 //   prudente   como el veterano, pero pesa el triple el riesgo de la ronda.
+//   dentro-listo   como el veterano, pero duerme siempre dentro de la muralla, buscando un sitio sin quejas que él sepa.
+//   dentro-ciego   como el veterano, pero duerme siempre dentro, donde le pille la noche.
 // Todos cenan una ración entera si pueden.
 const path = require("path");
 const RAIZ = path.resolve(__dirname, "..");
@@ -105,13 +107,26 @@ function valor(s, l, f, lambda) {
   if (s.pedidoHoy.some((p) => p.lugar === l)) pr += 0.4;
   return ev - pr * (g >= 3 ? 0.5 : 1) * lambda;
 }
-function veterano(s, rnd, g, lambda) {
+// dormir dentro: buscar, con lo que ha visto hoy, un sitio sin quejas; «ciego» duerme donde le pille
+function dormirDentro(s, ciego) {
+  if (ciego || !E.L[s.lugar].dentro) return E.L[s.lugar].dentro ? E.acabarDia(s) : volver(s);
+  const malo = (l) => E.saberNoche(s, l).filter((x) => !x.startsWith("Que tú sepas")).length;
+  if (malo(s.lugar) === 0) return E.acabarDia(s);
+  const o = E.opciones(s);
+  const mejor = o.movs.filter((mv) => mv.ok && E.L[mv.destino].dentro && mv.coste <= o.quedan).sort((a, b) => malo(a.destino) - malo(b.destino))[0];
+  if (mejor && malo(mejor.destino) < malo(s.lugar)) return E.mover(s, mejor.destino);
+  return E.acabarDia(s);
+}
+function veterano(s, rnd, g, lambda, dentro) {
   const o = E.opciones(s);
   const m = R.MODOS[s.modo];
   const f = E.franja(s.t);
   const dr = costes(s, s.lugar);
   if (g.libres > 4) return E.esperar(s);
-  if (o.quedan <= dr.ribera + (m.zona === "lugar" ? 1 : 0) || (s.t >= 30 && s.pan >= 2) || s.pan >= 4) return volver(s);
+  if (dentro && E.L[s.lugar].dentro && (o.quedan <= (m.zona === "lugar" ? 4 : 6) || (s.t >= 30 && s.pan >= 2))) return dormirDentro(s, dentro === "ciego");
+  if (!dentro || !E.L[s.lugar].dentro) {
+    if (o.quedan <= dr.ribera + (m.zona === "lugar" ? 1 : 0) || (s.t >= 30 && s.pan >= 2) || s.pan >= 4) return volver(s);
+  }
   const r = E.rondaEnTuZona(s);
   const tr = o.acc.find((x) => x.id === "trabajo");
   if (tr && tr.ok && s.cuerpo >= 4) return E.pedirTrabajo(s);
@@ -138,6 +153,8 @@ const BOTS = {
   novato,
   veterano: (s, rnd, g) => veterano(s, rnd, g, 1.5),
   prudente: (s, rnd, g) => veterano(s, rnd, g, 3),
+  "dentro-listo": (s, rnd, g) => veterano(s, rnd, g, 1.5, "listo"),
+  "dentro-ciego": (s, rnd, g) => veterano(s, rnd, g, 1.5, "ciego"),
 };
 
 // ------------------------------------------------------------------ partidas
@@ -163,7 +180,7 @@ function jugar(modo, bot, sem) {
 
 const pct = (x, n) => `${Math.round((100 * (x || 0)) / n)}`.padStart(3) + " %";
 console.log(`${N} partidas por bot y prueba · versión ${R.version}${Object.keys(pal).length ? " · palancas " + JSON.stringify(pal) : ""}\n`);
-console.log("prueba bot        | siega  sin siega | hambre  destierro  azotes | día   cuerpo* | pan/día  moverse  pasos o cruces/día  ronda al llegar/día");
+console.log("prueba bot           | siega  sin siega | hambre  destierro  azotes | día   cuerpo* | pan/día  moverse  pasos o cruces/día  ronda al llegar/día");
 for (const modo of ["A", "B"]) {
   for (const bot of Object.keys(BOTS)) {
     const fin = {}; let dias = 0, cuerpo = 0, llegan = 0, T = null;
@@ -177,7 +194,7 @@ for (const modo of ["A", "B"]) {
     }
     const ratos = T.mover + T.pedir + T.trabajar + T.esperar + T.perdido || 1;
     const mov = modo === "A" ? T.pasos : T.cruces;
-    console.log(`${modo}      ${bot.padEnd(10)} | ${pct(fin.siega, N)}  ${pct(fin.aguanta, N)}     | ${pct(fin.hambre, N)}  ${pct(fin.desterrado, N)}      ${pct(fin.muerto, N)} | ${(dias / N).toFixed(1).padStart(4)}  ${llegan ? (cuerpo / llegan).toFixed(1) : " — "}     | ${((T.panPedido + T.panTrabajo) / dias).toFixed(2).padStart(5)}    ${pct(T.mover, ratos)}   ${(mov / dias).toFixed(1).padStart(4)}                ${(T.encuentros / dias).toFixed(2)}`);
+    console.log(`${modo}      ${bot.padEnd(13)} | ${pct(fin.siega, N)}  ${pct(fin.aguanta, N)}     | ${pct(fin.hambre, N)}  ${pct(fin.desterrado, N)}      ${pct(fin.muerto, N)} | ${(dias / N).toFixed(1).padStart(4)}  ${llegan ? (cuerpo / llegan).toFixed(1) : " — "}     | ${((T.panPedido + T.panTrabajo) / dias).toFixed(2).padStart(5)}    ${pct(T.mover, ratos)}   ${(mov / dias).toFixed(1).padStart(4)}                ${(T.encuentros / dias).toFixed(2)}`);
   }
   console.log("");
 }

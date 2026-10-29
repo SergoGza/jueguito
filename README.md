@@ -1,4 +1,4 @@
-# Liber Vagatorum · el juguete (j0.4)
+# Liber Vagatorum · el juguete (j0.5)
 
 Prueba mínima del núcleo del juego, tras el replanteamiento de octubre de 2026: **un mendigo, una necesidad (el hambre) y una amenaza (la ronda)**. Nada más: ni los tuyos, ni el relevo, ni tretas, ni exámenes. Si el núcleo solo no obliga a exponerse para comer, los sistemas de encima no lo van a arreglar.
 
@@ -37,7 +37,7 @@ Todo está en `rules.js` y la ayuda del juego lo explica.
   - Quieto, no te para.
 - **Detenciones:** cárcel y sin pan; la segunda, azotes; la tercera, destierro (fin).
 - **Trabajo:** las obras de la catedral cogen peones a prima los días laborables, por 2 pedazos y cansancio (−1 de cuerpo esa noche). Con el cuerpo bajo es más difícil que te cojan. Ninguna de las dos cosas se dice antes: se aprende («Tus brazos no me valen, muchacho»). Desde la ribera no se llega a tiempo: hay que haber dormido dentro.
-- **La noche:** ración entera (2 pedazos) +1 de cuerpo, media −1, nada −2. Dormir dentro ahorra el camino de la mañana, pero la ronda de noche puede encontrarte.
+- **La noche:** ración entera (2 pedazos) +1 de cuerpo, media −1, nada −2. Dormir dentro ahorra el camino, pero la ronda de noche va donde ha habido quejas: donde te vieron pedir ese día (1 de 3; fichado, 1 de 2), donde otros pobres pidieron en dos franjas o más (1 de 6; fichado, 1 de 4) y, donde nadie se quejó, menos (1 de 12; fichado, 1 de 8). En B cuenta el barrio entero. El juego solo te dice lo que sabes: si te vieron pedir y si viste otros pobres; las cifras no.
 - **Objetivo:** aguantar diez días (1 a 10 de junio de 1545; el 4 es Corpus Christi y el 7, domingo) hasta la siega, que empieza el 11. En la siega el mayoral coge segadores según el cuerpo (con 4 o más, seguro; con 3, a veces; con menos, no). La cifra no se dice: «Tus brazos no me valen». Así, llegar con lo justo no es lo mismo que llegar entero.
 
 **Licencias históricas** (también en la ayuda): la ronda y su recorrido son invención; que en San Esteban nadie avise sale de que Soto, su prior, escribió contra la orden, sin documento que lo diga; la limosna va en pan y no en dinero para no meter el mercado en esta prueba; las cifras son del juego.
@@ -67,8 +67,8 @@ El correo de destino está en `rules.js` (`CONFIG.email`); en GitHub Pages queda
 
 Todo en `rules.js`. **Cada vez que cambies algo, sube la versión en dos sitios**, o los móviles seguirán con la copia vieja:
 
-1. `rules.js` → `version: "j0.4"`, por ejemplo a `"j0.5"`.
-2. `sw.js` → `const VERSION = "lv-j0.4-1"`, por ejemplo a `"lv-j0.5-1"`.
+1. `rules.js` → `version: "j0.5"`, por ejemplo a `"j0.6"`.
+2. `sw.js` → `const VERSION = "lv-j0.5-1"`, por ejemplo a `"lv-j0.6-1"`.
 
 ## Probarlo en local
 
@@ -80,5 +80,5 @@ y abre `http://localhost:8000`. Con `?semilla=7` la partida nueva sale siempre i
 
 ## Herramientas
 
-- `herramientas/bot.js`: cinco bots (escondido, azar, novato, veterano, prudente) que juegan miles de partidas con el motor real y sacan porcentajes por prueba. `node herramientas/bot.js 1000`. Admite palancas para probar cambios sin tocar `rules.js`. No son personas: sirven para ver si una regla rompe algo, no para fijar la dificultad.
+- `herramientas/bot.js`: siete bots (escondido, azar, novato, veterano, prudente y dos que duermen siempre dentro: uno elige dónde y otro no) que juegan miles de partidas con el motor real y sacan porcentajes por prueba. `node herramientas/bot.js 1000`. Admite palancas para probar cambios sin tocar `rules.js`. No son personas: sirven para ver si una regla rompe algo, no para fijar la dificultad.
 - `herramientas/agentes/`: agentes de Claude que juegan la app real y escriben un diario (`/agentes prueba` desde Claude Code). Ver su README.

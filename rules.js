@@ -150,7 +150,12 @@
     // llegas a donde está la ronda: probabilidad de que te paren
     pararAlLlegar: { desconocido: 1 / 4, conocido: 1 / 3 },
     // dormir dentro de la muralla (en un portal): la ronda de noche
-    nocheDentro: { desconocido: 1 / 4, conocido: 1 / 2 },
+    // dormir dentro de la muralla: la ronda de noche va donde hubo quejas (de ti o de otros pobres)
+    //  vigilada: hoy te vieron pedir en tu sitio (A) o en tu barrio (B)
+    //  pobres: hoy hubo otros pobres pidiendo ahí en 2 franjas o más (lo sabes solo si lo viste)
+    //  tranquila: lo demás. Cada par: [sin fichar, fichado]
+    nocheDentro: { vigilada: [1 / 3, 1 / 2], pobres: [1 / 6, 1 / 4], tranquila: [1 / 12, 1 / 8] },
+    nochePobresFranjas: 2,
     // obras: cogen peones a prima, los días de trabajo
     trabajo: { pedirRatos: 1, probPorCuerpo: { 6: 0.5, 5: 0.5, 4: 0.5, 3: 0.25 }, hasta: 4, paga: 2, cansancio: 1 },
     // cena: pedazos de pan que comes → cambio de cuerpo
@@ -170,7 +175,7 @@
   ];
 
   window.RULES = {
-    version: "j0.4", CONFIG, FRANJAS, RATOS, DIAS, MODOS, BARRIOS, LUGARES, CAMINOS, CALENDARIO, DIAS_SENALADOS,
+    version: "j0.5", CONFIG, FRANJAS, RATOS, DIAS, MODOS, BARRIOS, LUGARES, CAMINOS, CALENDARIO, DIAS_SENALADOS,
     RONDA, PARAMS, LICENCIAS,
     // la mesa de los agentes pregunta por PERSONAJES: en el juguete, cada «personaje» es una prueba
     PERSONAJES: [

@@ -423,6 +423,33 @@
     if (s.bajaRibera) s.lugar = "ribera";
   }
 
+  // la noche dentro de la muralla: dónde ha habido quejas hoy en tu zona (la tuya o la de otros pobres)
+  function riesgoNoche(s) {
+    const zona = lugaresZona(s, zonaDe(s, s.lugar));
+    const vigilada = s.pedidoHoy.some((p) => zona.includes(p.lugar));
+    let pobres = 0;
+    for (const l of zona) {
+      if (!L[l].dentro) continue;
+      let k = 0;
+      for (let f = 0; f < R.FRANJAS.length; f++) if (estado(s, l, s.dia, f).pobres) k++;
+      pobres = Math.max(pobres, k);
+    }
+    const nivel = vigilada ? "vigilada" : pobres >= P.nochePobresFranjas ? "pobres" : "tranquila";
+    return { nivel, vigilada, pobres };
+  }
+  // lo que sabe el jugador de su sitio para dormir (sin cifras): solo lo que vio
+  function saberNoche(s, lugar) {
+    const l = lugar || s.lugar;
+    if (!L[l].dentro) return [];
+    const zona = lugaresZona(s, zonaDe(s, l));
+    const out = [];
+    if (s.pedidoHoy.some((p) => zona.includes(p.lugar))) out.push(zona.length > 1 ? "Hoy te vieron pedir en este barrio: los vecinos se habrán quejado." : "Hoy te vieron pedir aquí: los vecinos se habrán quejado.");
+    const vistos = zona.filter((id) => { const m = s.memoria[id]; return m && m.dia === s.dia && m.pobres; });
+    if (vistos.length) out.push(`Hoy has visto otros pobres pidiendo ${zona.length > 1 ? "en este barrio" : "aquí"}: la ronda de noche también va a por ellos.`);
+    if (!out.length) out.push("Que tú sepas, aquí nadie se ha quejado hoy.");
+    return out;
+  }
+
   function cenar(s, n) {
     if (s.fase !== "noche") return false;
     const lin = [];
@@ -439,13 +466,16 @@
       lin.push(comido === 2 ? "Cenas una ración entera." : comido === 1 ? "Cenas media ración." : "Te acuestas sin cenar.");
       if (s.trabajoHoy) { dc -= P.trabajo.cansancio; lin.push("Estás molido del trabajo."); }
       if (s.duerme === "portal") {
-        const p = s.conocido ? P.nocheDentro.conocido : P.nocheDentro.desconocido;
+        const rn = riesgoNoche(s);
+        const p = P.nocheDentro[rn.nivel][s.conocido ? 1 : 0];
+        s.hoy.nocheNivel = rn.nivel;
         if (tirar(s, "noche") < p) {
           detenidoNoche = true;
           s.detenciones++;
           s.conocido = true;
           const pan = s.pan; s.pan = 0;
           lin.push(`De madrugada, la ronda te encuentra durmiendo en un portal de ${L[s.lugar].nombre}. Te llevan a la cárcel${pan ? " y te quitan el pan" : ""}.`);
+          lin.push(rn.nivel === "vigilada" ? "Los vecinos se habían quejado de ti: te vieron pedir aquí." : rn.nivel === "pobres" ? "Venían a por los pobres que piden por aquí, y te llevaron con ellos." : "Era la ronda de costumbre. Mala suerte.");
           apunta(s, "detenido", `Detenido de noche en ${L[s.lugar].corto}. Detención ${s.detenciones} de ${P.detencionesMax}.`, { motivo: "de noche" });
           if (s.detenciones === 2) { dc += P.carcel.azotes; azotes = true; lin.push(`Detención 2 de ${P.detencionesMax}: te azotan. A la tercera, destierro.`); }
           else if (s.detenciones === 1) lin.push(`Detención 1 de ${P.detencionesMax}. A la segunda, azotes; a la tercera, destierro. Ya te tienen fichado.`);
@@ -454,7 +484,7 @@
     }
     s.cuerpo = clamp(s.cuerpo + dc, 0, P.cuerpoMax);
     s.porDia.push(Object.assign({ dia: s.dia, modo: s.modo, cuerpoNoche: s.cuerpo, comido, duerme: s.duerme, detenido: s.detenidoHoy || (detenidoNoche ? "de noche" : null) }, s.hoy, { lugares: Object.keys(s.hoy.lugares).length }));
-    apunta(s, "noche", `Noche (${DUERME[s.duerme]}): come ${comido}, cuerpo ${antes} → ${s.cuerpo}.`);
+    apunta(s, "noche", `Noche (${DUERME[s.duerme]}${s.hoy.nocheNivel ? ", " + s.hoy.nocheNivel : ""}): come ${comido}, cuerpo ${antes} → ${s.cuerpo}.`);
     s.noche = { lineas: lin, antes, despues: s.cuerpo, dia: s.dia, detenido: s.duerme === "carcel" || detenidoNoche };
     // finales
     if (s.detenciones >= P.detencionesMax) {
@@ -555,7 +585,7 @@
     FIN, L, VECINOS, DEL_BARRIO, CRUCES, BARRIO, GENTE_TXT, FINALES,
     franja, ratoEnFranja, nombreFranja, dia, estado, zonaDe, lugaresZona, rondaAhora, rondaEnTuZona, edad,
     nueva, opciones, previsionPedir, mover, pedir, pedirTrabajo, esperar, acabarDia, seguir, comprobarNoche, cenar,
-    informe, resumenDias, momentoTxt,
+    informe, resumenDias, momentoTxt, riesgoNoche, saberNoche,
     empezarJornada(s) { if (s.fase === "amanecer") { s.fase = "dia"; s.noche = null; } },
   };
 })();

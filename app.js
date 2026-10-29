@@ -80,7 +80,10 @@
         const x0 = Math.min(...ls.map((l) => l.x)) - 26, x1 = Math.max(...ls.map((l) => l.x)) + 26;
         const y0 = Math.min(...ls.map((l) => l.y)) - 24, y1 = Math.max(...ls.map((l) => l.y)) + 28;
         const mio = b.id === L[s.lugar].barrio;
-        g += `<rect x="${x0}" y="${y0}" width="${x1 - x0}" height="${y1 - y0}" rx="16" fill="var(--barrio)" stroke="${mio ? "var(--accent)" : "var(--line)"}" stroke-width="${mio ? 2 : 1}" stroke-dasharray="${mio ? "" : "4 3"}"/>`;
+        // la ronda vigila todo su barrio: si la ves ahora en él, se pinta el barrio entero
+        const vigilado = E.DEL_BARRIO[b.id].some((id) => { const m = s.memoria[id]; return m && m.ronda && E.edad(s, m).nivel === 0; });
+        g += `<rect x="${x0}" y="${y0}" width="${x1 - x0}" height="${y1 - y0}" rx="16" fill="${vigilado ? "var(--bad-bg)" : "var(--barrio)"}" stroke="${vigilado ? "var(--bad)" : mio ? "var(--accent)" : "var(--line)"}" stroke-width="${mio || vigilado ? 2 : 1}" stroke-dasharray="${mio || vigilado ? "" : "4 3"}"/>`;
+        if (vigilado) g += `<text x="${x1 - 8}" y="${y1 - 6}" font-size="9.5" fill="var(--bad)" font-weight="700" text-anchor="end">vigilado</text>`;
         g += `<text x="${x0 + 8}" y="${y0 + 12}" font-size="9.5" fill="var(--muted)" font-weight="700">${esc(b.nombre)}</text>`;
       }
     }
@@ -167,9 +170,8 @@
     if (s.lugar === "puerta" && s.cronica.some((c) => c.dia === s.dia - 1 && c.tipo === "detenido")) notas.push("Te sueltan al amanecer en la Puerta del Río.");
     else if (L[s.lugar].dentro) notas.push(`Te despiertas en un portal de ${L[s.lugar].nombre}.`);
     else notas.push("Te despiertas en la ribera.");
-    if (s.cuerpo <= 2) notas.push("Estás débil: en las obras no te cogerán.");
     h += `<div class="panel">${notas.map((x) => `<p>${esc(x)}</p>`).join("")}</div>`;
-    h += `<div class="btns">${btn("empezarDia", "Empezar el día", "", { cls: "primary" })}</div></div>`;
+    h += `<div class="btns">${btn("empezarDia", "Empezar el día", "", { cls: "primary" })}${s.dia > 1 ? btn("recuerdo", "Lo que recuerdas", "Dónde y cuándo has visto a la ronda", { cls: "secundario" }) : ""}</div></div>`;
     return h;
   }
 
@@ -190,6 +192,7 @@
       }
       h += `</ul>`;
       if (!r) h += `<p class="small">No ves a la ronda${zona.length > 1 ? " en el barrio" : " aquí"}.</p>`;
+      else if (zona.length > 1) h += `<p class="small ronda-txt">La ronda está en ${esc(L[r].nombre)} y vigila todo el barrio.</p>`;
       const vistos = s.pedidoHoy.filter((p) => p.lugar === s.lugar);
       if (vistos.length) h += `<p class="small ronda-txt">Hoy te han visto pedir aquí (${vistos.map((p) => R.FRANJAS[p.f].nombre.toLowerCase()).join(", ")}).</p>`;
     }
@@ -250,7 +253,7 @@
     const o = E.opciones(s);
     const p = ui.pestana === "ciudad" ? "ciudad" : "acciones";
     let h = cabecera(true) + `<div class="juego pestana-${p}">`;
-    h += `<div class="col-mapa">${s.aviso ? `<p class="aviso ${s.aviso.tono || ""}">${esc(s.aviso.texto)}</p>` : ""}${mapa(o)}</div>`;
+    h += `<div class="col-mapa">${s.aviso ? `<p class="aviso ${s.aviso.tono || ""}">${esc(s.aviso.texto)}</p>` : ""}${mapa(o)}<div class="btns">${btn("recuerdo", "Lo que recuerdas", "Dónde y cuándo has visto a la ronda", { cls: "secundario" })}</div></div>`;
     h += `<nav class="pestanas" aria-label="Paneles">
       <button class="pestana${p === "acciones" ? " act" : ""}" data-act="pestana" data-id="acciones">Qué haces</button>
       <button class="pestana${p === "ciudad" ? " act" : ""}" data-act="pestana" data-id="ciudad">La ciudad</button></nav>`;
@@ -316,17 +319,40 @@
       <p>Eres un pobre forastero en Salamanca, en junio de 1545. Desde la orden de pobres del año pasado, pedir en la ciudad está prohibido. Duermes fuera de la muralla, en la ribera; el pan está dentro. <b>Objetivo: aguantar diez días.</b></p>
       <h3>El día</h3><p>Seis franjas, de prima a completas, de seis ratos cada una. Pedir ocupa una franja entera. Al acabar completas cierran la puerta de la muralla: quien se queda dentro duerme en un portal.</p>
       <h3>Moverte</h3>${mover.join("")}
-      <h3>Lo que ves</h3><p>La gente, los otros pobres y la ronda cambian al empezar cada franja. Lo que viste vale para la franja en que lo viste. En el mapa, lo visto hace rato se ve más claro.</p>
+      <h3>Lo que ves</h3><p>La gente, los otros pobres y la ronda cambian al empezar cada franja. Lo que viste vale para la franja en que lo viste. En el mapa, lo visto hace rato se ve más claro. En «Lo que recuerdas» tienes dónde y cuándo has visto a la ronda.</p>
       <h3>Pedir</h3><p>Solo dentro de la muralla y donde hay gente que dé. Con mucha gente suele caer algo; con poca, muchas veces nada; si hay otros pobres pidiendo, os repartís lo que hay. Desde el día ${P.escasezDesde}, el pan sube y la gente da menos.</p>
       <p>Quien te ve pedir puede avisar a la ronda, y la ronda suele ir luego allí. En la puerta, las Escuelas y San Martín avisan enseguida; en San Esteban, nadie.</p>
       <h3>La ronda</h3><p>Un alguacil con sus corchetes. Tiene un recorrido de costumbre, a veces se desvía, acude adonde le avisan y a sexta se va a comer.</p>
       <p>Si te ve pedir, te detiene (con mucha gente, a veces no te ve). Si llegas a donde está, puede pararte: la primera vez te echa de la ciudad; si ya te conoce, te detiene. Si estás quieto cuando llega, no te para, pero no pidas delante de ella. Si empiezas a pedir a mitad de franja, puede llegar mientras pides.</p>
       <h3>Detenciones</h3><p>Noche en la cárcel y te quitan el pan. La segunda vez, además, azotes. La tercera, destierro: se acaba la partida.</p>
-      <h3>Trabajar</h3><p>Las obras de la catedral cogen peones a prima los días de trabajo. Si te cogen, cargas piedra hasta el final de nona por ${P.trabajo.paga} pedazos de pan, y por la noche estás más cansado. Con el cuerpo bajo no te cogen.</p>
+      <h3>Trabajar</h3><p>Las obras de la catedral cogen peones a prima los días de trabajo. Si te cogen, cargas piedra hasta el final de nona por ${P.trabajo.paga} pedazos de pan.</p>
       <h3>La noche</h3><p>Una ración son 2 pedazos de pan. Ración entera: +1 de cuerpo. Media: −1. Nada: −2. Puedes guardar hasta ${P.panMax} pedazos. Si el cuerpo llega a 0, mueres.</p>
       <h3>Lo que sabe cualquiera en Salamanca</h3><p>Las iglesias se llenan a la hora de misa (prima) y a vísperas. El mercado de la plaza, por la mañana. Los estudiantes salen a tercia y a nona. A vísperas, la gente pasea por la Rúa. El jueves 4 es Corpus Christi; el 7, domingo.</p>
       <h3>Licencias históricas</h3><ul class="small">${R.LICENCIAS.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>
       <div class="btns">${btn("cerrar", "Cerrar", "", { cls: "primary" })}</div></div>`;
+  }
+  // lo que el mozo recuerda: no lo lleva escrito, lo ha visto con sus ojos
+  function recuerdoHtml() {
+    const corto = (d) => R.CALENDARIO[d - 1].fecha.split(" de ")[0];
+    const vistas = s.vistas || [];
+    let h = `<div class="modal-in"><h2>Lo que recuerdas</h2><p class="small muted">No lo llevas escrito: es lo que has visto con tus ojos.</p><h3>Dónde has visto a la ronda</h3>`;
+    if (!vistas.length) h += `<p>Todavía no la has visto.</p>`;
+    else {
+      h += `<ul class="ciudad">`;
+      R.FRANJAS.forEach((fr, f) => {
+        const porLugar = {};
+        vistas.filter((v) => v.f === f).forEach((v) => (porLugar[v.lugar] = porLugar[v.lugar] || []).push(v.dia));
+        const items = Object.entries(porLugar).sort((a, b) => b[1].length - a[1].length)
+          .map(([l, dias]) => `<b>${esc(L[l].corto)}</b> (${dias.map(corto).join(", ")})`);
+        h += `<li><b>${fr.nombre}:</b> ${items.length ? items.join(" · ") : `<span class="muted">no la has visto</span>`}</li>`;
+      });
+      h += `</ul>`;
+    }
+    const malos = s.cronica.filter((c) => c.tipo === "echado" || c.tipo === "detenido");
+    if (malos.length) {
+      h += `<h3>Dónde te ha parado</h3><ul class="ciudad">${malos.map((c) => `<li>${esc(corto(c.dia))}, ${esc(E.momentoTxt(c.t).split(" ")[0].toLowerCase())}: ${esc(c.texto)}</li>`).join("")}</ul>`;
+    }
+    return h + `<div class="btns">${btn("cerrar", "Cerrar", "", { cls: "primary" })}</div></div>`;
   }
   function menuHtml() {
     const enJuego = s && ui.pantalla === "juego" && s.fase !== "fin";
@@ -409,6 +435,7 @@
     nueva() { ui.pantalla = "inicio"; },
     inicio() { cerrarModal(); ui.pantalla = "inicio"; },
     ayuda() { abrirModal(ayudaHtml()); return "modal"; },
+    recuerdo() { s.recuerdaAbierto = (s.recuerdaAbierto || 0) + 1; store(LS.partida, s); abrirModal(recuerdoHtml()); return "modal"; },
     menu() { abrirModal(menuHtml()); return "modal"; },
     cerrar() { cerrarModal(); return "modal"; },
     tema() {

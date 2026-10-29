@@ -1,4 +1,4 @@
-# Liber Vagatorum · el juguete (j0.1)
+# Liber Vagatorum · el juguete (j0.2)
 
 Prueba mínima del núcleo del juego, tras el replanteamiento de octubre de 2026: **un mendigo, una necesidad (el hambre) y una amenaza (la ronda)**. Nada más: ni los tuyos, ni el relevo, ni tretas, ni exámenes. Si el núcleo solo no obliga a exponerse para comer, los sistemas de encima no lo van a arreglar.
 
@@ -30,12 +30,13 @@ Todo está en `rules.js` y la ayuda del juego lo explica.
 - **El día:** seis franjas (prima a completas) de seis ratos. Pedir ocupa una franja. Al acabar completas cierran la puerta de la muralla.
 - **El pan está dentro y los pobres duermen fuera.** Fuera de la muralla nadie da. Dentro, solo donde hay gente que no es pobre; si hay otros pobres pidiendo, os repartís lo que hay. Desde el día 6, el pan sube y la gente da menos.
 - **Lo que ves caduca.** La gente, los pobres y la ronda cambian al empezar cada franja. Lo demás lo sabes de cuando estuviste, y el mapa lo pinta más claro cuanto más viejo.
+- **Lo que recuerdas.** Un panel que hay que abrir guarda dónde y cuándo has visto a la ronda, por franjas, y dónde te ha parado. Es la forma de aprender su recorrido de costumbre, y lo que heredará el siguiente en el relevo.
 - **La ronda:** un recorrido de costumbre (plaza por la mañana, a sexta come, escuelas a nona, Rúa a vísperas, puerta al cerrar), desvíos al azar y, sobre todo, va donde avisan. Quien te ve pedir avisa; en la puerta, las Escuelas y San Martín, enseguida; en San Esteban, nadie.
-  - Si te ve pedir, te detiene (con mucha gente, a veces no te ve).
+  - Si te ve pedir, te detiene (con mucha gente, a veces no te ve). En B vigila todo su barrio, y el mapa lo pinta entero.
   - Si llegas a donde está, puede pararte: la primera vez te echa de la ciudad; si ya te conoce, te detiene.
   - Quieto, no te para.
 - **Detenciones:** cárcel y sin pan; la segunda, azotes; la tercera, destierro (fin).
-- **Trabajo:** las obras de la catedral cogen peones a prima los días laborables, por 2 pedazos y cansancio. Desde la ribera no se llega a tiempo: hay que haber dormido dentro.
+- **Trabajo:** las obras de la catedral cogen peones a prima los días laborables, por 2 pedazos y cansancio (−1 de cuerpo esa noche). Con el cuerpo bajo es más difícil que te cojan. Ninguna de las dos cosas se dice antes: se aprende («Tus brazos no me valen, muchacho»). Desde la ribera no se llega a tiempo: hay que haber dormido dentro.
 - **La noche:** ración entera (2 pedazos) +1 de cuerpo, media −1, nada −2. Dormir dentro ahorra el camino de la mañana, pero la ronda de noche puede encontrarte.
 - **Objetivo:** aguantar diez días (1 a 10 de junio de 1545; el 4 es Corpus Christi y el 7, domingo).
 
@@ -56,8 +57,8 @@ El correo de destino está en `rules.js` (`CONFIG.email`); en GitHub Pages queda
 
 Todo en `rules.js`. **Cada vez que cambies algo, sube la versión en dos sitios**, o los móviles seguirán con la copia vieja:
 
-1. `rules.js` → `version: "j0.1"`, por ejemplo a `"j0.2"`.
-2. `sw.js` → `const VERSION = "lv-j0.1-1"`, por ejemplo a `"lv-j0.2-1"`.
+1. `rules.js` → `version: "j0.2"`, por ejemplo a `"j0.3"`.
+2. `sw.js` → `const VERSION = "lv-j0.2-1"`, por ejemplo a `"lv-j0.3-1"`.
 
 ## Probarlo en local
 

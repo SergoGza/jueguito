@@ -30,6 +30,7 @@ Después, en cada paso:
 - `python3 herramientas/agentes/mesa.py ver <carpeta>` vuelve a enseñar la pantalla si la necesitas.
 - La pantalla trae al final `=== LO QUE PUEDES PULSAR ===` con el título de cada botón; el detalle está arriba, en la propia pantalla. Lo marcado `[–]` no está disponible y dice por qué. «Cómo se juega» abre la ayuda y no gasta nada: la ventana sale sola y se cierra con tu siguiente orden.
 - El mapa de la ciudad no se ve en la mesa; lo mismo está en texto en «La ciudad: lo que sabes».
+- «Lo que recuerdas» abre lo que tu personaje ha visto de la ronda (dónde y cuándo). No gasta nada, como la ayuda.
 - Si la app pide confirmación, la mesa la acepta y te lo dice.
 - Tras pedir, trabajar o si te para la ronda, sale una pantalla de resultado con «Seguir».
 

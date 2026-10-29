@@ -103,7 +103,12 @@
   function observar(s) {
     if (s.t >= FIN) return;
     const f = franja(s.t), r = rondaAhora(s);
-    for (const id of lugaresZona(s, zonaDe(s, s.lugar))) {
+    const zona = lugaresZona(s, zonaDe(s, s.lugar));
+    if (r && zona.includes(r)) {
+      s.vistas = s.vistas || [];
+      if (!s.vistas.some((v) => v.dia === s.dia && v.f === f)) s.vistas.push({ dia: s.dia, f, lugar: r });
+    }
+    for (const id of zona) {
       const e = estado(s, id, s.dia, f);
       s.memoria[id] = { dia: s.dia, f, gente: e.gente, pobres: e.pobres, da: e.da, trabajo: e.trabajo, ronda: r === id };
     }
@@ -125,7 +130,7 @@
       empezada: new Date().toISOString(),
       dia: 1, t: 0, fase: "amanecer", lugar: "ribera",
       cuerpo: P.cuerpoInicial, pan: P.panInicial, detenciones: 0, conocido: false,
-      avisos: {}, avisosT: {}, rondas: {}, rondasPorque: {}, memoria: {}, pedidoHoy: [],
+      avisos: {}, avisosT: {}, rondas: {}, rondasPorque: {}, memoria: {}, pedidoHoy: [], vistas: [], recuerdaAbierto: 0,
       trabajoHoy: false, trabajoPedido: false, detenidoHoy: null, duerme: null,
       n: 0, final: null, ultimo: null, aviso: null, noche: null,
       cronica: [], hoy: null, porDia: [], encuesta: {},
@@ -203,7 +208,6 @@
       let pt = "";
       if (!e || !e.trabajo) pt = R.CALENDARIO[s.dia - 1].tipo !== "laborable" ? "hoy es fiesta: no hay obra" : "solo cogen peones a prima";
       else if (s.trabajoPedido) pt = "ya has preguntado hoy";
-      else if (!(P.trabajo.probPorCuerpo[s.cuerpo] > 0)) pt = "estás demasiado débil: no te cogen";
       acc.push({ id: "trabajo", ok: !pt, porque: pt, coste: P.trabajo.pedirRatos });
     }
     acc.push({ id: "esperar", ok: quedan > 0, porque: quedan > 0 ? "" : "", coste: quedan > 0 ? R.RATOS - (s.t % R.RATOS) : 0 });
@@ -218,7 +222,10 @@
     if (e.da >= 3) out.push("Mucha gente: suele caer algo, a veces dos pedazos.");
     else if (e.da === 2) out.push(e.pobres ? "Hay más pobres pidiendo: os repartís lo que hay. Muchas veces, nada." : "Poca gente: muchas veces, nada.");
     const r = rondaEnTuZona(s);
-    if (r) out.push(r === s.lugar ? `La ronda está aquí: si pides, te detienen${e.da >= 3 ? " (con tanta gente, puede que no te vea)" : ""}.` : `La ronda está en el barrio (${L[r].corto}): si pides, te detienen${e.da >= 3 ? " (con tanta gente, puede que no te vea)" : ""}.`);
+    if (r) {
+      const salvo = e.da >= 3 ? " (con tanta gente, puede que no te vea)" : "";
+      out.push(r === s.lugar ? `La ronda está aquí: si pides, te ve y te detiene${salvo}.` : `La ronda está en ${L[r].nombre} y vigila todo el barrio: si pides en cualquier sitio de él, te ve y te detiene${salvo}.`);
+    }
     const a = L[s.lugar].aviso;
     if (a === 0) out.push("Aquí nadie avisa a la ronda.");
     else if (a >= 2) out.push("Aquí avisan enseguida a la ronda.");
@@ -366,14 +373,16 @@
       apunta(s, "trabajo", "Le cogen de peón en las obras.", { t: t0 });
       const lin = [
         "Te cogen de peón en las obras de la catedral. Cargas piedra hasta el final de nona.",
-        `Te pagan en pan: ${P.trabajo.paga} pedazos. Esta noche estarás más cansado (−${P.trabajo.cansancio} de cuerpo).`,
+        `Te pagan en pan: ${P.trabajo.paga} pedazos. Acabas molido.`,
         "Mientras trabajas, la ronda no te molesta.",
       ];
       if (sobra) lin.push(`No te cabe todo en el hatillo: se pierde${sobra === 1 ? " un pedazo" : "n " + sobra + " pedazos"}.`);
       resultado(s, "Trabajas", lin, "bien");
     } else {
       apunta(s, "trabajo", "No le cogen en las obras.", { t: t0 });
-      resultado(s, "No te cogen", ["El capataz elige a otros. Hoy sobran brazos."], "neutro");
+      // con el cuerpo bajo, el capataz lo dice a su manera; las reglas no
+      const linea = s.cuerpo <= 3 ? "El capataz te mira de arriba abajo: «Tus brazos no me valen, muchacho.»" : "El capataz elige a otros. Hoy sobran brazos.";
+      resultado(s, "No te cogen", [linea], "neutro");
     }
     return true;
   }
@@ -500,6 +509,7 @@
     else L2.push(`Cruces de barrio: ${T.cruces} (${(T.cruces / Math.max(1, s.porDia.length)).toFixed(1)} por día) · movimientos dentro del barrio: ${T.libres}`);
     L2.push(`Pedir: ${T.pedidas} veces, ${T.panPedido} pedazos · trabajo: ${T.panTrabajo} pedazos`);
     L2.push(`Llegó donde estaba la ronda: ${T.encuentros} veces (le pararon ${T.paradas}) · vio llegar la ronda estando quieto: ${T.rondaVista}`);
+    L2.push(`Abrió «Lo que recuerdas»: ${s.recuerdaAbierto || 0} veces · vio la ronda en ${(s.vistas || []).length} franjas`);
     const det = s.cronica.filter((c) => c.tipo === "detenido");
     if (det.length) L2.push("Detenciones: " + det.map((c) => `día ${c.dia}, ${c.motivo}`).join(" · "));
     L2.push("");
@@ -528,7 +538,7 @@
     }
     L2.push("");
     L2.push("== Datos en bruto ==");
-    L2.push(JSON.stringify({ v: s.v, modo: s.modo, semilla: s.semilla, final: s.final, porDia: s.porDia, encuesta: s.encuesta, rondas: s.rondas }));
+    L2.push(JSON.stringify({ v: s.v, modo: s.modo, semilla: s.semilla, final: s.final, porDia: s.porDia, encuesta: s.encuesta, rondas: s.rondas, vistas: s.vistas, recuerdaAbierto: s.recuerdaAbierto }));
     return L2.join("\n");
   }
 

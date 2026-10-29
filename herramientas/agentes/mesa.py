@@ -39,7 +39,7 @@ ETIQUETAS = ("[DECIDO]", "[OBVIO]", "[NADA]", "[NO ENTIENDO]")
 # Si el Chromium de Playwright no se puede descargar (en la nube de Claude Code, su servidor no está en la lista de
 # dominios), preparar.sh deja aquí la ruta de otro Chromium.
 CHROMIUM = RAIZ / "herramientas" / "agentes" / ".chromium"
-AYUDA = {"ayuda"}  # abren explicaciones: van al final de la lista
+AYUDA = {"ayuda", "recuerdo"}  # abren explicaciones o recuerdos: no gastan nada; van al final de la lista
 
 
 def servir(route):
@@ -166,7 +166,7 @@ class Mesa:
         t = self.texto()
         lineas = []
         if t["modal"]:
-            lineas += ["=== VENTANA DE AYUDA (se cierra sola con tu siguiente orden; la pantalla del juego sigue igual que antes) ===",
+            lineas += ["=== VENTANA DE AYUDA O RECUERDOS (se cierra sola con tu siguiente orden; la pantalla del juego sigue igual que antes) ===",
                        t["modal"].removesuffix("Cerrar").strip(), ""]
         else:
             lineas += [t["app"], ""]
@@ -188,7 +188,7 @@ class Mesa:
                 if x["ok"]:
                     n += 1
                     items.append(f"[{n}] {x['txt'].split(' · ')[0]}")
-            lineas.append("Ayuda (explica, no gasta nada): " + " · ".join(items))
+            lineas.append("Ayuda y recuerdos (no gastan nada): " + " · ".join(items))
         if self.dialogos:
             lineas += ["", "(Aviso de la app, aceptado: " + " | ".join(self.dialogos) + ")"]
         if self.errores:

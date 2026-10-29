@@ -300,9 +300,9 @@
     s.t = FIN;
     const extra = [];
     if (pan) extra.push(`Te quitan el pan (${pan} ${pan === 1 ? "pedazo" : "pedazos"}).`);
-    if (s.detenciones >= P.detencionesMax) extra.push("Es la tercera vez. Mañana te sacan de la ciudad con destierro.");
-    else if (s.detenciones === 2) extra.push("Es la segunda vez: esta noche te azotan.");
-    else extra.push("Es la primera vez: pasas la noche en la cárcel y mañana te sueltan en la puerta.");
+    if (s.detenciones >= P.detencionesMax) extra.push(`Detención ${s.detenciones} de ${P.detencionesMax}: mañana te sacan de la ciudad con destierro.`);
+    else if (s.detenciones === 2) extra.push(`Detención 2 de ${P.detencionesMax}: esta noche te azotan. A la tercera, destierro.`);
+    else extra.push(`Detención 1 de ${P.detencionesMax}: pasas la noche en la cárcel y mañana te sueltan en la puerta. A la segunda, azotes; a la tercera, destierro.`);
     resultado(s, "Te detienen", lineas.concat(extra), "mal");
   }
 
@@ -447,14 +447,15 @@
           const pan = s.pan; s.pan = 0;
           lin.push(`De madrugada, la ronda te encuentra durmiendo en un portal de ${L[s.lugar].nombre}. Te llevan a la cárcel${pan ? " y te quitan el pan" : ""}.`);
           apunta(s, "detenido", `Detenido de noche en ${L[s.lugar].corto}. Detención ${s.detenciones} de ${P.detencionesMax}.`, { motivo: "de noche" });
-          if (s.detenciones === 2) { dc += P.carcel.azotes; azotes = true; lin.push("Es la segunda vez: te azotan."); }
+          if (s.detenciones === 2) { dc += P.carcel.azotes; azotes = true; lin.push(`Detención 2 de ${P.detencionesMax}: te azotan. A la tercera, destierro.`); }
+          else if (s.detenciones === 1) lin.push(`Detención 1 de ${P.detencionesMax}. A la segunda, azotes; a la tercera, destierro. Ya te tienen fichado.`);
         } else lin.push(`Duermes en un portal de ${L[s.lugar].nombre}. Nadie te molesta.`);
       } else lin.push("Duermes al raso en la ribera.");
     }
     s.cuerpo = clamp(s.cuerpo + dc, 0, P.cuerpoMax);
     s.porDia.push(Object.assign({ dia: s.dia, modo: s.modo, cuerpoNoche: s.cuerpo, comido, duerme: s.duerme, detenido: s.detenidoHoy || (detenidoNoche ? "de noche" : null) }, s.hoy, { lugares: Object.keys(s.hoy.lugares).length }));
     apunta(s, "noche", `Noche (${DUERME[s.duerme]}): come ${comido}, cuerpo ${antes} → ${s.cuerpo}.`);
-    s.noche = { lineas: lin, antes, despues: s.cuerpo, dia: s.dia };
+    s.noche = { lineas: lin, antes, despues: s.cuerpo, dia: s.dia, detenido: s.duerme === "carcel" || detenidoNoche };
     // finales
     if (s.detenciones >= P.detencionesMax) {
       return fin(s, "desterrado", "Te sacan de Salamanca con destierro. Si vuelves, la horca.");

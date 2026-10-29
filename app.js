@@ -166,7 +166,8 @@
         <p><b>Aguanta diez días.</b> El 11 de junio empieza la siega, y en la siega hay trabajo para quien pueda con la hoz.</p>`;
     }
     if (s.noche) {
-      h += `<div class="panel"><h3>La noche</h3>${s.noche.lineas.map((x) => `<p>${esc(x)}</p>`).join("")}<p>Cuerpo: ${s.noche.antes} → <b>${s.noche.despues}</b>.</p></div>`;
+      // una detención de noche tiene que verse: es fácil no enterarse
+      h += `<div class="panel${s.noche.detenido ? " res mal" : ""}"><h3>${s.noche.detenido ? "La noche: detenido" : "La noche"}</h3>${s.noche.lineas.map((x) => `<p>${esc(x)}</p>`).join("")}<p>Cuerpo: ${s.noche.antes} → <b>${s.noche.despues}</b>.</p></div>`;
     }
     const notas = [];
     if (d.tipo === "domingo") notas.push("Es domingo: no hay obra. Las iglesias se llenan a prima y a tercia; la plaza está tranquila.");
@@ -339,7 +340,8 @@
       <p>Quien te ve pedir puede avisar a la ronda, y la ronda suele ir luego allí. En la puerta, las Escuelas y San Martín avisan enseguida; en San Esteban, nadie.</p>
       <h3>La ronda</h3><p>Un alguacil con sus corchetes. Tiene un recorrido de costumbre, a veces se desvía, acude adonde le avisan y a sexta se va a comer.</p>
       <p>Si te ve pedir, te detiene (con mucha gente, a veces no te ve). Si llegas a donde está, puede pararte: la primera vez te echa de la ciudad y te queda fichado; si ya te tiene fichado, te detiene. Si estás quieto cuando llega, no te para, pero no pidas delante de ella. Si empiezas a pedir a mitad de franja, puede llegar mientras pides.</p>
-      <h3>Detenciones</h3><p>Noche en la cárcel y te quitan el pan. La segunda vez, además, azotes. La tercera, destierro: se acaba la partida.</p>
+      <h3>Detenciones</h3><p>Noche en la cárcel y te quitan el pan. La segunda vez, además, azotes. La tercera, destierro: se acaba la partida. Te pueden detener pidiendo, al llegar a donde está la ronda si ya te tiene fichado, o de noche si duermes dentro de la muralla.</p>
+      <p><b>Fichado</b> quiere decir que la ronda ya te conoce la cara (te echó de la ciudad o te detuvo). No es una detención, pero desde entonces, si te para, te detiene.</p>
       <h3>Trabajar</h3><p>Las obras de la catedral cogen peones a prima los días de trabajo. Si te cogen, cargas piedra hasta el final de nona por ${P.trabajo.paga} pedazos de pan.</p>
       <h3>La noche</h3><p>Una ración son 2 pedazos de pan. Ración entera: +1 de cuerpo. Media: −1. Nada: −2. Puedes guardar hasta ${P.panMax} pedazos. Si el cuerpo llega a 0, mueres.</p>
       <h3>Lo que sabe cualquiera en Salamanca</h3><p>Las iglesias se llenan a la hora de misa (prima) y a vísperas. El mercado de la plaza, por la mañana. Los estudiantes salen a tercia y a nona. A vísperas, la gente pasea por la Rúa. El jueves 4 es Corpus Christi; el 7, domingo.</p>
@@ -472,8 +474,9 @@
     correo() {
       actualizarHistorial();
       const i = informeActual();
-      const cuerpo = `${i.resumen}\n\n(Adjunta el informe descargado: ${i.nombre})\n\n` + i.texto.split("== Crónica ==")[0];
-      location.href = `mailto:${R.CONFIG.email}?subject=${encodeURIComponent("Liber Vagatorum · informe de " + (s.jugador || "anónimo") + " · " + R.MODOS[s.modo].nombre)}&body=${encodeURIComponent(cuerpo.slice(0, 1800))}`;
+      // el cuerpo lleva el informe hasta la crónica incluida (los datos en bruto van en el archivo adjunto)
+      const cuerpo = `${i.resumen}\n\n(Adjunta el informe descargado: ${i.nombre})\n\n` + i.texto.split("== Dónde estuvo la ronda")[0];
+      location.href = `mailto:${R.CONFIG.email}?subject=${encodeURIComponent("Liber Vagatorum · informe de " + (s.jugador || "anónimo") + " · " + R.MODOS[s.modo].nombre)}&body=${encodeURIComponent(cuerpo.slice(0, 6000))}`;
       return "nada";
     },
     hDescargar(d) { const x = load(LS.historial, [])[+d.i]; if (x) descargar(x.informe, nombreArchivo(x.jugador, x.fecha, "")); return "nada"; },

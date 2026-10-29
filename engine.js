@@ -418,6 +418,9 @@
   function irANoche(s) {
     s.fase = "noche";
     s.duerme = s.detenidoHoy ? "carcel" : (L[s.lugar].dentro ? "portal" : "raso");
+    // en el puente no se duerme: fuera de la muralla, se duerme en la ribera
+    s.bajaRibera = !s.detenidoHoy && !L[s.lugar].dentro && s.lugar !== "ribera";
+    if (s.bajaRibera) s.lugar = "ribera";
   }
 
   function cenar(s, n) {

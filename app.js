@@ -213,7 +213,7 @@
       const sig = f + 1 < R.FRANJAS.length ? `Esperar a ${R.FRANJAS[f + 1].nombre.toLowerCase()}` : "Esperar a que anochezca";
       h += btn("esperar", sig, `${es.coste} ${es.coste === 1 ? "rato" : "ratos"}. Quieto, la ronda no te para; si llega, la verás.`);
     }
-    h += btn("acabar", "Acabar el día aquí", L[s.lugar].dentro ? "Dormirás en un portal, dentro de la muralla: la ronda de noche puede encontrarte." : "Dormirás al raso en la ribera.");
+    h += btn("acabar", "Acabar el día aquí", L[s.lugar].dentro ? "Dormirás en un portal, dentro de la muralla: la ronda de noche puede encontrarte." : s.lugar === "ribera" ? "Dormirás al raso en la ribera." : "En el puente no se puede dormir: bajarás a la ribera.");
     h += `</div></div>`;
     return h;
   }
@@ -275,7 +275,7 @@
       h += `<div class="panel res mal"><p>Duermes en la cárcel. El pan te lo han quitado.</p></div><div class="btns">${btn("cenar", "Seguir", "", { cls: "primary", data: { n: 0 } })}</div></div>`;
       return h;
     }
-    const donde = s.duerme === "portal" ? `Duermes en un portal de ${L[s.lugar].nombre}, dentro de la muralla. La ronda de noche puede encontrarte${s.conocido ? ", y ya te conoce" : ""}.` : "Duermes al raso en la ribera, fuera de la muralla.";
+    const donde = s.duerme === "portal" ? `Duermes en un portal de ${L[s.lugar].nombre}, dentro de la muralla. La ronda de noche puede encontrarte${s.conocido ? ", y ya te conoce" : ""}.` : `${s.bajaRibera ? "En el puente no se puede dormir: toda la noche pasan carros y el portazguero echa a los que se tumban. Bajas a la ribera. " : ""}Duermes al raso en la ribera, fuera de la muralla.`;
     h += `<div class="panel"><p>${esc(donde)}</p><p>Tienes <b>${s.pan}</b> ${s.pan === 1 ? "pedazo" : "pedazos"} de pan. Una ración son 2 pedazos. Puedes guardar hasta ${P.panMax}.</p>${s.trabajoHoy ? `<p>Estás molido del trabajo: −${P.trabajo.cansancio} de cuerpo esta noche.</p>` : ""}</div><div class="btns">`;
     const fx = (n) => { const v = P.cena[n] - (s.trabajoHoy ? P.trabajo.cansancio : 0); return `${v >= 0 ? "+" : "−"}${Math.abs(v)} de cuerpo`; };
     if (s.pan >= 2) h += btn("cenar", "Cenar una ración entera", `2 pedazos · ${fx(2)}`, { cls: "primary", data: { n: 2 } });

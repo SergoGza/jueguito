@@ -1,4 +1,4 @@
-# Liber Vagatorum · el juguete (j0.2)
+# Liber Vagatorum · el juguete (j0.3)
 
 Prueba mínima del núcleo del juego, tras el replanteamiento de octubre de 2026: **un mendigo, una necesidad (el hambre) y una amenaza (la ronda)**. Nada más: ni los tuyos, ni el relevo, ni tretas, ni exámenes. Si el núcleo solo no obliga a exponerse para comer, los sistemas de encima no lo van a arreglar.
 
@@ -28,7 +28,7 @@ Con la misma semilla (`?semilla=N`), la ciudad es la misma en A y en B.
 Todo está en `rules.js` y la ayuda del juego lo explica.
 
 - **El día:** seis franjas (prima a completas) de seis ratos. Pedir ocupa una franja. Al acabar completas cierran la puerta de la muralla.
-- **El pan está dentro y los pobres duermen fuera.** Fuera de la muralla nadie da. Dentro, solo donde hay gente que no es pobre; si hay otros pobres pidiendo, os repartís lo que hay. Desde el día 6, el pan sube y la gente da menos.
+- **El pan está dentro y los pobres duermen fuera, en la ribera** (en el puente no se puede dormir). Fuera de la muralla nadie da. Dentro, solo donde hay gente que no es pobre; si hay otros pobres pidiendo, os repartís lo que hay. Desde el día 6, el pan sube y la gente da menos.
 - **Lo que ves caduca.** La gente, los pobres y la ronda cambian al empezar cada franja. Lo demás lo sabes de cuando estuviste, y el mapa lo pinta más claro cuanto más viejo.
 - **Lo que recuerdas.** Un panel que hay que abrir guarda dónde y cuándo has visto a la ronda, por franjas, y dónde te ha parado. Es la forma de aprender su recorrido de costumbre, y lo que heredará el siguiente en el relevo.
 - **La ronda:** un recorrido de costumbre (plaza por la mañana, a sexta come, escuelas a nona, Rúa a vísperas, puerta al cerrar), desvíos al azar y, sobre todo, va donde avisan. Quien te ve pedir avisa; en la puerta, las Escuelas y San Martín, enseguida; en San Esteban, nadie.
@@ -57,8 +57,8 @@ El correo de destino está en `rules.js` (`CONFIG.email`); en GitHub Pages queda
 
 Todo en `rules.js`. **Cada vez que cambies algo, sube la versión en dos sitios**, o los móviles seguirán con la copia vieja:
 
-1. `rules.js` → `version: "j0.2"`, por ejemplo a `"j0.3"`.
-2. `sw.js` → `const VERSION = "lv-j0.2-1"`, por ejemplo a `"lv-j0.3-1"`.
+1. `rules.js` → `version: "j0.3"`, por ejemplo a `"j0.4"`.
+2. `sw.js` → `const VERSION = "lv-j0.3-1"`, por ejemplo a `"lv-j0.4-1"`.
 
 ## Probarlo en local
 

@@ -1,4 +1,4 @@
-# Liber Vagatorum · el juguete (j0.3)
+# Liber Vagatorum · el juguete (j0.4)
 
 Prueba mínima del núcleo del juego, tras el replanteamiento de octubre de 2026: **un mendigo, una necesidad (el hambre) y una amenaza (la ronda)**. Nada más: ni los tuyos, ni el relevo, ni tretas, ni exámenes. Si el núcleo solo no obliga a exponerse para comer, los sistemas de encima no lo van a arreglar.
 
@@ -38,11 +38,21 @@ Todo está en `rules.js` y la ayuda del juego lo explica.
 - **Detenciones:** cárcel y sin pan; la segunda, azotes; la tercera, destierro (fin).
 - **Trabajo:** las obras de la catedral cogen peones a prima los días laborables, por 2 pedazos y cansancio (−1 de cuerpo esa noche). Con el cuerpo bajo es más difícil que te cojan. Ninguna de las dos cosas se dice antes: se aprende («Tus brazos no me valen, muchacho»). Desde la ribera no se llega a tiempo: hay que haber dormido dentro.
 - **La noche:** ración entera (2 pedazos) +1 de cuerpo, media −1, nada −2. Dormir dentro ahorra el camino de la mañana, pero la ronda de noche puede encontrarte.
-- **Objetivo:** aguantar diez días (1 a 10 de junio de 1545; el 4 es Corpus Christi y el 7, domingo).
+- **Objetivo:** aguantar diez días (1 a 10 de junio de 1545; el 4 es Corpus Christi y el 7, domingo) hasta la siega, que empieza el 11. En la siega el mayoral coge segadores según el cuerpo (con 4 o más, seguro; con 3, a veces; con menos, no). La cifra no se dice: «Tus brazos no me valen». Así, llegar con lo justo no es lo mismo que llegar entero.
 
 **Licencias históricas** (también en la ayuda): la ronda y su recorrido son invención; que en San Esteban nadie avise sale de que Soto, su prior, escribió contra la orden, sin documento que lo diga; la limosna va en pan y no en dinero para no meter el mercado en esta prueba; las cifras son del juego.
 
-**Comprobación gruesa (no es un objetivo de dificultad).** Con un bot que ya conoce los horarios y el recorrido de la ronda: quien se esconde en la ribera muere de hambre el día 3 siempre, quien juega al azar no aguanta nunca, y el bot aguanta entre la mitad y dos tercios de las partidas en las dos pruebas. En A le pierde la ronda (le paran al llegar); en B, el hambre. Una persona que juega por primera vez no sabe lo que sabe el bot.
+**Bots (j0.4, 1.000 partidas cada uno; no es un objetivo de dificultad).** Llegan a la siega (con siega o sin ella):
+
+| Bot | A | B |
+|---|---|---|
+| Escondido en la ribera | 0 % (hambre, día 3) | 0 % |
+| Al azar | 0 % | 0 % |
+| Novato (no conoce la ciudad) | 33 % | 19 % |
+| Veterano (conoce horarios y ronda) | 48 % | 61 % |
+| Prudente (veterano que pesa el triple el riesgo) | 67 % | 33 % |
+
+En A lo que mata es la ronda (destierro); en B, el hambre. En A la prudencia compensa; en B, quien evita la ronda se muere de hambre.
 
 ## El informe
 
@@ -57,8 +67,8 @@ El correo de destino está en `rules.js` (`CONFIG.email`); en GitHub Pages queda
 
 Todo en `rules.js`. **Cada vez que cambies algo, sube la versión en dos sitios**, o los móviles seguirán con la copia vieja:
 
-1. `rules.js` → `version: "j0.3"`, por ejemplo a `"j0.4"`.
-2. `sw.js` → `const VERSION = "lv-j0.3-1"`, por ejemplo a `"lv-j0.4-1"`.
+1. `rules.js` → `version: "j0.4"`, por ejemplo a `"j0.5"`.
+2. `sw.js` → `const VERSION = "lv-j0.4-1"`, por ejemplo a `"lv-j0.5-1"`.
 
 ## Probarlo en local
 
@@ -70,4 +80,5 @@ y abre `http://localhost:8000`. Con `?semilla=7` la partida nueva sale siempre i
 
 ## Herramientas
 
-`herramientas/agentes/`: agentes de Claude que juegan la app real y escriben un diario (`/agentes prueba` desde Claude Code). Ver su README.
+- `herramientas/bot.js`: cinco bots (escondido, azar, novato, veterano, prudente) que juegan miles de partidas con el motor real y sacan porcentajes por prueba. `node herramientas/bot.js 1000`. Admite palancas para probar cambios sin tocar `rules.js`. No son personas: sirven para ver si una regla rompe algo, no para fijar la dificultad.
+- `herramientas/agentes/`: agentes de Claude que juegan la app real y escriben un diario (`/agentes prueba` desde Claude Code). Ver su README.

@@ -157,17 +157,20 @@
     cena: { 2: 1, 1: -1, 0: -2 },
     carcel: { cuerpo: -1, azotes: -1 }, // la segunda detención trae azotes; la tercera, destierro
     detencionesMax: 3,
+    // la siega empieza al acabar el último día: cogen segadores según el cuerpo (no se dice la cifra; se aprende)
+    siega: { probPorCuerpo: { 6: 1, 5: 1, 4: 1, 3: 0.5 } },
   };
 
   const LICENCIAS = [
     "La ronda, su recorrido y que coma a sexta son invención del juego.",
     "Que en San Esteban nadie avise a la ronda sale de que Soto, su prior, escribió contra la orden; no hay documento que lo diga.",
     "La limosna se da en pan (pedazos) y no en dinero, para no meter el mercado en esta prueba.",
+    "La siega empieza el 11 de junio; en Castilla solía empezar a finales de junio o en julio.",
     "Las cifras (gente, limosna, probabilidades) son del juego.",
   ];
 
   window.RULES = {
-    version: "j0.3", CONFIG, FRANJAS, RATOS, DIAS, MODOS, BARRIOS, LUGARES, CAMINOS, CALENDARIO, DIAS_SENALADOS,
+    version: "j0.4", CONFIG, FRANJAS, RATOS, DIAS, MODOS, BARRIOS, LUGARES, CAMINOS, CALENDARIO, DIAS_SENALADOS,
     RONDA, PARAMS, LICENCIAS,
     // la mesa de los agentes pregunta por PERSONAJES: en el juguete, cada «personaje» es una prueba
     PERSONAJES: [

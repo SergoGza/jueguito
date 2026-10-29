@@ -158,7 +158,7 @@
     if (s.dia === 1 && !s.noche) {
       h += `<p>Eres un mozo de La Armuña. Has bajado a Salamanca porque en tu aldea no queda pan hasta la siega. Duermes en la ribera del Tormes, fuera de la muralla.</p>
         <p>Desde la orden de pobres del año pasado, en la ciudad está prohibido pedir. Pero el pan está dentro, y no hay otra manera de comer.</p>
-        <p><b>Aguanta diez días.</b></p>`;
+        <p><b>Aguanta diez días.</b> El 11 de junio empieza la siega, y en la siega hay trabajo para quien pueda con la hoz.</p>`;
     }
     if (s.noche) {
       h += `<div class="panel"><h3>La noche</h3>${s.noche.lineas.map((x) => `<p>${esc(x)}</p>`).join("")}<p>Cuerpo: ${s.noche.antes} → <b>${s.noche.despues}</b>.</p></div>`;
@@ -289,8 +289,8 @@
     const ratos = T.mover + T.pedir + T.trabajar + T.esperar + T.perdido || 1;
     const pct = (x) => Math.round((100 * x) / ratos) + " %";
     const enc = s.encuesta || {};
-    const tit = { aguanta: "Aguantas", hambre: "Mueres de hambre", muerto: "Mueres", desterrado: "Desterrado", abandona: "Partida abandonada" }[s.final.tipo] || "Fin";
-    let h = cabecera() + `<div class="wrap"><div class="panel res ${s.final.tipo === "aguanta" ? "bien" : "mal"}"><h2>${tit}</h2><p>${esc(s.final.texto)}</p><p class="small">Día ${s.final.dia} · ${esc(R.MODOS[s.modo].nombre)}</p></div>`;
+    const tit = { siega: "Te cogen para la siega", aguanta: "Aguantas, pero no te cogen", hambre: "Mueres de hambre", muerto: "Mueres", desterrado: "Desterrado", abandona: "Partida abandonada" }[s.final.tipo] || "Fin";
+    let h = cabecera() + `<div class="wrap"><div class="panel res ${s.final.tipo === "siega" ? "bien" : "mal"}"><h2>${tit}</h2><p>${esc(s.final.texto)}</p><p class="small">Día ${s.final.dia} · ${esc(R.MODOS[s.modo].nombre)}</p></div>`;
     h += `<div class="panel"><h3>Tu partida</h3>
       <p class="small">Tiempo: moverte ${pct(T.mover)} · pedir ${pct(T.pedir)} · trabajar ${pct(T.trabajar)} · esperar ${pct(T.esperar + T.perdido)}.</p>
       <p class="small">${s.modo === "A" ? `${T.pasos} ${T.pasos === 1 ? "paso" : "pasos"}` : `${T.cruces} ${T.cruces === 1 ? "cruce" : "cruces"} de barrio`} · pediste ${T.pedidas} veces (${T.panPedido} pedazos) · llegaste ${T.encuentros} ${T.encuentros === 1 ? "vez" : "veces"} donde estaba la ronda · ${s.detenciones} ${s.detenciones === 1 ? "detención" : "detenciones"}.</p></div>`;
@@ -316,7 +316,7 @@
     if (!modo || modo === "A") mover.push(`<p><b>Prueba A · calles.</b> Cada paso a un sitio vecino cuesta 2 ratos (tres pasos, una franja). Solo ves el sitio donde estás, y la ronda igual: solo te ve si estáis en el mismo sitio.</p>`);
     if (!modo || modo === "B") mover.push(`<p><b>Prueba B · barrios.</b> Dentro de tu barrio te mueves sin gastar tiempo y lo ves entero. Pasar a un barrio vecino cuesta una franja. La ronda ve igual que tú: todo su barrio.</p>`);
     return `<div class="modal-in"><h2>Cómo se juega</h2>
-      <p>Eres un pobre forastero en Salamanca, en junio de 1545. Desde la orden de pobres del año pasado, pedir en la ciudad está prohibido. Duermes fuera de la muralla, en la ribera; el pan está dentro. <b>Objetivo: aguantar diez días.</b></p>
+      <p>Eres un pobre forastero en Salamanca, en junio de 1545. Desde la orden de pobres del año pasado, pedir en la ciudad está prohibido. Duermes fuera de la muralla, en la ribera; el pan está dentro. <b>Objetivo: aguantar diez días, hasta la siega.</b> En la siega cogen segadores, pero no a cualquiera: quieren brazos que puedan con la hoz.</p>
       <h3>El día</h3><p>Seis franjas, de prima a completas, de seis ratos cada una. Pedir ocupa una franja entera. Al acabar completas cierran la puerta de la muralla: quien se queda dentro duerme en un portal.</p>
       <h3>Moverte</h3>${mover.join("")}
       <h3>Lo que ves</h3><p>La gente, los otros pobres y la ronda cambian al empezar cada franja. Lo que viste vale para la franja en que lo viste. En el mapa, lo visto hace rato se ve más claro. En «Lo que recuerdas» tienes dónde y cuándo has visto a la ronda.</p>

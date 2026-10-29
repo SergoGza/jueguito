@@ -462,7 +462,12 @@
     if (s.cuerpo <= 0) {
       return fin(s, azotes ? "muerto" : "hambre", azotes ? "No aguantas los azotes con el cuerpo tan gastado. Mueres antes del amanecer." : "Mueres de hambre.");
     }
-    if (s.dia >= R.DIAS) return fin(s, "aguanta", `Aguantas los ${R.DIAS} días. Nadie sale de la pobreza: solo se aguanta un día más.`);
+    if (s.dia >= R.DIAS) {
+      // la siega: el mayoral mira los brazos antes de dar la hoz
+      const p = P.siega.probPorCuerpo[s.cuerpo] || 0;
+      if (tirar(s, "siega") < p) return fin(s, "siega", "Al amanecer empieza la siega. El mayoral te mira los brazos y te da una hoz. Unas semanas comerás de tu trabajo; después, otra vez a la ribera.");
+      return fin(s, "aguanta", "Al amanecer empieza la siega. El mayoral te mira y pasa de largo: «Tus brazos no me valen, muchacho». Has aguantado, pero no te quiere nadie.");
+    }
     if (s.duerme === "carcel" || detenidoNoche) s.lugar = "puerta";
     s.dia++;
     empezarDia(s);
@@ -483,7 +488,7 @@
     return T;
   }
   const DUERME = { carcel: "cárcel", portal: "portal", raso: "al raso" };
-  const FINALES = { aguanta: "Aguanta", hambre: "Muere de hambre", muerto: "Muere tras los azotes", desterrado: "Desterrado", abandona: "Abandona" };
+  const FINALES = { siega: "Llega a la siega y le cogen", aguanta: "Llega a la siega y no le cogen", hambre: "Muere de hambre", muerto: "Muere tras los azotes", desterrado: "Desterrado", abandona: "Abandona" };
 
   function informe(s) {
     const m = R.MODOS[s.modo];

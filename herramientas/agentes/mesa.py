@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Mesa de juego: deja jugar Liber Vagatorum desde la línea de comandos, sobre la app real.
+"""Mesa de juego: deja jugar Liber Vagatorum (el juguete) desde la línea de comandos, sobre la app real.
 
 Abre la app en un Chromium sin ventana (Playwright), enseña el texto de la pantalla y una lista numerada de lo que
 se puede pulsar, y pulsa lo que se le pida. Quien juega ve exactamente lo que vería en el móvil: ni reglas ni cifras
@@ -7,17 +7,17 @@ ocultas. Cada partida vive en su propia carpeta (perfil del navegador, estado de
 varias partidas pueden jugarse a la vez sin pisarse.
 
 Uso (desde la raíz del repositorio):
-  python3 herramientas/agentes/mesa.py nueva <personaje> <carpeta> [semilla] [nombre]
+  python3 herramientas/agentes/mesa.py nueva <prueba> <carpeta> [semilla] [nombre]
   python3 herramientas/agentes/mesa.py ver <carpeta>
   python3 herramientas/agentes/mesa.py pulsar <carpeta> <n o texto> [<n o texto> ...]
   python3 herramientas/agentes/mesa.py diario <carpeta> "<etiqueta> texto"
-  python3 herramientas/agentes/mesa.py encuesta <carpeta> "<dolió>" "<sobraba>" "<faltó>" ["<otros>"]
+  python3 herramientas/agentes/mesa.py encuesta <carpeta> "<dolió>" "<cómo ibas>" "<sorpresa>" "<sobraba>" ["<otros>"]
   python3 herramientas/agentes/mesa.py estado <carpeta>
   python3 herramientas/agentes/mesa.py comprobar     (abre el navegador y la app, y dice si funciona)
 
-personaje: mozo, viuda o soldado. En «pulsar», un número es siempre el botón con ese número en la lista de la
-pantalla actual; «dado:4» pulsa el dado que vale 4; un texto pulsa el primer botón disponible cuyo título empiece por
-él (si no hay, el primero cuyo título o descripción lo contenga), sin distinguir mayúsculas. Con varios, se pulsan en orden, cada uno sobre la pantalla
+prueba: A (calles) o B (barrios). En «pulsar», un número es siempre el botón con ese número en la lista de la
+pantalla actual; un texto pulsa el primer botón disponible cuyo título empiece por él (si no hay, el primero cuyo título
+o descripción lo contenga), sin distinguir mayúsculas. Con varios, se pulsan en orden, cada uno sobre la pantalla
 que deja el anterior.
 """
 import json
@@ -33,13 +33,13 @@ from playwright.sync_api import sync_playwright
 RAIZ = Path(__file__).resolve().parents[2]
 ORIGEN = "http://liber.local/"
 # Botones que no son del juego o que lo romperían: menú, tema, instalar, historial, informes y abandonar.
-FUERA = {"menu", "tema", "inicio", "historial", "instalar", "abandonar", "abandonarDesdeInicio", "nueva",
-         "descargar", "compartir", "copiar", "hDescargar", "hCompartir", "hCopiar", "empezar", "elegirPj"}
+FUERA = {"menu", "tema", "inicio", "instalar", "abandonar", "nueva", "continuar", "correo",
+         "descargar", "compartir", "copiar", "hDescargar", "hCompartir", "hCopiar", "empezar"}
 ETIQUETAS = ("[DECIDO]", "[OBVIO]", "[NADA]", "[NO ENTIENDO]")
 # Si el Chromium de Playwright no se puede descargar (en la nube de Claude Code, su servidor no está en la lista de
 # dominios), preparar.sh deja aquí la ruta de otro Chromium.
 CHROMIUM = RAIZ / "herramientas" / "agentes" / ".chromium"
-AYUDA = {"ayuda", "metro", "red"}  # abren explicaciones: van al final de la lista
+AYUDA = {"ayuda"}  # abren explicaciones: van al final de la lista
 
 
 def servir(route):
@@ -128,7 +128,7 @@ class Mesa:
             if (!el) return '';
             const c = el.cloneNode(true);
             c.removeAttribute('id');
-            c.querySelectorAll('.icon-btn').forEach((x) => x.remove());
+            c.querySelectorAll('.icon-btn, svg, .leyenda, .dia-barra').forEach((x) => x.remove());
             c.querySelectorAll('.estado .chip').forEach((ch) => {
               const b = ch.querySelector('b');
               const partes = Array.from(ch.childNodes).filter((n) => n.nodeType === 3).map((n) => n.textContent.trim()).filter(Boolean);
@@ -224,16 +224,17 @@ class Mesa:
 
     def estado(self):
         return self.pg.evaluate("""() => { const s = window.__LV.s; if (!s) return null;
-          return { dia: s.dia, fase: s.fase, franja: s.franja, final: s.final, personaje: s.pj, version: s.v }; }""")
+          return { dia: s.dia, fase: s.fase, t: s.t, franja: window.ENGINE.franja(Math.min(s.t, window.ENGINE.FIN - 1)),
+                   noche: s.t >= window.ENGINE.FIN, final: s.final, modo: s.modo, version: s.v }; }""")
 
 
 def momento(est):
     if not est:
         return "inicio"
-    franjas = ["Prima", "Tercia", "Sexta", "Nona", "Vísperas"]
+    franjas = ["Prima", "Tercia", "Sexta", "Nona", "Vísperas", "Completas"]
     f = est["fase"]
-    if f == "franja":
-        return f"Día {est['dia']} · {franjas[est['franja']] if est['franja'] < 5 else 'noche'}"
+    if f in ("dia", "resultado"):
+        return f"Día {est['dia']} · " + ("noche" if est["noche"] else f"{franjas[est['franja']]} (rato {est['t'] % 6 + 1})")
     return f"Día {est['dia']} · {'fin' if f == 'fin' else f}"
 
 
@@ -260,8 +261,10 @@ def main(a):
     orden = a[0]
     if orden == "nueva":
         if len(a) < 3:
-            raise SystemExit("Uso: nueva <personaje> <carpeta> [semilla] [nombre]")
-        pj, carpeta = a[1], Path(a[2])
+            raise SystemExit("Uso: nueva <A|B> <carpeta> [semilla] [nombre]")
+        pj, carpeta = a[1].upper(), Path(a[2])
+        if pj not in ("A", "B"):
+            raise SystemExit("La prueba tiene que ser A o B.")
         semilla = a[3] if len(a) > 3 else ""
         nombre = a[4] if len(a) > 4 else "Agente"
         if carpeta.exists():
@@ -270,15 +273,14 @@ def main(a):
         with Mesa(carpeta) as m:
             m.abrir("?semilla=" + urllib.parse.quote(semilla) if semilla else "")
             m.pg.fill("#nombre", nombre)
-            m.pg.click("[data-act=empezar]")
-            ficha = m.pg.evaluate("""(id) => { const p = window.RULES.PERSONAJES.find((x) => x.id === id);
-              return [`TU PERSONAJE: ${p.nombre} (${p.origen}, ${p.cuerpoTipo})`, p.resumen, ...p.claves.map((c) => "- " + c)]; }""", pj)
+            ficha = m.pg.evaluate("""(id) => { const p = window.RULES.MODOS[id];
+              return [`PRUEBA: ${p.nombre}`, p.resumen]; }""", pj)
             ficha = "\n".join(ficha)
-            m.pg.click(f"[data-act=elegirPj][data-id={pj}]")
+            m.pg.click(f"[data-act=empezar][data-id={pj}]")
             m.guardar()
             est = m.estado()
-            (carpeta / "partida.json").write_text(json.dumps({"personaje": pj, "semilla": semilla, "nombre": nombre, "version": est["version"] if est else None, "empezada": datetime.now().isoformat(timespec="seconds")}, ensure_ascii=False, indent=1), encoding="utf-8")
-            print(ficha + "\n(Es lo que se ve al elegir personaje.)\n")
+            (carpeta / "partida.json").write_text(json.dumps({"prueba": pj, "semilla": semilla, "nombre": nombre, "version": est["version"] if est else None, "empezada": datetime.now().isoformat(timespec="seconds")}, ensure_ascii=False, indent=1), encoding="utf-8")
+            print(ficha + "\n(Es lo que se ve al elegir la prueba en la pantalla de inicio.)\n")
             print(m.pantalla())
         return
     carpeta = Path(a[1])
@@ -315,14 +317,16 @@ def main(a):
             est = m.estado()
             if not est or est["fase"] != "fin":
                 raise SystemExit("La encuesta se contesta al acabar la partida.")
-            resp = (a[2:] + ["", "", "", ""])[:4]
-            for clave, valor in zip(("dolio", "sobro", "falto", "otros"), resp):
+            claves = ("dolio", "ir", "sorpresa", "sobro", "otros")
+            resp = (a[2:] + [""] * 5)[:5]
+            for clave, valor in zip(claves, resp):
                 if valor:
                     m.pg.fill(f"[data-enc={clave}]", valor)
             m.pg.wait_for_timeout(50)
             informe = m.pg.evaluate("() => window.ENGINE.informe(window.__LV.s)")
             (carpeta / "informe.txt").write_text(informe, encoding="utf-8")
-            resultado = {"final": est["final"], "encuesta": dict(zip(("dolio", "sobro", "falto", "otros"), resp))}
+            datos = m.pg.evaluate("() => { const s = window.__LV.s; return { porDia: s.porDia, resumen: window.ENGINE.resumenDias(s), detenciones: s.detenciones }; }")
+            resultado = {"final": est["final"], "prueba": est["modo"], "encuesta": dict(zip(claves, resp)), **datos}
             (carpeta / "resultado.json").write_text(json.dumps(resultado, ensure_ascii=False, indent=1), encoding="utf-8")
             print("Encuesta guardada e informe escrito en " + str(carpeta / "informe.txt"))
         elif orden == "estado":

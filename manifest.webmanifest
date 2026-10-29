@@ -1,7 +1,7 @@
 {
-  "name": "Liber Vagatorum · prototipo",
+  "name": "Liber Vagatorum · el juguete",
   "short_name": "Liber V.",
-  "description": "Sobrevive como pobre en la Salamanca de 1545. Prototipo jugable.",
+  "description": "Un mendigo, el hambre y la ronda en la Salamanca de 1545. Prueba mínima del núcleo.",
   "lang": "es",
   "start_url": "./",
   "scope": "./",

@@ -37,8 +37,8 @@
     const f = franjaAct();
     const chips = [
       `<div class="chip${s.cuerpo <= 2 ? " alerta" : ""}">Cuerpo<b>${s.cuerpo}/${P.cuerpoMax}</b></div>`,
-      `<div class="chip${s.pan === 0 ? " alerta" : ""}">Pan<b>${s.pan}</b>pedazos</div>`,
-      `<div class="chip${s.conocido ? " alerta" : ""}">Ronda<b>${s.conocido ? "te conoce" : "no te conoce"}</b></div>`,
+      `<div class="chip${s.pan === 0 ? " alerta" : ""}">Pan<b>${s.pan}</b></div>`,
+      `<div class="chip${s.conocido ? " alerta" : ""}">Fichado<b>${s.conocido ? "sí" : "no"}</b></div>`,
       `<div class="chip${s.detenciones ? " alerta" : ""}">Detenciones<b>${s.detenciones}/${P.detencionesMax}</b></div>`,
     ].join("");
     let barra = "";
@@ -50,7 +50,7 @@
         }).join("");
         return `<div><div class="fr ${i === f && s.t < E.FIN ? "act" : ""}">${fr.nombre}</div><div class="ratos">${ratos}</div></div>`;
       }).join("")}</div>`;
-      barra += `<p class="small muted" style="margin:4px 0 0">${s.t >= E.FIN ? "Ya es de noche." : `${R.FRANJAS[f].nombre} (${R.FRANJAS[f].hora}), rato ${E.ratoEnFranja(s.t) + 1} de ${R.RATOS}. Quedan ${E.FIN - s.t} ratos hasta que cierren la puerta.`}</p>`;
+      barra += `<p class="small muted hora">${s.t >= E.FIN ? "Ya es de noche." : `${R.FRANJAS[f].nombre}, rato ${E.ratoEnFranja(s.t) + 1}/${R.RATOS} · quedan ${E.FIN - s.t} ratos para que cierren la puerta`}</p>`;
     }
     return `<header class="top"><div class="top-in${ancho ? " ancho" : ""}">
       <div class="top-row">
@@ -67,6 +67,10 @@
   function mapa(o) {
     const modoB = R.MODOS[s.modo].zona === "barrio";
     const posibles = new Set((o ? o.movs : []).filter((m) => m.ok).map((m) => m.destino));
+    const costeDe = {};
+    (o ? o.movs : []).filter((m) => m.ok).forEach((m) => (costeDe[m.destino] = m.tipo === "libre" ? "gratis" : m.tipo === "cruce" ? "1 franja" : `${m.coste} ratos`));
+    const movil = window.innerWidth < 760;
+    const fs = movil ? 12 : 10;
     let g = `<svg viewBox="0 0 360 320" aria-hidden="true" role="img">`;
     // río y puente
     g += `<path d="M0,296 C60,286 120,304 180,294 S300,286 360,296 L360,320 L0,320Z" fill="var(--river)"/>`;
@@ -112,11 +116,12 @@
       if (m && m.ronda) g += `<path d="M${l.x + 10},${l.y - 20} l7,7 l-7,7 l-7,-7z" fill="var(--bad)" opacity="${op}"/><text x="${l.x + 10}" y="${l.y - 10}" font-size="8" fill="#fff" text-anchor="middle" font-weight="700" opacity="${op}">R</text>`;
       if (pedidos[l.id]) g += `<ellipse cx="${l.x - 13}" cy="${l.y - 12}" rx="6" ry="3.6" fill="none" stroke="var(--bad)" stroke-width="1.2"/><circle cx="${l.x - 13}" cy="${l.y - 12}" r="1.6" fill="var(--bad)"/>`;
       if (aqui) g += `<circle cx="${l.x}" cy="${l.y}" r="3.5" fill="var(--accent)"/>`;
-      g += `<text x="${l.x}" y="${l.y + 24}" font-size="10" text-anchor="middle" fill="var(--ink)" font-weight="${aqui ? 700 : 400}">${esc(l.corto)}</text>`;
+      g += `<text x="${l.x}" y="${l.y + 25}" font-size="${fs}" text-anchor="middle" fill="var(--ink)" font-weight="${aqui ? 700 : 400}" paint-order="stroke" stroke="var(--surface)" stroke-width="3">${esc(l.corto)}</text>`;
+      if (costeDe[l.id] && !aqui) g += `<text x="${l.x}" y="${l.y + 25 + fs}" font-size="${fs - 2}" text-anchor="middle" fill="var(--accent)" font-weight="700" paint-order="stroke" stroke="var(--surface)" stroke-width="3">${costeDe[l.id]}</text>`;
       g += `</g>`;
     }
     g += `</svg>`;
-    const ley = `<div class="leyenda" aria-hidden="true"><span><i style="background:var(--g3)"></i>mucha gente</span><span><i style="background:var(--g2)"></i>poca</span><span><i style="background:var(--g1)"></i>nadie que dé</span><span><i style="border-style:dashed"></i>sin ver</span><span style="color:var(--bad)">◆ ronda</span><span style="color:var(--bad)">◉ te vieron pedir hoy</span><span>Lo claro es lo visto hace rato.</span></div>`;
+    const ley = `<div class="leyenda" aria-hidden="true"><span><i style="background:var(--g3)"></i>mucha gente</span><span><i style="background:var(--g2)"></i>poca</span><span><i style="background:var(--g1)"></i>nadie que dé</span><span><i style="border-style:dashed"></i>sin ver</span><span style="color:var(--bad)">◆ ronda</span><span style="color:var(--bad)">◉ te vieron pedir hoy</span><span>Lo claro es lo visto hace rato.</span><span><b>Toca un sitio con borde discontinuo para ir.</b></span></div>`;
     return `<div class="mapa">${g}${ley}</div>`;
   }
 
@@ -199,23 +204,32 @@
     return h + `</div>`;
   }
 
+  // lo que se sabe antes de actuar: para leer, sin botones
   function panelAcciones(o) {
-    let h = `<div class="panel"><h3>Qué haces</h3>`;
+    let h = `<div class="panel"><h3>Antes de actuar</h3>`;
     const pd = o.acc.find((a) => a.id === "pedir");
-    if (pd.ok) h += `<ul class="prev">${E.previsionPedir(s).map((x) => `<li>${esc(x)}</li>`).join("")}</ul>`;
-    h += `<div class="btns">`;
-    h += btn("pedir", "Pedir aquí", pd.ok ? "1 franja" : pd.porque, { disabled: !pd.ok, cls: pd.ok && E.rondaEnTuZona(s) ? "riesgo" : "" });
+    const lin = pd.ok ? E.previsionPedir(s) : [`Pedir: ${pd.porque}.`];
     const tr = o.acc.find((a) => a.id === "trabajo");
-    if (tr) h += btn("trabajo", "Pedir trabajo en las obras", tr.ok ? `Si te cogen, cargas piedra hasta el final de nona por ${P.trabajo.paga} pedazos de pan. Preguntar cuesta 1 rato.` : tr.porque, { disabled: !tr.ok });
-    const es = o.acc.find((a) => a.id === "esperar");
+    if (tr) lin.push(tr.ok ? `Obras: si te cogen, cargas piedra hasta el final de nona por ${P.trabajo.paga} pedazos de pan. Preguntar cuesta 1 rato.` : `Obras: ${tr.porque}.`);
+    lin.push("Esperar: quieto, la ronda no te para; si llega, la verás.");
+    lin.push(L[s.lugar].dentro ? "Si acabas el día aquí, dormirás en un portal, dentro de la muralla: la ronda de noche puede encontrarte." : s.lugar === "ribera" ? "Si acabas el día aquí, dormirás al raso en la ribera." : "En el puente no se puede dormir: si acabas el día aquí, bajarás a la ribera.");
+    return h + `<ul class="prev">${lin.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div>`;
+  }
+  function barraAcciones(o) {
+    const pd = o.acc.find((a) => a.id === "pedir");
+    const e = s.t < E.FIN ? E.estado(s, s.lugar, s.dia, E.franja(s.t)) : null;
+    const r = E.rondaEnTuZona(s);
+    const tr = o.acc.find((a) => a.id === "trabajo");
+    let h = `<div class="barra-acc">`;
+    // el trabajo solo aparece aquí cuando se puede pedir; por qué no se puede está en «Antes de actuar»
+    if (tr && tr.ok) h += btn("trabajo", "Pedir trabajo en las obras", "1 rato · si te cogen, hasta nona", { cls: "accion" });
+    h += btn("pedir", "Pedir aquí", pd.ok ? `1 franja · ${e.da >= 3 ? "mucha gente" : "poca gente"}${r ? " · ¡ronda!" : ""}` : pd.porque, { disabled: !pd.ok, cls: pd.ok ? (r ? "riesgo" : "accion") : "" });
     if (s.t < E.FIN) {
-      const f = E.franja(s.t);
-      const sig = f + 1 < R.FRANJAS.length ? `Esperar a ${R.FRANJAS[f + 1].nombre.toLowerCase()}` : "Esperar a que anochezca";
-      h += btn("esperar", sig, `${es.coste} ${es.coste === 1 ? "rato" : "ratos"}. Quieto, la ronda no te para; si llega, la verás.`);
+      const f = E.franja(s.t), es = o.acc.find((a) => a.id === "esperar");
+      h += btn("esperar", f + 1 < R.FRANJAS.length ? `Esperar a ${R.FRANJAS[f + 1].nombre.toLowerCase()}` : "Esperar a la noche", `${es.coste} ${es.coste === 1 ? "rato" : "ratos"}`);
     }
-    h += btn("acabar", "Acabar el día aquí", L[s.lugar].dentro ? "Dormirás en un portal, dentro de la muralla: la ronda de noche puede encontrarte." : s.lugar === "ribera" ? "Dormirás al raso en la ribera." : "En el puente no se puede dormir: bajarás a la ribera.");
-    h += `</div></div>`;
-    return h;
+    h += btn("acabar", "Acabar el día", L[s.lugar].dentro ? "en un portal: ronda de noche" : "dormir en la ribera");
+    return h + `</div>`;
   }
 
   function panelMover(o) {
@@ -253,12 +267,13 @@
     const o = E.opciones(s);
     const p = ui.pestana === "ciudad" ? "ciudad" : "acciones";
     let h = cabecera(true) + `<div class="juego pestana-${p}">`;
-    h += `<div class="col-mapa">${s.aviso ? `<p class="aviso ${s.aviso.tono || ""}">${esc(s.aviso.texto)}</p>` : ""}${mapa(o)}<div class="btns">${btn("recuerdo", "Lo que recuerdas", "Dónde y cuándo has visto a la ronda", { cls: "secundario" })}</div></div>`;
+    h += `<div class="col-mapa">${s.aviso ? `<p class="aviso ${s.aviso.tono || ""}">${esc(s.aviso.texto)}</p>` : ""}${mapa(o)}<div class="recuerdo-btn">${btn("recuerdo", "Lo que recuerdas", "dónde y cuándo has visto a la ronda", { cls: "secundario" })}</div><div class="barra-mapa">${barraAcciones(o)}</div></div>`;
     h += `<nav class="pestanas" aria-label="Paneles">
-      <button class="pestana${p === "acciones" ? " act" : ""}" data-act="pestana" data-id="acciones">Qué haces</button>
+      <button class="pestana${p === "acciones" ? " act" : ""}" data-act="pestana" data-id="acciones">Aquí</button>
       <button class="pestana${p === "ciudad" ? " act" : ""}" data-act="pestana" data-id="ciudad">La ciudad</button></nav>`;
     // «Adónde vas» va con «Qué haces» en el móvil y con las pestañas; en pantalla ancha, junto a «La ciudad»
-    h += `<div class="pn pn-acciones">${panelAqui(o)}${panelAcciones(o)}<div class="mover-estrecho">${panelMover(o)}</div></div>`;
+    // las acciones: bajo el mapa (fijas abajo en el móvil) o, en pantalla ancha, arriba de la columna central
+    h += `<div class="pn pn-acciones"><div class="barra-col">${barraAcciones(o)}</div>${panelAqui(o)}${panelAcciones(o)}<div class="mover-estrecho">${panelMover(o)}</div></div>`;
     h += `<div class="pn pn-ciudad"><div class="mover-ancho">${panelMover(o)}</div>${panelCiudad()}</div>`;
     return h + `</div>`;
   }
@@ -323,7 +338,7 @@
       <h3>Pedir</h3><p>Solo dentro de la muralla y donde hay gente que dé. Con mucha gente suele caer algo; con poca, muchas veces nada; si hay otros pobres pidiendo, os repartís lo que hay. Desde el día ${P.escasezDesde}, el pan sube y la gente da menos.</p>
       <p>Quien te ve pedir puede avisar a la ronda, y la ronda suele ir luego allí. En la puerta, las Escuelas y San Martín avisan enseguida; en San Esteban, nadie.</p>
       <h3>La ronda</h3><p>Un alguacil con sus corchetes. Tiene un recorrido de costumbre, a veces se desvía, acude adonde le avisan y a sexta se va a comer.</p>
-      <p>Si te ve pedir, te detiene (con mucha gente, a veces no te ve). Si llegas a donde está, puede pararte: la primera vez te echa de la ciudad; si ya te conoce, te detiene. Si estás quieto cuando llega, no te para, pero no pidas delante de ella. Si empiezas a pedir a mitad de franja, puede llegar mientras pides.</p>
+      <p>Si te ve pedir, te detiene (con mucha gente, a veces no te ve). Si llegas a donde está, puede pararte: la primera vez te echa de la ciudad y te queda fichado; si ya te tiene fichado, te detiene. Si estás quieto cuando llega, no te para, pero no pidas delante de ella. Si empiezas a pedir a mitad de franja, puede llegar mientras pides.</p>
       <h3>Detenciones</h3><p>Noche en la cárcel y te quitan el pan. La segunda vez, además, azotes. La tercera, destierro: se acaba la partida.</p>
       <h3>Trabajar</h3><p>Las obras de la catedral cogen peones a prima los días de trabajo. Si te cogen, cargas piedra hasta el final de nona por ${P.trabajo.paga} pedazos de pan.</p>
       <h3>La noche</h3><p>Una ración son 2 pedazos de pan. Ración entera: +1 de cuerpo. Media: −1. Nada: −2. Puedes guardar hasta ${P.panMax} pedazos. Si el cuerpo llega a 0, mueres.</p>
@@ -511,9 +526,12 @@
     if (k && s) { s.encuesta = s.encuesta || {}; s.encuesta[k] = ev.target.value; store(LS.partida, s); }
   });
 
+  let anchoAntes = window.innerWidth < 760;
   window.addEventListener("resize", () => {
     const hdr = app.querySelector(".top");
     if (hdr) document.documentElement.style.setProperty("--hdr", hdr.offsetHeight + "px");
+    const movil = window.innerWidth < 760;
+    if (movil !== anchoAntes) { anchoAntes = movil; render(); } // el mapa cambia el tamaño de letra
   });
   aplicarTema();
   render();

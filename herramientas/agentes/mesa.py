@@ -33,7 +33,7 @@ from playwright.sync_api import sync_playwright
 RAIZ = Path(__file__).resolve().parents[2]
 ORIGEN = "http://liber.local/"
 # Botones que no son del juego o que lo romperían: menú, tema, instalar, historial, informes y abandonar.
-FUERA = {"menu", "tema", "inicio", "instalar", "abandonar", "nueva", "continuar", "correo",
+FUERA = {"menu", "tema", "inicio", "instalar", "abandonar", "nueva", "continuar", "correo", "pestana",
          "descargar", "compartir", "copiar", "hDescargar", "hCompartir", "hCopiar", "empezar"}
 ETIQUETAS = ("[DECIDO]", "[OBVIO]", "[NADA]", "[NO ENTIENDO]")
 # Si el Chromium de Playwright no se puede descargar (en la nube de Claude Code, su servidor no está en la lista de

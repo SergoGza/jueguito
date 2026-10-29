@@ -45,7 +45,9 @@ p { margin: 0.4em 0; }
 /* barra superior */
 .top { position: sticky; top: 0; z-index: 5; background: var(--bg); border-bottom: 1px solid var(--line); padding: calc(6px + env(safe-area-inset-top)) 16px 6px; }
 .top-in { max-width: 680px; margin: 0 auto; }
-.top-row { display: flex; align-items: center; gap: 8px; }
+.top-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.top-btns { display: flex; gap: 8px; }
+.top-row .estado { order: 3; flex: 1 1 100%; }
 .top-title { flex: 1; font-family: Georgia, serif; font-weight: 700; font-size: 1rem; line-height: 1.2; }
 .top-title span { display: block; font-family: system-ui, sans-serif; font-weight: 400; font-size: 0.8rem; color: var(--muted); }
 .icon-btn { border: 1px solid var(--line); background: var(--surface); color: var(--ink); border-radius: 8px; padding: 6px 10px; font-size: 0.95rem; min-height: 36px; cursor: pointer; }
@@ -128,3 +130,57 @@ table.dias th, table.dias td { border-bottom: 1px solid var(--line); padding: 3p
 .modal-in { background: var(--bg); color: var(--ink); width: 100%; max-width: 680px; max-height: 88vh; overflow: auto; border-radius: 14px 14px 0 0; padding: 12px 18px calc(18px + env(safe-area-inset-bottom)); }
 .modal-in h3 { margin-top: 1em; }
 .menu-list { display: grid; gap: 8px; margin: 10px 0; }
+
+/* ------------------------------------------------------------------ la pantalla del día
+   Móvil: una columna. Mediana (760 px): mapa a la izquierda y una pestaña a la derecha.
+   Ancha (1200 px): tres columnas, todo a la vista. */
+.juego { max-width: 680px; margin: 0 auto; padding: 0 16px 40px; }
+.pestanas { display: none; }
+.pestana {
+  flex: 1; border: 1px solid var(--line); background: var(--surface2); color: var(--muted); font: inherit; font-weight: 600;
+  padding: 8px 10px; border-radius: 10px 10px 0 0; cursor: pointer; border-bottom: 0;
+}
+.pestana.act { background: var(--surface); color: var(--ink); border-color: var(--accent); border-width: 2px 1px 0; }
+
+.mover-ancho { display: none; }
+@media (min-width: 760px) {
+  .top-in.ancho { max-width: 1500px; }
+  .top-in.ancho .top-row { flex-wrap: nowrap; }
+  .top-in.ancho .top-title { flex: 0 0 auto; }
+  .top-in.ancho .top-row .estado { order: 0; flex: 1 1 auto; margin-top: 0; max-width: 760px; margin-left: auto; }
+  .top-in.ancho .chip { display: flex; gap: 6px; align-items: baseline; justify-content: center; padding: 6px 8px; font-size: 0.8rem; }
+  .top-in.ancho .chip b { display: inline; font-size: 1rem; }
+  .juego {
+    max-width: 1500px; display: grid; gap: 0 18px; align-items: start;
+    grid-template-columns: minmax(340px, 1.1fr) minmax(320px, 1fr);
+    grid-template-areas: "mapa tabs" "mapa panel";
+  }
+  .col-mapa { grid-area: mapa; position: sticky; top: calc(var(--hdr, 140px) + 8px); }
+  .col-mapa .mapa svg { max-height: calc(100vh - var(--hdr, 140px) - 120px); }
+  .pestanas { display: flex; gap: 6px; grid-area: tabs; margin-top: 10px; }
+  .pn { grid-area: panel; }
+  .pn > .panel:first-child { margin-top: 0; border-top-left-radius: 0; border-top-right-radius: 0; }
+  .juego.pestana-acciones .pn-ciudad, .juego.pestana-ciudad .pn-acciones { display: none; }
+}
+@media (min-width: 1200px) {
+  .juego {
+    grid-template-columns: minmax(420px, 1.15fr) minmax(340px, 1fr) minmax(280px, 0.8fr);
+    grid-template-areas: "mapa acc ciu";
+  }
+  .pestanas { display: none; }
+  .juego.pestana-acciones .pn-ciudad, .juego.pestana-ciudad .pn-acciones { display: block; }
+  .pn-acciones { grid-area: acc; }
+  .mover-estrecho { display: none; }
+  .mover-ancho { display: block; }
+  .pn-ciudad { grid-area: ciu; }
+  .pn {
+    position: sticky; top: calc(var(--hdr, 140px) + 8px); max-height: calc(100vh - var(--hdr, 140px) - 16px);
+    overflow-y: auto; padding-bottom: 12px; scrollbar-width: thin;
+  }
+  .pn > .panel:first-child { margin-top: 10px; border-radius: 12px; }
+  .pn-acciones .panel { padding: 8px 12px; }
+  .pn-acciones .panel h2 { font-size: 1.2rem; }
+  .pn-acciones .btn { padding: 7px 11px; min-height: 0; }
+  .pn-acciones .btns { gap: 6px; }
+  .ciudad li { padding: 3px 0; }
+}

@@ -10,7 +10,7 @@
 
   let s = load(LS.partida, null);
   if (s && (!s.v || !s.hoy)) s = null;
-  const ui = { pantalla: s && s.fase !== "fin" ? "juego" : "inicio" };
+  const ui = { pantalla: s && s.fase !== "fin" ? "juego" : "inicio", pestana: "acciones" };
   let faseAntes = null;
   let instalar = null;
   window.addEventListener("beforeinstallprompt", (e) => { e.preventDefault(); instalar = e; });
@@ -32,7 +32,7 @@
   }
   const franjaAct = () => E.franja(Math.min(s.t, E.FIN - 1));
 
-  function cabecera() {
+  function cabecera(ancho) {
     const d = E.dia(s), m = R.MODOS[s.modo];
     const f = franjaAct();
     const chips = [
@@ -52,13 +52,13 @@
       }).join("")}</div>`;
       barra += `<p class="small muted" style="margin:4px 0 0">${s.t >= E.FIN ? "Ya es de noche." : `${R.FRANJAS[f].nombre} (${R.FRANJAS[f].hora}), rato ${E.ratoEnFranja(s.t) + 1} de ${R.RATOS}. Quedan ${E.FIN - s.t} ratos hasta que cierren la puerta.`}</p>`;
     }
-    return `<header class="top"><div class="top-in">
+    return `<header class="top"><div class="top-in${ancho ? " ancho" : ""}">
       <div class="top-row">
         <div class="top-title">Día ${s.dia} de ${R.DIAS} · ${esc(d.fecha)}<span>${esc(m.nombre)}${d.fiesta && d.tipo !== "domingo" ? " · " + esc(d.fiesta) : ""}</span></div>
-        <button class="icon-btn" data-act="ayuda" aria-label="Cómo se juega">?</button>
-        <button class="icon-btn" data-act="menu" aria-label="Menú">⋯</button>
+        <div class="estado">${chips}</div>
+        <div class="top-btns"><button class="icon-btn" data-act="ayuda" aria-label="Cómo se juega">?</button>
+        <button class="icon-btn" data-act="menu" aria-label="Menú">⋯</button></div>
       </div>
-      <div class="estado">${chips}</div>
       ${barra}
     </div></header>`;
   }
@@ -244,15 +244,19 @@
     return h + `</ul></div>`;
   }
 
+  // En el móvil, todo en una columna. En pantalla mediana, el mapa a la izquierda y a la derecha una pestaña
+  // («Qué haces» o «La ciudad»). En pantalla ancha, tres columnas: mapa, qué haces y la ciudad.
   function pantallaDia() {
     const o = E.opciones(s);
-    let h = cabecera() + `<div class="wrap">`;
-    if (s.aviso) h += `<p class="aviso ${s.aviso.tono || ""}">${esc(s.aviso.texto)}</p>`;
-    h += mapa(o);
-    h += panelAqui(o);
-    h += panelAcciones(o);
-    h += panelMover(o);
-    h += panelCiudad();
+    const p = ui.pestana === "ciudad" ? "ciudad" : "acciones";
+    let h = cabecera(true) + `<div class="juego pestana-${p}">`;
+    h += `<div class="col-mapa">${s.aviso ? `<p class="aviso ${s.aviso.tono || ""}">${esc(s.aviso.texto)}</p>` : ""}${mapa(o)}</div>`;
+    h += `<nav class="pestanas" aria-label="Paneles">
+      <button class="pestana${p === "acciones" ? " act" : ""}" data-act="pestana" data-id="acciones">Qué haces</button>
+      <button class="pestana${p === "ciudad" ? " act" : ""}" data-act="pestana" data-id="ciudad">La ciudad</button></nav>`;
+    // «Adónde vas» va con «Qué haces» en el móvil y con las pestañas; en pantalla ancha, junto a «La ciudad»
+    h += `<div class="pn pn-acciones">${panelAqui(o)}${panelAcciones(o)}<div class="mover-estrecho">${panelMover(o)}</div></div>`;
+    h += `<div class="pn pn-ciudad"><div class="mover-ancho">${panelMover(o)}</div>${panelCiudad()}</div>`;
     return h + `</div>`;
   }
 
@@ -393,6 +397,7 @@
       ui.pantalla = "juego";
     },
     continuar() { ui.pantalla = "juego"; },
+    pestana(d) { ui.pestana = d.id === "ciudad" ? "ciudad" : "acciones"; render(); return "modal"; },
     empezarDia() { E.empezarJornada(s); },
     mover(d) { E.mover(s, d.id); E.comprobarNoche(s); },
     pedir() { E.pedir(s); },
@@ -449,6 +454,8 @@
     else if (s.fase === "fin") h = pantallaFin();
     else h = pantallaDia();
     app.innerHTML = h;
+    const hdr = app.querySelector(".top");
+    document.documentElement.style.setProperty("--hdr", (hdr ? hdr.offsetHeight : 0) + "px");
     const clave = (ui.pantalla || "") + "|" + (s ? s.fase + "|" + s.dia : "");
     if (clave !== faseAntes) { window.scrollTo(0, 0); faseAntes = clave; }
   }
@@ -477,6 +484,10 @@
     if (k && s) { s.encuesta = s.encuesta || {}; s.encuesta[k] = ev.target.value; store(LS.partida, s); }
   });
 
+  window.addEventListener("resize", () => {
+    const hdr = app.querySelector(".top");
+    if (hdr) document.documentElement.style.setProperty("--hdr", hdr.offsetHeight + "px");
+  });
   aplicarTema();
   render();
   if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(() => {});

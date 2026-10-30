@@ -169,6 +169,19 @@
     detencionesMax: 3,
     // la siega empieza al acabar el último día: cogen segadores según el cuerpo (no se dice la cifra; se aprende)
     siega: { probPorCuerpo: { 6: 1, 5: 1, 4: 1, 3: 0.5 } },
+    // la llaga (fingir): una vez, de noche en la ribera, y para siempre. Más limosna y el alguacil no te pregunta
+    // (Robles: al que ve con una llaga «no le puede preguntar más»); pero ni las obras ni el mayoral te cogen.
+    // Nada de esto se explica: lo dicen el viejo de la ribera, el capataz, el alguacil y el mayoral.
+    llaga: {
+      limosna: 1,   // la tirada de limosna (1 a 6) sube tantos puntos
+      cuerpo: -1,   // la noche que te la haces: fiebre
+      cuerpoMax: 5, // desde entonces el cuerpo no pasa de aquí
+      encona: 1 / 3, // cada noche siguiente, probabilidad de que se encone (−1 de cuerpo): cuanto antes, más noches
+      parar: 0,     // multiplica la probabilidad de que la ronda te pare al llegar, mientras dure la protección
+      protege: 3,   // cuántas veces te deja pasar el alguacil por la llaga; luego te reconoce (0: siempre)
+      pillar: 1,    // multiplica la de que te vea pidiendo (pedir sigue prohibido)
+      noche: 1,     // multiplica la de la ronda de noche
+    },
   };
 
   const LICENCIAS = [
@@ -180,7 +193,7 @@
   ];
 
   window.RULES = {
-    version: "j0.6", CONFIG, FRANJAS, RATOS, DIAS, MODOS, BARRIOS, LUGARES, CAMINOS, CALENDARIO, DIAS_SENALADOS,
+    version: "j0.7-llaga", CONFIG, FRANJAS, RATOS, DIAS, MODOS, BARRIOS, LUGARES, CAMINOS, CALENDARIO, DIAS_SENALADOS,
     RONDA, PARAMS, LICENCIAS,
     // la mesa de los agentes pregunta por PERSONAJES: en el juguete, cada «personaje» es una prueba
     PERSONAJES: [

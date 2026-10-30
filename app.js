@@ -36,7 +36,7 @@
     const d = E.dia(s), m = R.MODOS[s.modo];
     const f = franjaAct();
     const chips = [
-      `<div class="chip${s.cuerpo <= 2 ? " alerta" : ""}">Cuerpo<b>${s.cuerpo}/${P.cuerpoMax}</b></div>`,
+      `<div class="chip${s.cuerpo <= 2 || s.llaga ? " alerta" : ""}">${s.llaga ? "Cuerpo · llaga" : "Cuerpo"}<b>${s.cuerpo}/${E.cuerpoMax(s)}</b></div>`,
       `<div class="chip${s.pan === 0 ? " alerta" : ""}">Pan<b>${s.pan}</b></div>`,
       `<div class="chip${s.conocido ? " alerta" : ""}">Fichado<b>${s.conocido ? "sí" : "no"}</b></div>`,
       `<div class="chip${s.detenciones ? " alerta" : ""}">Detenciones<b>${s.detenciones}/${P.detencionesMax}</b></div>`,
@@ -299,8 +299,19 @@
       return h;
     }
     const donde = s.duerme === "portal" ? `Duermes en un portal de ${L[s.lugar].nombre}, dentro de la muralla.` : `${s.bajaRibera ? "En el puente no se puede dormir: toda la noche pasan carros y el portazguero echa a los que se tumban. Bajas a la ribera. " : ""}Duermes al raso en la ribera, fuera de la muralla.`;
-    h += `<div class="panel"><p>${esc(donde)}</p><p>Tienes <b>${s.pan}</b> ${s.pan === 1 ? "pedazo" : "pedazos"} de pan. Una ración son 2 pedazos. Puedes guardar hasta ${P.panMax}.</p>${s.trabajoHoy ? `<p>Estás molido del trabajo: −${P.trabajo.cansancio} de cuerpo esta noche.</p>` : ""}</div><div class="btns">`;
-    const fx = (n) => { const v = P.cena[n] - (s.trabajoHoy ? P.trabajo.cansancio : 0); return `${v >= 0 ? "+" : "−"}${Math.abs(v)} de cuerpo`; };
+    const fiebre = s.llaga && s.llaga === s.dia;
+    h += `<div class="panel"><p>${esc(donde)}</p><p>Tienes <b>${s.pan}</b> ${s.pan === 1 ? "pedazo" : "pedazos"} de pan. Una ración son 2 pedazos. Puedes guardar hasta ${P.panMax}.</p>${s.trabajoHoy ? `<p>Estás molido del trabajo: −${P.trabajo.cansancio} de cuerpo esta noche.</p>` : ""}</div>`;
+    // el viejo de la ribera: lo que da la llaga lo dice él; lo que cuesta, nadie
+    if (E.puedeLlaga(s)) {
+      const viejo = s.viejo === 1
+        ? "Junto al fuego, un viejo se descubre la pierna: una llaga abierta, en carne viva. «Esta me da de comer. Ranúnculo y sal, un trapo sucio encima, y no dejarla cerrar nunca.»"
+        : "El viejo de la llaga duerme a tu lado, con la pierna al aire.";
+      h += `<div class="panel"><p>${esc(viejo)}</p></div><div class="btns">${btn("llaga", "Hacerte una llaga como la suya", "no la dejarás cerrar")}</div>`;
+    } else if (fiebre) {
+      h += `<div class="panel res mal"><p>Te frotas la pierna con ranúnculo y sal hasta que se abre la carne. Arde. El viejo te ata un trapo encima.</p><p>Esta noche, fiebre: −${-P.llaga.cuerpo} de cuerpo.</p></div>`;
+    }
+    h += `<div class="btns">`;
+    const fx = (n) => { const v = P.cena[n] - (s.trabajoHoy ? P.trabajo.cansancio : 0) + (fiebre ? P.llaga.cuerpo : 0); return `${v >= 0 ? "+" : "−"}${Math.abs(v)} de cuerpo`; };
     if (s.pan >= 2) h += btn("cenar", "Cenar una ración entera", `2 pedazos · ${fx(2)}`, { cls: "primary", data: { n: 2 } });
     if (s.pan >= 1) h += btn("cenar", "Cenar media ración", `1 pedazo · ${fx(1)}${s.pan > 1 ? " · guardas el resto" : ""}`, { data: { n: 1 } });
     h += btn("cenar", s.pan ? "No cenar" : "Acostarte sin cenar", `${fx(0)}${s.pan ? " · guardas el pan" : ""}`, { data: { n: 0 } });
@@ -471,6 +482,7 @@
     acabar() { E.acabarDia(s); E.comprobarNoche(s); },
     seguir() { E.seguir(s); },
     cenar(d) { E.cenar(s, +d.n || 0); if (s.fase === "fin") guardarEnHistorial(); },
+    llaga() { E.hacerLlaga(s); },
     nueva() { ui.pantalla = "inicio"; },
     inicio() { cerrarModal(); ui.pantalla = "inicio"; },
     ayuda() { abrirModal(ayudaHtml()); return "modal"; },

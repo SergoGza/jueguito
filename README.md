@@ -50,6 +50,34 @@ Todo está en `rules.js` y la ayuda del juego lo explica.
 
 Repetir rutina se paga; darse cuenta y cambiarla compensa.
 
+## La llaga (rama `llaga`, versión j0.7-llaga; no está en `main` ni en GitHub Pages)
+
+Fingir entra por la llaga, decidido el 30 de octubre de 2026. Sale de Robles (Salamanca, 1545): «la llaga de la pierna le es un Perú», y al que ve con una llaga la justicia «no le puede preguntar más». Y de la vuelta que le da Soto con san Juan Crisóstomo: «si el pobre finge alguna lesión, por necesidad y menester grande la finge, por causa de tu crueldad». Se ha hecho en una rama aparte para no tocar la j0.6 mientras la prueba la gente.
+
+- **Cómo.** De noche en la ribera, una sola vez y para siempre. Lo enseña un viejo que duerme allí: «Esta me da de comer». Lo que cuesta no lo dice nadie; lo dicen el capataz, el alguacil y el mayoral.
+- **Lo que da.** La tirada de limosna sube 1. Las tres primeras veces que llegas a donde está la ronda, el alguacil te mira la pierna y sigue su camino. A la cuarta ya no le vale: «Otra vez tú, el de la pierna. Esa llaga ya me la sé».
+- **Lo que cuesta.** Esa noche, fiebre (−1 de cuerpo). El cuerpo ya no pasa de 5. Cada noche siguiente, una de cada tres se encona (−1). Ni las obras ni el mayoral te cogen: el final es aguantar sin siega.
+- **Palancas** en `PARAMS.llaga`: `limosna`, `cuerpo`, `cuerpoMax`, `encona`, `parar`, `protege`, `pillar`, `noche`.
+
+**Calibrado con bots** (`LLAGA=1 node herramientas/bot.js 2000`; juegan como el veterano). Por parejas con la misma semilla, solo en las partidas en que el bot se hizo la llaga:
+
+| Cuándo se la hace | Llega con llaga | El veterano sin llaga llega | De ellos, con siega |
+|---|---|---|---|
+| La primera noche | 53 % | 49 % | 30 % |
+| Desde el día 3 | 59 % | 52 % | 31 % |
+| Desde el día 5 | 65 % | 56 % | 34 % |
+| Desde el día 7 | 78 % | 67 % | 41 % |
+| En apuros (desde el día 4, cuerpo ≤ 2 o dos detenciones) | 54 % | 43 % | 22 % |
+
+Hacérsela pronto casi no salva y pierde la siega. Tarde, y sobre todo en apuros, salva unos 11 de cada 100 a cambio de una siega que ya era difícil. Se llegó aquí tras descartar dos versiones:
+
+- **Protección para siempre** (más limosna y el alguacil no te para nunca): hacérsela la primera noche llegaba al 97 %. Quitaba las dos formas de morir y, después de hacérsela, la partida ya no tenía tensión.
+- **Protección a medias** (el alguacil te para la mitad de las veces): como protege lo mismo cada día, el momento daba igual. Cuando la llaga temprana quedaba igualada con no hacérsela, la tardía tampoco ayudaba.
+
+Con la protección que se gasta, la hecha pronto la gasta pronto y la hecha en apuros la guarda para el final.
+
+**Del núcleo, de paso:** casi todas las detenciones del veterano (1,4 por partida) son por llegar a donde está la ronda cuando ya te tiene fichado. Pidiendo, solo 0,15; de noche, 0,22 (`DESGLOSE=1`).
+
 ## El informe
 
 Al acabar (o al abandonar), cinco preguntas y el informe: la partida entera, el tiempo repartido entre moverse, pedir, trabajar y esperar, los pasos o cruces por día, las veces que llegó donde estaba la ronda, la crónica, dónde estuvo la ronda en cada franja (que el jugador no veía) y los datos en bruto.

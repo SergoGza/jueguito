@@ -5,6 +5,8 @@
 //   node herramientas/bot.js [N] [palancas-json]
 //   PRUEBAS=A,B node herramientas/bot.js 1000      (también la prueba B)
 //   RUTINA=1 node herramientas/bot.js 1000         (el veterano y el prudente no se dan cuenta de que la ronda aprende)
+//   LLAGA=1 node herramientas/bot.js 2000          (el veterano con distintas reglas para hacerse la llaga, y comparación por parejas)
+//   DESGLOSE=1 ...                                 (detenciones por partida según el motivo)
 //   node herramientas/bot.js 1000 '{"PARAMS.pararAlLlegar":{"desconocido":0.3,"conocido":0.4}}'
 //
 // Bots:
@@ -101,7 +103,8 @@ function valor(s, l, f, lambda) {
   const g = genteBase(s, l, s.dia, f);
   if (g < 2) return -9;
   const LT = s.dia >= P.escasezDesde ? P.limosnaEscasez : P.limosna;
-  const media = (da) => (da >= 3 ? LT[3] : da === 2 ? LT[2] : [0]).reduce((a, b) => a + b, 0) / (da >= 2 ? 6 : 1);
+  const sube = s.llaga ? P.llaga.limosna : 0; // con la llaga, la tirada sube
+  const media = (da) => (da < 2 ? 0 : [1, 2, 3, 4, 5, 6].reduce((a, t) => a + LT[da >= 3 ? 3 : 2][Math.min(6, t + sube) - 1], 0) / 6);
   const pp = E.L[l].pobres;
   const ev = (1 - pp) * media(g) + pp * media(g - 1);
   const circ = (R.CALENDARIO[s.dia - 1].tipo === "corpus" ? R.RONDA.circuitoCorpus : R.RONDA.circuito)[f];
@@ -136,7 +139,7 @@ function veterano(s, rnd, g, lambda, dentro) {
   }
   const r = E.rondaEnTuZona(s);
   const tr = o.acc.find((x) => x.id === "trabajo");
-  if (tr && tr.ok && s.cuerpo >= 4) return E.pedirTrabajo(s);
+  if (tr && tr.ok && s.cuerpo >= 4 && !s.llaga) return E.pedirTrabajo(s);
   const pd = o.acc.find((x) => x.id === "pedir");
   if (pd && pd.ok && !r) {
     const sig = s.t % 6 !== 0 && R.RONDA.circuito[f + 1] && E.zonaDe(s, R.RONDA.circuito[f + 1]) === E.zonaDe(s, s.lugar);
@@ -164,6 +167,21 @@ const BOTS = {
   "dentro-ciego": (s, rnd, g) => veterano(s, rnd, g, 1.5, "ciego"),
 };
 
+// la llaga: cuándo se la hace el bot (de noche, en la ribera). Juegan como el veterano.
+//   llaga-dN     la primera noche en la ribera desde el día N, pase lo que pase.
+//   llaga-apurado  solo cuando va mal: desde el día 4, con el cuerpo a 2 o menos o con dos detenciones,
+//                  y si la fiebre no le mata esa noche.
+const sobrevive = (s) => s.cuerpo + P.cena[Math.min(2, s.pan)] + P.llaga.cuerpo - (s.trabajoHoy ? P.trabajo.cansancio : 0) > 0;
+const LLAGA = {
+  "llaga-d1": (s) => s.dia >= 1,
+  "llaga-d3": (s) => s.dia >= 3,
+  "llaga-d5": (s) => s.dia >= 5,
+  "llaga-d7": (s) => s.dia >= 7,
+  "llaga-apurado": (s) => s.dia >= 4 && (s.cuerpo <= 2 || s.detenciones >= 2) && sobrevive(s),
+};
+for (const k of Object.keys(LLAGA)) BOTS[k] = BOTS.veterano;
+const SOLO = process.env.LLAGA ? ["veterano", ...Object.keys(LLAGA)] : null;
+
 // ------------------------------------------------------------------ partidas
 function jugar(modo, bot, sem) {
   let st = 12345 + sem * 7919;
@@ -174,7 +192,7 @@ function jugar(modo, bot, sem) {
   while (s.fase !== "fin" && guard++ < 5000) {
     if (s.fase === "amanecer") { E.empezarJornada(s); continue; }
     if (s.fase === "resultado") { E.seguir(s); continue; }
-    if (s.fase === "noche") { E.cenar(s, 2); continue; }
+    if (s.fase === "noche") { if (LLAGA[bot] && E.puedeLlaga(s) && LLAGA[bot](s)) E.hacerLlaga(s); E.cenar(s, 2); continue; }
     if (s.t >= E.FIN) { E.comprobarNoche(s); continue; }
     const clave = s.dia * 100 + s.t;
     g.libres = g.clave === clave ? g.libres + 1 : 0; g.clave = clave; // en B, moverse dentro del barrio no gasta tiempo
@@ -187,23 +205,50 @@ function jugar(modo, bot, sem) {
 
 const pct = (x, n) => `${Math.round((100 * (x || 0)) / n)}`.padStart(3) + " %";
 console.log(`${N} partidas por bot y prueba · versión ${R.version}${Object.keys(pal).length ? " · palancas " + JSON.stringify(pal) : ""}\n`);
-console.log("prueba bot           | siega  sin siega | hambre  destierro  azotes | día   cuerpo* | pan/día  moverse  pasos o cruces/día  ronda al llegar/día");
+console.log("prueba bot             | siega  sin siega | hambre  destierro  azotes | día   cuerpo* | pan/día  moverse  pasos o cruces/día  ronda al llegar/día | llaga");
 // por defecto solo la prueba A (el núcleo desde el 30 de octubre de 2026); PRUEBAS=A,B para las dos
+const llega = (s) => s.final.tipo === "siega" || s.final.tipo === "aguanta";
+const finales = {}; // bot → semilla → partida (para comparar por parejas con la misma semilla)
 for (const modo of (process.env.PRUEBAS || "A").split(",")) {
-  for (const bot of Object.keys(BOTS)) {
-    const fin = {}; let dias = 0, cuerpo = 0, llegan = 0, T = null;
+  for (const bot of SOLO || Object.keys(BOTS)) {
+    const fin = {}; let dias = 0, cuerpo = 0, llegan = 0, llagados = 0, T = null;
+    finales[bot] = [];
     for (let i = 1; i <= N; i++) {
       const s = jugar(modo, bot, i);
+      finales[bot][i] = { tipo: s.final.tipo, llaga: s.llaga || 0, dia: s.final.dia };
       fin[s.final.tipo] = (fin[s.final.tipo] || 0) + 1;
       dias += s.final.dia;
-      if (s.final.tipo === "siega" || s.final.tipo === "aguanta") { cuerpo += s.cuerpo; llegan++; }
+      if (s.llaga) llagados++;
+      if (process.env.DESGLOSE) for (const c of s.cronica) if (c.tipo === "detenido") { const m = c.motivo.startsWith("pidiendo") ? "pidiendo" : c.motivo; (fin.det = fin.det || {})[m] = (fin.det[m] || 0) + 1; }
+      if (llega(s)) { cuerpo += s.cuerpo; llegan++; }
       const t = E.resumenDias(s);
       if (!T) T = t; else Object.keys(t).forEach((k) => (T[k] += t[k]));
     }
     const ratos = T.mover + T.pedir + T.trabajar + T.esperar + T.perdido || 1;
     const mov = modo === "A" ? T.pasos : T.cruces;
-    console.log(`${modo}      ${bot.padEnd(13)} | ${pct(fin.siega, N)}  ${pct(fin.aguanta, N)}     | ${pct(fin.hambre, N)}  ${pct(fin.desterrado, N)}      ${pct(fin.muerto, N)} | ${(dias / N).toFixed(1).padStart(4)}  ${llegan ? (cuerpo / llegan).toFixed(1) : " — "}     | ${((T.panPedido + T.panTrabajo) / dias).toFixed(2).padStart(5)}    ${pct(T.mover, ratos)}   ${(mov / dias).toFixed(1).padStart(4)}                ${(T.encuentros / dias).toFixed(2)}`);
+    console.log(`${modo}      ${bot.padEnd(15)} | ${pct(fin.siega, N)}  ${pct(fin.aguanta, N)}     | ${pct(fin.hambre, N)}  ${pct(fin.desterrado, N)}      ${pct(fin.muerto, N)} | ${(dias / N).toFixed(1).padStart(4)}  ${llegan ? (cuerpo / llegan).toFixed(1) : " — "}     | ${((T.panPedido + T.panTrabajo) / dias).toFixed(2).padStart(5)}    ${pct(T.mover, ratos)}   ${(mov / dias).toFixed(1).padStart(4)}                ${(T.encuentros / dias).toFixed(2)}                | ${pct(llagados, N)}`);
+    if (fin.det) console.log("         detenciones por partida: " + Object.entries(fin.det).map(([k, v]) => `${k} ${(v / N).toFixed(2)}`).join(" · "));
   }
   console.log("");
+  // por parejas: en las semillas en que el bot se hizo la llaga, qué le pasó y qué le pasó al veterano (que no se la hace)
+  if (finales.veterano && Object.keys(LLAGA).some((b) => finales[b])) {
+    console.log("Por parejas (misma semilla), solo las partidas en que el bot se hizo la llaga:");
+    console.log("bot             | partidas | llega con llaga | el veterano llega | el veterano siega");
+    for (const b of Object.keys(LLAGA)) {
+      if (!finales[b]) continue;
+      let n = 0, a = 0, v = 0, vs = 0;
+      for (let i = 1; i <= N; i++) {
+        const x = finales[b][i];
+        if (!x.llaga) continue;
+        n++;
+        if (x.tipo === "siega" || x.tipo === "aguanta") a++;
+        const y = finales.veterano[i];
+        if (y.tipo === "siega" || y.tipo === "aguanta") v++;
+        if (y.tipo === "siega") vs++;
+      }
+      console.log(`${b.padEnd(15)} | ${String(n).padStart(8)} | ${n ? pct(a, n) : "  —  "}           | ${n ? pct(v, n) : "  —  "}             | ${n ? pct(vs, n) : "  —  "}`);
+    }
+    console.log("");
+  }
 }
 console.log("* cuerpo medio de los que llegan a la siega (con siega o sin ella).");

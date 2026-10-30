@@ -35,6 +35,8 @@
   const mundo = (s, clave) => hash(`${s.semilla}|${clave}`);
   const tirar = (s, clave) => hash(`${s.semilla}|acc|${s.n++}|${clave}`);
   const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+  const LL = P.llaga || {};
+  const cuerpoMax = (s) => (s.llaga ? LL.cuerpoMax : P.cuerpoMax);
 
   // ------------------------------------------------------------------ tiempo
   const franja = (t) => Math.min(R.FRANJAS.length - 1, Math.floor(t / R.RATOS));
@@ -264,11 +266,14 @@
     const r = rondaEnTuZona(s);
     if (r && zonaDe(s, destino) !== zonaAntes) {
       s.hoy.encuentros++;
-      const p = s.conocido ? P.pararAlLlegar.conocido : P.pararAlLlegar.desconocido;
+      // la llaga te protege mientras el alguacil no se haya hecho a ella (LL.protege veces; 0: siempre)
+      const cubre = s.llaga && (!LL.protege || (s.llagaPasadas || 0) < LL.protege);
+      const p = (s.conocido ? P.pararAlLlegar.conocido : P.pararAlLlegar.desconocido) * (cubre ? LL.parar : 1);
       const donde = r === destino ? "aquí" : `en ${L[r].nombre}`;
       apunta(s, "encuentro", `Llega a ${L[destino].corto} y la ronda está ${donde}.`);
       if (tirar(s, "parar") < p) { parar(s, r); return true; }
-      s.aviso = { texto: `La ronda está ${donde}. Pasas sin que te paren.`, tono: "mal" };
+      if (cubre) s.llagaPasadas = (s.llagaPasadas || 0) + 1;
+      s.aviso = { texto: cubre ? `La ronda está ${donde}. El alguacil te mira la pierna y sigue su camino.` : `La ronda está ${donde}. Pasas sin que te paren.`, tono: "mal" };
     } else if (mv.tipo !== "libre") {
       s.aviso = { texto: `Llegas a ${L[destino].nombre}.`, tono: "neutro" };
     }
@@ -278,8 +283,10 @@
   function parar(s, r) {
     s.hoy.paradas++;
     const sabia = s.rondasPorque[`${s.dia}|${franja(s.t)}`] === "aprendido";
+    const pierna = s.llaga && LL.protege && (s.llagaPasadas || 0) >= LL.protege;
     if (s.conocido) {
-      detener(s, "parado", [sabia ? "El alguacil te reconoce: «Sabía que te encontraría aquí». Te llevan a la cárcel." : "El alguacil te reconoce: ya te tenían visto. Te llevan a la cárcel."]);
+      detener(s, "parado", [pierna ? "El alguacil se planta delante: «Otra vez tú, el de la pierna. Esa llaga ya me la sé». Te llevan a la cárcel."
+        : sabia ? "El alguacil te reconoce: «Sabía que te encontraría aquí». Te llevan a la cárcel." : "El alguacil te reconoce: ya te tenían visto. Te llevan a la cárcel."]);
       return;
     }
     s.conocido = true;
@@ -338,11 +345,11 @@
     // si la ronda viene por el aviso que acabas de provocar, llega cuando ya terminas: no te pilla esta vez
     const porTuAviso = r1 === lugar && s.rondasPorque[k1] === "aviso" && avisoPrevio === 0;
     const r1zona = r1 && !porTuAviso && zonaDe(s, r1) === zonaDe(s, lugar) ? r1 : null;
-    const pP = (e) => P.pillarPidiendo[e.da >= 3 ? 3 : 2];
+    const pP = (e) => P.pillarPidiendo[e.da >= 3 ? 3 : 2] * (s.llaga ? LL.pillar : 1);
     let pillado = null;
     if (r0 && tirar(s, "pillar0") < pP(e0) * seg1 / R.RATOS) pillado = "estaba";
     if (!pillado && r1zona && tirar(s, "pillar1") < pP(estado(s, lugar, s.dia, f0 + 1)) * seg2 / R.RATOS) pillado = "llega";
-    const tir = 1 + Math.floor(tirar(s, "limosna") * 6);
+    const tir = Math.min(6, 1 + Math.floor(tirar(s, "limosna") * 6) + (s.llaga ? LL.limosna : 0));
     const tabla = s.dia >= P.escasezDesde ? P.limosnaEscasez : P.limosna;
     const gana = tabla[e0.da >= 3 ? 3 : 2][tir - 1];
     if (pillado) {
@@ -362,6 +369,7 @@
     s.hoy.panPedido += gana - sobra;
     const lin = [];
     if (gana === 0) lin.push(`Pides en ${L[lugar].nombre}. No te dan nada.`);
+    else if (s.llaga) lin.push(`Pides en ${L[lugar].nombre} con la pierna al aire. Te dan ${gana === 1 ? "un pedazo de pan" : gana + " pedazos de pan"}, sin mirarte a la cara.`);
     else lin.push(`Pides en ${L[lugar].nombre}. Te dan ${gana === 1 ? "un pedazo de pan" : gana + " pedazos de pan"}.`);
     if (sobra) lin.push(`No te cabe todo en el hatillo: se pierde${sobra === 1 ? " un pedazo" : "n " + sobra + " pedazos"}.`);
     const rFin = rondaEnTuZona(s);
@@ -380,7 +388,7 @@
     const t0 = s.t;
     s.trabajoPedido = true;
     pasar(s, P.trabajo.pedirRatos, "trabajar", true);
-    const p = P.trabajo.probPorCuerpo[s.cuerpo] || 0;
+    const p = s.llaga ? 0 : P.trabajo.probPorCuerpo[s.cuerpo] || 0;
     if (tirar(s, "trabajo") < p) {
       const hasta = P.trabajo.hasta * R.RATOS;
       pasar(s, hasta - s.t, "trabajar", true);
@@ -398,7 +406,8 @@
     } else {
       apunta(s, "trabajo", "No le cogen en las obras.", { t: t0 });
       // con el cuerpo bajo, el capataz lo dice a su manera; las reglas no
-      const linea = s.cuerpo <= 3 ? "El capataz te mira de arriba abajo: «Tus brazos no me valen, muchacho.»" : "El capataz elige a otros. Hoy sobran brazos.";
+      const linea = s.llaga ? "El capataz te ve la pierna: «¿Con eso vas a cargar piedra? Vete a pedir, que es lo tuyo.»"
+        : s.cuerpo <= 3 ? "El capataz te mira de arriba abajo: «Tus brazos no me valen, muchacho.»" : "El capataz elige a otros. Hoy sobran brazos.";
       resultado(s, "No te cogen", [linea], "neutro");
     }
     return true;
@@ -438,6 +447,17 @@
     // en el puente no se duerme: fuera de la muralla, se duerme en la ribera
     s.bajaRibera = !s.detenidoHoy && !L[s.lugar].dentro && s.lugar !== "ribera";
     if (s.bajaRibera) s.lugar = "ribera";
+    // en la ribera duerme el viejo de la llaga: cuántas noches lo has tenido al lado
+    if (puedeLlaga(s)) s.viejo = (s.viejo || 0) + 1;
+  }
+
+  // la llaga: de noche en la ribera, una vez y para siempre. Te la enseña el viejo; lo que cuesta no lo dice nadie.
+  function puedeLlaga(s) { return !!P.llaga && s.fase === "noche" && s.duerme === "raso" && !s.llaga; }
+  function hacerLlaga(s) {
+    if (!puedeLlaga(s)) return false;
+    s.llaga = s.dia;
+    apunta(s, "llaga", "Se hace una llaga en la pierna, como el viejo.");
+    return true;
   }
 
   // la noche dentro de la muralla: dónde ha habido quejas hoy en tu zona (la tuya o la de otros pobres)
@@ -484,7 +504,7 @@
       if (s.trabajoHoy) { dc -= P.trabajo.cansancio; lin.push("Estás molido del trabajo."); }
       if (s.duerme === "portal") {
         const rn = riesgoNoche(s);
-        const p = P.nocheDentro[rn.nivel][s.conocido ? 1 : 0];
+        const p = P.nocheDentro[rn.nivel][s.conocido ? 1 : 0] * (s.llaga ? LL.noche : 1);
         s.hoy.nocheNivel = rn.nivel;
         if (tirar(s, "noche") < p) {
           detenidoNoche = true;
@@ -501,7 +521,9 @@
         } else lin.push(`Duermes en un portal de ${L[s.lugar].nombre}. Nadie te molesta.`);
       } else lin.push("Duermes al raso en la ribera.");
     }
-    s.cuerpo = clamp(s.cuerpo + dc, 0, P.cuerpoMax);
+    if (s.llaga && s.llaga === s.dia) { dc += LL.cuerpo; lin.push("La llaga te da fiebre toda la noche."); }
+    else if (s.llaga && LL.encona && tirar(s, "encona") < LL.encona) { dc -= 1; lin.push("La llaga se te ha enconado: supura y te sube la fiebre."); }
+    s.cuerpo = clamp(s.cuerpo + dc, 0, cuerpoMax(s));
     s.porDia.push(Object.assign({ dia: s.dia, modo: s.modo, cuerpoNoche: s.cuerpo, comido, duerme: s.duerme, detenido: s.detenidoHoy || (detenidoNoche ? "de noche" : null) }, s.hoy, { lugares: Object.keys(s.hoy.lugares).length }));
     apunta(s, "noche", `Noche (${DUERME[s.duerme]}${s.hoy.nocheNivel ? ", " + s.hoy.nocheNivel : ""}): come ${comido}, cuerpo ${antes} → ${s.cuerpo}.`);
     s.noche = { lineas: lin, antes, despues: s.cuerpo, dia: s.dia, detenido: s.duerme === "carcel" || detenidoNoche };
@@ -514,6 +536,7 @@
     }
     if (s.dia >= R.DIAS) {
       // la siega: el mayoral mira los brazos antes de dar la hoz
+      if (s.llaga) return fin(s, "aguanta", "Al amanecer empieza la siega. El mayoral te ve la pierna y pasa de largo sin mirarte los brazos. Has aguantado, y tu llaga te seguirá dando de comer en la ciudad.");
       const p = P.siega.probPorCuerpo[s.cuerpo] || 0;
       if (tirar(s, "siega") < p) return fin(s, "siega", "Al amanecer empieza la siega. El mayoral te mira los brazos y te da una hoz. Unas semanas comerás de tu trabajo; después, otra vez a la ribera.");
       return fin(s, "aguanta", "Al amanecer empieza la siega. El mayoral te mira y pasa de largo: «Tus brazos no me valen, muchacho». Has aguantado, pero no te quiere nadie.");
@@ -551,7 +574,7 @@
     L2.push(`Versión: ${s.v} · ${m.nombre} · semilla ${s.semilla}${s.semillaFija ? " (fija)" : ""}`);
     L2.push(`Empezada: ${s.empezada}`);
     L2.push(`Final: ${s.final ? `${FINALES[s.final.tipo] || s.final.tipo}, día ${s.final.dia}. ${s.final.texto}` : "sin acabar"}`);
-    L2.push(`Cuerpo al final: ${s.cuerpo} · detenciones: ${s.detenciones}`);
+    L2.push(`Cuerpo al final: ${s.cuerpo} · detenciones: ${s.detenciones} · llaga: ${s.llaga ? "se la hizo la noche del día " + s.llaga : "no"}`);
     L2.push("");
     L2.push("== Encuesta ==");
     const E = s.encuesta || {};
@@ -596,7 +619,7 @@
     }
     L2.push("");
     L2.push("== Datos en bruto ==");
-    L2.push(JSON.stringify({ v: s.v, modo: s.modo, semilla: s.semilla, final: s.final, porDia: s.porDia, encuesta: s.encuesta, rondas: s.rondas, rondasPorque: s.rondasPorque, habitos: s.habitos, vistas: s.vistas, recuerdaAbierto: s.recuerdaAbierto }));
+    L2.push(JSON.stringify({ v: s.v, modo: s.modo, semilla: s.semilla, final: s.final, porDia: s.porDia, encuesta: s.encuesta, rondas: s.rondas, rondasPorque: s.rondasPorque, habitos: s.habitos, vistas: s.vistas, recuerdaAbierto: s.recuerdaAbierto, llaga: s.llaga || null }));
     return L2.join("\n");
   }
 
@@ -604,7 +627,7 @@
     FIN, L, VECINOS, DEL_BARRIO, CRUCES, BARRIO, GENTE_TXT, FINALES,
     franja, ratoEnFranja, nombreFranja, dia, estado, zonaDe, lugaresZona, rondaAhora, rondaEnTuZona, edad,
     nueva, opciones, previsionPedir, mover, pedir, pedirTrabajo, esperar, acabarDia, seguir, comprobarNoche, cenar,
-    informe, resumenDias, momentoTxt, riesgoNoche, saberNoche,
+    informe, resumenDias, momentoTxt, riesgoNoche, saberNoche, puedeLlaga, hacerLlaga, cuerpoMax,
     empezarJornada(s) { if (s.fase === "amanecer") { s.fase = "dia"; s.noche = null; } },
   };
 })();

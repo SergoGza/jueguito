@@ -3,6 +3,8 @@
 //
 // Uso (desde la raíz del repositorio):
 //   node herramientas/bot.js [N] [palancas-json]
+//   PRUEBAS=A,B node herramientas/bot.js 1000      (también la prueba B)
+//   RUTINA=1 node herramientas/bot.js 1000         (el veterano y el prudente no se dan cuenta de que la ronda aprende)
 //   node herramientas/bot.js 1000 '{"PARAMS.pararAlLlegar":{"desconocido":0.3,"conocido":0.4}}'
 //
 // Bots:
@@ -11,7 +13,8 @@
 //   novato     no conoce la ciudad: entra, va a sitios al azar, pide donde hay gente si no ve la ronda, no repite sitio
 //              el mismo día y vuelve a la ribera antes de que cierren.
 //   veterano   conoce los horarios de la gente y el recorrido de costumbre de la ronda (lo que aprende un jugador en
-//              unas partidas). Elige adónde ir por lo que espera sacar menos el riesgo. Arriesga más.
+//              unas partidas). Elige adónde ir por lo que espera sacar menos el riesgo. Arriesga más. No repite sitio y
+//              hora cuando ve que la ronda se lo ha aprendido.
 //   prudente   como el veterano, pero pesa el triple el riesgo de la ronda.
 //   dentro-listo   como el veterano, pero duerme siempre dentro de la muralla, buscando un sitio sin quejas que él sepa.
 //   dentro-ciego   como el veterano, pero duerme siempre dentro, donde le pille la noche.
@@ -105,6 +108,10 @@ function valor(s, l, f, lambda) {
   let pr = R.RONDA.desvio * E.lugaresZona(s, E.zonaDe(s, l)).filter((x) => E.L[x].dentro).length / 8;
   if (circ && E.zonaDe(s, circ) === E.zonaDe(s, l)) pr += 1 - R.RONDA.desvio;
   if (s.pedidoHoy.some((p) => p.lugar === l)) pr += 0.4;
+  // la ronda aprende: el veterano y el prudente se dan cuenta (lo ven en Recuerdos) y no repiten sitio y hora;
+  // con RUTINA=1 no se dan cuenta
+  const ap = R.RONDA.aprende;
+  if (ap && !process.env.RUTINA) { const h = ((s.habitos || {})[f] || {})[l]; if (h && h.length >= ap.minDias - 1) pr += ap.prob * (h.length >= ap.minDias ? 1 : 0.5); }
   return ev - pr * (g >= 3 ? 0.5 : 1) * lambda;
 }
 // dormir dentro: buscar, con lo que ha visto hoy (dónde pidió y dónde vio pobres), un sitio sin quejas; «ciego» duerme donde le pille
@@ -181,7 +188,8 @@ function jugar(modo, bot, sem) {
 const pct = (x, n) => `${Math.round((100 * (x || 0)) / n)}`.padStart(3) + " %";
 console.log(`${N} partidas por bot y prueba · versión ${R.version}${Object.keys(pal).length ? " · palancas " + JSON.stringify(pal) : ""}\n`);
 console.log("prueba bot           | siega  sin siega | hambre  destierro  azotes | día   cuerpo* | pan/día  moverse  pasos o cruces/día  ronda al llegar/día");
-for (const modo of ["A", "B"]) {
+// por defecto solo la prueba A (el núcleo desde el 30 de octubre de 2026); PRUEBAS=A,B para las dos
+for (const modo of (process.env.PRUEBAS || "A").split(",")) {
   for (const bot of Object.keys(BOTS)) {
     const fin = {}; let dias = 0, cuerpo = 0, llegan = 0, T = null;
     for (let i = 1; i <= N; i++) {

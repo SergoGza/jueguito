@@ -4,6 +4,8 @@
 (function () {
   const CONFIG = {
     email: "sergiogza0@gmail.com", // a donde van los informes (en GitHub Pages queda a la vista)
+    // A (calles) es el núcleo desde el 30 de octubre de 2026. B (barrios) queda en el código: se juega con ?prueba=B.
+    pruebas: ["A"],
   };
 
   // El día: seis horas canónicas. Cada franja son 6 ratos.
@@ -136,6 +138,9 @@
     circuitoCorpus: ["plaza", "rua", "rua", "rua", "plaza", "puerta"], // acompaña la procesión
     desvio: 0.3,     // probabilidad de ir a otro sitio de dentro al azar (si nadie ha avisado)
     persigue: [0, 0.4, 0.8, 0.9], // probabilidad de ir donde hay quejas, según cuántas (0, 1, 2, 3 o más)
+    // la ronda aprende tus costumbres: si te han visto pedir en el mismo sitio a la misma hora en minDias días
+    // distintos (donde alguien avisa), desde entonces suele ir allí a esa hora. No se explica: lo dice el alguacil.
+    aprende: { minDias: 2, prob: 0.6 },
   };
 
   const PARAMS = {
@@ -175,7 +180,7 @@
   ];
 
   window.RULES = {
-    version: "j0.5", CONFIG, FRANJAS, RATOS, DIAS, MODOS, BARRIOS, LUGARES, CAMINOS, CALENDARIO, DIAS_SENALADOS,
+    version: "j0.6", CONFIG, FRANJAS, RATOS, DIAS, MODOS, BARRIOS, LUGARES, CAMINOS, CALENDARIO, DIAS_SENALADOS,
     RONDA, PARAMS, LICENCIAS,
     // la mesa de los agentes pregunta por PERSONAJES: en el juguete, cada «personaje» es una prueba
     PERSONAJES: [

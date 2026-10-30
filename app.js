@@ -54,7 +54,7 @@
     }
     return `<header class="top"><div class="top-in${ancho ? " ancho" : ""}">
       <div class="top-row">
-        <div class="top-title">Día ${s.dia} de ${R.DIAS} · ${esc(d.fecha)}<span>${esc(m.nombre)}${d.fiesta && d.tipo !== "domingo" ? " · " + esc(d.fiesta) : ""}</span></div>
+        <div class="top-title">Día ${s.dia} de ${R.DIAS} · ${esc(d.fecha)}<span>${R.CONFIG.pruebas.includes(s.modo) ? "Salamanca, 1545" : esc(m.nombre)}${d.fiesta && d.tipo !== "domingo" ? " · " + esc(d.fiesta) : ""}</span></div>
         <div class="estado">${chips}</div>
         <div class="top-btns">${s.fase === "dia" || s.fase === "amanecer" ? `<button class="icon-btn" data-act="recuerdo" aria-label="Lo que recuerdas">Recuerdos</button>` : ""}<button class="icon-btn" data-act="ayuda" aria-label="Cómo se juega">?</button>
         <button class="icon-btn" data-act="menu" aria-label="Menú">⋯</button></div>
@@ -125,6 +125,14 @@
     return `<div class="mapa">${g}${ley}</div>`;
   }
 
+  // las pruebas que se ofrecen: las de CONFIG y, si la dirección lo pide (?prueba=B), esa también
+  function pruebasVisibles() {
+    const extra = new URLSearchParams(location.search).get("prueba");
+    const v = R.CONFIG.pruebas.slice();
+    if (extra && R.MODOS[extra] && !v.includes(extra)) v.push(extra);
+    return v;
+  }
+
   // ------------------------------------------------------------------ pantallas
   function pantallaInicio() {
     const nombre = load(LS.nombre, "");
@@ -134,13 +142,12 @@
       <h1>Liber Vagatorum</h1>
       <p class="muted">El juguete · versión ${esc(R.version)}</p>
       <p>Una prueba mínima del juego: un mendigo, el hambre y la ronda. Nada más: ni compañeros, ni tretas, ni exámenes.</p>
-      <p>Hay dos versiones de la ciudad, A y B. Solo cambia cómo te mueves y cuánto ves. Si puedes, juega las dos y manda el informe de cada una al acabar.</p>
+      <p>Al acabar, contesta las preguntas y manda el informe. Cada partida sirve, aunque mueras el primer día.</p>
       <label class="campo" for="nombre">Tu nombre (para el informe)</label>
       <input type="text" id="nombre" value="${esc(nombre)}" autocomplete="name">
       <div class="btns">
         ${enCurso ? btn("continuar", "Seguir la partida en curso", `${R.MODOS[s.modo].nombre} · día ${s.dia}`, { cls: "primary" }) : ""}
-        ${btn("empezar", "Empezar la prueba A · calles", R.MODOS.A.resumen, { data: { id: "A" } })}
-        ${btn("empezar", "Empezar la prueba B · barrios", R.MODOS.B.resumen, { data: { id: "B" } })}
+        ${pruebasVisibles().map((id) => btn("empezar", pruebasVisibles().length > 1 ? `Empezar la ${R.MODOS[id].nombre.toLowerCase()}` : "Empezar una partida", pruebasVisibles().length > 1 ? R.MODOS[id].resumen : "", { data: { id }, cls: enCurso ? "" : "primary" })).join("")}
         ${btn("ayuda", "Cómo se juega", "")}
       </div>`;
     if (hist.length) {
@@ -321,7 +328,7 @@
         ${btn("correo", "Abrir el correo con el resumen", `Para: ${R.CONFIG.email}. Adjunta el informe descargado.`, { cls: navigator.share ? "" : "primary" })}
         <div class="fila-btn">${btn("descargar", "Descargar", "", { cls: "secundario" })}${btn("copiar", "Copiar", "", { cls: "secundario" })}</div>
       </div></div>`;
-    h += `<div class="btns">${btn("nueva", "Volver al inicio", "Para jugar otra partida o la otra prueba")}</div></div>`;
+    h += `<div class="btns">${btn("nueva", "Volver al inicio", "Para jugar otra partida")}</div></div>`;
     return h;
   }
 
@@ -329,13 +336,15 @@
   function ayudaHtml() {
     const modo = s && ui.pantalla === "juego" ? s.modo : null;
     const mover = [];
-    if (!modo || modo === "A") mover.push(`<p><b>Prueba A · calles.</b> Cada paso a un sitio vecino cuesta 2 ratos (tres pasos, una franja). Solo ves el sitio donde estás, y la ronda igual: solo te ve si estáis en el mismo sitio.</p>`);
-    if (!modo || modo === "B") mover.push(`<p><b>Prueba B · barrios.</b> Dentro de tu barrio te mueves sin gastar tiempo y lo ves entero. Pasar a un barrio vecino cuesta una franja. La ronda ve igual que tú: todo su barrio.</p>`);
+    const ver = modo ? [modo] : pruebasVisibles();
+    const etiqueta = (id) => (ver.length > 1 || id === "B" ? `<b>${R.MODOS[id].nombre}.</b> ` : "");
+    if (ver.includes("A")) mover.push(`<p>${etiqueta("A")}Cada paso a un sitio vecino cuesta 2 ratos (tres pasos, una franja). Solo ves el sitio donde estás, y la ronda igual: solo te ve si estáis en el mismo sitio.</p>`);
+    if (ver.includes("B")) mover.push(`<p>${etiqueta("B")}Dentro de tu barrio te mueves sin gastar tiempo y lo ves entero. Pasar a un barrio vecino cuesta una franja. La ronda ve igual que tú: todo su barrio.</p>`);
     return `<div class="modal-in"><h2>Cómo se juega</h2>
       <p>Eres un pobre forastero en Salamanca, en junio de 1545. Desde la orden de pobres del año pasado, pedir en la ciudad está prohibido. Duermes fuera de la muralla, en la ribera; el pan está dentro. <b>Objetivo: aguantar diez días, hasta la siega.</b> En la siega cogen segadores, pero no a cualquiera: quieren brazos que puedan con la hoz.</p>
       <h3>El día</h3><p>Seis franjas, de prima a completas, de seis ratos cada una. Pedir ocupa una franja entera. Al acabar completas cierran la puerta de la muralla: quien se queda dentro duerme en un portal.</p>
       <h3>Moverte</h3>${mover.join("")}
-      <h3>Lo que ves</h3><p>La gente, los otros pobres y la ronda cambian al empezar cada franja. Lo que viste vale para la franja en que lo viste. En el mapa, lo visto hace rato se ve más claro. En «Lo que recuerdas» tienes dónde y cuándo has visto a la ronda.</p>
+      <h3>Lo que ves</h3><p>La gente, los otros pobres y la ronda cambian al empezar cada franja. Lo que viste vale para la franja en que lo viste. En el mapa, lo visto hace rato se ve más claro. En «Recuerdos» tienes dónde y cuándo has visto a la ronda, y dónde has pedido tú.</p>
       <h3>Pedir</h3><p>Solo dentro de la muralla y donde hay gente que dé. Con mucha gente suele caer algo; con poca, muchas veces nada; si hay otros pobres pidiendo, os repartís lo que hay. Desde el día ${P.escasezDesde}, el pan sube y la gente da menos.</p>
       <p>Quien te ve pedir puede avisar a la ronda, y la ronda suele ir luego allí. En la puerta, las Escuelas y San Martín avisan enseguida; en San Esteban, nadie.</p>
       <h3>La ronda</h3><p>Un alguacil con sus corchetes. Tiene un recorrido de costumbre, a veces se desvía, acude adonde le avisan y a sexta se va a comer.</p>
@@ -363,6 +372,18 @@
         const items = Object.entries(porLugar).sort((a, b) => b[1].length - a[1].length)
           .map(([l, dias]) => `<b>${esc(L[l].corto)}</b> (${dias.map(corto).join(", ")})`);
         h += `<li><b>${fr.nombre}:</b> ${items.length ? items.join(" · ") : `<span class="muted">no la has visto</span>`}</li>`;
+      });
+      h += `</ul>`;
+    }
+    // dónde has pedido tú: tu propia costumbre
+    const pedidas = s.cronica.filter((c) => c.tipo === "pedir" || c.tipo === "pillado");
+    if (pedidas.length) {
+      h += `<h3>Dónde has pedido</h3><ul class="ciudad">`;
+      R.FRANJAS.forEach((fr, f) => {
+        const porLugar = {};
+        pedidas.filter((c) => E.franja(c.t) === f).forEach((c) => { const d = (porLugar[c.lugar] = porLugar[c.lugar] || []); if (!d.includes(c.dia)) d.push(c.dia); });
+        const items = Object.entries(porLugar).sort((a, b) => b[1].length - a[1].length).map(([l, dias]) => `<b>${esc(L[l].corto)}</b> (${dias.map(corto).join(", ")})`);
+        if (items.length) h += `<li><b>${fr.nombre}:</b> ${items.join(" · ")}</li>`;
       });
       h += `</ul>`;
     }
@@ -437,7 +458,7 @@
       store(LS.nombre, nombre.trim());
       if (s && s.fase !== "fin" && !confirm("Hay una partida a medias. ¿Empezar otra? La de ahora se perderá.")) return;
       const sem = new URLSearchParams(location.search).get("semilla");
-      s = E.nueva(d.id === "B" ? "B" : "A", nombre.trim(), sem || null);
+      s = E.nueva(R.MODOS[d.id] ? d.id : "A", nombre.trim(), sem || null);
       ui.pantalla = "juego";
     },
     continuar() { ui.pantalla = "juego"; },

@@ -271,7 +271,10 @@ def main(a):
             raise SystemExit(f"La carpeta {carpeta} ya existe: bórrala o usa otra para empezar de cero.")
         carpeta.mkdir(parents=True)
         with Mesa(carpeta) as m:
-            m.abrir("?semilla=" + urllib.parse.quote(semilla) if semilla else "")
+            q = [f"semilla={urllib.parse.quote(semilla)}"] if semilla else []
+            if pj != "A":
+                q.append(f"prueba={pj}")  # B ya no se ofrece por defecto: hay que pedirla en la dirección
+            m.abrir("?" + "&".join(q) if q else "")
             m.pg.fill("#nombre", nombre)
             ficha = m.pg.evaluate("""(id) => { const p = window.RULES.MODOS[id];
               return [`PRUEBA: ${p.nombre}`, p.resumen]; }""", pj)
@@ -280,7 +283,8 @@ def main(a):
             m.guardar()
             est = m.estado()
             (carpeta / "partida.json").write_text(json.dumps({"prueba": pj, "semilla": semilla, "nombre": nombre, "version": est["version"] if est else None, "empezada": datetime.now().isoformat(timespec="seconds")}, ensure_ascii=False, indent=1), encoding="utf-8")
-            print(ficha + "\n(Es lo que se ve al elegir la prueba en la pantalla de inicio.)\n")
+            if pj != "A":  # desde que A es el núcleo, la pantalla de inicio no ofrece elegir prueba
+                print(ficha + "\n(Es lo que se ve al elegir la prueba en la pantalla de inicio.)\n")
             print(m.pantalla())
         return
     carpeta = Path(a[1])

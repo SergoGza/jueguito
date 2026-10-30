@@ -82,9 +82,14 @@
       const tl = s.avisosT[l] || 0;
       if (n > max || (n === max && n > 0 && tl > cuando)) { max = n; donde = l; cuando = tl; }
     }
+    // la ronda aprende: donde te han visto pedir a esta misma hora en varios días, vuelve
+    const ap = R.RONDA.aprende;
+    let aprendido = null, nmax = 0;
+    if (ap) for (const [l, dias] of Object.entries((s.habitos || {})[f] || {})) if (dias.length >= ap.minDias && dias.length > nmax) { nmax = dias.length; aprendido = l; }
     let pos, porque;
     if (donde && mundo(s, `rondaP|${k}`) < R.RONDA.persigue[Math.min(3, max)]) { pos = donde; porque = "aviso"; }
     else if (circ === null) { pos = null; porque = "come"; }
+    else if (aprendido && mundo(s, `rondaA|${k}`) < ap.prob) { pos = aprendido; porque = "aprendido"; }
     else if (mundo(s, `rondaD|${k}`) < R.RONDA.desvio) { pos = DENTRO[Math.floor(mundo(s, `rondaL|${k}`) * DENTRO.length)]; porque = "desvío"; }
     else { pos = circ; porque = "recorrido"; }
     s.rondas[k] = pos;
@@ -272,8 +277,9 @@
 
   function parar(s, r) {
     s.hoy.paradas++;
+    const sabia = s.rondasPorque[`${s.dia}|${franja(s.t)}`] === "aprendido";
     if (s.conocido) {
-      detener(s, "parado", [`El alguacil te reconoce: ya te tenían visto. Te llevan a la cárcel.`]);
+      detener(s, "parado", [sabia ? "El alguacil te reconoce: «Sabía que te encontraría aquí». Te llevan a la cárcel." : "El alguacil te reconoce: ya te tenían visto. Te llevan a la cárcel."]);
       return;
     }
     s.conocido = true;
@@ -283,7 +289,7 @@
     observar(s);
     apunta(s, "echado", `Te para la ronda en ${L[antes].corto} y te echan de la ciudad.`);
     resultado(s, "Te para la ronda", [
-      `En ${L[r].nombre} te para el alguacil. Le dices de dónde eres y adónde vas.`,
+      sabia ? `En ${L[r].nombre} te para el alguacil: «Sabía que te encontraría aquí». Le dices de dónde eres y adónde vas.` : `En ${L[r].nombre} te para el alguacil. Le dices de dónde eres y adónde vas.`,
       "No te detiene: te acompaña hasta la puerta y te echa al puente. Pierdes media franja.",
       "Ya te conoce la cara. Si vuelve a pararte, te lleva a la cárcel.",
     ], "mal");
@@ -315,7 +321,14 @@
     const r0 = rondaEnTuZona(s);
     const aviso = L[lugar].aviso;
     const avisoPrevio = s.avisos[lugar] || 0;
-    if (aviso) { s.avisos[lugar] = avisoPrevio + aviso; s.avisosT[lugar] = s.dia * 100 + t0; }
+    if (aviso) {
+      s.avisos[lugar] = avisoPrevio + aviso; s.avisosT[lugar] = s.dia * 100 + t0;
+      // lo que la autoridad aprende de ti: dónde y a qué hora te han visto pedir
+      s.habitos = s.habitos || {};
+      const h = (s.habitos[f0] = s.habitos[f0] || {});
+      const dias = (h[lugar] = h[lugar] || []);
+      if (!dias.includes(s.dia)) dias.push(s.dia);
+    }
     s.pedidoHoy.push({ lugar, f: f0 });
     s.hoy.pedidas++;
     const seg1 = Math.min(R.RATOS, (f0 + 1) * R.RATOS - t0), seg2 = R.RATOS - seg1;
@@ -338,7 +351,11 @@
         ? `Estás pidiendo en ${L[lugar].nombre} cuando aparece la ronda${donde !== lugar ? ` por ${L[donde].nombre}` : ""}. Te ve con la mano tendida.`
         : `Pides en ${L[lugar].nombre} con la ronda ${donde === lugar ? "delante" : "en el barrio"}. Te ve.`;
       apunta(s, "pillado", `Empieza a pedir en ${L[lugar].corto}. ${l1}`, { pillado, t: t0 });
-      detener(s, pillado === "llega" ? "pidiendo, llegó la ronda" : "pidiendo delante de la ronda", [l1, "Pedir está prohibido en la ciudad desde la orden de pobres."]);
+      const kp = `${s.dia}|${pillado === "llega" ? f0 + 1 : f0}`;
+      const lin = [l1];
+      if (s.rondasPorque[kp] === "aprendido") lin.push("«Sabía que te encontraría aquí», dice el alguacil.");
+      lin.push("Pedir está prohibido en la ciudad desde la orden de pobres.");
+      detener(s, pillado === "llega" ? "pidiendo, llegó la ronda" : "pidiendo delante de la ronda", lin);
       return true;
     }
     const sobra = gana ? guardarPan(s, gana) : 0;
@@ -573,13 +590,13 @@
         const k = `${d}|${f}`;
         if (!(k in s.rondas)) return `${fr.nombre}: —`;
         const p = s.rondas[k];
-        return `${fr.nombre}: ${p ? L[p].corto : "comiendo"}${s.rondasPorque[k] === "aviso" ? " (aviso)" : ""}`;
+        return `${fr.nombre}: ${p ? L[p].corto : "comiendo"}${s.rondasPorque[k] === "aviso" ? " (aviso)" : s.rondasPorque[k] === "aprendido" ? " (tu costumbre)" : ""}`;
       });
       L2.push(`Día ${d}: ` + fila.join(" · "));
     }
     L2.push("");
     L2.push("== Datos en bruto ==");
-    L2.push(JSON.stringify({ v: s.v, modo: s.modo, semilla: s.semilla, final: s.final, porDia: s.porDia, encuesta: s.encuesta, rondas: s.rondas, vistas: s.vistas, recuerdaAbierto: s.recuerdaAbierto }));
+    L2.push(JSON.stringify({ v: s.v, modo: s.modo, semilla: s.semilla, final: s.final, porDia: s.porDia, encuesta: s.encuesta, rondas: s.rondas, rondasPorque: s.rondasPorque, habitos: s.habitos, vistas: s.vistas, recuerdaAbierto: s.recuerdaAbierto }));
     return L2.join("\n");
   }
 

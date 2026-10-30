@@ -1,4 +1,4 @@
-# Liber Vagatorum · el juguete (j0.6)
+# Liber Vagatorum · el juguete (j0.7)
 
 Prueba mínima del núcleo del juego, tras el replanteamiento de octubre de 2026: **un mendigo, una necesidad (el hambre) y una amenaza (la ronda)**. Nada más: ni los tuyos, ni el relevo, ni tretas, ni exámenes. Si el núcleo solo no obliga a exponerse para comer, los sistemas de encima no lo van a arreglar.
 
@@ -50,9 +50,9 @@ Todo está en `rules.js` y la ayuda del juego lo explica.
 
 Repetir rutina se paga; darse cuenta y cambiarla compensa.
 
-## La llaga (rama `llaga`, versión j0.7-llaga; no está en `main` ni en GitHub Pages)
+## La llaga (j0.7; se activa al empezar)
 
-Fingir entra por la llaga, decidido el 30 de octubre de 2026. Sale de Robles (Salamanca, 1545): «la llaga de la pierna le es un Perú», y al que ve con una llaga la justicia «no le puede preguntar más». Y de la vuelta que le da Soto con san Juan Crisóstomo: «si el pobre finge alguna lesión, por necesidad y menester grande la finge, por causa de tu crueldad». Se ha hecho en una rama aparte para no tocar la j0.6 mientras la prueba la gente.
+Fingir entra por la llaga, decidido el 30 de octubre de 2026. Sale de Robles (Salamanca, 1545): «la llaga de la pierna le es un Perú», y al que ve con una llaga la justicia «no le puede preguntar más». Y de la vuelta que le da Soto con san Juan Crisóstomo: «si el pobre finge alguna lesión, por necesidad y menester grande la finge, por causa de tu crueldad». **Se activa con el botón «Activar llaga» de la pantalla de inicio** (se recuerda en el móvil). Sin activarla, la partida es igual que la j0.6, con los mismos números en los bots; así se puede probar desde la app instalada y no se mezcla con las pruebas de la j0.6. El informe dice si estaba activada y si se la hizo. Los agentes juegan sin ella.
 
 - **Cómo.** De noche en la ribera, una sola vez y para siempre. Lo enseña un viejo que duerme allí: «Esta me da de comer». Lo que cuesta no lo dice nadie; lo dicen el capataz, el alguacil y el mayoral.
 - **Lo que da.** La tirada de limosna sube 1. Las tres primeras veces que llegas a donde está la ronda, el alguacil te mira la pierna y sigue su camino. A la cuarta ya no le vale: «Otra vez tú, el de la pierna. Esa llaga ya me la sé».
@@ -91,8 +91,8 @@ El correo de destino está en `rules.js` (`CONFIG.email`); en GitHub Pages queda
 
 Todo en `rules.js`. **Cada vez que cambies algo, sube la versión en dos sitios**, o los móviles seguirán con la copia vieja:
 
-1. `rules.js` → `version: "j0.6"`, por ejemplo a `"j0.7"`.
-2. `sw.js` → `const VERSION = "lv-j0.6-1"`, por ejemplo a `"lv-j0.7-1"`.
+1. `rules.js` → `version: "j0.7"`, por ejemplo a `"j0.8"`.
+2. `sw.js` → `const VERSION = "lv-j0.7-1"`, por ejemplo a `"lv-j0.8-1"`.
 
 ## Probarlo en local
 

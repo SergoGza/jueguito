@@ -186,7 +186,7 @@ const SOLO = process.env.LLAGA ? ["veterano", ...Object.keys(LLAGA)] : null;
 function jugar(modo, bot, sem) {
   let st = 12345 + sem * 7919;
   const rnd = () => { st = (st * 1103515245 + 12345) & 0x7fffffff; return st / 0x7fffffff; };
-  const s = E.nueva(modo, "bot", String(sem));
+  const s = E.nueva(modo, "bot", String(sem), { llaga: !!LLAGA[bot] });
   const g = { clave: null, libres: 0 };
   let guard = 0;
   while (s.fase !== "fin" && guard++ < 5000) {

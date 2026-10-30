@@ -100,6 +100,7 @@ p { margin: 0.4em 0; }
 .btn .d { display: block; font-size: 0.85rem; color: var(--muted); }
 .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); text-align: center; font-weight: 700; }
 .btn.primary .d { color: var(--accent-ink); opacity: 0.85; }
+.btn.activo { background: var(--bad-bg); border-color: var(--bad); }
 .btn.riesgo { border-color: var(--bad); }
 .btn:disabled { opacity: 0.5; cursor: not-allowed; }
 .btn.secundario { text-align: center; }

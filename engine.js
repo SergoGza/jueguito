@@ -131,7 +131,7 @@
   const GENTE_TXT = ["nadie", "nadie que dé", "poca gente", "mucha gente"];
 
   // ------------------------------------------------------------------ partida
-  function nueva(modo, jugador, semilla) {
+  function nueva(modo, jugador, semilla, opts) {
     const s = {
       v: R.version, modo, jugador: jugador || "", semilla: String(semilla || Math.floor(Math.random() * 1e9)), semillaFija: !!semilla,
       empezada: new Date().toISOString(),
@@ -141,6 +141,7 @@
       trabajoHoy: false, trabajoPedido: false, detenidoHoy: null, duerme: null,
       n: 0, final: null, ultimo: null, aviso: null, noche: null,
       cronica: [], hoy: null, porDia: [], encuesta: {},
+      conLlaga: !!(opts && opts.llaga), // la llaga se activa al empezar (prueba de fingir)
     };
     empezarDia(s);
     s.noche = null;
@@ -452,7 +453,7 @@
   }
 
   // la llaga: de noche en la ribera, una vez y para siempre. Te la enseña el viejo; lo que cuesta no lo dice nadie.
-  function puedeLlaga(s) { return !!P.llaga && s.fase === "noche" && s.duerme === "raso" && !s.llaga; }
+  function puedeLlaga(s) { return !!P.llaga && !!s.conLlaga && s.fase === "noche" && s.duerme === "raso" && !s.llaga; }
   function hacerLlaga(s) {
     if (!puedeLlaga(s)) return false;
     s.llaga = s.dia;
@@ -574,7 +575,7 @@
     L2.push(`Versión: ${s.v} · ${m.nombre} · semilla ${s.semilla}${s.semillaFija ? " (fija)" : ""}`);
     L2.push(`Empezada: ${s.empezada}`);
     L2.push(`Final: ${s.final ? `${FINALES[s.final.tipo] || s.final.tipo}, día ${s.final.dia}. ${s.final.texto}` : "sin acabar"}`);
-    L2.push(`Cuerpo al final: ${s.cuerpo} · detenciones: ${s.detenciones} · llaga: ${s.llaga ? "se la hizo la noche del día " + s.llaga : "no"}`);
+    L2.push(`Cuerpo al final: ${s.cuerpo} · detenciones: ${s.detenciones} · llaga: ${!s.conLlaga ? "no activada" : s.llaga ? "activada; se la hizo la noche del día " + s.llaga : "activada; no se la hizo"}`);
     L2.push("");
     L2.push("== Encuesta ==");
     const E = s.encuesta || {};
@@ -619,7 +620,7 @@
     }
     L2.push("");
     L2.push("== Datos en bruto ==");
-    L2.push(JSON.stringify({ v: s.v, modo: s.modo, semilla: s.semilla, final: s.final, porDia: s.porDia, encuesta: s.encuesta, rondas: s.rondas, rondasPorque: s.rondasPorque, habitos: s.habitos, vistas: s.vistas, recuerdaAbierto: s.recuerdaAbierto, llaga: s.llaga || null }));
+    L2.push(JSON.stringify({ v: s.v, modo: s.modo, semilla: s.semilla, final: s.final, porDia: s.porDia, encuesta: s.encuesta, rondas: s.rondas, rondasPorque: s.rondasPorque, habitos: s.habitos, vistas: s.vistas, recuerdaAbierto: s.recuerdaAbierto, conLlaga: !!s.conLlaga, llaga: s.llaga || null }));
     return L2.join("\n");
   }
 

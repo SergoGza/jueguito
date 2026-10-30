@@ -1,7 +1,7 @@
 /* Liber Vagatorum · el juguete. Pantallas y botones. Las reglas están en rules.js y el motor en engine.js. */
 (function () {
   const R = window.RULES, E = window.ENGINE, P = R.PARAMS;
-  const LS = { partida: "lvj-partida", historial: "lvj-historial", tema: "lvj-tema", nombre: "lvj-nombre" };
+  const LS = { partida: "lvj-partida", historial: "lvj-historial", tema: "lvj-tema", nombre: "lvj-nombre", llaga: "lvj-llaga" };
   const load = (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } };
   const store = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* sin almacenamiento */ } };
   const esc = (t) => String(t == null ? "" : t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -141,12 +141,13 @@
     let h = `<div class="wrap">
       <h1>Liber Vagatorum</h1>
       <p class="muted">El juguete · versión ${esc(R.version)}</p>
-      <p>Una prueba mínima del juego: un mendigo, el hambre y la ronda. Nada más: ni compañeros, ni tretas, ni exámenes.</p>
+      <p>Una prueba mínima del juego: un mendigo, el hambre y la ronda. Nada más: ni compañeros ni exámenes.</p>
       <p>Al acabar, contesta las preguntas y manda el informe. Cada partida sirve, aunque mueras el primer día.</p>
       <label class="campo" for="nombre">Tu nombre (para el informe)</label>
       <input type="text" id="nombre" value="${esc(nombre)}" autocomplete="name">
       <div class="btns">
-        ${enCurso ? btn("continuar", "Seguir la partida en curso", `${R.MODOS[s.modo].nombre} · día ${s.dia}`, { cls: "primary" }) : ""}
+        ${enCurso ? btn("continuar", "Seguir la partida en curso", `${R.MODOS[s.modo].nombre} · día ${s.dia}${s.conLlaga ? " · con llaga" : ""}`, { cls: "primary" }) : ""}
+        ${load(LS.llaga, false) ? btn("llagaOnOff", "Llaga activada", "La tendrán las partidas que empieces. Toca para quitarla.", { cls: "activo" }) : btn("llagaOnOff", "Activar llaga", "Prueba nueva: fingir. Mejor si ya has jugado sin ella.")}
         ${pruebasVisibles().map((id) => btn("empezar", pruebasVisibles().length > 1 ? `Empezar la ${R.MODOS[id].nombre.toLowerCase()}` : "Empezar una partida", pruebasVisibles().length > 1 ? R.MODOS[id].resumen : "", { data: { id }, cls: enCurso ? "" : "primary" })).join("")}
         ${btn("ayuda", "Cómo se juega", "")}
       </div>`;
@@ -469,10 +470,15 @@
       store(LS.nombre, nombre.trim());
       if (s && s.fase !== "fin" && !confirm("Hay una partida a medias. ¿Empezar otra? La de ahora se perderá.")) return;
       const sem = new URLSearchParams(location.search).get("semilla");
-      s = E.nueva(R.MODOS[d.id] ? d.id : "A", nombre.trim(), sem || null);
+      s = E.nueva(R.MODOS[d.id] ? d.id : "A", nombre.trim(), sem || null, { llaga: load(LS.llaga, false) });
       ui.pantalla = "juego";
     },
     continuar() { ui.pantalla = "juego"; },
+    llagaOnOff() {
+      const nombre = (document.getElementById("nombre") || {}).value;
+      if (nombre != null) store(LS.nombre, nombre.trim()); // que no se pierda lo escrito al repintar
+      store(LS.llaga, !load(LS.llaga, false));
+    },
     pestana(d) { ui.pestana = d.id === "ciudad" ? "ciudad" : "acciones"; render(); return "modal"; },
     empezarDia() { E.empezarJornada(s); },
     mover(d) { E.mover(s, d.id); E.comprobarNoche(s); },

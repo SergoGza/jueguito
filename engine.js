@@ -475,7 +475,9 @@
           s.conocido = true;
           const pan = s.pan; s.pan = 0;
           lin.push(`De madrugada, la ronda te encuentra durmiendo en un portal de ${L[s.lugar].nombre}. Te llevan a la cárcel${pan ? " y te quitan el pan" : ""}.`);
-          lin.push(rn.nivel === "vigilada" ? "Los vecinos se habían quejado de ti: te vieron pedir aquí." : rn.nivel === "pobres" ? "Venían a por los pobres que piden por aquí, y te llevaron con ellos." : "Era la ronda de costumbre. Mala suerte.");
+          // no lo explica el juego: lo dice el alguacil, y solo cuando hay algo que decir
+          if (rn.nivel === "vigilada") lin.push("«Ya me han dicho que andabas pidiendo por aquí», dice el alguacil.");
+          else if (rn.nivel === "pobres") lin.push("«Venimos a limpiar esto de pordioseros. Tú también vienes», dice el alguacil.");
           apunta(s, "detenido", `Detenido de noche en ${L[s.lugar].corto}. Detención ${s.detenciones} de ${P.detencionesMax}.`, { motivo: "de noche" });
           if (s.detenciones === 2) { dc += P.carcel.azotes; azotes = true; lin.push(`Detención 2 de ${P.detencionesMax}: te azotan. A la tercera, destierro.`); }
           else if (s.detenciones === 1) lin.push(`Detención 1 de ${P.detencionesMax}. A la segunda, azotes; a la tercera, destierro. Ya te tienen fichado.`);

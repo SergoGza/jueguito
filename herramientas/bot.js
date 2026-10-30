@@ -107,7 +107,7 @@ function valor(s, l, f, lambda) {
   if (s.pedidoHoy.some((p) => p.lugar === l)) pr += 0.4;
   return ev - pr * (g >= 3 ? 0.5 : 1) * lambda;
 }
-// dormir dentro: buscar, con lo que ha visto hoy, un sitio sin quejas; «ciego» duerme donde le pille
+// dormir dentro: buscar, con lo que ha visto hoy (dónde pidió y dónde vio pobres), un sitio sin quejas; «ciego» duerme donde le pille
 function dormirDentro(s, ciego) {
   if (ciego || !E.L[s.lugar].dentro) return E.L[s.lugar].dentro ? E.acabarDia(s) : volver(s);
   const malo = (l) => E.saberNoche(s, l).filter((x) => !x.startsWith("Que tú sepas")).length;

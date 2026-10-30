@@ -213,7 +213,7 @@
     const tr = o.acc.find((a) => a.id === "trabajo");
     if (tr) lin.push(tr.ok ? `Obras: si te cogen, cargas piedra hasta el final de nona por ${P.trabajo.paga} pedazos de pan. Preguntar cuesta 1 rato.` : `Obras: ${tr.porque}.`);
     lin.push("Esperar: quieto, la ronda no te para; si llega, la verás.");
-    lin.push(L[s.lugar].dentro ? `Si acabas el día aquí, dormirás en un portal, dentro de la muralla: la ronda de noche va donde ha habido quejas. ${E.saberNoche(s).join(" ")}` : s.lugar === "ribera" ? "Si acabas el día aquí, dormirás al raso en la ribera." : "En el puente no se puede dormir: si acabas el día aquí, bajarás a la ribera.");
+    lin.push(L[s.lugar].dentro ? "Si acabas el día aquí, dormirás en un portal, dentro de la muralla." : s.lugar === "ribera" ? "Si acabas el día aquí, dormirás al raso en la ribera." : "En el puente no se puede dormir: si acabas el día aquí, bajarás a la ribera.");
     return h + `<ul class="prev">${lin.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div>`;
   }
   function barraAcciones(o) {
@@ -291,7 +291,7 @@
       h += `<div class="panel res mal"><p>Duermes en la cárcel. El pan te lo han quitado.</p></div><div class="btns">${btn("cenar", "Seguir", "", { cls: "primary", data: { n: 0 } })}</div></div>`;
       return h;
     }
-    const donde = s.duerme === "portal" ? `Duermes en un portal de ${L[s.lugar].nombre}, dentro de la muralla. La ronda de noche va donde ha habido quejas${s.conocido ? ", y ya te tiene fichado" : ""}. ${E.saberNoche(s).join(" ")}` : `${s.bajaRibera ? "En el puente no se puede dormir: toda la noche pasan carros y el portazguero echa a los que se tumban. Bajas a la ribera. " : ""}Duermes al raso en la ribera, fuera de la muralla.`;
+    const donde = s.duerme === "portal" ? `Duermes en un portal de ${L[s.lugar].nombre}, dentro de la muralla.` : `${s.bajaRibera ? "En el puente no se puede dormir: toda la noche pasan carros y el portazguero echa a los que se tumban. Bajas a la ribera. " : ""}Duermes al raso en la ribera, fuera de la muralla.`;
     h += `<div class="panel"><p>${esc(donde)}</p><p>Tienes <b>${s.pan}</b> ${s.pan === 1 ? "pedazo" : "pedazos"} de pan. Una ración son 2 pedazos. Puedes guardar hasta ${P.panMax}.</p>${s.trabajoHoy ? `<p>Estás molido del trabajo: −${P.trabajo.cansancio} de cuerpo esta noche.</p>` : ""}</div><div class="btns">`;
     const fx = (n) => { const v = P.cena[n] - (s.trabajoHoy ? P.trabajo.cansancio : 0); return `${v >= 0 ? "+" : "−"}${Math.abs(v)} de cuerpo`; };
     if (s.pan >= 2) h += btn("cenar", "Cenar una ración entera", `2 pedazos · ${fx(2)}`, { cls: "primary", data: { n: 2 } });
@@ -343,7 +343,7 @@
       <h3>Detenciones</h3><p>Noche en la cárcel y te quitan el pan. La segunda vez, además, azotes. La tercera, destierro: se acaba la partida. Te pueden detener pidiendo, al llegar a donde está la ronda si ya te tiene fichado, o de noche si duermes dentro de la muralla.</p>
       <p><b>Fichado</b> quiere decir que la ronda ya te conoce la cara (te echó de la ciudad o te detuvo). No es una detención, pero desde entonces, si te para, te detiene.</p>
       <h3>Trabajar</h3><p>Las obras de la catedral cogen peones a prima los días de trabajo. Si te cogen, cargas piedra hasta el final de nona por ${P.trabajo.paga} pedazos de pan.</p>
-      <h3>Dormir dentro</h3><p>Ahorra el camino, pero la ronda de noche va donde ha habido quejas: donde te vieron pedir ese día y donde piden muchos otros pobres. Donde nadie se ha quejado también puede pasar, pero menos. Si ya te tienen fichado, el riesgo sube.</p>
+      <h3>Dormir dentro</h3><p>Ahorra el camino de vuelta, pero de noche también hay ronda.</p>
       <h3>La noche</h3><p>Una ración son 2 pedazos de pan. Ración entera: +1 de cuerpo. Media: −1. Nada: −2. Puedes guardar hasta ${P.panMax} pedazos. Si el cuerpo llega a 0, mueres.</p>
       <h3>Lo que sabe cualquiera en Salamanca</h3><p>Las iglesias se llenan a la hora de misa (prima) y a vísperas. El mercado de la plaza, por la mañana. Los estudiantes salen a tercia y a nona. A vísperas, la gente pasea por la Rúa. El jueves 4 es Corpus Christi; el 7, domingo.</p>
       <h3>Licencias históricas</h3><ul class="small">${R.LICENCIAS.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>

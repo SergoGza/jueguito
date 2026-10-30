@@ -13,10 +13,12 @@
 //   escondido  se queda en la ribera todos los días.
 //   azar       pulsa cualquier cosa que se pueda pulsar.
 //   novato     no conoce la ciudad: entra, va a sitios al azar, pide donde hay gente si no ve la ronda, no repite sitio
-//              el mismo día y vuelve a la ribera antes de que cierren.
+//              el mismo día y vuelve a la ribera antes de que cierren, por el camino más corto.
 //   veterano   conoce los horarios de la gente y el recorrido de costumbre de la ronda (lo que aprende un jugador en
 //              unas partidas). Elige adónde ir por lo que espera sacar menos el riesgo. Arriesga más. No repite sitio y
 //              hora cuando ve que la ronda se lo ha aprendido.
+//              Sale por la puerta en la que espera menos riesgo (j0.8: hay dos) y no empieza nada que le impida salir
+//              antes de que cierren (hasta la j0.7.2 a veces se quedaba dentro sin querer, 1 de cada 9 noches).
 //   prudente   como el veterano, pero pesa el triple el riesgo de la ronda.
 //   dentro-listo   como el veterano, pero duerme siempre dentro de la muralla, buscando un sitio sin quejas que él sepa.
 //   dentro-ciego   como el veterano, pero duerme siempre dentro, donde le pille la noche.
@@ -33,6 +35,9 @@ require(path.join(RAIZ, "engine.js"));
 const R = window.RULES, E = window.ENGINE, P = R.PARAMS;
 
 // ------------------------------------------------------------------ utilidades
+// las puertas: sitios de dentro con un vecino de fuera (la del Río y, desde la j0.8, la de San Pablo)
+const PUERTAS = Object.keys(E.L).filter((l) => E.L[l].dentro && E.VECINOS[l].some((v) => !E.L[v].dentro));
+const DENTRO_N = Object.keys(E.L).filter((l) => E.L[l].dentro).length;
 function costes(s, desde) {
   const m = R.MODOS[s.modo];
   const d = { [desde]: 0 }; const q = [desde];
@@ -56,8 +61,35 @@ function primerPaso(s, destino) {
   }
   return best && best.mv;
 }
+// ratos que cuesta salir de la muralla desde un sitio de dentro: llegar a una puerta y dar un paso fuera
+function salida(s, l) {
+  const m = R.MODOS[s.modo], d = costes(s, l);
+  return Math.min(...PUERTAS.map((g) => d[g])) + (m.zona === "lugar" ? m.paso : m.cruce);
+}
+// lo que sabe el veterano del riesgo en una puerta a una hora: el recorrido de costumbre, los desvíos y lo que la ronda le ha aprendido
+function riesgoPuerta(s, gate, t) {
+  if (t >= E.FIN) return 0;
+  const f = E.franja(t);
+  const circ = (R.CALENDARIO[s.dia - 1].tipo === "corpus" ? R.RONDA.circuitoCorpus : R.RONDA.circuito)[f];
+  let pr = (R.RONDA.desvio * E.lugaresZona(s, E.zonaDe(s, gate)).filter((x) => E.L[x].dentro).length) / DENTRO_N;
+  if (circ && E.zonaDe(s, circ) === E.zonaDe(s, gate)) pr += 1 - R.RONDA.desvio;
+  if ((((s.habitos || {})[f] || {})[gate] || []).length >= R.RONDA.aprende.minDias) pr += R.RONDA.aprende.prob;
+  return pr;
+}
 function volver(s) {
   if (s.lugar === "ribera") return E.acabarDia(s);
+  // dentro de la muralla y lejos de una puerta: el que conoce la ronda elige por cuál salir; el novato («ciego»), la más cercana
+  if (E.L[s.lugar].dentro && !PUERTAS.includes(s.lugar) && !s._ciego) {
+    const m = R.MODOS[s.modo], dd = costes(s, s.lugar), fuera = m.zona === "lugar" ? m.paso : m.cruce;
+    let mejor = null;
+    for (const g of PUERTAS) {
+      const llega = s.t + dd[g];
+      if (llega + fuera > E.FIN) continue;
+      const v = riesgoPuerta(s, g, llega) * 3 + dd[g] / 12;
+      if (!mejor || v < mejor.v) mejor = { v, g };
+    }
+    if (mejor) { const mv = primerPaso(s, mejor.g); if (mv) return E.mover(s, mv.destino); }
+  }
   const mv = primerPaso(s, "ribera");
   const dd = costes(s, "ribera");
   // solo si acerca de verdad (en B, moverse dentro del barrio no acerca)
@@ -80,6 +112,7 @@ function azar(s, rnd) {
 }
 
 function novato(s, rnd, g) {
+  s._ciego = true;
   const o = E.opciones(s);
   const vuelta = costes(s, s.lugar).ribera;
   if (o.quedan <= vuelta + (R.MODOS[s.modo].zona === "lugar" ? 2 : 0)) return volver(s);
@@ -135,7 +168,8 @@ function veterano(s, rnd, g, lambda, dentro) {
   if (g.libres > 4) return E.esperar(s);
   if (dentro && E.L[s.lugar].dentro && (o.quedan <= (m.zona === "lugar" ? 4 : 6) || (s.t >= 30 && s.pan >= 2))) return dormirDentro(s, dentro === "ciego");
   if (!dentro || !E.L[s.lugar].dentro) {
-    if (o.quedan <= dr.ribera + (m.zona === "lugar" ? 1 : 0) || (s.t >= 30 && s.pan >= 2) || s.pan >= 4) return volver(s);
+    const margen = E.L[s.lugar].dentro ? salida(s, s.lugar) : dr.ribera;
+    if (o.quedan <= margen + (m.zona === "lugar" ? 1 : 0) || (s.t >= 30 && s.pan >= 2) || s.pan >= 4) return volver(s);
   }
   const r = E.rondaEnTuZona(s);
   const tr = o.acc.find((x) => x.id === "trabajo");
@@ -143,17 +177,21 @@ function veterano(s, rnd, g, lambda, dentro) {
   const pd = o.acc.find((x) => x.id === "pedir");
   if (pd && pd.ok && !r) {
     const sig = s.t % 6 !== 0 && R.RONDA.circuito[f + 1] && E.zonaDe(s, R.RONDA.circuito[f + 1]) === E.zonaDe(s, s.lugar);
-    if (valor(s, s.lugar, f, lambda) > 0.2 && !sig && !s.pedidoHoy.some((p) => p.lugar === s.lugar && E.L[s.lugar].aviso > 0)) return E.pedir(s);
+    const cabe = dentro || !E.L[s.lugar].dentro || s.t + 6 + salida(s, s.lugar) <= E.FIN; // pedir y aún salir antes de que cierren
+    if (cabe && valor(s, s.lugar, f, lambda) > 0.2 && !sig && !s.pedidoHoy.some((p) => p.lugar === s.lugar && E.L[s.lugar].aviso > 0)) return E.pedir(s);
   }
   let best = null;
   for (const l of Object.keys(E.L)) {
     if (!E.L[l].dentro || (r && E.zonaDe(s, l) === E.zonaDe(s, r))) continue;
     const llega = s.t + dr[l];
     if (llega + 6 > E.FIN) continue;
+    if (!dentro && llega + 6 + salida(s, l) > E.FIN) continue;
     const v = valor(s, l, E.franja(llega), lambda) - dr[l] / 12;
     if (!best || v > best.v) best = { v, l };
   }
   if (best && best.l !== s.lugar && best.v > 0) { const mv = primerPaso(s, best.l); if (mv) return E.mover(s, mv.destino); }
+  // esperar una franja entera solo si después aún se puede salir
+  if (!dentro && E.L[s.lugar].dentro && (f + 1) * 6 + salida(s, s.lugar) > E.FIN) return volver(s);
   return E.esperar(s);
 }
 

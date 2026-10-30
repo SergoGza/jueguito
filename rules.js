@@ -57,6 +57,11 @@
       desc: "El puente, con el toro de piedra a la entrada. Pasan arrieros y viajeros, pero van de camino y no dan. De noche no se puede dormir aquí.",
     },
     {
+      id: "orilla", nombre: "Orilla del Tormes", corto: "Orilla", barrio: "ribera", dentro: false, x: 252, y: 266,
+      gente: [1, 1, 1, 1, 1, 1], pobres: 0, aviso: 0, quien: "gente de paso",
+      desc: "El camino que va por fuera de la muralla, junto al río, del puente a la Puerta de San Pablo. Pasan arrieros, lavanderas y pobres. Aquí no hay donde echarse a dormir.",
+    },
+    {
       id: "puerta", nombre: "Puerta del Río", corto: "Puerta", barrio: "catedral", dentro: true, x: 180, y: 232,
       gente: [2, 2, 1, 1, 2, 1], pobres: 0.2, aviso: 2, quien: "gente que entra y sale",
       desc: "La puerta de la muralla que da al puente. El portero mira a quien entra y a quien sale, y avisa. Al acabar completas, la cierran.",
@@ -92,6 +97,11 @@
       desc: "Calle tranquila entre la plaza y el convento de San Esteban.",
     },
     {
+      id: "sanpolo", nombre: "Puerta de San Pablo", corto: "Pta. S. Pablo", barrio: "sanesteban", dentro: true, x: 318, y: 238,
+      gente: [1, 1, 1, 1, 1, 1], pobres: 0, aviso: 0, quien: "carros y gente de paso",
+      desc: "La otra puerta de la muralla del lado del río, aguas abajo del puente, junto a San Esteban. Sus guardas miran los carros por lo que pagan, no a los pobres. Al acabar completas, la cierran.",
+    },
+    {
       id: "sanesteban", nombre: "Convento de San Esteban", corto: "S. Esteban", barrio: "sanesteban", dentro: true, x: 300, y: 196,
       gente: [2, 1, 1, 1, 2, 1], pobres: 0.5, aviso: 0, quien: "frailes y devotos",
       desc: "El convento de los dominicos. Su prior, fray Domingo de Soto, ha escrito contra la orden de pobres: aquí nadie avisa a la ronda. Pero acuden muchos pobres.",
@@ -103,6 +113,8 @@
     ["ribera", "puente"], ["puente", "puerta"], ["puerta", "catedral"], ["catedral", "escuelas"],
     ["catedral", "rua"], ["rua", "sanmartin"], ["rua", "plaza"], ["sanmartin", "plaza"],
     ["escuelas", "sanesteban"], ["sanesteban", "sanpablo"], ["sanpablo", "plaza"],
+    // la segunda puerta (j0.8): del puente, por la orilla, a la Puerta de San Pablo y San Esteban
+    ["puente", "orilla"], ["orilla", "sanpolo"], ["sanpolo", "sanesteban"],
   ];
 
   // Junio de 1545 (calendario juliano): el 1 fue lunes y el 4, jueves de Corpus Christi.
@@ -189,11 +201,12 @@
     "Que en San Esteban nadie avise a la ronda sale de que Soto, su prior, escribió contra la orden; no hay documento que lo diga.",
     "La limosna se da en pan (pedazos) y no en dinero, para no meter el mercado en esta prueba.",
     "La siega empieza el 11 de junio; en Castilla solía empezar a finales de junio o en julio.",
+    "La Puerta de San Pablo existió, del lado del río y al este del puente; que sus guardas no avisen a la ronda es del juego. Había más puertas, que el juego deja fuera.",
     "Las cifras (gente, limosna, probabilidades) son del juego.",
   ];
 
   window.RULES = {
-    version: "j0.7.2", CONFIG, FRANJAS, RATOS, DIAS, MODOS, BARRIOS, LUGARES, CAMINOS, CALENDARIO, DIAS_SENALADOS,
+    version: "j0.8", CONFIG, FRANJAS, RATOS, DIAS, MODOS, BARRIOS, LUGARES, CAMINOS, CALENDARIO, DIAS_SENALADOS,
     RONDA, PARAMS, LICENCIAS,
     // la mesa de los agentes pregunta por PERSONAJES: en el juguete, cada «personaje» es una prueba
     PERSONAJES: [

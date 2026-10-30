@@ -50,7 +50,7 @@
         }).join("");
         return `<div><div class="fr ${i === f && s.t < E.FIN ? "act" : ""}">${fr.nombre}</div><div class="ratos">${ratos}</div></div>`;
       }).join("")}</div>`;
-      barra += `<p class="small muted hora">${s.t >= E.FIN ? "Ya es de noche." : `${R.FRANJAS[f].nombre}, rato ${E.ratoEnFranja(s.t) + 1}/${R.RATOS} · quedan ${E.FIN - s.t} ratos para que cierren la puerta`}</p>`;
+      barra += `<p class="small muted hora">${s.t >= E.FIN ? "Ya es de noche." : `${R.FRANJAS[f].nombre}, rato ${E.ratoEnFranja(s.t) + 1}/${R.RATOS} · quedan ${E.FIN - s.t} ratos para que cierren las puertas`}</p>`;
     }
     return `<header class="top"><div class="top-in${ancho ? " ancho" : ""}">
       <div class="top-row">
@@ -92,7 +92,8 @@
       }
     }
     // muralla
-    g += `<path d="M166,240 L34,236 L16,130 L28,30 L330,20 L346,150 L332,238 L194,240" fill="none" stroke="var(--wall)" stroke-width="4" stroke-linejoin="round"/>`;
+    // (huecos: la Puerta del Río, en 180, y la de San Pablo, en 318)
+    g += `<path d="M166,240 L34,236 L16,130 L28,30 L330,20 L346,150 L332,238 L328,238.1 M308,238.4 L194,240" fill="none" stroke="var(--wall)" stroke-width="4" stroke-linejoin="round"/>`;
     // caminos
     for (const [a, b] of R.CAMINOS) {
       const la = L[a], lb = L[b];
@@ -221,7 +222,7 @@
     const tr = o.acc.find((a) => a.id === "trabajo");
     if (tr) lin.push(tr.ok ? `Obras: si te cogen, cargas piedra hasta el final de nona por ${P.trabajo.paga} pedazos de pan. Preguntar cuesta 1 rato.` : `Obras: ${tr.porque}.`);
     lin.push("Esperar: quieto, la ronda no te para; si llega, la verás.");
-    lin.push(L[s.lugar].dentro ? "Si acabas el día aquí, dormirás en un portal, dentro de la muralla." : s.lugar === "ribera" ? "Si acabas el día aquí, dormirás al raso en la ribera." : "En el puente no se puede dormir: si acabas el día aquí, bajarás a la ribera.");
+    lin.push(L[s.lugar].dentro ? "Si acabas el día aquí, dormirás en un portal, dentro de la muralla." : s.lugar === "ribera" ? "Si acabas el día aquí, dormirás al raso en la ribera." : `${s.lugar === "puente" ? "En el puente" : "Aquí"} no se puede dormir: si acabas el día aquí, bajarás a la ribera.`);
     return h + `<ul class="prev">${lin.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div>`;
   }
   function barraAcciones(o) {
@@ -299,7 +300,7 @@
       h += `<div class="panel res mal"><p>Duermes en la cárcel. El pan te lo han quitado.</p></div><div class="btns">${btn("cenar", "Seguir", "", { cls: "primary", data: { n: 0 } })}</div></div>`;
       return h;
     }
-    const donde = s.duerme === "portal" ? `Duermes en un portal de ${L[s.lugar].nombre}, dentro de la muralla.` : `${s.bajaRibera ? "En el puente no se puede dormir: toda la noche pasan carros y el portazguero echa a los que se tumban. Bajas a la ribera. " : ""}Duermes al raso en la ribera, fuera de la muralla.`;
+    const donde = s.duerme === "portal" ? `Duermes en un portal de ${L[s.lugar].nombre}, dentro de la muralla.` : `${s.bajaRibera ? (s.bajaDe === "puente" ? "En el puente no se puede dormir: toda la noche pasan carros y el portazguero echa a los que se tumban. Bajas a la ribera. " : "En la orilla no hay donde echarse. Bajas a la ribera. ") : ""}Duermes al raso en la ribera, fuera de la muralla.`;
     const fiebre = s.llaga && s.llaga === s.dia;
     h += `<div class="panel"><p>${esc(donde)}</p><p>Tienes <b>${s.pan}</b> ${s.pan === 1 ? "pedazo" : "pedazos"} de pan. Una ración son 2 pedazos. Puedes guardar hasta ${P.panMax}.</p>${s.trabajoHoy ? `<p>Estás molido del trabajo: −${P.trabajo.cansancio} de cuerpo esta noche.</p>` : ""}</div>`;
     // el viejo de la ribera: lo que da la llaga lo dice él; lo que cuesta, nadie
@@ -354,11 +355,11 @@
     if (ver.includes("B")) mover.push(`<p>${etiqueta("B")}Dentro de tu barrio te mueves sin gastar tiempo y lo ves entero. Pasar a un barrio vecino cuesta una franja. La ronda ve igual que tú: todo su barrio.</p>`);
     return `<div class="modal-in"><h2>Cómo se juega</h2>
       <p>Eres un pobre forastero en Salamanca, en junio de 1545. Desde la orden de pobres del año pasado, pedir en la ciudad está prohibido. Duermes fuera de la muralla, en la ribera; el pan está dentro. <b>Objetivo: aguantar diez días, hasta la siega.</b> En la siega cogen segadores, pero no a cualquiera: quieren brazos que puedan con la hoz.</p>
-      <h3>El día</h3><p>Seis franjas, de prima a completas, de seis ratos cada una. Pedir ocupa una franja entera. Al acabar completas cierran la puerta de la muralla: quien se queda dentro duerme en un portal.</p>
+      <h3>El día</h3><p>Seis franjas, de prima a completas, de seis ratos cada una. Pedir ocupa una franja entera. Al acabar completas cierran las puertas de la muralla: quien se queda dentro duerme en un portal.</p>
       <h3>Moverte</h3>${mover.join("")}
       <h3>Lo que ves</h3><p>La gente, los otros pobres y la ronda cambian al empezar cada franja. Lo que viste vale para la franja en que lo viste. En el mapa, lo visto hace rato se ve más claro. En «Recuerdos» tienes dónde y cuándo has visto a la ronda, y dónde has pedido tú.</p>
       <h3>Pedir</h3><p>Solo dentro de la muralla y donde hay gente que dé. Con mucha gente suele caer algo; con poca, muchas veces nada; si hay otros pobres pidiendo, os repartís lo que hay. Desde el día ${P.escasezDesde}, el pan sube y la gente da menos.</p>
-      <p>Quien te ve pedir puede avisar a la ronda, y la ronda suele ir luego allí. En la puerta, las Escuelas y San Martín avisan enseguida; en San Esteban, nadie.</p>
+      <p>Quien te ve pedir puede avisar a la ronda, y la ronda suele ir luego allí. En la Puerta del Río, las Escuelas y San Martín avisan enseguida; en San Esteban, nadie.</p>
       <h3>La ronda</h3><p>Un alguacil con sus corchetes. Tiene un recorrido de costumbre, a veces se desvía, acude adonde le avisan y a sexta se va a comer.</p>
       <p>Si te ve pedir, te detiene (con mucha gente, a veces no te ve). Si llegas a donde está, puede pararte: la primera vez te echa de la ciudad y te queda fichado; si ya te tiene fichado, te detiene. Si estás quieto cuando llega, no te para, pero no pidas delante de ella. Si empiezas a pedir a mitad de franja, puede llegar mientras pides.</p>
       <h3>Detenciones</h3><p>Noche en la cárcel y te quitan el pan. La segunda vez, además, azotes. La tercera, destierro: se acaba la partida. Te pueden detener pidiendo, al llegar a donde está la ronda si ya te tiene fichado, o de noche si duermes dentro de la muralla.</p>

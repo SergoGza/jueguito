@@ -452,6 +452,7 @@
     s.duerme = s.detenidoHoy ? "carcel" : (L[s.lugar].dentro ? "portal" : "raso");
     // en el puente no se duerme: fuera de la muralla, se duerme en la ribera
     s.bajaRibera = !s.detenidoHoy && !L[s.lugar].dentro && s.lugar !== "ribera";
+    s.bajaDe = s.bajaRibera ? s.lugar : null;
     if (s.bajaRibera) s.lugar = "ribera";
     // en la ribera duerme el viejo de la llaga: cuántas noches lo has tenido al lado
     if (puedeLlaga(s)) s.viejo = (s.viejo || 0) + 1;

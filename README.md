@@ -1,4 +1,4 @@
-# Liber Vagatorum · el juguete (j0.7.1)
+# Liber Vagatorum · el juguete (j0.7.2)
 
 Prueba mínima del núcleo del juego, tras el replanteamiento de octubre de 2026: **un mendigo, una necesidad (el hambre) y una amenaza (la ronda)**. Nada más: ni los tuyos, ni el relevo, ni tretas, ni exámenes. Si el núcleo solo no obliga a exponerse para comer, los sistemas de encima no lo van a arreglar.
 
@@ -55,7 +55,7 @@ Repetir rutina se paga; darse cuenta y cambiarla compensa.
 Fingir entra por la llaga, decidido el 30 de octubre de 2026. Sale de Robles (Salamanca, 1545): «la llaga de la pierna le es un Perú», y al que ve con una llaga la justicia «no le puede preguntar más». Y de la vuelta que le da Soto con san Juan Crisóstomo: «si el pobre finge alguna lesión, por necesidad y menester grande la finge, por causa de tu crueldad». **Se activa con el botón «Activar llaga» de la pantalla de inicio** (se recuerda en el móvil). Sin activarla, la partida es igual que la j0.6, con los mismos números en los bots; así se puede probar desde la app instalada y no se mezcla con las pruebas de la j0.6. El informe dice si estaba activada y si se la hizo. Los agentes juegan sin ella.
 
 - **Cómo.** De noche en la ribera, una sola vez y para siempre. Lo enseña un viejo que duerme allí: «Esta me da de comer». Lo que cuesta no lo dice nadie; lo dicen el capataz, el alguacil y el mayoral.
-- **Lo que da.** La tirada de limosna sube 1. Las tres primeras veces que llegas a donde está la ronda, el alguacil te mira la pierna y sigue su camino. A la cuarta ya no le vale: si te para, sea para echarte o para detenerte, el alguacil dice «Otra vez tú, el de la pierna. Esa llaga ya me la sé» (en la j0.7, si aún no te tenía fichado, te echaba sin mencionar la pierna; arreglado en la j0.7.1).
+- **Lo que da.** La tirada de limosna sube 1. Las tres primeras veces que llegas a donde está la ronda, el alguacil te mira la pierna y sigue su camino. A la cuarta ya no le vale: si te para, sea para echarte o para detenerte, el alguacil dice «Otra vez tú, el de la pierna. Esa llaga ya me la sé» (en la j0.7, si aún no te tenía fichado, te echaba sin mencionar la pierna; arreglado en la j0.7.1). Si además te esperaba allí por tu costumbre, dice las dos cosas: «…Esa llaga ya me la sé, y sabía que te encontraría aquí» (j0.7.2; antes la frase de la pierna tapaba la de la costumbre).
 - **Lo que cuesta.** Esa noche, fiebre (−1 de cuerpo). El cuerpo ya no pasa de 5. Cada noche siguiente, una de cada tres se encona (−1). Ni las obras ni el mayoral te cogen: el final es aguantar sin siega.
 - **Palancas** en `PARAMS.llaga`: `limosna`, `cuerpo`, `cuerpoMax`, `encona`, `parar`, `protege`, `pillar`, `noche`.
 
@@ -91,8 +91,8 @@ El correo de destino está en `rules.js` (`CONFIG.email`); en GitHub Pages queda
 
 Todo en `rules.js`. **Cada vez que cambies algo, sube la versión en dos sitios**, o los móviles seguirán con la copia vieja:
 
-1. `rules.js` → `version: "j0.7.1"`, por ejemplo a `"j0.8"`.
-2. `sw.js` → `const VERSION = "lv-j0.7.1-1"`, por ejemplo a `"lv-j0.8-1"`.
+1. `rules.js` → `version: "j0.7.2"`, por ejemplo a `"j0.8"`.
+2. `sw.js` → `const VERSION = "lv-j0.7.2-1"`, por ejemplo a `"lv-j0.8-1"`.
 
 ## Probarlo en local
 

@@ -285,9 +285,13 @@
     s.hoy.paradas++;
     const sabia = s.rondasPorque[`${s.dia}|${franja(s.t)}`] === "aprendido";
     const pierna = s.llaga && LL.protege && (s.llagaPasadas || 0) >= LL.protege;
+    // lo que dice el alguacil: si ya se sabe la llaga y además te esperaba por tu costumbre, dice las dos cosas
+    const dice = pierna && sabia ? "«Otra vez tú, el de la pierna. Esa llaga ya me la sé, y sabía que te encontraría aquí»"
+      : pierna ? "«Otra vez tú, el de la pierna. Esa llaga ya me la sé»"
+      : sabia ? "«Sabía que te encontraría aquí»" : null;
     if (s.conocido) {
-      detener(s, "parado", [pierna ? "El alguacil se planta delante: «Otra vez tú, el de la pierna. Esa llaga ya me la sé». Te llevan a la cárcel."
-        : sabia ? "El alguacil te reconoce: «Sabía que te encontraría aquí». Te llevan a la cárcel." : "El alguacil te reconoce: ya te tenían visto. Te llevan a la cárcel."]);
+      detener(s, "parado", [pierna ? `El alguacil se planta delante: ${dice}. Te llevan a la cárcel.`
+        : dice ? `El alguacil te reconoce: ${dice}. Te llevan a la cárcel.` : "El alguacil te reconoce: ya te tenían visto. Te llevan a la cárcel."]);
       return;
     }
     s.conocido = true;
@@ -298,8 +302,7 @@
     apunta(s, "echado", `Te para la ronda en ${L[antes].corto} y te echan de la ciudad.`);
     resultado(s, "Te para la ronda", [
       // la cuarta vez con la llaga, aunque aún no te tenga fichado, el alguacil ya se la sabe
-      pierna ? `En ${L[r].nombre} te para el alguacil: «Otra vez tú, el de la pierna. Esa llaga ya me la sé». Le dices de dónde eres y adónde vas.`
-        : sabia ? `En ${L[r].nombre} te para el alguacil: «Sabía que te encontraría aquí». Le dices de dónde eres y adónde vas.` : `En ${L[r].nombre} te para el alguacil. Le dices de dónde eres y adónde vas.`,
+      dice ? `En ${L[r].nombre} te para el alguacil: ${dice}. Le dices de dónde eres y adónde vas.` : `En ${L[r].nombre} te para el alguacil. Le dices de dónde eres y adónde vas.`,
       "No te detiene: te acompaña hasta la puerta y te echa al puente. Pierdes media franja.",
       "Ya te conoce la cara. Si vuelve a pararte, te lleva a la cárcel.",
     ], "mal");

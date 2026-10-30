@@ -297,7 +297,9 @@
     observar(s);
     apunta(s, "echado", `Te para la ronda en ${L[antes].corto} y te echan de la ciudad.`);
     resultado(s, "Te para la ronda", [
-      sabia ? `En ${L[r].nombre} te para el alguacil: «Sabía que te encontraría aquí». Le dices de dónde eres y adónde vas.` : `En ${L[r].nombre} te para el alguacil. Le dices de dónde eres y adónde vas.`,
+      // la cuarta vez con la llaga, aunque aún no te tenga fichado, el alguacil ya se la sabe
+      pierna ? `En ${L[r].nombre} te para el alguacil: «Otra vez tú, el de la pierna. Esa llaga ya me la sé». Le dices de dónde eres y adónde vas.`
+        : sabia ? `En ${L[r].nombre} te para el alguacil: «Sabía que te encontraría aquí». Le dices de dónde eres y adónde vas.` : `En ${L[r].nombre} te para el alguacil. Le dices de dónde eres y adónde vas.`,
       "No te detiene: te acompaña hasta la puerta y te echa al puente. Pierdes media franja.",
       "Ya te conoce la cara. Si vuelve a pararte, te lleva a la cárcel.",
     ], "mal");

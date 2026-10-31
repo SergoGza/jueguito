@@ -74,11 +74,23 @@
   }
 
   // ------------------------------------------------------------------ la ronda
+  // las costumbres de la ronda este verano: cada partida saca las suyas de la semilla (j0.9)
+  function recorridoVerano(s) {
+    const c = R.RONDA.costumbres;
+    const elige = (k) => c[k][Math.floor(mundo(s, `costumbre|${k}`) * c[k].length)];
+    const manana = elige("manana");
+    return [manana, manana, null, elige("nona"), elige("visperas"), elige("cierra")];
+  }
+  function circuitoDia(s, d) {
+    // partidas empezadas antes de la j0.9 siguen con el recorrido fijo
+    if (!s.circuito) s.circuito = s.v === R.version ? recorridoVerano(s) : R.RONDA.circuitoAntiguo.slice();
+    if (R.CALENDARIO[d - 1].tipo !== "corpus") return s.circuito;
+    return R.RONDA.circuitoCorpus.map((l, f) => (f === 5 ? s.circuito[5] : l));
+  }
   function rondaFranja(s, d, f) {
     const k = `${d}|${f}`;
     if (k in s.rondas) return s.rondas[k];
-    const tipo = R.CALENDARIO[d - 1].tipo;
-    const circ = (tipo === "corpus" ? R.RONDA.circuitoCorpus : R.RONDA.circuito)[f];
+    const circ = circuitoDia(s, d)[f];
     let max = 0, donde = null, cuando = -1;
     for (const [l, n] of Object.entries(s.avisos)) {
       const tl = s.avisosT[l] || 0;
@@ -143,6 +155,7 @@
       cronica: [], hoy: null, porDia: [], encuesta: {},
       conLlaga: !!(opts && opts.llaga), // la llaga se activa al empezar (prueba de fingir)
     };
+    s.circuito = recorridoVerano(s);
     empezarDia(s);
     s.noche = null;
     return s;
@@ -615,6 +628,8 @@
     });
     L2.push("");
     L2.push("== Dónde estuvo la ronda (el jugador no lo veía) ==");
+    const cv = circuitoDia(s, 1);
+    L2.push(`Costumbres de este verano: por la mañana, ${L[cv[0]].nombre}; a nona, ${L[cv[3]].nombre}; a vísperas, ${L[cv[4]].nombre}; al anochecer cierra la ${L[cv[5]].nombre}.`);
     for (let d = 1; d <= s.dia; d++) {
       const fila = R.FRANJAS.map((fr, f) => {
         const k = `${d}|${f}`;
@@ -626,14 +641,14 @@
     }
     L2.push("");
     L2.push("== Datos en bruto ==");
-    L2.push(JSON.stringify({ v: s.v, modo: s.modo, semilla: s.semilla, final: s.final, porDia: s.porDia, encuesta: s.encuesta, rondas: s.rondas, rondasPorque: s.rondasPorque, habitos: s.habitos, vistas: s.vistas, recuerdaAbierto: s.recuerdaAbierto, conLlaga: !!s.conLlaga, llaga: s.llaga || null }));
+    L2.push(JSON.stringify({ v: s.v, modo: s.modo, semilla: s.semilla, circuito: s.circuito, final: s.final, porDia: s.porDia, encuesta: s.encuesta, rondas: s.rondas, rondasPorque: s.rondasPorque, habitos: s.habitos, vistas: s.vistas, recuerdaAbierto: s.recuerdaAbierto, conLlaga: !!s.conLlaga, llaga: s.llaga || null }));
     return L2.join("\n");
   }
 
   window.ENGINE = {
     FIN, L, VECINOS, DEL_BARRIO, CRUCES, BARRIO, GENTE_TXT, FINALES,
     franja, ratoEnFranja, nombreFranja, dia, estado, zonaDe, lugaresZona, rondaAhora, rondaEnTuZona, edad,
-    nueva, opciones, previsionPedir, mover, pedir, pedirTrabajo, esperar, acabarDia, seguir, comprobarNoche, cenar,
+    nueva, opciones, previsionPedir, mover, pedir, pedirTrabajo, esperar, acabarDia, seguir, comprobarNoche, cenar, circuitoDia,
     informe, resumenDias, momentoTxt, riesgoNoche, saberNoche, puedeLlaga, hacerLlaga, cuerpoMax,
     empezarJornada(s) { if (s.fase === "amanecer") { s.fase = "dia"; s.noche = null; } },
   };

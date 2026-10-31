@@ -89,7 +89,7 @@
     {
       id: "plaza", nombre: "Plaza de San Martín", corto: "Plaza", barrio: "rua", dentro: true, x: 172, y: 50,
       gente: [3, 3, 2, 2, 2, 1], pobres: 0.4, aviso: 1, quien: "compradores y vendedores",
-      desc: "La plaza del mercado. Mucha gente por la mañana, y la ronda pasa a menudo.",
+      desc: "La plaza del mercado. Mucha gente por la mañana.",
     },
     {
       id: "sanpablo", nombre: "Calle de San Pablo", corto: "San Pablo", barrio: "sanesteban", dentro: true, x: 286, y: 92,
@@ -144,10 +144,19 @@
   };
 
   // La ronda: un alguacil y sus corchetes. Está en un sitio cada franja (o en ninguno).
-  // circuito: dónde suele estar (null: está comiendo). Se desvía al azar a veces; y si alguien ha avisado, va allí.
+  // Sus costumbres cambian cada verano (cada partida), con la semilla (j0.9). El esqueleto es fijo y sale del mundo:
+  // por la mañana (prima y tercia) anda donde hay mercado o misa; a sexta come; a nona y a vísperas, donde hay gente;
+  // al anochecer cierra una de las dos puertas; el Corpus acompaña la procesión. Lo que cambia es el sitio concreto.
+  // Se desvía al azar a veces; y si alguien ha avisado, va allí.
   const RONDA = {
-    circuito: ["plaza", "plaza", null, "escuelas", "rua", "puerta"],
-    circuitoCorpus: ["plaza", "rua", "rua", "rua", "plaza", "puerta"], // acompaña la procesión
+    costumbres: {
+      manana: ["plaza", "catedral", "sanmartin"],
+      nona: ["escuelas", "rua", "catedral", "plaza"],
+      visperas: ["rua", "catedral", "plaza"],
+      cierra: ["puerta", "sanpolo"],
+    },
+    circuitoCorpus: ["plaza", "rua", "rua", "rua", "plaza", null], // acompaña la procesión; a completas, la puerta que cierre ese verano
+    circuitoAntiguo: ["plaza", "plaza", null, "escuelas", "rua", "puerta"], // el fijo hasta la j0.8 (para partidas empezadas antes)
     desvio: 0.3,     // probabilidad de ir a otro sitio de dentro al azar (si nadie ha avisado)
     persigue: [0, 0.4, 0.8, 0.9], // probabilidad de ir donde hay quejas, según cuántas (0, 1, 2, 3 o más)
     // la ronda aprende tus costumbres: si te han visto pedir en el mismo sitio a la misma hora en minDias días
@@ -197,7 +206,7 @@
   };
 
   const LICENCIAS = [
-    "La ronda, su recorrido y que coma a sexta son invención del juego.",
+    "La ronda, sus costumbres y que coma a sexta son invención del juego.",
     "Que en San Esteban nadie avise a la ronda sale de que Soto, su prior, escribió contra la orden; no hay documento que lo diga.",
     "La limosna se da en pan (pedazos) y no en dinero, para no meter el mercado en esta prueba.",
     "La siega empieza el 11 de junio; en Castilla solía empezar a finales de junio o en julio.",
@@ -206,7 +215,7 @@
   ];
 
   window.RULES = {
-    version: "j0.8", CONFIG, FRANJAS, RATOS, DIAS, MODOS, BARRIOS, LUGARES, CAMINOS, CALENDARIO, DIAS_SENALADOS,
+    version: "j0.9", CONFIG, FRANJAS, RATOS, DIAS, MODOS, BARRIOS, LUGARES, CAMINOS, CALENDARIO, DIAS_SENALADOS,
     RONDA, PARAMS, LICENCIAS,
     // la mesa de los agentes pregunta por PERSONAJES: en el juguete, cada «personaje» es una prueba
     PERSONAJES: [

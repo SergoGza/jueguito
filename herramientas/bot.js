@@ -7,6 +7,7 @@
 //   RUTINA=1 node herramientas/bot.js 1000         (el veterano y el prudente no se dan cuenta de que la ronda aprende)
 //   LLAGA=1 node herramientas/bot.js 2000          (el veterano con distintas reglas para hacerse la llaga, y comparación por parejas)
 //   DESGLOSE=1 ...                                 (detenciones por partida según el motivo)
+//   CIERRA=1 ...                                   (por separado, los veranos en que la ronda cierra cada puerta)
 //   node herramientas/bot.js 1000 '{"PARAMS.pararAlLlegar":{"desconocido":0.3,"conocido":0.4}}'
 //
 // Bots:
@@ -14,12 +15,17 @@
 //   azar       pulsa cualquier cosa que se pueda pulsar.
 //   novato     no conoce la ciudad: entra, va a sitios al azar, pide donde hay gente si no ve la ronda, no repite sitio
 //              el mismo día y vuelve a la ribera antes de que cierren, por el camino más corto.
-//   veterano   conoce los horarios de la gente y el recorrido de costumbre de la ronda (lo que aprende un jugador en
-//              unas partidas). Elige adónde ir por lo que espera sacar menos el riesgo. Arriesga más. No repite sitio y
-//              hora cuando ve que la ronda se lo ha aprendido.
+//   veterano   conoce los horarios de la gente y el esqueleto de las costumbres de la ronda (por la mañana, donde hay
+//              mercado o misa; a sexta come; a nona y a vísperas, donde hay gente; al anochecer cierra una puerta), y
+//              aprende las de este verano de lo que ve, como quien mira Recuerdos (desde la j0.9 cambian en cada partida;
+//              hasta la j0.8 se sabía el recorrido fijo). Elige adónde ir por lo que espera sacar menos el riesgo.
+//              Arriesga más. No repite sitio y hora cuando ve que la ronda se lo ha aprendido.
 //              Sale por la puerta en la que espera menos riesgo (j0.8: hay dos) y no empieza nada que le impida salir
 //              antes de que cierren (hasta la j0.7.2 a veces se quedaba dentro sin querer, 1 de cada 9 noches).
 //   prudente   como el veterano, pero pesa el triple el riesgo de la ronda.
+//   vidente    como el veterano, pero sabe las costumbres de este verano desde el primer día (techo de lo que da saber).
+//   memorioso  como el veterano, pero cree que la ronda sigue el recorrido fijo de hasta la j0.8 y no aprende (el que
+//              se lo sabía de memoria).
 //   dentro-listo   como el veterano, pero duerme siempre dentro de la muralla, buscando un sitio sin quejas que él sepa.
 //   dentro-ciego   como el veterano, pero duerme siempre dentro, donde le pille la noche.
 // Todos cenan una ración entera si pueden.
@@ -33,6 +39,56 @@ const poner = (o, k, v) => { const ks = k.split("."); let x = o; while (ks.lengt
 for (const [k, v] of Object.entries(pal)) poner(window.RULES, k, v);
 require(path.join(RAIZ, "engine.js"));
 const R = window.RULES, E = window.ENGINE, P = R.PARAMS;
+
+// ------------------------------------------------------------------ lo que sabe de la ronda
+// Devuelve, para una franja, dónde cree que estará la ronda por costumbre: { sitio: probabilidad } ({} si come).
+// s._sabe: "sabe" (las de este verano), "viejo" (el recorrido fijo de hasta la j0.8) o "aprende" (del esqueleto y lo visto).
+const CLAVE = ["manana", "manana", null, "nona", "visperas", "cierra"];
+const CORPUS_VIEJO = ["plaza", "rua", "rua", "rua", "plaza", "puerta"];
+function cree(s, d, f) {
+  if (f > 5) return {};
+  const corpus = R.CALENDARIO[d - 1].tipo === "corpus";
+  if (s._sabe === "viejo") { const l = (corpus ? CORPUS_VIEJO : R.RONDA.circuitoAntiguo)[f]; return l ? { [l]: 1 } : {}; }
+  if (s._sabe === "sabe") { const l = E.circuitoDia(s, d)[f]; return l ? { [l]: 1 } : {}; }
+  if (corpus && f < 5) return { [R.RONDA.circuitoCorpus[f]]: 1 }; // la procesión se conoce
+  const k = CLAVE[f];
+  if (!k) return {};
+  const cand = R.RONDA.costumbres[k];
+  // probabilidad de ver la ronda en un sitio si es su costumbre (sin desviarse) o si no lo es (por un desvío)
+  const si = 1 - R.RONDA.desvio + R.RONDA.desvio / DENTRO_N, no = R.RONDA.desvio / DENTRO_N;
+  const w = {};
+  for (const c of cand) {
+    let p = 1;
+    for (const o of (s._obs || {})[k] || []) p *= o.vio ? (o.lugar === c ? si : no) : (o.lugar === c ? 1 - si : 1 - no);
+    w[c] = p;
+  }
+  const tot = Object.values(w).reduce((a, b) => a + b, 0) || 1;
+  for (const c of cand) w[c] /= tot;
+  return w;
+}
+// probabilidad de que la ronda esté en la zona de un sitio a una franja, según lo que cree el bot (sin contar avisos)
+function probRonda(s, l, d, f) {
+  const z = E.zonaDe(s, l);
+  let pr = (R.RONDA.desvio * E.lugaresZona(s, z).filter((x) => E.L[x].dentro).length) / DENTRO_N;
+  for (const [c, p] of Object.entries(cree(s, d, f))) if (E.zonaDe(s, c) === z) pr += (1 - R.RONDA.desvio) * p;
+  return pr;
+}
+// lo que ve: en cada franja, si la ronda está o no donde está él (solo cuenta en los sitios de costumbre posibles)
+function apuntarVisto(s) {
+  if (s.t >= E.FIN || s.fase !== "dia" || !E.L[s.lugar].dentro) return;
+  const f = E.franja(s.t), k = CLAVE[f];
+  if (!k || R.CALENDARIO[s.dia - 1].tipo === "corpus" && f < 5) return;
+  const clave = `${s.dia}|${f}|${s.lugar}`;
+  s._vistoK = s._vistoK || {};
+  if (s._vistoK[clave]) return;
+  s._vistoK[clave] = 1;
+  if (!R.RONDA.costumbres[k].includes(s.lugar)) return;
+  // si vino por un aviso suyo, no cuenta como costumbre
+  const porque = s.rondasPorque[`${s.dia}|${f}`];
+  const vio = !!E.rondaEnTuZona(s);
+  if (vio && porque === "aviso" && s.pedidoHoy.length) return;
+  ((s._obs = s._obs || {})[k] = s._obs[k] || []).push({ lugar: s.lugar, vio });
+}
 
 // ------------------------------------------------------------------ utilidades
 // las puertas: sitios de dentro con un vecino de fuera (la del Río y, desde la j0.8, la de San Pablo)
@@ -70,9 +126,7 @@ function salida(s, l) {
 function riesgoPuerta(s, gate, t) {
   if (t >= E.FIN) return 0;
   const f = E.franja(t);
-  const circ = (R.CALENDARIO[s.dia - 1].tipo === "corpus" ? R.RONDA.circuitoCorpus : R.RONDA.circuito)[f];
-  let pr = (R.RONDA.desvio * E.lugaresZona(s, E.zonaDe(s, gate)).filter((x) => E.L[x].dentro).length) / DENTRO_N;
-  if (circ && E.zonaDe(s, circ) === E.zonaDe(s, gate)) pr += 1 - R.RONDA.desvio;
+  let pr = probRonda(s, gate, s.dia, f);
   if ((((s.habitos || {})[f] || {})[gate] || []).length >= R.RONDA.aprende.minDias) pr += R.RONDA.aprende.prob;
   return pr;
 }
@@ -140,9 +194,7 @@ function valor(s, l, f, lambda) {
   const media = (da) => (da < 2 ? 0 : [1, 2, 3, 4, 5, 6].reduce((a, t) => a + LT[da >= 3 ? 3 : 2][Math.min(6, t + sube) - 1], 0) / 6);
   const pp = E.L[l].pobres;
   const ev = (1 - pp) * media(g) + pp * media(g - 1);
-  const circ = (R.CALENDARIO[s.dia - 1].tipo === "corpus" ? R.RONDA.circuitoCorpus : R.RONDA.circuito)[f];
-  let pr = R.RONDA.desvio * E.lugaresZona(s, E.zonaDe(s, l)).filter((x) => E.L[x].dentro).length / 8;
-  if (circ && E.zonaDe(s, circ) === E.zonaDe(s, l)) pr += 1 - R.RONDA.desvio;
+  let pr = probRonda(s, l, s.dia, f);
   if (s.pedidoHoy.some((p) => p.lugar === l)) pr += 0.4;
   // la ronda aprende: el veterano y el prudente se dan cuenta (lo ven en Recuerdos) y no repiten sitio y hora;
   // con RUTINA=1 no se dan cuenta
@@ -176,7 +228,7 @@ function veterano(s, rnd, g, lambda, dentro) {
   if (tr && tr.ok && s.cuerpo >= 4 && !s.llaga) return E.pedirTrabajo(s);
   const pd = o.acc.find((x) => x.id === "pedir");
   if (pd && pd.ok && !r) {
-    const sig = s.t % 6 !== 0 && R.RONDA.circuito[f + 1] && E.zonaDe(s, R.RONDA.circuito[f + 1]) === E.zonaDe(s, s.lugar);
+    const sig = s.t % 6 !== 0 && f < 5 && probRonda(s, s.lugar, s.dia, f + 1) > 0.5; // la ronda suele llegar aquí la franja siguiente
     const cabe = dentro || !E.L[s.lugar].dentro || s.t + 6 + salida(s, s.lugar) <= E.FIN; // pedir y aún salir antes de que cierren
     if (cabe && valor(s, s.lugar, f, lambda) > 0.2 && !sig && !s.pedidoHoy.some((p) => p.lugar === s.lugar && E.L[s.lugar].aviso > 0)) return E.pedir(s);
   }
@@ -203,7 +255,10 @@ const BOTS = {
   prudente: (s, rnd, g) => veterano(s, rnd, g, 3),
   "dentro-listo": (s, rnd, g) => veterano(s, rnd, g, 1.5, "listo"),
   "dentro-ciego": (s, rnd, g) => veterano(s, rnd, g, 1.5, "ciego"),
+  vidente: (s, rnd, g) => veterano(s, rnd, g, 1.5),
+  memorioso: (s, rnd, g) => veterano(s, rnd, g, 1.5),
 };
+const SABE = { vidente: "sabe", memorioso: "viejo" }; // los demás aprenden
 
 // la llaga: cuándo se la hace el bot (de noche, en la ribera). Juegan como el veterano.
 //   llaga-dN     la primera noche en la ribera desde el día N, pase lo que pase.
@@ -225,6 +280,7 @@ function jugar(modo, bot, sem) {
   let st = 12345 + sem * 7919;
   const rnd = () => { st = (st * 1103515245 + 12345) & 0x7fffffff; return st / 0x7fffffff; };
   const s = E.nueva(modo, "bot", String(sem), { llaga: !!LLAGA[bot] });
+  s._sabe = SABE[bot] || "aprende";
   const g = { clave: null, libres: 0 };
   let guard = 0;
   while (s.fase !== "fin" && guard++ < 5000) {
@@ -234,7 +290,9 @@ function jugar(modo, bot, sem) {
     if (s.t >= E.FIN) { E.comprobarNoche(s); continue; }
     const clave = s.dia * 100 + s.t;
     g.libres = g.clave === clave ? g.libres + 1 : 0; g.clave = clave; // en B, moverse dentro del barrio no gasta tiempo
+    apuntarVisto(s);
     BOTS[bot](s, rnd, g);
+    apuntarVisto(s);
     E.comprobarNoche(s);
   }
   if (s.fase !== "fin" && process.env.DEPURAR) console.error("atasco", modo, bot, sem, s.dia, s.t, s.lugar, s.fase, s.cronica.slice(-6).map((c) => c.texto));
@@ -254,6 +312,7 @@ for (const modo of (process.env.PRUEBAS || "A").split(",")) {
     for (let i = 1; i <= N; i++) {
       const s = jugar(modo, bot, i);
       finales[bot][i] = { tipo: s.final.tipo, llaga: s.llaga || 0, dia: s.final.dia };
+      if (process.env.CIERRA) { const c = s.circuito[5]; const x = ((fin.cierra = fin.cierra || {})[c] = fin.cierra[c] || { n: 0, llega: 0 }); x.n++; if (llega(s)) x.llega++; }
       fin[s.final.tipo] = (fin[s.final.tipo] || 0) + 1;
       dias += s.final.dia;
       if (s.llaga) llagados++;
@@ -265,6 +324,7 @@ for (const modo of (process.env.PRUEBAS || "A").split(",")) {
     const ratos = T.mover + T.pedir + T.trabajar + T.esperar + T.perdido || 1;
     const mov = modo === "A" ? T.pasos : T.cruces;
     console.log(`${modo}      ${bot.padEnd(15)} | ${pct(fin.siega, N)}  ${pct(fin.aguanta, N)}     | ${pct(fin.hambre, N)}  ${pct(fin.desterrado, N)}      ${pct(fin.muerto, N)} | ${(dias / N).toFixed(1).padStart(4)}  ${llegan ? (cuerpo / llegan).toFixed(1) : " — "}     | ${((T.panPedido + T.panTrabajo) / dias).toFixed(2).padStart(5)}    ${pct(T.mover, ratos)}   ${(mov / dias).toFixed(1).padStart(4)}                ${(T.encuentros / dias).toFixed(2)}                | ${pct(llagados, N)}`);
+    if (fin.cierra) console.log("         llega según la puerta que cierra la ronda: " + Object.entries(fin.cierra).map(([k, x]) => `${E.L[k].corto} ${pct(x.llega, x.n).trim()} (${x.n})`).join(" · "));
     if (fin.det) console.log("         detenciones por partida: " + Object.entries(fin.det).map(([k, v]) => `${k} ${(v / N).toFixed(2)}`).join(" · "));
   }
   console.log("");

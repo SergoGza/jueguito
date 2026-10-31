@@ -1,4 +1,4 @@
-# Liber Vagatorum · el juguete (j0.8)
+# Liber Vagatorum · el juguete (j0.9)
 
 Prueba mínima del núcleo del juego, tras el replanteamiento de octubre de 2026: **un mendigo, una necesidad (el hambre) y una amenaza (la ronda)**. Nada más: ni los tuyos, ni el relevo, ni tretas, ni exámenes. Si el núcleo solo no obliga a exponerse para comer, los sistemas de encima no lo van a arreglar.
 
@@ -20,11 +20,13 @@ Ningún criterio fijado antes de probar separó una de otra: en A nadie contó p
 Todo está en `rules.js` y la ayuda del juego lo explica.
 
 - **El día:** seis franjas (prima a completas) de seis ratos. Pedir ocupa una franja. Al acabar completas cierran las puertas de la muralla.
-- **Dos puertas** (j0.8). La Puerta del Río, junto al puente, y la de San Pablo, al este, junto a San Esteban, a la que se llega desde el puente por la orilla (un paso más). La ronda pasa por la del Río a completas, en su recorrido de costumbre; la de San Pablo no está en su recorrido, nadie pide en ella y sus guardas no avisan. Así, al acabar el día se elige: el oeste, más rico a vísperas (Catedral, Rúa), sale por la puerta vigilada; el este, más pobre, sale libre. Quieto en una puerta, la ronda no te para, y salir hacia fuera no cuenta como llegar adonde está. Historia: el Postigo Ciego (pegado a la Puerta del Río) y la Puerta de San Pablo existieron; ver el registro.
+- **Dos puertas** (j0.8). La Puerta del Río, junto al puente, y la de San Pablo, al este, junto a San Esteban, a la que se llega desde el puente por la orilla (un paso más). Al anochecer la ronda va a cerrar una de las dos, y cuál es una de sus costumbres de ese verano (ver abajo). En la de San Pablo nadie pide y sus guardas no avisan. Así, al acabar el día se elige por dónde salir según lo que sepas de la ronda: el oeste es más rico a vísperas (Catedral, Rúa); el este, más pobre. Quieto en una puerta, la ronda no te para, y salir hacia fuera no cuenta como llegar adonde está. Historia: el Postigo Ciego (pegado a la Puerta del Río) y la Puerta de San Pablo existieron; ver el registro.
 - **El pan está dentro y los pobres duermen fuera, en la ribera** (en el puente y en la orilla no se puede dormir: se baja a la ribera). Fuera de la muralla nadie da. Dentro, solo donde hay gente que no es pobre; si hay otros pobres pidiendo, os repartís lo que hay. Desde el día 6, el pan sube y la gente da menos.
 - **Lo que ves caduca.** La gente, los pobres y la ronda cambian al empezar cada franja. Lo demás lo sabes de cuando estuviste, y el mapa lo pinta más claro cuanto más viejo.
-- **Lo que recuerdas** (botón «Recuerdos» de la cabecera). Un panel que hay que abrir guarda dónde y cuándo has visto a la ronda, dónde has pedido tú (por franjas) y dónde te ha parado. Es la forma de aprender su recorrido de costumbre y de ver la tuya, y lo que heredará el siguiente en el relevo.
-- **La ronda:** un recorrido de costumbre (plaza por la mañana, a sexta come, escuelas a nona, Rúa a vísperas, Puerta del Río al cerrar), desvíos al azar y, sobre todo, va donde avisan. Quien te ve pedir avisa; en la Puerta del Río, las Escuelas y San Martín, enseguida; en San Esteban, nadie.
+- **Lo que recuerdas** (botón «Recuerdos» de la cabecera). Un panel que hay que abrir guarda dónde y cuándo has visto a la ronda, dónde has pedido tú (por franjas) y dónde te ha parado. Es la forma de aprender sus costumbres de este verano y de ver las tuyas, y lo que heredará el siguiente en el relevo.
+- **La ronda:** unas costumbres, desvíos al azar y, sobre todo, va donde avisan.
+  - **Las costumbres cambian cada verano** (j0.9; cada partida es un verano y las saca de la semilla). El esqueleto es fijo y sale del mundo: por la mañana (prima y tercia) anda donde hay mercado o misa (la Plaza, la Catedral o San Martín); a sexta come; a nona y a vísperas, donde hay gente (nona: Escuelas, Rúa, Catedral o Plaza; vísperas: Rúa, Catedral o Plaza); al anochecer cierra una de las dos puertas; el Corpus acompaña la procesión. Lo que cambia es el sitio: hay 72 combinaciones. La ayuda dice que no son las mismas cada verano; cuáles son, se aprende mirando (Recuerdos). El informe las dice al final. Hasta la j0.8 el recorrido era fijo (Plaza, Plaza, come, Escuelas, Rúa, Puerta del Río) y quien había jugado varias veces se lo sabía de memoria.
+  - Quien te ve pedir avisa; Quien te ve pedir avisa; en la Puerta del Río, las Escuelas y San Martín, enseguida; en San Esteban, nadie.
   - Si te ve pedir, te detiene (con mucha gente, a veces no te ve).
   - Si llegas a donde está, puede pararte: la primera vez te echa de la ciudad; si ya te conoce, te detiene.
   - Quieto, no te para.
@@ -36,22 +38,25 @@ Todo está en `rules.js` y la ayuda del juego lo explica.
 **Principio (Sergio):** la información la dan los personajes y el mundo, y el jugador la interpreta; nada de una voz en off que lleve de la mano. Pendiente: recortar «Antes de actuar» con ese criterio después de esta tanda de pruebas.
 - **Objetivo:** aguantar diez días (1 a 10 de junio de 1545; el 4 es Corpus Christi y el 7, domingo) hasta la siega, que empieza el 11. En la siega el mayoral coge segadores según el cuerpo (con 4 o más, seguro; con 3, a veces; con menos, no). La cifra no se dice: «Tus brazos no me valen». Así, llegar con lo justo no es lo mismo que llegar entero.
 
-**Licencias históricas** (también en la ayuda): la ronda y su recorrido son invención; que en San Esteban nadie avise sale de que Soto, su prior, escribió contra la orden, sin documento que lo diga; la limosna va en pan y no en dinero para no meter el mercado en esta prueba; que los guardas de la Puerta de San Pablo no avisen es del juego, y la muralla tenía más puertas de las dos que salen; las cifras son del juego.
+**Licencias históricas** (también en la ayuda): la ronda y sus costumbres son invención; que en San Esteban nadie avise sale de que Soto, su prior, escribió contra la orden, sin documento que lo diga; la limosna va en pan y no en dinero para no meter el mercado en esta prueba; que los guardas de la Puerta de San Pablo no avisen es del juego, y la muralla tenía más puertas de las dos que salen; las cifras son del juego.
 
-**Bots (2.000 partidas cada uno; no es un objetivo de dificultad).** Llegan a la siega, con siega o sin ella. Hasta la j0.7.2, el veterano y el prudente se quedaban dentro de la muralla sin querer 1 de cada 9 noches (esperaban o pedían cuando ya no les daba tiempo a salir) y eso les daba tiempo de pedir: sus cifras de entonces (50 % y 51 %) estaban infladas. Desde la j0.8 siempre salen a tiempo y eligen puerta. La primera columna es la j0.7.2 (una puerta) con los bots arreglados:
+**Bots (2.000 partidas cada uno; no es un objetivo de dificultad).** Llegan a la siega, con siega o sin ella. Hasta la j0.7.2, el veterano y el prudente se quedaban dentro de la muralla sin querer 1 de cada 9 noches y eso les daba tiempo de pedir: sus cifras de entonces (50 % y 51 %) estaban infladas. Desde la j0.8 siempre salen a tiempo y eligen puerta. Desde la j0.9 el veterano y el prudente conocen el esqueleto de las costumbres de la ronda y aprenden las del verano de lo que ven; hasta la j0.8 se sabían el recorrido fijo.
 
-| Bot | j0.7.2, una puerta | j0.8, dos puertas |
-|---|---|---|
-| Escondido en la ribera | 0 % | 0 % |
-| Novato (no conoce la ciudad; sale por la puerta más cercana) | 19 % | 32 % |
-| Veterano (conoce horarios y ronda; cambia de rutina si se la aprenden; elige puerta) | 43 % | 51 % |
-| Prudente (como el veterano, pesa el triple el riesgo) | 27 % | 31 % |
-| Veterano y prudente que no cambian de rutina (`RUTINA=1`) | 30 % y 39 % | 44 % y 57 % |
-| Duerme siempre dentro, eligiendo sitio | 37 % | 36 % |
+| Bot | j0.7.2, una puerta | j0.8, dos puertas | j0.9, costumbres por verano |
+|---|---|---|---|
+| Escondido en la ribera | 0 % | 0 % | 0 % |
+| Novato (no conoce la ciudad; sale por la puerta más cercana) | 19 % | 32 % | 40 % |
+| Veterano (conoce horarios; aprende la ronda; cambia de rutina si se la aprenden; elige puerta) | 43 % | 51 % | 53 % |
+| Prudente (como el veterano, pesa el triple el riesgo) | 27 % | 31 % | 25 % |
+| Veterano y prudente que no cambian de rutina (`RUTINA=1`) | 30 % y 39 % | 44 % y 57 % | 44 % y 59 % |
+| Duerme siempre dentro, eligiendo sitio | 37 % | 36 % | 39 % |
+| Vidente (como el veterano, pero sabe las costumbres del verano desde el primer día) | — | — | 62 % |
+| Memorioso (como el veterano, pero cree que la ronda sigue el recorrido fijo de hasta la j0.8) | — | — | 51 % |
 
-- **La segunda puerta:** el veterano sale por la de San Pablo 1 de cada 5 tardes; los destierros bajan del 24 % al 16 % y las paradas al llegar, de 1,33 a 1,02 por partida. La del Río sigue siendo la salida de casi todas las tardes. Lo que más mata al veterano y al prudente es el hambre (31 % y 64 %).
-- **Darse cuenta de la rutina** compensa al veterano (51 % frente a 44 %), pero el prudente se pasa de cauto: deja los mejores sitios y se muere de hambre (31 % frente a 57 %).
-- **Detenciones del veterano** (`DESGLOSE=1`): al llegar donde está la ronda, 1,02 por partida; pidiendo, 0,13; de noche, ninguna (duerme siempre fuera).
+- **Costumbres por verano (j0.9):** saberlas desde el primer día vale unos 9 puntos (vidente 62 % frente al veterano que las aprende, 53 %); el que se sabía el recorrido viejo no saca ventaja (51 %). El veterano acierta pronto qué puerta cierra (9 de cada 10 veranos hacia el día 9), porque sale por ellas; lo demás le cuesta más, porque esquiva la ronda y la ve poco. Los veranos en que la ronda cierra la Puerta de San Pablo son más fáciles (veterano 58 % frente a 47 %; novato 48 % frente a 31 %): el oeste, más rico, sale por la puerta grande sin ronda. `CIERRA=1` lo separa.
+- **La segunda puerta (j0.8):** el veterano salía por la de San Pablo 1 de cada 5 tardes. Lo que más mata al veterano y al prudente es el hambre.
+- **Darse cuenta de la rutina** compensa al veterano (53 % frente a 44 %), pero el prudente se pasa de cauto: deja los mejores sitios y se muere de hambre (25 % frente a 59 %).
+- **Detenciones del veterano** (`DESGLOSE=1`): al llegar donde está la ronda, 0,98 por partida; pidiendo, 0,07; de noche, ninguna (duerme siempre fuera).
 
 ## La llaga (j0.7; se activa al empezar)
 
@@ -64,15 +69,15 @@ Fingir entra por la llaga, decidido el 30 de octubre de 2026. Sale de Robles (Sa
 
 **Calibrado con bots** (`LLAGA=1 node herramientas/bot.js 2000`; juegan como el veterano). Por parejas con la misma semilla, solo en las partidas en que el bot se hizo la llaga. Se calibró con los bots de antes, que se quedaban dentro sin querer; con los bots arreglados (j0.8) la llaga ayuda bastante más, porque el veterano honrado pasa más hambre y la llaga da de comer:
 
-| Cuándo se la hace | Calibrado (j0.7): con llaga / el veterano sin ella | j0.8, bots arreglados: con llaga / el veterano sin ella | j0.8: el veterano, con siega |
+| Cuándo se la hace | Calibrado (j0.7): con llaga / el veterano sin ella | j0.8, bots arreglados: con llaga / el veterano sin ella | j0.9: con llaga / el veterano sin ella |
 |---|---|---|---|
-| La primera noche | 53 % / 49 % | 63 % / 51 % | 18 % |
-| Desde el día 3 | 59 % / 52 % | 71 % / 52 % | 18 % |
-| Desde el día 5 | 65 % / 56 % | 75 % / 54 % | 19 % |
-| Desde el día 7 | 78 % / 67 % | 81 % / 59 % | 21 % |
-| En apuros (desde el día 4, cuerpo ≤ 2 o dos detenciones) | 54 % / 43 % | 56 % / 45 % | 23 % |
+| La primera noche | 53 % / 49 % | 63 % / 51 % | 70 % / 53 % |
+| Desde el día 3 | 59 % / 52 % | 71 % / 52 % | 72 % / 54 % |
+| Desde el día 5 | 65 % / 56 % | 75 % / 54 % | 78 % / 57 % |
+| Desde el día 7 | 78 % / 67 % | 81 % / 59 % | 83 % / 61 % |
+| En apuros (desde el día 4, cuerpo ≤ 2 o dos detenciones) | 54 % / 43 % | 56 % / 45 % | 56 % / 45 % |
 
-Al calibrarla: hacérsela pronto casi no salvaba y perdía la siega; tarde, y sobre todo en apuros, salvaba unos 11 de cada 100. Con los bots arreglados, salva de 10 a 22 de cada 100 según cuándo, y la siega que se pierde era de 1 de cada 5. Está pendiente de revisar con los informes. Se llegó a la versión actual tras descartar dos:
+Al calibrarla: hacérsela pronto casi no salvaba y perdía la siega; tarde, y sobre todo en apuros, salvaba unos 11 de cada 100. Con los bots arreglados, salva de 10 a 22 de cada 100 según cuándo (en la j0.9, de 11 a 22), y la siega que se pierde es de 1 de cada 4 o 5. Está pendiente de revisar con los informes. Se llegó a la versión actual tras descartar dos:
 
 - **Protección para siempre** (más limosna y el alguacil no te para nunca): hacérsela la primera noche llegaba al 97 %. Quitaba las dos formas de morir y, después de hacérsela, la partida ya no tenía tensión.
 - **Protección a medias** (el alguacil te para la mitad de las veces): como protege lo mismo cada día, el momento daba igual. Cuando la llaga temprana quedaba igualada con no hacérsela, la tardía tampoco ayudaba.
@@ -94,8 +99,8 @@ El correo de destino está en `rules.js` (`CONFIG.email`); en GitHub Pages queda
 
 Todo en `rules.js`. **Cada vez que cambies algo, sube la versión en dos sitios**, o los móviles seguirán con la copia vieja:
 
-1. `rules.js` → `version: "j0.8"`, por ejemplo a `"j0.8"`.
-2. `sw.js` → `const VERSION = "lv-j0.8-1"`, por ejemplo a `"lv-j0.8-1"`.
+1. `rules.js` → `version: "j0.9"`, por ejemplo a `"j1.0"`.
+2. `sw.js` → `const VERSION = "lv-j0.9-1"`, por ejemplo a `"lv-j1.0-1"`.
 
 ## Probarlo en local
 
@@ -107,5 +112,5 @@ y abre `http://localhost:8000`. Con `?semilla=7` la partida nueva sale siempre i
 
 ## Herramientas
 
-- `herramientas/bot.js`: siete bots (escondido, azar, novato, veterano, prudente y dos que duermen siempre dentro: uno elige dónde y otro no) que juegan miles de partidas con el motor real y sacan porcentajes. El veterano y el prudente salen siempre antes de que cierren y eligen puerta por el riesgo que esperan; el novato sale por la más cercana. `node herramientas/bot.js 1000` (solo A; `PRUEBAS=A,B` para las dos; `RUTINA=1` para que el veterano y el prudente no se den cuenta de que la ronda aprende). Admite palancas para probar cambios sin tocar `rules.js`. No son personas: sirven para ver si una regla rompe algo, no para fijar la dificultad.
+- `herramientas/bot.js`: nueve bots (escondido, azar, novato, veterano, prudente, vidente, memorioso y dos que duermen siempre dentro: uno elige dónde y otro no) que juegan miles de partidas con el motor real y sacan porcentajes. El veterano y el prudente salen siempre antes de que cierren, eligen puerta por el riesgo que esperan y aprenden las costumbres de la ronda de lo que ven; el novato sale por la más cercana. `node herramientas/bot.js 1000` (solo A; `PRUEBAS=A,B` para las dos; `RUTINA=1` para que el veterano y el prudente no se den cuenta de que la ronda aprende; `CIERRA=1` para separar los veranos según la puerta que cierra la ronda). Admite palancas para probar cambios sin tocar `rules.js`. No son personas: sirven para ver si una regla rompe algo, no para fijar la dificultad.
 - `herramientas/agentes/`: agentes de Claude que juegan la app real y escriben un diario (`/agentes prueba` desde Claude Code). Ver su README.

@@ -203,6 +203,28 @@
       pillar: 1,    // multiplica la de que te vea pidiendo (pedir sigue prohibido)
       noche: 1,     // multiplica la de la ronda de noche
     },
+    // los tuyos (j0.10; se activan al empezar): dos que bajaron contigo de La Armuña y viven con tus mismas reglas.
+    // De noche, en la ribera, te cuentan lo que vieron y, si no han sacado para cenar, te piden pan.
+    // Si pasan hambre y les niegas pan teniéndolo, pueden malsinarte (Soto, 1545). Nada de esto se explica: lo dicen ellos.
+    tuyos: {
+      quienes: [
+        // pideMax: veces que pide al día como mucho
+        { id: "pedro", nombre: "Pedro", manera: "prudente", el: true, pideMax: 2 },       // pide poco y se recoge pronto: ve poco
+        { id: "catalina", nombre: "Catalina", manera: "arriesgada", el: false, pideMax: 3 }, // no pide dos franjas seguidas: recorre la ciudad, ve mucho, le pillan
+      ],
+      cuerpo: 4, pan: 1,
+      quieto: 0,          // con el cuerpo así o menos no sale de la ribera (0: siempre sale)
+      oidas: 0.25,        // cada noche, probabilidad de contar algo que le han dicho
+      oidasCierto: 2 / 3, // y de que sea verdad
+      trato: "malsinar",  // si les niegas pan: «malsinar» (decidido) o «confianza» (para comparar con bots)
+      malsinarCuerpo: 6,  // al negarle pan teniéndolo, con el cuerpo así o menos (6: siempre que te pide): la primera vez avisa; después, puede venderte
+      malsinar: 0.5,      // probabilidad de que vaya al alguacil a la mañana siguiente, ya avisado
+      // palancas apagadas (medidas con bots el 1 de noviembre; Sergio eligió no darles nada a cambio dentro del verano):
+      trueque: false,     // si es true, la noche que te pide pan solo te cuenta lo que vio si le das
+      pide: 2,            // lo que pide como mucho: lo que le falta para una ración (2) o media (1)
+      devuelve: false,    // si es true, el que te debe pan te da un pedazo la noche que no tienes para cenar, o te lo lleva a la cárcel
+      confianza: { inicial: 2, max: 3 }, // trato «confianza»: con 1, cuenta la mitad; con 0, nada
+    },
   };
 
   const LICENCIAS = [
@@ -215,7 +237,7 @@
   ];
 
   window.RULES = {
-    version: "j0.9", CONFIG, FRANJAS, RATOS, DIAS, MODOS, BARRIOS, LUGARES, CAMINOS, CALENDARIO, DIAS_SENALADOS,
+    version: "j0.10", CONFIG, FRANJAS, RATOS, DIAS, MODOS, BARRIOS, LUGARES, CAMINOS, CALENDARIO, DIAS_SENALADOS,
     RONDA, PARAMS, LICENCIAS,
     // la mesa de los agentes pregunta por PERSONAJES: en el juguete, cada «personaje» es una prueba
     PERSONAJES: [

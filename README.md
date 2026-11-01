@@ -1,6 +1,6 @@
-# Liber Vagatorum · el juguete (j0.9)
+# Liber Vagatorum · el juguete (j0.10)
 
-Prueba mínima del núcleo del juego, tras el replanteamiento de octubre de 2026: **un mendigo, una necesidad (el hambre) y una amenaza (la ronda)**. Nada más: ni los tuyos, ni el relevo, ni tretas, ni exámenes. Si el núcleo solo no obliga a exponerse para comer, los sistemas de encima no lo van a arreglar.
+Prueba mínima del núcleo del juego, tras el replanteamiento de octubre de 2026: **un mendigo, una necesidad (el hambre) y una amenaza (la ronda)**. Encima, dos pruebas que se activan al empezar: la llaga (fingir) y los tuyos. Ni el relevo, ni más tretas, ni exámenes. Si el núcleo solo no obliga a exponerse para comer, los sistemas de encima no lo van a arreglar.
 
 Es una página estática, sin servidor, instalable en el móvil y jugable sin conexión. Te mueves tocando el mapa (o con la lista «Adónde vas»); en el móvil, pedir, esperar y acabar el día van en una barra fija abajo, y solo se desplaza la pantalla para leer. Se publica en GitHub Pages desde `main`: https://sergogza.github.io/jueguito/
 
@@ -86,6 +86,32 @@ Con la protección que se gasta, la hecha pronto la gasta pronto y la hecha en a
 
 **Del núcleo, de paso:** casi todas las detenciones del veterano son por llegar a donde está la ronda cuando ya te tiene fichado, y sobre todo en la Puerta del Río a completas. Por eso la j0.8 añade la segunda puerta (ver arriba).
 
+## Los tuyos (j0.10; se activan al empezar)
+
+Decidido por rondas el 31 de octubre y el 1 de noviembre de 2026 (ver `claude/decisiones-replanteamiento.md` en el proyecto). **Se activa con el botón «Jugar con los tuyos» de la pantalla de inicio**, como la llaga, y solo en la prueba A. Sin activarlo, la partida es la normal.
+
+- **Quiénes.** Pedro y Catalina, de tu aldea, bajaron contigo. Pedro es prudente: pide dos veces al día como mucho, no repite sitio y hora, prefiere donde nadie avisa y se recoge pronto. Catalina se arriesga: no pide dos franjas seguidas, recorre la ciudad y le pillan más. Quien ve es quien se expone.
+- **De día viven con tus reglas**, a escala de franja: cada franja andan hasta tres pasos (y pueden toparse con la ronda) o piden en un sitio (misma tabla de limosna, mismos avisos, mismas detenciones, la ronda también les aprende las costumbres). Donde piden cuentan como otros pobres. Su azar sale de la semilla, no de tus tiradas.
+- **Lo que se ve.** Si coincides con uno: «Catalina está pidiendo aquí». Si en tu sitio quedan quejas de otro que pidió hace poco: «Un vecino rezonga: "Otra vez pordioseros por aquí"» (sin eso, el jugador pedía donde acababa de pedir un tuyo y la ronda le cogía: 0,57 detenciones por partida).
+- **De noche, si dormís en la ribera,** te cuentan lo que vieron, tal cual («A tercia vi la ronda en la Catedral… Sin ronda: Rúa y Plaza (nona)»), a veces algo de oídas que puede estar mal. Va a «Recuerdos», en «Lo que te han contado». El que no ha sacado para cenar te pide, y tú le das 0, 1 o 2 pedazos.
+- **Malsinar** (Soto, Salamanca 1545: «unos malsinan de otros»). Si te pide y se lo niegas teniendo pan, la primera vez te avisa («Tengo hambre, y el alguacil da pan al que le cuenta cosas»); las siguientes, la mitad de las veces va al alguacil a la mañana siguiente: la ronda se aprende de golpe tus costumbres de pedir y él se va. El alguacil, cuando te pilla así: «Ya me han contado dónde pides».
+- **El final dice con quién llegas a la siega** («Llegáis a la siega tú y Pedro. Catalina murió el día 7») o si mueres acompañado o solo. Es un adelanto del relevo.
+- **Palancas** en `PARAMS.tuyos`. Apagadas, medidas con bots: `trueque` (solo te cuentan si les das), `devuelve` (el que te debe pan te da un pedazo la noche que no tienes, o te lo lleva a la cárcel), `trato: "confianza"` (al que dejas con hambre te cuenta menos), `mundo: false` (sin efecto en el mundo, para diagnosticar).
+
+**Bots** (`TUYOS=1`; 2.000 partidas, el veterano; `DAR=` cómo reparte):
+
+| | Llega a la siega | Los tuyos vivos al final (Pedro / Catalina) | Malsinadas por partida |
+|---|---|---|---|
+| Sin los tuyos | 53 % | — | — |
+| No les da nunca | 47 % | 53 % / 47 % | 0,43 |
+| Solo a Catalina | 41 % | 56 % / 62 % | 0,28 |
+| A los dos lo que piden, guardándose su ración | 37 % | 74 % / 60 % | 0,13 |
+| Lo que piden, aunque se quede sin cenar | 16 % | 91 % / 75 % | 0 |
+
+- **Darles pan no compensa dentro del verano.** Es una decisión de Sergio (1 de noviembre): compartir en un verano de hambre no sale a cuenta, como en la realidad; lo que hará que importe mantenerlos vivos es el relevo, que va a continuación. Con `devuelve` las estrategias quedaban casi empatadas (46 %, 45 % y 43 %), pero funciona como un seguro y se descartó.
+- **Lo que cuentan vale unos 5 puntos** (47 % frente a 42 % con `OIDOS=0`).
+- **Los tuyos piden pan una de cada tres noches.** Sacan unos 1,5 pedazos al día. Ven unos 4 o 5 sitios al día.
+
 ## El informe
 
 Al acabar (o al abandonar), cinco preguntas y el informe: la partida entera, el tiempo repartido entre moverse, pedir, trabajar y esperar, los pasos o cruces por día, las veces que llegó donde estaba la ronda, la crónica, dónde estuvo la ronda en cada franja (que el jugador no veía) y los datos en bruto.
@@ -99,8 +125,8 @@ El correo de destino está en `rules.js` (`CONFIG.email`); en GitHub Pages queda
 
 Todo en `rules.js`. **Cada vez que cambies algo, sube la versión en dos sitios**, o los móviles seguirán con la copia vieja:
 
-1. `rules.js` → `version: "j0.9"`, por ejemplo a `"j1.0"`.
-2. `sw.js` → `const VERSION = "lv-j0.9-1"`, por ejemplo a `"lv-j1.0-1"`.
+1. `rules.js` → `version: "j0.10"`, por ejemplo a `"j0.11"`.
+2. `sw.js` → `const VERSION = "lv-j0.10-1"`, por ejemplo a `"lv-j0.11-1"`.
 
 ## Probarlo en local
 
@@ -112,5 +138,5 @@ y abre `http://localhost:8000`. Con `?semilla=7` la partida nueva sale siempre i
 
 ## Herramientas
 
-- `herramientas/bot.js`: nueve bots (escondido, azar, novato, veterano, prudente, vidente, memorioso y dos que duermen siempre dentro: uno elige dónde y otro no) que juegan miles de partidas con el motor real y sacan porcentajes. El veterano y el prudente salen siempre antes de que cierren, eligen puerta por el riesgo que esperan y aprenden las costumbres de la ronda de lo que ven; el novato sale por la más cercana. `node herramientas/bot.js 1000` (solo A; `PRUEBAS=A,B` para las dos; `RUTINA=1` para que el veterano y el prudente no se den cuenta de que la ronda aprende; `CIERRA=1` para separar los veranos según la puerta que cierra la ronda). Admite palancas para probar cambios sin tocar `rules.js`. No son personas: sirven para ver si una regla rompe algo, no para fijar la dificultad.
+- `herramientas/bot.js`: nueve bots (escondido, azar, novato, veterano, prudente, vidente, memorioso y dos que duermen siempre dentro: uno elige dónde y otro no) que juegan miles de partidas con el motor real y sacan porcentajes. El veterano y el prudente salen siempre antes de que cierren, eligen puerta por el riesgo que esperan y aprenden las costumbres de la ronda de lo que ven; el novato sale por la más cercana. `node herramientas/bot.js 1000` (solo A; `PRUEBAS=A,B` para las dos; `RUTINA=1` para que el veterano y el prudente no se den cuenta de que la ronda aprende; `CIERRA=1` para separar los veranos según la puerta que cierra la ronda; `TUYOS=1` con los tuyos, y `DAR=nadie|todos|ojos|hambre|generoso` para cómo les da pan; `BOTS=veterano,…` para jugar solo con algunos bots). Admite palancas para probar cambios sin tocar `rules.js`. No son personas: sirven para ver si una regla rompe algo, no para fijar la dificultad.
 - `herramientas/agentes/`: agentes de Claude que juegan la app real y escriben un diario (`/agentes prueba` desde Claude Code). Ver su README.

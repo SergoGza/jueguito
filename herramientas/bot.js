@@ -7,7 +7,14 @@
 //   RUTINA=1 node herramientas/bot.js 1000         (el veterano y el prudente no se dan cuenta de que la ronda aprende)
 //   LLAGA=1 node herramientas/bot.js 2000          (el veterano con distintas reglas para hacerse la llaga, y comparación por parejas)
 //   DESGLOSE=1 ...                                 (detenciones por partida según el motivo)
+//   BOTS=veterano,prudente ...                     (solo esos bots)
 //   CIERRA=1 ...                                   (por separado, los veranos en que la ronda cierra cada puerta)
+//   TUYOS=1 ...                                    (con los tuyos, Pedro y Catalina; j0.10)
+//     DAR=todos|nadie|ojos|hambre|generoso         cómo les da pan el bot de noche (por defecto, todos):
+//                                                  todos, lo que piden guardándose su ración; ojos, solo a Catalina, la
+//                                                  que más ve; hambre, primero al más flaco; generoso, lo que piden aunque
+//                                                  se quede sin cenar
+//     OIDOS=0                                      el bot no usa lo que le cuentan para aprender la ronda
 //   node herramientas/bot.js 1000 '{"PARAMS.pararAlLlegar":{"desconocido":0.3,"conocido":0.4}}'
 //
 // Bots:
@@ -72,6 +79,30 @@ function probRonda(s, l, d, f) {
   let pr = (R.RONDA.desvio * E.lugaresZona(s, z).filter((x) => E.L[x].dentro).length) / DENTRO_N;
   for (const [c, p] of Object.entries(cree(s, d, f))) if (E.zonaDe(s, c) === z) pr += (1 - R.RONDA.desvio) * p;
   return pr;
+}
+// lo que le cuentan los tuyos: lo apunta como si lo hubiera visto (con OIDOS=0, no)
+function apuntarContado(s) {
+  const c = s.contado || [];
+  for (let i = s._contadoN || 0; i < c.length; i++) {
+    const x = c[i], k = CLAVE[x.f];
+    if (process.env.OIDOS === "0" || !k || (R.CALENDARIO[x.dia - 1].tipo === "corpus" && x.f < 5)) continue;
+    if (!R.RONDA.costumbres[k].includes(x.lugar)) continue;
+    ((s._obs = s._obs || {})[k] = s._obs[k] || []).push({ lugar: x.lugar, vio: x.ronda });
+  }
+  s._contadoN = c.length;
+}
+// de noche: cuánto pan da a cada uno de los tuyos
+function repartir(s) {
+  const pol = process.env.DAR || "todos";
+  if (pol === "nadie" || !s.nocheTuyos) return;
+  let pide = s.nocheTuyos.filter((x) => x.presente && x.pide > 0);
+  if (pol === "ojos") pide = pide.filter((x) => x.id === "catalina");
+  if (pol === "hambre") pide.sort((a, b) => a.cuerpo - b.cuerpo);
+  for (const x of pide) {
+    const guarda = pol === "generoso" ? 0 : s.cuerpo <= 4 ? 2 : 1;
+    const n = Math.min(x.pide, s.pan - guarda);
+    if (n > 0) E.darPan(s, x.id, n);
+  }
 }
 // lo que ve: en cada franja, si la ronda está o no donde está él (solo cuenta en los sitios de costumbre posibles)
 function apuntarVisto(s) {
@@ -230,7 +261,8 @@ function veterano(s, rnd, g, lambda, dentro) {
   if (pd && pd.ok && !r) {
     const sig = s.t % 6 !== 0 && f < 5 && probRonda(s, s.lugar, s.dia, f + 1) > 0.5; // la ronda suele llegar aquí la franja siguiente
     const cabe = dentro || !E.L[s.lugar].dentro || s.t + 6 + salida(s, s.lugar) <= E.FIN; // pedir y aún salir antes de que cierren
-    if (cabe && valor(s, s.lugar, f, lambda) > 0.2 && !sig && !s.pedidoHoy.some((p) => p.lugar === s.lugar && E.L[s.lugar].aviso > 0)) return E.pedir(s);
+    const ajeno = E.hayQuejas(s, s.lugar) || E.tuyosEn(s, s.lugar).some((x) => x.pide); // ahí pide o ha pedido otro: vendrá la ronda
+    if (cabe && !ajeno && valor(s, s.lugar, f, lambda) > 0.2 && !sig && !s.pedidoHoy.some((p) => p.lugar === s.lugar && E.L[s.lugar].aviso > 0)) return E.pedir(s);
   }
   let best = null;
   for (const l of Object.keys(E.L)) {
@@ -273,20 +305,20 @@ const LLAGA = {
   "llaga-apurado": (s) => s.dia >= 4 && (s.cuerpo <= 2 || s.detenciones >= 2) && sobrevive(s),
 };
 for (const k of Object.keys(LLAGA)) BOTS[k] = BOTS.veterano;
-const SOLO = process.env.LLAGA ? ["veterano", ...Object.keys(LLAGA)] : null;
+const SOLO = process.env.BOTS ? process.env.BOTS.split(",") : process.env.LLAGA ? ["veterano", ...Object.keys(LLAGA)] : null;
 
 // ------------------------------------------------------------------ partidas
 function jugar(modo, bot, sem) {
   let st = 12345 + sem * 7919;
   const rnd = () => { st = (st * 1103515245 + 12345) & 0x7fffffff; return st / 0x7fffffff; };
-  const s = E.nueva(modo, "bot", String(sem), { llaga: !!LLAGA[bot] });
+  const s = E.nueva(modo, "bot", String(sem), { llaga: !!LLAGA[bot], tuyos: !!process.env.TUYOS });
   s._sabe = SABE[bot] || "aprende";
   const g = { clave: null, libres: 0 };
   let guard = 0;
   while (s.fase !== "fin" && guard++ < 5000) {
     if (s.fase === "amanecer") { E.empezarJornada(s); continue; }
     if (s.fase === "resultado") { E.seguir(s); continue; }
-    if (s.fase === "noche") { if (LLAGA[bot] && E.puedeLlaga(s) && LLAGA[bot](s)) E.hacerLlaga(s); E.cenar(s, 2); continue; }
+    if (s.fase === "noche") { repartir(s); apuntarContado(s); if (LLAGA[bot] && E.puedeLlaga(s) && LLAGA[bot](s)) E.hacerLlaga(s); E.cenar(s, 2); continue; }
     if (s.t >= E.FIN) { E.comprobarNoche(s); continue; }
     const clave = s.dia * 100 + s.t;
     g.libres = g.clave === clave ? g.libres + 1 : 0; g.clave = clave; // en B, moverse dentro del barrio no gasta tiempo
@@ -318,6 +350,16 @@ for (const modo of (process.env.PRUEBAS || "A").split(",")) {
       if (s.llaga) llagados++;
       if (process.env.DESGLOSE) for (const c of s.cronica) if (c.tipo === "detenido") { const m = c.motivo.startsWith("pidiendo") ? "pidiendo" : c.motivo; (fin.det = fin.det || {})[m] = (fin.det[m] || 0) + 1; }
       if (llega(s)) { cuerpo += s.cuerpo; llegan++; }
+      if (s.tuyos) {
+        const Tt = (fin.tuyos = fin.tuyos || { vivos: {}, fin: {}, malsina: 0, contado: 0, dado: 0, sabia: 0, contadoAlg: 0 });
+        for (const tu of s.tuyos) {
+          const k = `${tu.nombre}:${tu.estado}`; Tt.fin[k] = (Tt.fin[k] || 0) + 1;
+          if (tu.estado === "malsino") Tt.malsina++;
+          Tt.dado += tu.recibido;
+        }
+        Tt.contado += (s.contado || []).length;
+        for (const c of s.cronica) if (c.tipo === "detenido" || c.tipo === "echado") { const k = `${c.dia}|${E.franja(c.t)}`; if ((s.rondasContado || {})[k]) Tt.contadoAlg++; }
+      }
       const t = E.resumenDias(s);
       if (!T) T = t; else Object.keys(t).forEach((k) => (T[k] += t[k]));
     }
@@ -325,6 +367,11 @@ for (const modo of (process.env.PRUEBAS || "A").split(",")) {
     const mov = modo === "A" ? T.pasos : T.cruces;
     console.log(`${modo}      ${bot.padEnd(15)} | ${pct(fin.siega, N)}  ${pct(fin.aguanta, N)}     | ${pct(fin.hambre, N)}  ${pct(fin.desterrado, N)}      ${pct(fin.muerto, N)} | ${(dias / N).toFixed(1).padStart(4)}  ${llegan ? (cuerpo / llegan).toFixed(1) : " — "}     | ${((T.panPedido + T.panTrabajo) / dias).toFixed(2).padStart(5)}    ${pct(T.mover, ratos)}   ${(mov / dias).toFixed(1).padStart(4)}                ${(T.encuentros / dias).toFixed(2)}                | ${pct(llagados, N)}`);
     if (fin.cierra) console.log("         llega según la puerta que cierra la ronda: " + Object.entries(fin.cierra).map(([k, x]) => `${E.L[k].corto} ${pct(x.llega, x.n).trim()} (${x.n})`).join(" · "));
+    if (fin.tuyos) {
+      const Tt = fin.tuyos, orden = Object.entries(Tt.fin).sort();
+      console.log(`         los tuyos al final: ${orden.map(([k, v]) => `${k} ${pct(v, N).trim()}`).join(" · ")}`);
+      console.log(`         por partida: pan dado ${(Tt.dado / N).toFixed(1)} · cosas contadas ${(Tt.contado / N).toFixed(0)} · malsinadas ${(Tt.malsina / N).toFixed(2)} · paradas por lo que contó un malsín ${(Tt.contadoAlg / N).toFixed(2)}`);
+    }
     if (fin.det) console.log("         detenciones por partida: " + Object.entries(fin.det).map(([k, v]) => `${k} ${(v / N).toFixed(2)}`).join(" · "));
   }
   console.log("");

@@ -131,6 +131,45 @@
     { dia: 10, fecha: "miércoles 10 de junio", tipo: "laborable" },
   ];
 
+  // Varios veranos (j0.11; se activa al empezar, con los tuyos). Salamanca juega los años que cuentan:
+  // 1545 la orden, 1552 las galeras, 1557 el hambre. Calendario juliano: en 1552 y 1557 el Corpus cae después
+  // del día 10 (16 y 17 de junio) y el domingo es el de Pentecostés.
+  //  galeras: una detención manda a galeras a los hombres (pragmática de 1552; sigue en vigor después).
+  //  escasezDesde: desde qué día la gente da menos (si no está, PARAMS.escasezDesde).
+  const VERANOS = [
+    { anio: 1545, calendario: CALENDARIO },
+    {
+      anio: 1552, galeras: true,
+      calendario: [
+        { dia: 1, fecha: "miércoles 1 de junio", tipo: "laborable" },
+        { dia: 2, fecha: "jueves 2 de junio", tipo: "laborable" },
+        { dia: 3, fecha: "viernes 3 de junio", tipo: "laborable" },
+        { dia: 4, fecha: "sábado 4 de junio", tipo: "laborable" },
+        { dia: 5, fecha: "domingo 5 de junio", tipo: "domingo", fiesta: "Pentecostés" },
+        { dia: 6, fecha: "lunes 6 de junio", tipo: "laborable" },
+        { dia: 7, fecha: "martes 7 de junio", tipo: "laborable" },
+        { dia: 8, fecha: "miércoles 8 de junio", tipo: "laborable" },
+        { dia: 9, fecha: "jueves 9 de junio", tipo: "laborable" },
+        { dia: 10, fecha: "viernes 10 de junio", tipo: "laborable" },
+      ],
+    },
+    {
+      anio: 1557, galeras: true, escasezDesde: 1,
+      calendario: [
+        { dia: 1, fecha: "martes 1 de junio", tipo: "laborable" },
+        { dia: 2, fecha: "miércoles 2 de junio", tipo: "laborable" },
+        { dia: 3, fecha: "jueves 3 de junio", tipo: "laborable" },
+        { dia: 4, fecha: "viernes 4 de junio", tipo: "laborable" },
+        { dia: 5, fecha: "sábado 5 de junio", tipo: "laborable" },
+        { dia: 6, fecha: "domingo 6 de junio", tipo: "domingo", fiesta: "Pentecostés" },
+        { dia: 7, fecha: "lunes 7 de junio", tipo: "laborable" },
+        { dia: 8, fecha: "martes 8 de junio", tipo: "laborable" },
+        { dia: 9, fecha: "miércoles 9 de junio", tipo: "laborable" },
+        { dia: 10, fecha: "jueves 10 de junio", tipo: "laborable" },
+      ],
+    },
+  ];
+
   // Cambios de gente en los días señalados: { tipo: { lugar: { franja: nivel } } }
   const DIAS_SENALADOS = {
     domingo: {
@@ -225,6 +264,21 @@
       devuelve: false,    // si es true, el que te debe pan te da un pedazo la noche que no tienes para cenar, o te lo lleva a la cárcel
       confianza: { inicial: 2, max: 3 }, // trato «confianza»: con 1, cuenta la mitad; con 0, nada
     },
+    // varios veranos (j0.11). La cadena dura lo que dure tu gente: si mueres con uno de los tuyos durmiendo a tu lado,
+    // sigues como él el verano siguiente; si mueres solo, se acaba. El destierro y las galeras no son morir: sigue uno
+    // de los tuyos, el que elijas. Entre verano y verano la cara se olvida y las detenciones quedan (los azotes se ven
+    // en la espalda). Con la cadena, los rasgos de hombre y mujer. Nada de esto se explica: lo dice el mundo.
+    cadena: {
+      // con qué empiezas el verano siguiente según la siega (hoz, espigar o nada); a medir con bots
+      inicio: { hoz: { cuerpo: 5, pan: 2 }, espiga: { cuerpo: 4, pan: 1 }, nada: { cuerpo: 3, pan: 0 } },
+      // la ronda cambia sus costumbres según dónde te vio pedir y por qué puerta pasabas: cada día visto suma esto
+      // al peso de ese sitio (cada sitio pesa 1 de partida)
+      reaccion: 0.5,
+      // el hombre al que la ronda para por la calle sin conocerle, con el cuerpo así o más, va a las obras sin paga
+      // hasta la noche (Briviesca, 1387: servir sin soldada). La mujer no va a las obras y en la siega espiga; la ronda,
+      // si la para por la calle, solo la echa, aunque la conozca. Pedir delante de la ronda y la noche, igual.
+      obrasForzadas: 5,
+    },
   };
 
   const LICENCIAS = [
@@ -235,10 +289,18 @@
     "La Puerta de San Pablo existió, del lado del río y al este del puente; que sus guardas no avisen a la ronda es del juego. Había más puertas, que el juego deja fuera.",
     "Las cifras (gente, limosna, probabilidades) son del juego.",
   ];
+  // solo con «Jugar varios veranos»
+  const LICENCIAS_CADENA = [
+    "Las galeras son de la pragmática de 1552 (el vagabundo sano de más de veinte años, cuatro años de galeras en lugar de azotes). En el juego, todos los hombres pasan de veinte y basta una detención.",
+    "El pan caro de 1557 sale de la crisis de grano de 1557-1558; que la gente dé menos desde el 1 de junio es del juego.",
+    "Que el alguacil mande a las obras sin paga al mozo sano que para por la calle sale de una ley más vieja (Briviesca, 1387: servir sin soldada); en Salamanca es del juego.",
+    "Que a la mujer la ronda solo la eche cuando la para por la calle es del juego. No había galeras para mujeres.",
+    "Entre un verano y otro, lo que pasa en el invierno se resume en cómo llegas: con hoz, espigando o sin nada.",
+  ];
 
   window.RULES = {
-    version: "j0.10", CONFIG, FRANJAS, RATOS, DIAS, MODOS, BARRIOS, LUGARES, CAMINOS, CALENDARIO, DIAS_SENALADOS,
-    RONDA, PARAMS, LICENCIAS,
+    version: "j0.11", CONFIG, FRANJAS, RATOS, DIAS, MODOS, BARRIOS, LUGARES, CAMINOS, CALENDARIO, VERANOS, DIAS_SENALADOS,
+    RONDA, PARAMS, LICENCIAS, LICENCIAS_CADENA,
     // la mesa de los agentes pregunta por PERSONAJES: en el juguete, cada «personaje» es una prueba
     PERSONAJES: [
       { id: "A", nombre: "Mozo de La Armuña", origen: "Forastero", cuerpoTipo: "Válido", resumen: MODOS.A.resumen, claves: ["Prueba A · calles"] },

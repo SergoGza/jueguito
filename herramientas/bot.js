@@ -15,6 +15,9 @@
 //                                                  que más ve; hambre, primero al más flaco; generoso, lo que piden aunque
 //                                                  se quede sin cenar
 //     OIDOS=0                                      el bot no usa lo que le cuentan para aprender la ronda
+//   CADENA=1 ...                                   (varios veranos, 1545, 1552 y 1557, con los tuyos y los rasgos; j0.11)
+//     HEREDERO=cuerpo|pedro|catalina               a quién elige el bot cuando puede elegir (por defecto, el de más cuerpo)
+//     SEXO=mujer                                   el bot empieza como una moza (solo para medir los rasgos)
 //   node herramientas/bot.js 1000 '{"PARAMS.pararAlLlegar":{"desconocido":0.3,"conocido":0.4}}'
 //
 // Bots:
@@ -30,6 +33,7 @@
 //              Sale por la puerta en la que espera menos riesgo (j0.8: hay dos) y no empieza nada que le impida salir
 //              antes de que cierren (hasta la j0.7.2 a veces se quedaba dentro sin querer, 1 de cada 9 noches).
 //   prudente   como el veterano, pero pesa el triple el riesgo de la ronda.
+//   osado      como el veterano, pero pesa un tercio el riesgo de la ronda (j0.11).
 //   vidente    como el veterano, pero sabe las costumbres de este verano desde el primer día (techo de lo que da saber).
 //   memorioso  como el veterano, pero cree que la ronda sigue el recorrido fijo de hasta la j0.8 y no aprende (el que
 //              se lo sabía de memoria).
@@ -54,7 +58,7 @@ const CLAVE = ["manana", "manana", null, "nona", "visperas", "cierra"];
 const CORPUS_VIEJO = ["plaza", "rua", "rua", "rua", "plaza", "puerta"];
 function cree(s, d, f) {
   if (f > 5) return {};
-  const corpus = R.CALENDARIO[d - 1].tipo === "corpus";
+  const corpus = E.dia(s, d).tipo === "corpus";
   if (s._sabe === "viejo") { const l = (corpus ? CORPUS_VIEJO : R.RONDA.circuitoAntiguo)[f]; return l ? { [l]: 1 } : {}; }
   if (s._sabe === "sabe") { const l = E.circuitoDia(s, d)[f]; return l ? { [l]: 1 } : {}; }
   if (corpus && f < 5) return { [R.RONDA.circuitoCorpus[f]]: 1 }; // la procesión se conoce
@@ -85,7 +89,7 @@ function apuntarContado(s) {
   const c = s.contado || [];
   for (let i = s._contadoN || 0; i < c.length; i++) {
     const x = c[i], k = CLAVE[x.f];
-    if (process.env.OIDOS === "0" || !k || (R.CALENDARIO[x.dia - 1].tipo === "corpus" && x.f < 5)) continue;
+    if (process.env.OIDOS === "0" || !k || (E.dia(s, x.dia).tipo === "corpus" && x.f < 5)) continue;
     if (!R.RONDA.costumbres[k].includes(x.lugar)) continue;
     ((s._obs = s._obs || {})[k] = s._obs[k] || []).push({ lugar: x.lugar, vio: x.ronda });
   }
@@ -108,7 +112,7 @@ function repartir(s) {
 function apuntarVisto(s) {
   if (s.t >= E.FIN || s.fase !== "dia" || !E.L[s.lugar].dentro) return;
   const f = E.franja(s.t), k = CLAVE[f];
-  if (!k || R.CALENDARIO[s.dia - 1].tipo === "corpus" && f < 5) return;
+  if (!k || E.dia(s).tipo === "corpus" && f < 5) return;
   const clave = `${s.dia}|${f}|${s.lugar}`;
   s._vistoK = s._vistoK || {};
   if (s._vistoK[clave]) return;
@@ -183,7 +187,7 @@ function volver(s) {
 }
 function genteBase(s, l, d, f) {
   let g = E.L[l].gente[f];
-  const mod = R.DIAS_SENALADOS[R.CALENDARIO[d - 1].tipo];
+  const mod = R.DIAS_SENALADOS[E.dia(s, d).tipo];
   if (mod && mod[l] && mod[l][f] != null) g = mod[l][f];
   return g;
 }
@@ -220,7 +224,7 @@ function valor(s, l, f, lambda) {
   if (f > 5 || !E.L[l].dentro) return -9;
   const g = genteBase(s, l, s.dia, f);
   if (g < 2) return -9;
-  const LT = s.dia >= P.escasezDesde ? P.limosnaEscasez : P.limosna;
+  const LT = E.escasez(s, s.dia) ? P.limosnaEscasez : P.limosna;
   const sube = s.llaga ? P.llaga.limosna : 0; // con la llaga, la tirada sube
   const media = (da) => (da < 2 ? 0 : [1, 2, 3, 4, 5, 6].reduce((a, t) => a + LT[da >= 3 ? 3 : 2][Math.min(6, t + sube) - 1], 0) / 6);
   const pp = E.L[l].pobres;
@@ -285,6 +289,7 @@ const BOTS = {
   novato,
   veterano: (s, rnd, g) => veterano(s, rnd, g, 1.5),
   prudente: (s, rnd, g) => veterano(s, rnd, g, 3),
+  osado: (s, rnd, g) => veterano(s, rnd, g, 0.5),
   "dentro-listo": (s, rnd, g) => veterano(s, rnd, g, 1.5, "listo"),
   "dentro-ciego": (s, rnd, g) => veterano(s, rnd, g, 1.5, "ciego"),
   vidente: (s, rnd, g) => veterano(s, rnd, g, 1.5),
@@ -311,11 +316,28 @@ const SOLO = process.env.BOTS ? process.env.BOTS.split(",") : process.env.LLAGA 
 function jugar(modo, bot, sem) {
   let st = 12345 + sem * 7919;
   const rnd = () => { st = (st * 1103515245 + 12345) & 0x7fffffff; return st / 0x7fffffff; };
-  const s = E.nueva(modo, "bot", String(sem), { llaga: !!LLAGA[bot], tuyos: !!process.env.TUYOS });
+  const s = E.nueva(modo, "bot", String(sem), { llaga: !!LLAGA[bot], tuyos: !!process.env.TUYOS, cadena: !!process.env.CADENA, mujer: process.env.SEXO === "mujer" });
   s._sabe = SABE[bot] || "aprende";
+  s._veranos = []; // lo que le pasa en cada verano al que juega (para medir la cadena)
   const g = { clave: null, libres: 0 };
   let guard = 0;
-  while (s.fase !== "fin" && guard++ < 5000) {
+  while (s.fase !== "fin" && guard++ < 20000) {
+    if (s.fase === "relevo") {
+      const pol = process.env.HEREDERO || "cuerpo";
+      const cands = s.relevo.candidatos.map((id) => s.tuyos.find((t) => t.id === id));
+      const elegido = cands.find((t) => t.id === pol) || cands.slice().sort((a, b) => b.cuerpo - a.cuerpo || a.detenciones - b.detenciones)[0];
+      s._veranos.push({ anio: s.anio, quien: s.quien.id, el: E.esHombre(s), fin: s.relevo.tipo, dia: s.dia });
+      E.elegirHeredero(s, elegido.id);
+      continue;
+    }
+    if (s.fase === "invierno") {
+      if (!s.invierno.relevo) s._veranos.push({ anio: s.anio, quien: s.quien.id, el: E.esHombre(s), fin: s.siega.yo, dia: s.dia });
+      s._heredado = s.invierno.relevo ? { anio: s.anio, quien: s.quien.id, siega: s.siega.yo } : null;
+      if (s._heredado) s._veranos.push({ anio: s.anio, quien: s.quien.id, el: E.esHombre(s), fin: "heredero:" + s.siega.yo, dia: s.dia });
+      E.siguienteVerano(s);
+      s._obs = {}; s._vistoK = {}; s._contadoN = 0; // las costumbres de la ronda son otras: vuelve a aprenderlas
+      continue;
+    }
     if (s.fase === "amanecer") { E.empezarJornada(s); continue; }
     if (s.fase === "resultado") { E.seguir(s); continue; }
     if (s.fase === "noche") { repartir(s); apuntarContado(s); if (LLAGA[bot] && E.puedeLlaga(s) && LLAGA[bot](s)) E.hacerLlaga(s); E.cenar(s, 2); continue; }
@@ -328,7 +350,57 @@ function jugar(modo, bot, sem) {
     E.comprobarNoche(s);
   }
   if (s.fase !== "fin" && process.env.DEPURAR) console.error("atasco", modo, bot, sem, s.dia, s.t, s.lugar, s.fase, s.cronica.slice(-6).map((c) => c.texto));
+  if (s.conCadena && s.final) {
+    // si la cadena se acaba en los días sin jugar (muere o se va el que había de seguir), es del heredero
+    const ult = s._veranos[s._veranos.length - 1];
+    const enResto = ult && ult.anio === s.anio && ult.quien === s.quien.id && s.final.cadena && s.final.cadena.quien !== s.quien.nombre;
+    if (enResto) s._veranos.push({ anio: s.anio, quien: s.final.cadena.quien.toLowerCase(), fin: "heredero:" + s.final.tipo, dia: s.final.dia });
+    else if (!(ult && ult.anio === s.anio && ult.quien === s.quien.id && s.cadena.vidas.length && s.cadena.vidas[s.cadena.vidas.length - 1].anio === s.anio && ["hambre", "muerto", "desterrado", "galeras"].includes(ult.fin)))
+      s._veranos.push({ anio: s.anio, quien: s.quien.id, el: E.esHombre(s), fin: s.final.tipo, dia: s.final.dia });
+  }
   return s;
+}
+
+// ------------------------------------------------------------------ la cadena (CADENA=1)
+const CAD = {}; // bot → agregados
+function sumarCadena(bot, s) {
+  const C = (CAD[bot] = CAD[bot] || { n: 0, hasta: {}, completa: 0, sigue: 0, vidas: 0, anios: {}, tuyos: {}, juega: {}, heredero: {} });
+  C.n++;
+  const fc = s.final.cadena || { hasta: s.anio };
+  C.hasta[fc.hasta] = (C.hasta[fc.hasta] || 0) + 1;
+  if (["siega", "espiga", "aguanta"].includes(s.final.tipo) && fc.hasta === R.VERANOS[R.VERANOS.length - 1].anio) C.completa++;
+  if (/^Sigue /.test(s.cadena.anales.slice(-1)[0].texto)) C.sigue++;
+  C.vidas += s.cadena.vidas.length + (["siega", "espiga", "aguanta"].includes(s.final.tipo) ? 1 : 0);
+  for (const v of s._veranos) {
+    const A = (C.anios[v.anio] = C.anios[v.anio] || { fin: {}, quien: {}, n: 0 });
+    const k = `${v.quien}:${v.fin}`;
+    A.fin[k] = (A.fin[k] || 0) + 1;
+  }
+  // cuántas cadenas juegan cada verano y con quién
+  for (const y of new Set(s._veranos.map((v) => v.anio))) {
+    const A = C.anios[y];
+    A.n++;
+    const q = s._veranos.find((v) => v.anio === y).quien;
+    A.quien[q] = (A.quien[q] || 0) + 1;
+  }
+  for (const h of s.heredados || []) C.heredero[`${h.id}@${h.anio}`] = (C.heredero[`${h.id}@${h.anio}`] || 0) + 1;
+  // qué fue de los tuyos (los que no heredaste)
+  for (const tu of s.tuyos) { const k = `${tu.nombre}:${tu.estado}${tu.fin ? "@" + tu.fin.anio : ""}`; C.tuyos[k] = (C.tuyos[k] || 0) + 1; }
+}
+function informeCadena(bot) {
+  const C = CAD[bot];
+  if (!C) return;
+  const ys = R.VERANOS.map((v) => v.anio);
+  console.log(`         CADENA (${C.n}): tu gente acaba en ${ys.map((y) => `${y} ${pct(C.hasta[y], C.n).trim()}`).join(" · ")} · llega a la siega de ${ys[ys.length - 1]} el que juega ${pct(C.completa, C.n).trim()} (+${pct(C.sigue, C.n).trim()} muere acompañado ese verano) · vidas jugadas por cadena ${(C.vidas / C.n).toFixed(2)}`);
+  for (const y of ys) {
+    const A = C.anios[y];
+    if (!A) continue;
+    const quien = Object.entries(A.quien).map(([q, n]) => `${q} ${pct(n, A.n).trim()}`).join(", ");
+    const fins = Object.entries(A.fin).sort((a, b) => b[1] - a[1]).map(([k, n]) => `${k} ${pct(n, A.n).trim()}`).join(" · ");
+    console.log(`         ${y}: lo juegan ${pct(A.n, C.n).trim()} de las cadenas (${quien}) → ${fins}`);
+  }
+  if (Object.keys(C.heredero).length) console.log(`         herederos: ${Object.entries(C.heredero).sort().map(([k, n]) => `${k} ${pct(n, C.n).trim()}`).join(" · ")}`);
+  console.log(`         los tuyos al final: ${Object.entries(C.tuyos).sort().map(([k, n]) => `${k} ${pct(n, C.n).trim()}`).join(" · ")}`);
 }
 
 const pct = (x, n) => `${Math.round((100 * (x || 0)) / n)}`.padStart(3) + " %";
@@ -343,6 +415,7 @@ for (const modo of (process.env.PRUEBAS || "A").split(",")) {
     finales[bot] = [];
     for (let i = 1; i <= N; i++) {
       const s = jugar(modo, bot, i);
+      if (s.conCadena) sumarCadena(bot, s);
       finales[bot][i] = { tipo: s.final.tipo, llaga: s.llaga || 0, dia: s.final.dia };
       if (process.env.CIERRA) { const c = s.circuito[5]; const x = ((fin.cierra = fin.cierra || {})[c] = fin.cierra[c] || { n: 0, llega: 0 }); x.n++; if (llega(s)) x.llega++; }
       fin[s.final.tipo] = (fin[s.final.tipo] || 0) + 1;
@@ -373,6 +446,7 @@ for (const modo of (process.env.PRUEBAS || "A").split(",")) {
       console.log(`         por partida: pan dado ${(Tt.dado / N).toFixed(1)} · cosas contadas ${(Tt.contado / N).toFixed(0)} · malsinadas ${(Tt.malsina / N).toFixed(2)} · paradas por lo que contó un malsín ${(Tt.contadoAlg / N).toFixed(2)}`);
     }
     if (fin.det) console.log("         detenciones por partida: " + Object.entries(fin.det).map(([k, v]) => `${k} ${(v / N).toFixed(2)}`).join(" · "));
+    informeCadena(bot);
   }
   console.log("");
   // por parejas: en las semillas en que el bot se hizo la llaga, qué le pasó y qué le pasó al veterano (que no se la hace)

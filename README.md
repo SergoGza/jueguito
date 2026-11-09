@@ -1,6 +1,6 @@
-# Liber Vagatorum · el juguete (j0.10)
+# Liber Vagatorum · el juguete (j0.11)
 
-Prueba mínima del núcleo del juego, tras el replanteamiento de octubre de 2026: **un mendigo, una necesidad (el hambre) y una amenaza (la ronda)**. Encima, dos pruebas que se activan al empezar: la llaga (fingir) y los tuyos. Ni el relevo, ni más tretas, ni exámenes. Si el núcleo solo no obliga a exponerse para comer, los sistemas de encima no lo van a arreglar.
+Prueba mínima del núcleo del juego, tras el replanteamiento de octubre de 2026: **un mendigo, una necesidad (el hambre) y una amenaza (la ronda)**. Encima, tres pruebas que se activan al empezar: la llaga (fingir), los tuyos y varios veranos (el relevo). Ni más tretas ni exámenes. Si el núcleo solo no obliga a exponerse para comer, los sistemas de encima no lo van a arreglar.
 
 Es una página estática, sin servidor, instalable en el móvil y jugable sin conexión. Te mueves tocando el mapa (o con la lista «Adónde vas»); en el móvil, pedir, esperar y acabar el día van en una barra fija abajo, y solo se desplaza la pantalla para leer. Se publica en GitHub Pages desde `main`: https://sergogza.github.io/jueguito/
 
@@ -112,9 +112,35 @@ Decidido por rondas el 31 de octubre y el 1 de noviembre de 2026 (ver `claude/de
 - **Lo que cuentan vale unos 5 puntos** (47 % frente a 42 % con `OIDOS=0`).
 - **Los tuyos piden pan una de cada tres noches.** Sacan unos 1,5 pedazos al día. Ven unos 4 o 5 sitios al día.
 
+## Varios veranos (j0.11; se activa al empezar)
+
+Decidido por rondas del 5 al 9 de noviembre de 2026 (ver «El relevo» en `claude/decisiones-replanteamiento.md`, en el proyecto). **Se activa con el botón «Jugar varios veranos»** de la pantalla de inicio; lleva siempre a los tuyos y solo existe en la prueba A. Sin activarlo, la partida es la de la j0.10 (los bots dan exactamente lo mismo).
+
+- **Tres veranos de Salamanca:** 1545 (la orden), 1552 (las galeras) y 1557 (el hambre), cada uno con su calendario juliano (en 1552 y 1557 el Corpus cae después del día 10 y el domingo es el de Pentecostés). En 1552 se pregona la pragmática: al hombre, una detención lo manda a galeras (se va como el desterrado). Las galeras siguen en 1557, y ese año la gente da poco desde el primer día.
+- **La cadena dura lo que dure tu gente.** Si mueres y uno de los tuyos ha dormido a tu lado esa noche (la ribera o el mismo portal; en la cárcel se muere solo), sigues como él el verano siguiente; si estaban los dos, eliges. Si mueres solo, se acaba. El destierro y las galeras no son morir: sigue uno de los tuyos, el que elijas. Los días que faltan para la siega se viven sin ti: los tuyos siguen con las mismas reglas y nadie les da pan; si el que ha de seguir se va, sigue el otro con la misma regla.
+- **La siega decide cómo llegas al verano siguiente:** con hoz, 5 de cuerpo y 2 pedazos; espigando, 4 y 1; sin nada, 3 y 0 (`PARAMS.cadena.inicio`). Vale igual para los tuyos.
+- **Entre veranos:** la cara se olvida y las detenciones quedan; al que azotaron, el alguacil le mira la espalda y es como si le conociera. La ronda saca costumbres nuevas, inclinadas hacia donde te vio pedir y la puerta por la que más pasabas (`PARAMS.cadena.reaccion`). Recuerdos guarda los veranos anteriores, con lo que vio el heredero.
+- **Hombre y mujer** (solo con varios veranos). El hombre (tú y Pedro) puede trabajar en las obras y segar con hoz; si la ronda le para por la calle sin conocerle y con 5 o más de cuerpo, lo manda a las obras sin paga hasta la noche (`PARAMS.cadena.obrasForzadas`). La mujer (Catalina) no va a las obras y en la siega espiga; la ronda, si la para por la calle, solo la echa, aunque la conozca. Pedir delante de la ronda y la noche, igual para los dos. Nada de esto se explica: lo dicen el capataz, el alguacil, el mayoral y el pregón.
+- **Al final,** cuánto aguantó tu gente («Tu gente aguantó de 1545 a 1552») y lo que fue de cada uno, verano a verano. Es un final provisional: el de 1565 vendrá después.
+- **Textos de los tuyos** (también sin varios veranos): el cuerpo se les nota por grados («se le ve flaco» con 3, «muy flaco» con 2, «no se tiene en pie» con 1), y «¿Tampoco hoy?» solo sale si la última vez que te pidieron se lo negaste; si no, «Acuérdate de lo que te dije».
+
+**Bots** (`CADENA=1`; 2.000 cadenas; «completa» = el que juega llega a la siega de 1557):
+
+| | Veterano: llega a 1557 / completa | Novato: llega a 1557 / completa |
+|---|---|---|
+| No les da nunca | 31 % / 7 % | 34 % / 18 % |
+| A los dos lo que piden, guardándose su ración | 36 % / 9 % | 39 % / 22 % |
+| Solo a Catalina | 38 % / 10 % | 42 % / 23 % |
+| Lo que piden, aunque se quede sin cenar | 39 % / 9 % | 40 % / 22 % |
+
+- **Con la cadena, dar pan compensa** (unos 2 a 5 puntos en completar, 5 a 8 en llegar a 1557), y dejarse morir para que siga otro no es lo mejor.
+- **Agujero cerrado:** al principio, los días que faltaban se saltaban y el heredero llegaba a la siega descansado. El bot que no sale de la ribera llevaba a su gente hasta 1557 en el 80 % de las cadenas. Viviendo esos días, el 18 %, y nunca completa.
+- **Elegir heredero sale parejo:** Pedro primero, 10 % (veterano) y 20 % (novato); Catalina primero, 8 % y 22 %. El hombre aguanta mejor 1545; la mujer, las galeras.
+- **Pendiente de Sergio: la mujer sale mejor en casi todo.** Para ella la ronda deja de ser una amenaza. Empezando como moza, llega a la siega de 1545 el 42 % (el mozo, el 30 %) con el veterano, y el 52 % (frente al 16 %) con el novato. Y en la cadena el arrojo gana a la prudencia, al revés que en un verano: novato 22 %, osado 19 %, veterano 9 %, prudente 0 %. Las cifras de la siega no lo arreglan (la hoz a 6 no cambia nada: con dos pedazos, la primera noche ya estás a 6).
+
 ## El informe
 
-Al acabar (o al abandonar), cinco preguntas y el informe: la partida entera, el tiempo repartido entre moverse, pedir, trabajar y esperar, los pasos o cruces por día, las veces que llegó donde estaba la ronda, la crónica, dónde estuvo la ronda en cada franja (que el jugador no veía) y los datos en bruto.
+Al acabar (o al abandonar), cinco preguntas (seis con varios veranos) y el informe: la partida entera, el tiempo repartido entre moverse, pedir, trabajar y esperar, los pasos o cruces por día, las veces que llegó donde estaba la ronda, la crónica, dónde estuvo la ronda en cada franja (que el jugador no veía) y los datos en bruto.
 
 - **Móvil:** «Compartir informe» adjunta un `.txt` y deja elegir la app de correo.
 - **Ordenador:** «Descargar» y luego «Abrir el correo», y adjunta el archivo.
@@ -125,8 +151,8 @@ El correo de destino está en `rules.js` (`CONFIG.email`); en GitHub Pages queda
 
 Todo en `rules.js`. **Cada vez que cambies algo, sube la versión en dos sitios**, o los móviles seguirán con la copia vieja:
 
-1. `rules.js` → `version: "j0.10"`, por ejemplo a `"j0.11"`.
-2. `sw.js` → `const VERSION = "lv-j0.10-1"`, por ejemplo a `"lv-j0.11-1"`.
+1. `rules.js` → `version: "j0.11"`, por ejemplo a `"j0.12"`.
+2. `sw.js` → `const VERSION = "lv-j0.11-1"`, por ejemplo a `"lv-j0.12-1"`.
 
 ## Probarlo en local
 
@@ -138,5 +164,5 @@ y abre `http://localhost:8000`. Con `?semilla=7` la partida nueva sale siempre i
 
 ## Herramientas
 
-- `herramientas/bot.js`: nueve bots (escondido, azar, novato, veterano, prudente, vidente, memorioso y dos que duermen siempre dentro: uno elige dónde y otro no) que juegan miles de partidas con el motor real y sacan porcentajes. El veterano y el prudente salen siempre antes de que cierren, eligen puerta por el riesgo que esperan y aprenden las costumbres de la ronda de lo que ven; el novato sale por la más cercana. `node herramientas/bot.js 1000` (solo A; `PRUEBAS=A,B` para las dos; `RUTINA=1` para que el veterano y el prudente no se den cuenta de que la ronda aprende; `CIERRA=1` para separar los veranos según la puerta que cierra la ronda; `TUYOS=1` con los tuyos, y `DAR=nadie|todos|ojos|hambre|generoso` para cómo les da pan; `BOTS=veterano,…` para jugar solo con algunos bots). Admite palancas para probar cambios sin tocar `rules.js`. No son personas: sirven para ver si una regla rompe algo, no para fijar la dificultad.
+- `herramientas/bot.js`: diez bots (escondido, azar, novato, veterano, prudente, osado, vidente, memorioso y dos que duermen siempre dentro: uno elige dónde y otro no) que juegan miles de partidas con el motor real y sacan porcentajes. El veterano y el prudente salen siempre antes de que cierren, eligen puerta por el riesgo que esperan y aprenden las costumbres de la ronda de lo que ven; el novato sale por la más cercana. `node herramientas/bot.js 1000` (solo A; `PRUEBAS=A,B` para las dos; `RUTINA=1` para que el veterano y el prudente no se den cuenta de que la ronda aprende; `CIERRA=1` para separar los veranos según la puerta que cierra la ronda; `TUYOS=1` con los tuyos, y `DAR=nadie|todos|ojos|hambre|generoso` para cómo les da pan; `CADENA=1` para varios veranos, con `HEREDERO=cuerpo|pedro|catalina` para a quién elige y `SEXO=mujer` para empezar como moza; `BOTS=veterano,…` para jugar solo con algunos bots). Admite palancas para probar cambios sin tocar `rules.js`. No son personas: sirven para ver si una regla rompe algo, no para fijar la dificultad.
 - `herramientas/agentes/`: agentes de Claude que juegan la app real y escriben un diario (`/agentes prueba` desde Claude Code). Ver su README.

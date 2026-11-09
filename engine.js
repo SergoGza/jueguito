@@ -32,23 +32,35 @@
     t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
     return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   }
-  const mundo = (s, clave) => hash(`${s.semilla}|${clave}`);
+  // el primer verano usa la semilla tal cual; los siguientes de la cadena, la semilla y el año (j0.11)
+  const mundo = (s, clave) => hash(`${s.semilla}${s.verano ? "|v" + s.anio : ""}|${clave}`);
   const tirar = (s, clave) => hash(`${s.semilla}|acc|${s.n++}|${clave}`);
   const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
   const LL = P.llaga || {};
+  const CA = P.cadena || {};
   const cuerpoMax = (s) => (s.llaga ? LL.cuerpoMax : P.cuerpoMax);
 
   // ------------------------------------------------------------------ tiempo
   const franja = (t) => Math.min(R.FRANJAS.length - 1, Math.floor(t / R.RATOS));
   const ratoEnFranja = (t) => (t >= FIN ? R.RATOS : t % R.RATOS);
   const nombreFranja = (f) => R.FRANJAS[f].nombre;
-  const dia = (s, d) => R.CALENDARIO[(d || s.dia) - 1];
+  // cada verano tiene su calendario (j0.11); las partidas sin año son de 1545
+  const VERANO = Object.fromEntries((R.VERANOS || []).map((v) => [v.anio, v]));
+  const verano = (s) => VERANO[(s && s.anio) || 1545] || { anio: 1545, calendario: R.CALENDARIO };
+  const calendario = (s) => verano(s).calendario || R.CALENDARIO;
+  const dia = (s, d) => calendario(s)[(d || s.dia) - 1];
+  const escasezDesde = (s) => verano(s).escasezDesde || P.escasezDesde;
+  const escasez = (s, d) => d >= escasezDesde(s);
+  // los rasgos de hombre y mujer van con la cadena
+  const rasgos = (s) => !!s.conCadena;
+  const esHombre = (s) => !s.quien || s.quien.el !== false;
+  const galeras = (s, el) => rasgos(s) && el && !!verano(s).galeras;
 
   // ------------------------------------------------------------------ el mundo
   function gente(s, lugar, d, f) {
     const l = L[lugar];
     let g = l.gente[f];
-    const mod = R.DIAS_SENALADOS[R.CALENDARIO[d - 1].tipo];
+    const mod = R.DIAS_SENALADOS[dia(s, d).tipo];
     if (mod && mod[lugar] && mod[lugar][f] != null) g = mod[lugar][f];
     if (l.dentro) {
       const r = mundo(s, `gente|${d}|${f}|${lugar}`);
@@ -62,29 +74,38 @@
     const l = L[lugar];
     if (!l.dentro) return false;
     let p = l.pobres;
-    if (R.CALENDARIO[d - 1].tipo !== "laborable" && ["catedral", "sanmartin", "sanesteban"].includes(lugar)) p += 0.2;
+    if (dia(s, d).tipo !== "laborable" && ["catedral", "sanmartin", "sanesteban"].includes(lugar)) p += 0.2;
     return mundo(s, `pobres|${d}|${f}|${lugar}`) < p;
   }
   function estado(s, lugar, d, f, excluir) {
     const g = gente(s, lugar, d, f);
     const pobres = hayPobres(s, lugar, d, f) || (!!s.conTuyos && (P.tuyos || {}).mundo !== false && tuyoPide(s, lugar, d, f, excluir));
     const da = g <= 1 ? 1 : Math.max(1, g - (pobres ? 1 : 0)); // gente que de verdad da
-    const trabajo = !!L[lugar].trabajo && f === 0 && R.CALENDARIO[d - 1].tipo === "laborable";
+    const trabajo = !!L[lugar].trabajo && f === 0 && dia(s, d).tipo === "laborable";
     return { gente: g, pobres, da, trabajo };
   }
 
   // ------------------------------------------------------------------ la ronda
   // las costumbres de la ronda este verano: cada partida saca las suyas de la semilla (j0.9)
+  // en la cadena (j0.11), desde el segundo verano las costumbres se inclinan hacia donde la ronda te vio pedir el verano
+  // anterior a esas horas y hacia la puerta por la que más pasabas (s.huella)
   function recorridoVerano(s) {
-    const c = R.RONDA.costumbres;
-    const elige = (k) => c[k][Math.floor(mundo(s, `costumbre|${k}`) * c[k].length)];
-    const manana = elige("manana");
-    return [manana, manana, null, elige("nona"), elige("visperas"), elige("cierra")];
+    const c = R.RONDA.costumbres, h = s.huella;
+    const elige = (k, fs) => {
+      const r = mundo(s, `costumbre|${k}`);
+      if (!h) return c[k][Math.floor(r * c[k].length)];
+      const w = c[k].map((l) => 1 + (CA.reaccion || 0) * (k === "cierra" ? (h.puertas[l] || 0) : fs.reduce((a, f) => a + ((h.pide[f] || {})[l] || 0), 0)));
+      let x = r * w.reduce((a, b) => a + b, 0);
+      for (let i = 0; i < w.length; i++) { x -= w[i]; if (x < 0) return c[k][i]; }
+      return c[k][c[k].length - 1];
+    };
+    const manana = elige("manana", [0, 1]);
+    return [manana, manana, null, elige("nona", [3]), elige("visperas", [4]), elige("cierra", [])];
   }
   function circuitoDia(s, d) {
     // partidas empezadas antes de la j0.9 siguen con el recorrido fijo
     if (!s.circuito) s.circuito = s.v === R.version ? recorridoVerano(s) : R.RONDA.circuitoAntiguo.slice();
-    if (R.CALENDARIO[d - 1].tipo !== "corpus") return s.circuito;
+    if (dia(s, d).tipo !== "corpus") return s.circuito;
     return R.RONDA.circuitoCorpus.map((l, f) => (f === 5 ? s.circuito[5] : l));
   }
   function rondaFranja(s, d, f) {
@@ -162,9 +183,14 @@
       n: 0, final: null, ultimo: null, aviso: null, noche: null,
       cronica: [], hoy: null, porDia: [], encuesta: {},
       conLlaga: !!(opts && opts.llaga), // la llaga se activa al empezar (prueba de fingir)
-      conTuyos: !!(opts && opts.tuyos) && modo === "A", // los tuyos se activan al empezar (j0.10); solo en la prueba A
+      conTuyos: !!(opts && (opts.tuyos || opts.cadena)) && modo === "A", // los tuyos se activan al empezar (j0.10); solo en la prueba A
+      conCadena: !!(opts && opts.cadena) && modo === "A", // varios veranos (j0.11), siempre con los tuyos
+      verano: 0, anio: R.VERANOS ? R.VERANOS[0].anio : 1545,
+      // quién eres: el mozo de La Armuña; en la cadena, después, el heredero (los bots pueden empezar con una moza)
+      quien: opts && opts.mujer ? { id: "moza", nombre: "la moza", el: false } : { id: "mozo", nombre: "el mozo", el: true },
     };
     if (s.conTuyos) s.tuyos = (TU.quienes || []).map(nuevoTuyo);
+    if (s.conCadena) { s.cadena = { vidas: [], anales: [], archivo: [] }; s.quienVerano = Object.assign({}, s.quien); }
     s.circuito = recorridoVerano(s);
     empezarDia(s);
     s.noche = null;
@@ -182,7 +208,7 @@
     observar(s);
   }
   function apunta(s, tipo, texto, datos) {
-    s.cronica.push(Object.assign({ dia: s.dia, t: s.t, tipo, texto, lugar: s.lugar }, datos || {}));
+    s.cronica.push(Object.assign({ anio: s.anio, dia: s.dia, t: s.t, tipo, texto, lugar: s.lugar }, datos || {}));
   }
   const momentoTxt = (t) => (t >= FIN ? "noche" : `${nombreFranja(franja(t))} ${ratoEnFranja(t) + 1}/${R.RATOS}`);
 
@@ -239,7 +265,8 @@
     acc.push({ id: "pedir", ok: !porque, porque, coste: R.RATOS });
     if (L[s.lugar].trabajo) {
       let pt = "";
-      if (!e || !e.trabajo) pt = R.CALENDARIO[s.dia - 1].tipo !== "laborable" ? "hoy es fiesta: no hay obra" : "solo cogen peones a prima";
+      if (rasgos(s) && !esHombre(s)) pt = "en las obras no cogen mujeres";
+      else if (!e || !e.trabajo) pt = dia(s).tipo !== "laborable" ? "hoy es fiesta: no hay obra" : "solo cogen peones a prima";
       else if (s.trabajoPedido) pt = "ya has preguntado hoy";
       acc.push({ id: "trabajo", ok: !pt, porque: pt, coste: P.trabajo.pedirRatos });
     }
@@ -286,6 +313,9 @@
     else s.hoy.libres++;
     pasar(s, mv.coste, "mover", false);
     s.lugar = destino;
+    // por qué puerta pasas (j0.11: la ronda se acuerda el verano siguiente)
+    const g = PUERTAS.includes(desde) && !L[destino].dentro ? desde : PUERTAS.includes(destino) && !L[desde].dentro ? destino : null;
+    if (g) { const ds = ((s.salidas = s.salidas || {})[g] = s.salidas[g] || []); if (!ds.includes(s.dia)) ds.push(s.dia); }
     observar(s);
     apunta(s, "mover", `${L[desde].corto} → ${L[destino].corto}`, { coste: mv.coste, tipoMov: mv.tipo, t: t0 });
     s.aviso = null;
@@ -317,21 +347,51 @@
     const dice = pierna && sabia ? `«Otra vez tú, el de la pierna. Esa llaga ya me la sé, y ${contado ? "ya me han contado dónde pides" : "sabía que te encontraría aquí"}»`
       : pierna ? "«Otra vez tú, el de la pierna. Esa llaga ya me la sé»"
       : sabia ? (contado ? "«Ya me han contado dónde pides»" : "«Sabía que te encontraría aquí»") : null;
-    if (s.conocido) {
-      detener(s, "parado", [pierna ? `El alguacil se planta delante: ${dice}. Te llevan a la cárcel.`
+    // con la cadena (j0.11): a la mujer solo la echa; al que azotaron otro verano le mira la espalda; al hombre sano que
+    // no conoce lo manda a las obras sin paga
+    const mujer = rasgos(s) && !esHombre(s);
+    const espalda = rasgos(s) && !mujer && !s.conocido && !!s.azotado;
+    if ((s.conocido || espalda) && !mujer) {
+      detener(s, "parado", [espalda ? `En ${L[r].nombre} te para el alguacil. Te levanta la camisa y te mira la espalda: «Tú ya has pasado por mis manos». Te llevan a la cárcel.`
+        : pierna ? `El alguacil se planta delante: ${dice}. Te llevan a la cárcel.`
         : dice ? `El alguacil te reconoce: ${dice}. Te llevan a la cárcel.` : "El alguacil te reconoce: ya te tenían visto. Te llevan a la cárcel."]);
       return;
     }
+    if (rasgos(s) && !mujer && !s.llaga && s.cuerpo >= (CA.obrasForzadas || 99)) { obrasForzadas(s, r, dice); return; }
+    const yaTeConoce = s.conocido;
     s.conocido = true;
     const antes = s.lugar;
     pasar(s, 3, "perdido", false);
     s.lugar = "puente";
     observar(s);
     apunta(s, "echado", `Te para la ronda en ${L[antes].corto} y te echan de la ciudad.`);
+    if (mujer) {
+      resultado(s, "Te para la ronda", [
+        yaTeConoce ? `En ${L[r].nombre} te para el alguacil y te reconoce: «¿Otra vez tú? Fuera de aquí, mujer».` : dice ? `En ${L[r].nombre} te para el alguacil: ${dice}. Le dices de dónde eres y adónde vas.` : `En ${L[r].nombre} te para el alguacil. Le dices de dónde eres y adónde vas.`,
+        "No te detiene: te acompaña hasta la puerta y te echa al puente. Pierdes media franja.",
+        yaTeConoce ? "Ya te conoce de sobra." : "Ya te conoce la cara.",
+      ], "mal");
+      return;
+    }
     resultado(s, "Te para la ronda", [
       // la cuarta vez con la llaga, aunque aún no te tenga fichado, el alguacil ya se la sabe
       dice ? `En ${L[r].nombre} te para el alguacil: ${dice}. Le dices de dónde eres y adónde vas.` : `En ${L[r].nombre} te para el alguacil. Le dices de dónde eres y adónde vas.`,
       "No te detiene: te acompaña hasta la puerta y te echa al puente. Pierdes media franja.",
+      "Ya te conoce la cara. Si vuelve a pararte, te lleva a la cárcel.",
+    ], "mal");
+  }
+  // el hombre sano al que para la ronda sin conocerle: a las obras, sin paga, hasta la noche (j0.11)
+  function obrasForzadas(s, r, dice) {
+    s.conocido = true;
+    const antes = s.lugar;
+    apunta(s, "obras", `Le para la ronda en ${L[antes].corto} y le manda a las obras sin paga.`);
+    s.lugar = "catedral";
+    pasar(s, FIN - s.t, "perdido", false);
+    s.lugar = "ribera";
+    s.trabajoHoy = true; // acaba molido, como el que trabaja
+    resultado(s, "Te para la ronda", [
+      `En ${L[r].nombre} te para el alguacil${dice ? `: ${dice}` : ""}. Te mira los brazos: «Mozo sano y sin oficio. A las obras, que trabajo hay».`,
+      "Te tienen cargando piedra en las obras de la catedral hasta completas, sin paga. Al anochecer te echan por la Puerta del Río y bajas a la ribera.",
       "Ya te conoce la cara. Si vuelve a pararte, te lleva a la cárcel.",
     ], "mal");
   }
@@ -347,7 +407,9 @@
     s.t = FIN;
     const extra = [];
     if (pan) extra.push(`Te quitan el pan (${pan} ${pan === 1 ? "pedazo" : "pedazos"}).`);
-    if (s.detenciones >= P.detencionesMax) extra.push(`Detención ${s.detenciones} de ${P.detencionesMax}: mañana te sacan de la ciudad con destierro.`);
+    // desde 1552, al hombre lo mandan a galeras (j0.11)
+    if (galeras(s, esHombre(s))) { s.galeras = true; extra.push("El alcalde no te manda azotar: te condena a cuatro años de galeras, como manda la pragmática. Mañana sales con la cadena de galeotes."); }
+    else if (s.detenciones >= P.detencionesMax) extra.push(`Detención ${s.detenciones} de ${P.detencionesMax}: mañana te sacan de la ciudad con destierro.`);
     else if (s.detenciones === 2) extra.push(`Detención 2 de ${P.detencionesMax}: esta noche te azotan. A la tercera, destierro.`);
     else extra.push(`Detención 1 de ${P.detencionesMax}: pasas la noche en la cárcel y mañana te sueltan en la puerta. A la segunda, azotes; a la tercera, destierro.`);
     resultado(s, "Te detienen", lineas.concat(extra), "mal");
@@ -384,7 +446,7 @@
     if (r0 && tirar(s, "pillar0") < pP(e0) * seg1 / R.RATOS) pillado = "estaba";
     if (!pillado && r1zona && tirar(s, "pillar1") < pP(estado(s, lugar, s.dia, f0 + 1)) * seg2 / R.RATOS) pillado = "llega";
     const tir = Math.min(6, 1 + Math.floor(tirar(s, "limosna") * 6) + (s.llaga ? LL.limosna : 0));
-    const tabla = s.dia >= P.escasezDesde ? P.limosnaEscasez : P.limosna;
+    const tabla = escasez(s, s.dia) ? P.limosnaEscasez : P.limosna;
     const gana = tabla[e0.da >= 3 ? 3 : 2][tir - 1];
     if (pillado) {
       const donde = r0 && pillado === "estaba" ? r0 : r1zona;
@@ -533,7 +595,8 @@
       dc += P.carcel.cuerpo;
       const lleva = TU.devuelve && (s.tuyos || []).find((tu) => tu.estado === "vive" && !tu.detenido && (tu.debe || 0) > 0 && tu.pan >= 1);
       if (lleva) { lleva.pan--; lleva.debe--; dc += 1; lin.push(`${lleva.nombre} te ha traído un pedazo de pan a la cárcel.`); }
-      if (s.detenciones === 2) { dc += P.carcel.azotes; azotes = true; lin.push("Antes de soltarte, te azotan."); }
+      if (s.galeras) lin.push("Mañana sales con la cadena de galeotes, camino del mar.");
+      else if (s.detenciones === 2) { dc += P.carcel.azotes; azotes = true; s.azotado = true; lin.push("Antes de soltarte, te azotan."); }
     } else {
       comido = clamp(n | 0, 0, Math.min(2, s.pan));
       s.pan -= comido;
@@ -554,7 +617,8 @@
           if (rn.nivel === "vigilada") lin.push("«Ya me han dicho que andabas pidiendo por aquí», dice el alguacil.");
           else if (rn.nivel === "pobres") lin.push("«Venimos a limpiar esto de pordioseros. Tú también vienes», dice el alguacil.");
           apunta(s, "detenido", `Detenido de noche en ${L[s.lugar].corto}. Detención ${s.detenciones} de ${P.detencionesMax}.`, { motivo: "de noche" });
-          if (s.detenciones === 2) { dc += P.carcel.azotes; azotes = true; lin.push(`Detención 2 de ${P.detencionesMax}: te azotan. A la tercera, destierro.`); }
+          if (galeras(s, esHombre(s))) { s.galeras = true; lin.push("Por la mañana el alcalde te condena a cuatro años de galeras, como manda la pragmática."); }
+          else if (s.detenciones === 2) { dc += P.carcel.azotes; azotes = true; s.azotado = true; lin.push(`Detención 2 de ${P.detencionesMax}: te azotan. A la tercera, destierro.`); }
           else if (s.detenciones === 1) lin.push(`Detención 1 de ${P.detencionesMax}. A la segunda, azotes; a la tercera, destierro. Ya te tienen fichado.`);
         } else lin.push(`Duermes en un portal de ${L[s.lugar].nombre}. Nadie te molesta.`);
       } else lin.push("Duermes al raso en la ribera.");
@@ -563,16 +627,20 @@
     else if (s.llaga && LL.encona && tirar(s, "encona") < LL.encona) { dc -= 1; lin.push("La llaga se te ha enconado: supura y te sube la fiebre."); }
     s.cuerpo = clamp(s.cuerpo + dc, 0, cuerpoMax(s));
     if (s.conTuyos) { tuyosNoche(s, lin); s.nocheTuyos = null; }
-    s.porDia.push(Object.assign({ dia: s.dia, modo: s.modo, cuerpoNoche: s.cuerpo, comido, duerme: s.duerme, detenido: s.detenidoHoy || (detenidoNoche ? "de noche" : null) }, s.hoy, { lugares: Object.keys(s.hoy.lugares).length }));
+    s.porDia.push(Object.assign({ anio: s.anio, dia: s.dia, modo: s.modo, cuerpoNoche: s.cuerpo, comido, duerme: s.duerme, detenido: s.detenidoHoy || (detenidoNoche ? "de noche" : null) }, s.hoy, { lugares: Object.keys(s.hoy.lugares).length }));
     apunta(s, "noche", `Noche (${DUERME[s.duerme]}${s.hoy.nocheNivel ? ", " + s.hoy.nocheNivel : ""}): come ${comido}, cuerpo ${antes} → ${s.cuerpo}.`);
     s.noche = { lineas: lin, antes, despues: s.cuerpo, dia: s.dia, detenido: s.duerme === "carcel" || detenidoNoche };
     // finales
+    if (s.galeras) {
+      return acaba(s, "galeras", "Al amanecer te sacan de la cárcel con la cadena de galeotes, camino del mar. Cuatro años al remo.");
+    }
     if (s.detenciones >= P.detencionesMax) {
-      return fin(s, "desterrado", "Te sacan de Salamanca con destierro. Si vuelves, la horca.");
+      return acaba(s, "desterrado", "Te sacan de Salamanca con destierro. Si vuelves, la horca.");
     }
     if (s.cuerpo <= 0) {
-      return fin(s, azotes ? "muerto" : "hambre", azotes ? "No aguantas los azotes con el cuerpo tan gastado. Mueres antes del amanecer." : "Mueres de hambre.");
+      return acaba(s, azotes ? "muerto" : "hambre", azotes ? "No aguantas los azotes con el cuerpo tan gastado. Mueres antes del amanecer." : "Mueres de hambre.");
     }
+    if (s.dia >= R.DIAS && s.conCadena) return finVerano(s);
     if (s.dia >= R.DIAS) {
       // la siega: el mayoral mira los brazos antes de dar la hoz
       if (s.llaga) return fin(s, "aguanta", "Al amanecer empieza la siega. El mayoral te ve la pierna y pasa de largo sin mirarte los brazos. Has aguantado, y tu llaga te seguirá dando de comer en la ciudad.");
@@ -589,6 +657,205 @@
   function fin(s, tipo, texto) {
     if (s.conTuyos) texto += " " + finTuyos(s, tipo);
     s.final = { tipo, dia: s.dia, texto };
+    s.fase = "fin";
+    apunta(s, "fin", texto);
+    return true;
+  }
+
+  // ------------------------------------------------------------------ la cadena de veranos (j0.11)
+  // Si mueres con uno de los tuyos durmiendo a tu lado, sigues como él el verano siguiente (si estaban los dos, eliges);
+  // si mueres solo, se acaba. El destierro y las galeras no son morir: sigue uno de los tuyos, el que elijas. El resto
+  // del verano pasa sin jugarlo: los que quedan llegan a la siega como están. La siega decide cómo pasas el invierno.
+  const ultimoVerano = () => (R.VERANOS || [{}]).length - 1;
+  const mayus = (t) => t.charAt(0).toUpperCase() + t.slice(1);
+  const FIN_CORTO = {
+    hambre: () => "muere de hambre", muerto: () => "muere después de los azotes", galeras: () => "a galeras",
+    desterrado: (el) => (el ? "desterrado" : "desterrada"), malsino: () => "te vende al alguacil",
+  };
+  // lo que queda de cada verano en la cuenta de tu gente
+  function anal(s, texto) { if (s.cadena) s.cadena.anales.push({ anio: s.anio, texto }); }
+  function analFin(s, nombre, el, tipo, d) { anal(s, `${mayus(nombre)}: ${FIN_CORTO[tipo] ? FIN_CORTO[tipo](el) : tipo} el ${d} de junio.`); }
+  // un tuyo ha dormido donde tú esta noche (la ribera o el mismo portal; en la cárcel se muere solo)
+  const juntos = (s, tu) => s.duerme !== "carcel" && tu.estado === "vive" && tu.durmio === s.duerme && tu.lugar === s.lugar;
+  // la siega: al hombre, el mayoral le mira los brazos (y la pierna); la mujer espiga si se tiene en pie
+  function siegaDe(el, cuerpo, llaga, r) {
+    if (el && llaga) return "nada";
+    return r < (P.siega.probPorCuerpo[cuerpo] || 0) ? (el ? "hoz" : "espiga") : "nada";
+  }
+  function textoSiega(res, el, llaga) {
+    if (res === "hoz") return "Al amanecer empieza la siega. El mayoral te mira los brazos y te da una hoz. Siegas hasta agosto y comes de tu trabajo.";
+    if (res === "espiga") return "Al amanecer empieza la siega. Vas detrás de los segadores espigando lo que se les cae, como las demás mujeres.";
+    if (!el) return "Al amanecer empieza la siega. No te tienes en pie para espigar de sol a sol.";
+    if (llaga) return "Al amanecer empieza la siega. El mayoral te ve la pierna y pasa de largo sin mirarte los brazos.";
+    return "Al amanecer empieza la siega. El mayoral te mira y pasa de largo: «Tus brazos no me valen, muchacho».";
+  }
+  const SIEGA_CORTO = { hoz: "siega con hoz", espiga: "espiga", nada: "sin siega" };
+  function siegaTuyos(s, lin) {
+    const out = {};
+    for (const tu of tuyosVivos(s)) {
+      tu.malsinaManana = false; // se acaba el verano: vuelven a la aldea
+      const res = siegaDe(tu.el, tu.cuerpo, false, mundo(s, `siega|${tu.id}`));
+      out[tu.id] = res;
+      lin.push(res === "hoz" ? `A ${tu.nombre} le dan una hoz.` : res === "espiga" ? `${tu.nombre} espiga.` : tu.el ? `A ${tu.nombre} el mayoral no lo quiere.` : `${tu.nombre} no está para espigar.`);
+      anal(s, `${tu.nombre}: ${SIEGA_CORTO[res]}.`);
+    }
+    return out;
+  }
+  // se acaba tu personaje: destierro, galeras o muerte. Sigue uno de los tuyos o se acaba la cadena.
+  function acaba(s, tipo, texto) {
+    if (!s.conCadena) return fin(s, tipo, texto);
+    const muere = tipo === "muerto" || tipo === "hambre";
+    const vivos = tuyosVivos(s).filter((tu) => !tu.malsinaManana);
+    const cands = muere ? vivos.filter((tu) => juntos(s, tu)) : vivos;
+    const nombres = (xs) => listaY(xs.map((t) => t.nombre));
+    let cola;
+    if (muere) cola = cands.length ? `${nombres(cands)} ${cands.length > 1 ? "estaban" : "estaba"} contigo.` : "Nadie te ha visto morir.";
+    else if (tipo === "desterrado") cola = vivos.length ? `${nombres(vivos)} se ${vivos.length > 1 ? "quedan" : "queda"} en la ribera.` : `Te vas ${esHombre(s) ? "solo" : "sola"}.`;
+    else cola = vivos.length ? `${nombres(vivos)} te ${vivos.length > 1 ? "ven" : "ve"} pasar desde el puente.` : "Nadie te ve salir.";
+    texto = `${texto} ${cola}`;
+    analFin(s, s.quien.nombre, esHombre(s), tipo, s.dia);
+    s.cadena.vidas.push({ id: s.quien.id, nombre: s.quien.nombre, el: esHombre(s), anio: s.anio, dia: s.dia, tipo, acompanado: muere ? cands.length > 0 : null });
+    if (!cands.length) return finCadena(s, tipo, texto);
+    if (s.verano >= ultimoVerano()) { anal(s, `Sigue ${nombres(cands)}.`); return finCadena(s, tipo, texto); }
+    for (const tu of tuyosVivos(s)) tu.malsinaManana = false; // ya no hay a quién vender
+    s.relevo = { tipo, texto, candidatos: cands.map((t) => t.id) };
+    s.fase = "relevo";
+    apunta(s, "relevo", texto);
+    return true;
+  }
+  // los días que faltan para la siega, sin ti: los tuyos viven con las mismas reglas y nadie les da pan. Si el que
+  // ha de seguir se va, sigue el otro con la misma regla (muere acompañado, o le destierran o le mandan a galeras);
+  // si no queda nadie, se acaba la cadena. Devuelve false si se acaba.
+  function restoDelVerano(s, lin) {
+    if (s.dia < R.DIAS) lin.push("Pasan los días que faltan para la siega.");
+    s.duerme = null; s.lugar = "ribera";
+    while (s.dia < R.DIAS) {
+      s.dia++;
+      s.avisos = {}; s.avisosT = {}; s.pedidoHoy = []; s.nocheTuyos = []; s.panAntesReparto = 0;
+      tuyosAmanecer(s);
+      for (let f = 0; f < R.FRANJAS.length; f++) {
+        rondaFranja(s, s.dia, f);
+        if (f > 0) for (const l of Object.keys(s.avisos)) { s.avisos[l]--; if (s.avisos[l] <= 0) delete s.avisos[l]; }
+        for (const tu of s.tuyos) tuyoFranja(s, tu, s.dia, f);
+      }
+      for (const tu of tuyosVivos(s)) {
+        tu.duerme = tu.detenido ? "carcel" : L[tu.lugar].dentro ? "portal" : "raso"; tu.durmio = tu.duerme;
+        if (!L[tu.lugar].dentro && tu.lugar !== "ribera") tu.lugar = "ribera";
+      }
+      const her = s.tuyos.find((t) => t.id === s.heredero);
+      const donde = { durmio: her.durmio, lugar: her.lugar };
+      const antes = tuyosVivos(s);
+      tuyosNoche(s, []);
+      // los otros que se van esos días
+      for (const t of antes) {
+        if (t === her || t.estado === "vive") continue;
+        const lt = t.el ? "lo" : "la";
+        lin.push(t.estado === "muerto" ? `El día ${s.dia} muere ${t.nombre}.` : t.estado === "galeras" ? `El día ${s.dia} a ${t.nombre} ${lt} mandan a galeras.` : `El día ${s.dia} a ${t.nombre} ${lt} destierran de la ciudad.`);
+      }
+      if (her.estado === "vive") continue;
+      const lo = her.el ? "lo" : "la";
+      const otros = tuyosVivos(s);
+      const muere = her.estado === "muerto";
+      const sigue = muere ? otros.filter((t) => donde.durmio !== "carcel" && t.durmio === donde.durmio && t.lugar === donde.lugar) : otros;
+      lin.push(muere ? `El día ${s.dia} muere ${her.nombre}${sigue.length ? `; ${sigue[0].nombre} estaba con ${her.el ? "él" : "ella"}` : ", sin nadie al lado"}.`
+        : her.estado === "galeras" ? `El día ${s.dia} a ${her.nombre} ${lo} mandan a galeras.` : `El día ${s.dia} a ${her.nombre} ${lo} destierran de la ciudad.`);
+      if (!sigue.length) { finCadena(s, her.estado === "muerto" ? "hambre" : her.estado, lin.join(" "), her.nombre); return false; }
+      s.heredero = sigue[0].id;
+      anal(s, `Sigue ${sigue[0].nombre}.`);
+    }
+    return true;
+  }
+  // sigues como uno de los tuyos: su cuerpo, su pan, sus detenciones y su espalda. Lo que vio va a Recuerdos.
+  function heredar(s, tu, tipo) {
+    const antes = s.quien;
+    s.vistasHeredero = { id: tu.id, nombre: tu.nombre, vistas: tu.vistas.map((v) => Object.assign({}, v)) };
+    s.quien = { id: tu.id, nombre: tu.nombre, el: tu.el, manera: tu.manera, desde: s.anio, antes: antes.nombre, antesEl: antes.el !== false, antesFin: tipo };
+    s.cuerpo = tu.cuerpo; s.pan = tu.pan; s.detenciones = tu.detenciones; s.azotado = !!tu.azotado;
+    s.llaga = 0; s.llagaPasadas = 0; s.galeras = false; s.trabajoHoy = false; s.conocido = false;
+    s.heredados = (s.heredados || []).concat([{ id: tu.id, nombre: tu.nombre, manera: tu.manera, anio: s.anio, detenciones: tu.detenciones, recibido: tu.recibido, negadas: tu.negadas, noches: tu.noches }]);
+    s.tuyos = s.tuyos.filter((t) => t.id !== tu.id);
+  }
+  function elegirHeredero(s, id) {
+    if (s.fase !== "relevo" || !s.relevo || !s.relevo.candidatos.includes(id)) return false;
+    const tipo = s.relevo.tipo;
+    const tu0 = s.tuyos.find((t) => t.id === id);
+    s.relevo = null;
+    anal(s, `Sigue ${tu0.nombre}.`);
+    apunta(s, "relevo", `Sigue ${tu0.nombre}.`);
+    s.heredero = id;
+    const lin = [];
+    if (!restoDelVerano(s, lin)) return true;
+    const tu = s.tuyos.find((t) => t.id === s.heredero);
+    if (tu.id !== id) lin.push(`Sigues como ${tu.nombre}.`);
+    heredar(s, tu, tipo);
+    s.heredero = null;
+    // la siega: llegáis como estáis
+    const res = siegaDe(esHombre(s), s.cuerpo, false, mundo(s, `siega|${tu.id}`));
+    lin.push(textoSiega(res, esHombre(s), false));
+    anal(s, `${tu.nombre}: ${SIEGA_CORTO[res]}.`);
+    s.siega = { yo: res, tuyos: siegaTuyos(s, lin) };
+    s.invierno = { anio: s.anio, siguiente: R.VERANOS[s.verano + 1].anio, lineas: lin, relevo: true };
+    s.fase = "invierno";
+    return true;
+  }
+  // se acaba el verano en la siega (has llegado)
+  function finVerano(s) {
+    const lin = [];
+    const res = siegaDe(esHombre(s), s.cuerpo, !!s.llaga, tirar(s, "siega"));
+    lin.push(textoSiega(res, esHombre(s), !!s.llaga));
+    anal(s, `${mayus(s.quien.nombre)}: ${SIEGA_CORTO[res]}.`);
+    const tuyos = siegaTuyos(s, lin);
+    if (s.verano >= ultimoVerano()) return finCadena(s, { hoz: "siega", espiga: "espiga", nada: "aguanta" }[res], lin.join(" "));
+    s.siega = { yo: res, tuyos };
+    s.invierno = { anio: s.anio, siguiente: R.VERANOS[s.verano + 1].anio, lineas: lin };
+    s.fase = "invierno";
+    apunta(s, "siega", lin.join(" "));
+    return true;
+  }
+  // lo de este verano pasa a Recuerdos marcado con su año (y, para el informe, dónde estuvo la ronda)
+  function archivarVerano(s) {
+    const pedidas = s.cronica.filter((c) => c.anio === s.anio && (c.tipo === "pedir" || c.tipo === "pillado")).map((c) => ({ dia: c.dia, f: franja(c.t), lugar: c.lugar }));
+    s.cadena.archivo.push({
+      anio: s.anio, quien: Object.assign({}, s.quienVerano || s.quien),
+      vistas: (s.vistas || []).slice(), contado: (s.contado || []).filter((x) => x.ronda), heredero: s.vistasHeredero || null, pedidas,
+      circuito: (s.circuito || []).slice(), rondas: s.rondas, rondasPorque: s.rondasPorque,
+    });
+    s.vistasHeredero = null;
+  }
+  // después del invierno: los años que pasan hasta el verano siguiente y cómo llega cada uno
+  function siguienteVerano(s) {
+    if (s.fase !== "invierno" || !s.siega) return false;
+    archivarVerano(s);
+    // la ronda se acuerda de dónde te vio pedir y de por qué puerta pasabas
+    const pide = {}, puertas = {};
+    for (const [f, ls] of Object.entries(s.habitos || {})) for (const [l, dias] of Object.entries(ls)) (pide[f] = pide[f] || {})[l] = dias.length;
+    for (const [g, dias] of Object.entries(s.salidas || {})) puertas[g] = dias.length;
+    s.huella = { pide, puertas };
+    const ini = CA.inicio;
+    s.verano++;
+    s.anio = R.VERANOS[s.verano].anio;
+    if (s.llaga) s.llaga = -1; // la llaga sigue abierta; se la hizo otro verano
+    const yo = ini[s.siega.yo] || ini.nada;
+    s.cuerpo = Math.min(cuerpoMax(s), yo.cuerpo); s.pan = yo.pan;
+    for (const tu of tuyosVivos(s)) {
+      const x = ini[s.siega.tuyos[tu.id]] || ini.nada;
+      Object.assign(tu, { cuerpo: x.cuerpo, pan: x.pan, conocido: false, lugar: "ribera", habitos: {}, vistas: [], detenido: null, quieto: false,
+        avisado: false, malsinaManana: false, ultimaNegada: false, hoy: null, ayer: null, galeras: false, obrasHoy: false, trabajoHoy: false, trabajaHasta: null });
+    }
+    Object.assign(s, {
+      dia: 1, lugar: "ribera", conocido: false, llagaPasadas: 0, viejo: 0, galeras: false,
+      avisos: {}, avisosT: {}, rondas: {}, rondasPorque: {}, rondasQuien: {}, rondasContado: {}, memoria: {}, pedidoHoy: [], vistas: [],
+      contado: [], habitos: {}, salidas: {}, tuyosAqui: {}, nocheTuyos: null, siega: null, invierno: null, relevo: null,
+      quienVerano: Object.assign({}, s.quien),
+    });
+    s.circuito = recorridoVerano(s);
+    empezarDia(s);
+    s.noche = null;
+    apunta(s, "verano", `Empieza el verano de ${s.anio}.`);
+    return true;
+  }
+  function finCadena(s, tipo, texto, quien) {
+    s.final = { tipo, dia: s.dia, texto, cadena: { desde: R.VERANOS[0].anio, hasta: s.anio, quien: quien || s.quien.nombre, vivos: tuyosVivos(s).map((t) => t.nombre) } };
     s.fase = "fin";
     apunta(s, "fin", texto);
     return true;
@@ -620,9 +887,9 @@
     }
     return mejor;
   };
-  function genteBase(lugar, d, f) {
+  function genteBase(s, lugar, d, f) {
     let g = L[lugar].gente[f];
-    const mod = R.DIAS_SENALADOS[R.CALENDARIO[d - 1].tipo];
+    const mod = R.DIAS_SENALADOS[dia(s, d).tipo];
     if (mod && mod[lugar] && mod[lugar][f] != null) g = mod[lugar][f];
     return g;
   }
@@ -639,8 +906,14 @@
   }
   function nuevoTuyo(q) {
     return Object.assign({}, q, { cuerpo: TU.cuerpo, pan: TU.pan, detenciones: 0, conocido: false, lugar: "ribera", habitos: {},
-      vistas: [], estado: "vive", detenido: null, quieto: false, negadas: 0, avisado: false, malsinaManana: false,
-      confianza: (TU.confianza || {}).inicial || 2, recibido: 0, noches: 0, hoy: null, ayer: null, fin: null });
+      vistas: [], estado: "vive", detenido: null, quieto: false, negadas: 0, avisado: false, malsinaManana: false, ultimaNegada: false,
+      confianza: (TU.confianza || {}).inicial || 2, recibido: 0, noches: 0, hoy: null, ayer: null, fin: null,
+      azotado: false, galeras: false, obrasHoy: false, trabajoHoy: false, trabajaHasta: null, durmio: null });
+  }
+  // cuando un tuyo se va (muere, destierro, galeras o te vende), queda en la cuenta de tu gente
+  function tuyoSeVa(s, tu, tipo, d, como) {
+    tu.estado = tipo; tu.fin = { tipo, dia: d, anio: s.anio };
+    if (s.cadena) analFin(s, tu.nombre, tu.el, como || tipo, d);
   }
   function tuyosAmanecer(s) {
     for (const tu of s.tuyos) {
@@ -654,19 +927,22 @@
           while (dias.length < ap.minDias) dias.push(-1); // -1: contado por un malsín
         }
         s.malsinado = { por: tu.nombre, dia: s.dia };
-        tu.estado = "malsino"; tu.fin = { tipo: "malsino", dia: s.dia };
+        tuyoSeVa(s, tu, "malsino", s.dia);
         apunta(s, "tuyos", `${tu.nombre} va al alguacil y le cuenta dónde pides.`);
         continue;
       }
       if (tu.detenido) { tu.lugar = "puerta"; tu.detenido = null; }
+      tu.obrasHoy = false; tu.trabajoHoy = false; tu.trabajaHasta = null;
       tu.hoy = { log: [], pide: [], lugares: {}, encuentros: 0 };
       tu.quieto = !L[tu.lugar].dentro && tu.cuerpo <= TU.quieto;
     }
   }
   // un tuyo hace su franja: entrar, salir, pedir o ir a otro sitio
   function tuyoFranja(s, tu, d, f) {
-    if (tu.estado !== "vive" || tu.detenido || tu.quieto || !tu.hoy) return;
+    if (tu.estado !== "vive" || tu.detenido || tu.quieto || !tu.hoy || tu.obrasHoy) return;
     const rnd = (k) => mundo(s, `tuyo|${tu.id}|${d}|${f}|${k}`);
+    // trabaja de peón hasta el final de nona: la ronda no le molesta (j0.11)
+    if (tu.trabajaHasta != null && f <= tu.trabajaHasta) { tu.hoy.lugares[tu.lugar] = 1; return; }
     const rf = s.rondas[`${d}|${f}`];
     const prudente = tu.manera === "prudente";
     const vio = (ff, l) => tu.vistas.some((v) => v.f === ff && v.lugar === l && d - v.dia <= 3); // la ha visto ahí a esa hora hace poco
@@ -687,7 +963,17 @@
           tu.vistas.push({ dia: d, f, lugar: sig });
           tu.hoy.encuentros++;
           if (rnd(`parar|${i}`) < (tu.conocido ? P.pararAlLlegar.conocido : P.pararAlLlegar.desconocido)) {
-            if (!tu.conocido) { tu.conocido = true; tu.lugar = "puente"; tu.hoy.log.push({ f, lugar: sig, tipo: "echado" }); return "echado"; }
+            // con la cadena (j0.11): a la mujer solo la echa; al azotado le mira la espalda; al hombre sano, a las obras
+            const mujer = rasgos(s) && !tu.el;
+            const espalda = rasgos(s) && !mujer && !tu.conocido && tu.azotado;
+            if (mujer || (!tu.conocido && !espalda)) {
+              tu.conocido = true;
+              if (!mujer && rasgos(s) && tu.cuerpo >= (CA.obrasForzadas || 99)) {
+                tu.obrasHoy = true; tu.lugar = "ribera"; tu.hoy.log.push({ f, lugar: sig, tipo: "obras" });
+                return "obras";
+              }
+              tu.lugar = "puente"; tu.hoy.log.push({ f, lugar: sig, tipo: "echado" }); return "echado";
+            }
             detenerTuyo(s, tu, "al llegar", f, sig);
             return "detenido";
           }
@@ -704,7 +990,7 @@
         const h = (tu.habitos[f] = tu.habitos[f] || {}); const dias = (h[l] = h[l] || []); if (!dias.includes(d)) dias.push(d);
       }
       const tir = 1 + Math.floor(rnd("limosna") * 6);
-      const tabla = d >= P.escasezDesde ? P.limosnaEscasez : P.limosna;
+      const tabla = escasez(s, d) ? P.limosnaEscasez : P.limosna;
       const gana = e.da >= 2 ? tabla[e.da >= 3 ? 3 : 2][tir - 1] : 0;
       tu.pan = Math.min(P.panMax, tu.pan + gana);
       tu.hoy.pide.push({ f, lugar: l, gana });
@@ -722,9 +1008,9 @@
       const n = 1;
       let mejor = null;
       for (const l of DENTRO) {
-        if (l === tu.lugar || DIST[tu.lugar][l] > n || genteBase(l, d, f) < 2) continue;
+        if (l === tu.lugar || DIST[tu.lugar][l] > n || genteBase(s, l, d, f) < 2) continue;
         if (prudente ? !buenoPrudente(f, l) : pidioHoy(l)) continue;
-        const v = prudente ? genteBase(l, d, f) + (L[l].aviso === 0 ? 1 : 0) - L[l].aviso * 0.3 + rnd(`cerca|${l}`) * 0.5 : rnd(`cerca|${l}`) * 3;
+        const v = prudente ? genteBase(s, l, d, f) + (L[l].aviso === 0 ? 1 : 0) - L[l].aviso * 0.3 + rnd(`cerca|${l}`) * 0.5 : rnd(`cerca|${l}`) * 3;
         if (!mejor || v > mejor.v) mejor = { v, l };
       }
       if (!mejor) return false;
@@ -736,13 +1022,13 @@
     // adónde ir para pedir la franja siguiente
     const destino = () => {
       const f2 = f + 1;
-      const cands = DENTRO.filter((l) => l !== tu.lugar && DIST[tu.lugar][l] <= 3 && genteBase(l, d, f2) >= 2);
+      const cands = DENTRO.filter((l) => l !== tu.lugar && DIST[tu.lugar][l] <= 3 && genteBase(s, l, d, f2) >= 2);
       let mejor = null;
       for (const l of cands) {
         let v;
         if (prudente) {
           if (!buenoPrudente(f2, l)) continue;
-          v = genteBase(l, d, f2) + (L[l].aviso === 0 ? 1 : 0) - L[l].aviso * 0.3 - DIST[tu.lugar][l] * 0.1 + rnd(`dest|${l}`) * 0.5;
+          v = genteBase(s, l, d, f2) + (L[l].aviso === 0 ? 1 : 0) - L[l].aviso * 0.3 - DIST[tu.lugar][l] * 0.1 + rnd(`dest|${l}`) * 0.5;
         } else {
           v = (tu.hoy.lugares[l] ? 0 : 1) + rnd(`dest|${l}`) * 3; // va a cualquier sitio con gente, mejor si no ha estado hoy
         }
@@ -750,6 +1036,17 @@
       }
       return mejor && mejor.l;
     };
+    // con la cadena (j0.11), el hombre que ha dormido dentro y tiene las obras a un paso pide trabajo a prima
+    if (rasgos(s) && tu.el && f === 0 && dia(s, d).tipo === "laborable" && L[tu.lugar].dentro && DIST[tu.lugar].catedral <= 1 && tu.cuerpo >= 4) {
+      const r = andar("catedral", 1);
+      if (r !== "llega") return;
+      if (rnd("obras") < (P.trabajo.probPorCuerpo[tu.cuerpo] || 0)) {
+        tu.trabajaHasta = P.trabajo.hasta - 1; tu.trabajoHoy = true; tu.pan = Math.min(P.panMax, tu.pan + P.trabajo.paga);
+        tu.hoy.lugares.catedral = 1;
+        tu.hoy.log.push({ f, lugar: "catedral", tipo: "trabajo" });
+        return;
+      }
+    }
     // la última franja: salir de la muralla antes de que cierren
     if (f === R.FRANJAS.length - 1) {
       if (!L[tu.lugar].dentro) { andar("ribera", 3); return; }
@@ -793,6 +1090,7 @@
   }
   function detenerTuyo(s, tu, motivo, f, lugar) {
     tu.detenciones++; tu.conocido = true; tu.pan = 0; tu.detenido = motivo;
+    if (galeras(s, tu.el)) tu.galeras = true; // desde 1552, el hombre detenido va a galeras (j0.11)
     tu.hoy.log.push({ f, lugar, tipo: "detenido", motivo });
   }
   // al llegar la noche: terminar su día y preparar lo que te cuentan
@@ -812,6 +1110,7 @@
         continue;
       }
       tu.duerme = tu.detenido ? "carcel" : L[tu.lugar].dentro ? "portal" : "raso";
+      tu.durmio = tu.duerme;
       if (!L[tu.lugar].dentro && tu.lugar !== "ribera") tu.lugar = "ribera";
       const presente = conmigo && tu.duerme === "raso";
       const x = { id: tu.id, nombre: tu.nombre, presente, lineas: [], pide: 0, dado: 0, cuerpo: tu.cuerpo };
@@ -820,12 +1119,16 @@
       if (tu.ayer) { x.lineas.push(tu.ayer); tu.ayer = null; }
       const rel = relatoTuyo(s, tu);
       x.relato = rel.lineas; x.items = rel.items;
+      // el cuerpo se le nota por grados (j0.11): con 3, flaco; con 2, muy flaco; con 1, no se tiene en pie
+      const a = tu.el ? "o" : "a";
+      const grado = tu.cuerpo <= 1 ? "no se tiene en pie" : tu.cuerpo === 2 ? `se ${tu.el ? "le" : "la"} ve muy flac${a}` : tu.cuerpo === 3 ? `se ${tu.el ? "le" : "la"} ve flac${a}` : "";
+      x.iPide = x.lineas.length; // lo que cuenta va antes de lo que pide
       if (tu.pan < 2) {
         x.pide = Math.min(TU.pide || 2, 2 - tu.pan);
-        const flaco = tu.cuerpo <= 2;
-        x.lineas.push(tu.pan === 0 ? `${tu.nombre} no ha sacado nada para cenar${flaco ? ` y se ${tu.el ? "le" : "la"} ve muy ${tu.el ? "flaco" : "flaca"}` : ""}. Te pide pan.` : `${tu.nombre} solo tiene un pedazo. Te pide otro.`);
-        if (TU.trato === "malsinar" && tu.avisado && tu.cuerpo <= TU.malsinarCuerpo) x.lineas.push(`${tu.nombre} te mira: «¿Tampoco hoy?».`);
-      }
+        x.lineas.push(tu.pan === 0 ? `${tu.nombre} no ha sacado nada para cenar${grado ? ` y ${grado}` : ""}. Te pide pan.` : `${tu.nombre} solo tiene un pedazo${grado ? ` y ${grado}` : ""}. Te pide otro.`);
+        // «¿Tampoco hoy?» solo si la última vez que te pidió se lo negaste teniendo pan
+        if (TU.trato === "malsinar" && tu.avisado && tu.cuerpo <= TU.malsinarCuerpo) x.lineas.push(tu.ultimaNegada ? `${tu.nombre} te mira: «¿Tampoco hoy?».` : `${tu.nombre} te mira: «Acuérdate de lo que te dije».`);
+      } else if (grado) x.lineas.push(tu.cuerpo <= 1 ? `${tu.nombre} no se tiene en pie.` : `A ${tu.nombre} se ${tu.el ? "le" : "la"} ve ${tu.cuerpo === 2 ? "muy " : ""}flac${a}.`);
       if (TU.devuelve && (tu.debe || 0) > 0 && s.pan < 2 && tu.pan >= 2) {
         tu.pan--; tu.debe--; s.pan++;
         x.lineas.push(`${tu.nombre} te da un pedazo: «Hoy por ti».`);
@@ -851,9 +1154,11 @@
         if (g.tipo === "pide") frases.push(`A ${fr(f)} pedí en ${L[g.lugar].nombre}: ${g.gana ? (g.gana === 1 ? "un pedazo" : g.gana + " pedazos") : "nada"}.`);
         else if (g.tipo === "echado") frases.push(`A ${fr(f)} me paró el alguacil en ${L[g.lugar].nombre} y me echó de la ciudad.`);
         else if (g.tipo === "detenido") frases.push(`A ${fr(f)} me cogió la ronda en ${L[g.lugar].nombre}.`);
+        else if (g.tipo === "obras") frases.push(`A ${fr(f)} me paró el alguacil en ${L[g.lugar].nombre} y me mandó a cargar piedra a las obras hasta la noche, sin paga.`);
+        else if (g.tipo === "trabajo") frases.push(`A ${fr(f)} me cogieron de peón en las obras: ${P.trabajo.paga} pedazos.`);
         else if (g.ronda) frases.push(`A ${fr(f)} vi la ronda en ${L[g.lugar].nombre}.`);
         else if (!sinF.includes(g.lugar)) sinF.push(g.lugar);
-        if (g.tipo !== "echado" && g.tipo !== "detenido") items.push({ dia: d, f, lugar: g.lugar, ronda: !!g.ronda });
+        if (g.tipo !== "echado" && g.tipo !== "detenido" && g.tipo !== "obras") items.push({ dia: d, f, lugar: g.lugar, ronda: !!g.ronda });
       }
       const sinR = sinF.filter((l) => !tu.hoy.log.some((x) => x.f === f && x.lugar === l && (x.tipo || x.ronda)));
       if (sinR.length) sin.push(`${listaY(sinR.map((l) => L[l].corto))} (${fr(f)})`);
@@ -882,7 +1187,7 @@
     if (x.contado) return;
     x.contado = true;
     if (TU.trueque && x.pide > 0) x.lineas = x.lineas.filter((l) => !l.endsWith("primero te pide pan."));
-    x.lineas.splice(x.lineas.findIndex((l) => l.startsWith(`${x.nombre} no ha sacado`) || l.startsWith(`${x.nombre} solo tiene`)) >= 0 ? x.lineas.findIndex((l) => l.startsWith(`${x.nombre} no ha sacado`) || l.startsWith(`${x.nombre} solo tiene`)) : x.lineas.length, 0, ...x.relato);
+    x.lineas.splice(x.iPide != null ? x.iPide : x.lineas.length, 0, ...x.relato);
     s.contado = s.contado || [];
     for (const it of x.items) s.contado.push(Object.assign({ quien: x.nombre }, it));
   }
@@ -903,27 +1208,31 @@
       if (tu.estado !== "vive") continue;
       const x = (s.nocheTuyos || []).find((y) => y.id === tu.id) || {};
       const antes = tu.cuerpo;
-      let dc = 0;
+      let dc = 0, azotes = false;
       if (tu.duerme === "carcel") {
         dc += P.carcel.cuerpo;
-        if (tu.detenciones === 2) dc += P.carcel.azotes;
-        tu.ayer = `${tu.nombre}: «Ayer me cogió la ronda${tu.detenciones === 2 ? " y me azotaron" : ""}. He pasado la noche en la cárcel».`;
+        if (tu.detenciones === 2 && !tu.galeras) { dc += P.carcel.azotes; azotes = true; tu.azotado = true; }
+        tu.ayer = `${tu.nombre}: «Ayer me cogió la ronda${azotes ? " y me azotaron" : ""}. He pasado la noche en la cárcel».`;
       } else {
         const come = Math.min(2, tu.pan);
         tu.pan -= come; dc += P.cena[come];
+        if (tu.obrasHoy || tu.trabajoHoy) dc -= P.trabajo.cansancio; // molido de cargar piedra (j0.11)
         if (tu.duerme === "portal") {
           const pidio = tu.hoy && tu.hoy.pide.some((p) => p.lugar === tu.lugar);
           let k = 0; for (let f = 0; f < R.FRANJAS.length; f++) if (estado(s, tu.lugar, d, f, tu.id).pobres) k++;
           const nivel = pidio ? "vigilada" : k >= P.nochePobresFranjas ? "pobres" : "tranquila";
           if (mundo(s, `tuyoNoche|${tu.id}|${d}`) < P.nocheDentro[nivel][tu.conocido ? 1 : 0]) {
-            tu.detenciones++; tu.conocido = true; tu.pan = 0;
-            if (tu.detenciones === 2) dc += P.carcel.azotes;
-            tu.ayer = `${tu.nombre}: «Anoche la ronda me sacó de un portal${tu.detenciones === 2 ? " y me azotaron" : ""}».`;
+            tu.detenciones++; tu.conocido = true; tu.pan = 0; tu.durmio = "carcel";
+            if (galeras(s, tu.el)) tu.galeras = true;
+            else if (tu.detenciones === 2) { dc += P.carcel.azotes; azotes = true; tu.azotado = true; }
+            tu.ayer = `${tu.nombre}: «Anoche la ronda me sacó de un portal${azotes ? " y me azotaron" : ""}».`;
             tu.lugar = "puerta";
           } else tu.ayer = `${tu.nombre}: «Anoche dormí en un portal de ${L[tu.lugar].nombre}».`;
         }
       }
       // si le negaste pan teniéndolo y pasa hambre: la primera vez te avisa; luego puede venderte
+      // la última vez que te pidió, ¿se lo negaste teniendo pan? (para lo que te dice la próxima vez)
+      if (x.presente && x.pide > 0) tu.ultimaNegada = x.dado === 0 && s.panAntesReparto >= 1;
       if (x.presente && x.pide > 0 && x.dado === 0 && s.panAntesReparto >= 1) {
         tu.negadas++;
         if (TU.trato === "malsinar" && antes <= TU.malsinarCuerpo) {
@@ -933,8 +1242,17 @@
         if (TU.trato === "confianza") tu.confianza = Math.max(0, tu.confianza - 1);
       } else if (x.presente && x.dado > 0 && TU.trato === "confianza") tu.confianza = Math.min((TU.confianza || {}).max || 3, tu.confianza + 1);
       tu.cuerpo = clamp(tu.cuerpo + dc, 0, P.cuerpoMax);
-      if (tu.detenciones >= P.detencionesMax) { tu.estado = "desterrado"; tu.fin = { tipo: "desterrado", dia: d }; if (x.presente || s.duerme === "raso") lin.push(`A ${tu.nombre} ${tu.el ? "lo" : "la"} han desterrado de la ciudad. No volverás a ${tu.el ? "verlo" : "verla"}.`); }
-      else if (tu.cuerpo <= 0) { tu.estado = "muerto"; tu.fin = { tipo: "muerto", dia: d }; if (s.duerme === "raso" && tu.duerme === "raso") lin.push(`${tu.nombre} no se ha despertado.`); }
+      const lo = tu.el ? "lo" : "la";
+      if (tu.galeras) {
+        tuyoSeVa(s, tu, "galeras", d);
+        if (x.presente || s.duerme === "raso") lin.push(`A ${tu.nombre} ${lo} han condenado a galeras. Mañana sale con la cadena de galeotes. No volverás a ver${lo}.`);
+      } else if (tu.detenciones >= P.detencionesMax) {
+        tuyoSeVa(s, tu, "desterrado", d);
+        if (x.presente || s.duerme === "raso") lin.push(`A ${tu.nombre} ${lo} han desterrado de la ciudad. No volverás a ver${lo}.`);
+      } else if (tu.cuerpo <= 0) {
+        tuyoSeVa(s, tu, "muerto", d, azotes ? "muerto" : "hambre");
+        if (s.duerme === "raso" && tu.duerme === "raso") lin.push(`${tu.nombre} no se ha despertado.`);
+      }
     }
   }
 
@@ -945,6 +1263,7 @@
       const f = t.fin || {};
       if (t.estado === "muerto") return `${t.nombre} murió el día ${f.dia}`;
       if (t.estado === "desterrado") return `a ${t.nombre} ${t.el ? "lo" : "la"} desterraron el día ${f.dia}`;
+      if (t.estado === "galeras") return `a ${t.nombre} ${t.el ? "lo" : "la"} mandaron a galeras el día ${f.dia}`;
       return `${t.nombre} te vendió al alguacil el día ${f.dia}`;
     });
     const resto = otros.length ? ` ${otros.join("; ").replace(/^./, (c) => c.toUpperCase())}.` : "";
@@ -964,7 +1283,17 @@
     return T;
   }
   const DUERME = { carcel: "cárcel", portal: "portal", raso: "al raso" };
-  const FINALES = { siega: "Llega a la siega y le cogen", aguanta: "Llega a la siega y no le cogen", hambre: "Muere de hambre", muerto: "Muere tras los azotes", desterrado: "Desterrado", abandona: "Abandona" };
+  const FINALES = { siega: "Llega a la siega y le cogen", aguanta: "Llega a la siega y no le cogen", espiga: "Llega a la siega y espiga", hambre: "Muere de hambre", muerto: "Muere tras los azotes", desterrado: "Desterrado", galeras: "Condenado a galeras", abandona: "Abandona" };
+  // lo que queda de tu gente, verano a verano (j0.11)
+  function resumenCadena(s) {
+    if (!s.cadena) return [];
+    const out = [];
+    for (const v of R.VERANOS) {
+      const xs = s.cadena.anales.filter((a) => a.anio === v.anio).map((a) => a.texto);
+      if (xs.length) out.push(`${v.anio}: ${xs.join(" ")}`);
+    }
+    return out;
+  }
 
   function informe(s) {
     const m = R.MODOS[s.modo];
@@ -972,12 +1301,15 @@
     const ratos = T.mover + T.pedir + T.trabajar + T.esperar + T.perdido || 1;
     const pct = (x) => Math.round((100 * x) / ratos) + " %";
     const L2 = [];
+    const cad = !!s.conCadena;
+    const fechaDe = (anio, d) => ((VERANO[anio || 1545] || {}).calendario || R.CALENDARIO)[d - 1].fecha;
     L2.push("LIBER VAGATORUM · EL JUGUETE · INFORME");
     L2.push(`Jugador: ${s.jugador || "anónimo"}`);
     L2.push(`Versión: ${s.v} · ${m.nombre} · semilla ${s.semilla}${s.semillaFija ? " (fija)" : ""}`);
     L2.push(`Empezada: ${s.empezada}`);
-    L2.push(`Final: ${s.final ? `${FINALES[s.final.tipo] || s.final.tipo}, día ${s.final.dia}. ${s.final.texto}` : "sin acabar"}`);
-    L2.push(`Cuerpo al final: ${s.cuerpo} · detenciones: ${s.detenciones} · llaga: ${!s.conLlaga ? "no activada" : s.llaga ? "activada; se la hizo la noche del día " + s.llaga : "activada; no se la hizo"} · los tuyos: ${s.conTuyos ? "activados" : "no activados"}`);
+    if (cad && s.final && s.final.cadena) L2.push(`Final: tu gente, de ${s.final.cadena.desde} a ${s.final.cadena.hasta}. El último, ${s.final.cadena.quien}: ${(FINALES[s.final.tipo] || s.final.tipo).toLowerCase()}, día ${s.final.dia} de ${s.final.cadena.hasta}. ${s.final.texto}`);
+    else L2.push(`Final: ${s.final ? `${FINALES[s.final.tipo] || s.final.tipo}, día ${s.final.dia}${cad ? " de " + s.anio : ""}. ${s.final.texto}` : "sin acabar"}`);
+    L2.push(`Cuerpo al final: ${s.cuerpo} · detenciones: ${s.detenciones} · llaga: ${!s.conLlaga ? "no activada" : s.llaga < 0 ? "activada; se la hizo otro verano" : s.llaga ? "activada; se la hizo la noche del día " + s.llaga : "activada; no se la hizo"} · los tuyos: ${s.conTuyos ? "activados" : "no activados"} · varios veranos: ${cad ? `activado (va por ${s.anio}, juega ${s.quien.nombre})` : "no activado"}`);
     L2.push("");
     L2.push("== Encuesta ==");
     const E = s.encuesta || {};
@@ -986,7 +1318,14 @@
     L2.push(`3. Si le sorprendió la ronda, mala decisión suya o mala suerte: ${E.sorpresa || "—"}`);
     L2.push(`4. Qué sobraba, estorbaba o no entendió: ${E.sobro || "—"}`);
     L2.push(`5. Otros: ${E.otros || "—"}`);
+    if (cad) L2.push(`6. Si pesó saber que seguiría como uno de los tuyos: ${E.cadena || "—"}`);
     L2.push("");
+    if (cad) {
+      L2.push("== La cadena ==");
+      resumenCadena(s).forEach((x) => L2.push(x));
+      for (const h of s.heredados || []) L2.push(`Heredó a ${h.nombre} (${h.manera}) en ${h.anio}: le había dado ${h.recibido} pedazos, se lo negó ${h.negadas} ${h.negadas === 1 ? "vez" : "veces"}, ${h.noches} noches juntos, llegó con ${h.detenciones} ${h.detenciones === 1 ? "detención" : "detenciones"}.`);
+      L2.push("");
+    }
     L2.push("== Para los criterios de la prueba ==");
     L2.push(`Tiempo: moverse ${pct(T.mover)} · pedir ${pct(T.pedir)} · trabajar ${pct(T.trabajar)} · esperar o acabar antes ${pct(T.esperar)} · perdido ${pct(T.perdido)}`);
     if (s.modo === "A") L2.push(`Pasos: ${T.pasos} (${(T.pasos / Math.max(1, s.porDia.length)).toFixed(1)} por día)`);
@@ -995,12 +1334,13 @@
     L2.push(`Llegó donde estaba la ronda: ${T.encuentros} veces (le pararon ${T.paradas}) · vio llegar la ronda estando quieto: ${T.rondaVista}`);
     L2.push(`Abrió «Lo que recuerdas»: ${s.recuerdaAbierto || 0} veces · vio la ronda en ${(s.vistas || []).length} franjas`);
     const det = s.cronica.filter((c) => c.tipo === "detenido");
-    if (det.length) L2.push("Detenciones: " + det.map((c) => `día ${c.dia}, ${c.motivo}`).join(" · "));
+    if (det.length) L2.push("Detenciones: " + det.map((c) => `día ${c.dia}${cad ? " de " + c.anio : ""}, ${c.motivo}`).join(" · "));
     L2.push("");
     if (s.conTuyos) {
       L2.push("== Los tuyos ==");
       for (const tu of s.tuyos) {
-        const est = { vive: `vive, cuerpo ${tu.cuerpo}`, muerto: `murió el día ${(tu.fin || {}).dia}`, desterrado: `desterrado el día ${(tu.fin || {}).dia}`, malsino: `te malsinó el día ${(tu.fin || {}).dia}` }[tu.estado];
+        const fd = `el día ${(tu.fin || {}).dia}${cad ? " de " + (tu.fin || {}).anio : ""}`;
+        const est = { vive: `vive, cuerpo ${tu.cuerpo}`, muerto: `murió ${fd}`, desterrado: `desterrado ${fd}`, galeras: `a galeras ${fd}`, malsino: `te malsinó ${fd}` }[tu.estado];
         L2.push(`${tu.nombre} (${tu.manera}): ${est} · detenciones ${tu.detenciones} · noches juntos ${tu.noches} · pan que le diste ${tu.recibido} · se lo negaste ${tu.negadas} ${tu.negadas === 1 ? "vez" : "veces"}${tu.avisado ? " · te avisó de que te vendería" : ""}`);
       }
       const c = s.contado || [];
@@ -1008,35 +1348,40 @@
       L2.push("");
     }
     L2.push("== Por día ==");
-    L2.push("día | mover | pedir | trabajar | esperar | " + (s.modo === "A" ? "pasos" : "cruces") + " | sitios | pan pedido | pan trabajo | come | duerme | cuerpo | ronda al llegar");
+    L2.push((cad ? "año | " : "") + "día | mover | pedir | trabajar | esperar | " + (s.modo === "A" ? "pasos" : "cruces") + " | sitios | pan pedido | pan trabajo | come | duerme | cuerpo | ronda al llegar");
     s.porDia.forEach((d) => {
-      L2.push(`${d.dia} | ${d.mover} | ${d.pedir} | ${d.trabajar} | ${d.esperar + d.perdido} | ${s.modo === "A" ? d.pasos : d.cruces} | ${d.lugares} | ${d.panPedido} | ${d.panTrabajo} | ${d.comido} | ${DUERME[d.duerme]}${d.detenido ? " (" + d.detenido + ")" : ""} | ${d.cuerpoNoche} | ${d.encuentros}`);
+      L2.push(`${cad ? d.anio + " | " : ""}${d.dia} | ${d.mover} | ${d.pedir} | ${d.trabajar} | ${d.esperar + d.perdido} | ${s.modo === "A" ? d.pasos : d.cruces} | ${d.lugares} | ${d.panPedido} | ${d.panTrabajo} | ${d.comido} | ${DUERME[d.duerme]}${d.detenido ? " (" + d.detenido + ")" : ""} | ${d.cuerpoNoche} | ${d.encuentros}`);
     });
     L2.push("");
     L2.push("== Crónica ==");
-    let diaAct = 0;
+    let diaAct = 0, anioAct = null;
     s.cronica.forEach((c) => {
-      if (c.dia !== diaAct) { diaAct = c.dia; L2.push(`-- Día ${c.dia} (${R.CALENDARIO[c.dia - 1].fecha}) --`); }
+      if (c.dia !== diaAct || c.anio !== anioAct) { diaAct = c.dia; anioAct = c.anio; L2.push(`-- ${cad ? c.anio + " · " : ""}Día ${c.dia} (${fechaDe(c.anio, c.dia)}) --`); }
       L2.push(`${momentoTxt(c.t)} · ${c.texto}`);
     });
     L2.push("");
     L2.push("== Dónde estuvo la ronda (el jugador no lo veía) ==");
-    const cv = circuitoDia(s, 1);
-    L2.push(`Costumbres de este verano: por la mañana, ${L[cv[0]].nombre}; a nona, ${L[cv[3]].nombre}; a vísperas, ${L[cv[4]].nombre}; al anochecer cierra la ${L[cv[5]].nombre}.`);
-    for (let d = 1; d <= s.dia; d++) {
-      const fila = R.FRANJAS.map((fr, f) => {
-        const k = `${d}|${f}`;
-        if (!(k in s.rondas)) return `${fr.nombre}: —`;
-        const p = s.rondas[k];
-        return `${fr.nombre}: ${p ? L[p].corto : "comiendo"}${s.rondasPorque[k] === "aviso" ? " (aviso)" : s.rondasPorque[k] === "aprendido" ? " (tu costumbre)" : ""}`;
-      });
-      L2.push(`Día ${d}: ` + fila.join(" · "));
+    const veranos = (cad ? s.cadena.archivo : []).concat([{ anio: s.anio, circuito: circuitoDia(s, 1), rondas: s.rondas, rondasPorque: s.rondasPorque, hasta: s.dia }]);
+    for (const v of veranos) {
+      const cv = v.circuito;
+      L2.push(`${cad ? v.anio + ". " : ""}Costumbres de este verano: por la mañana, ${L[cv[0]].nombre}; a nona, ${L[cv[3]].nombre}; a vísperas, ${L[cv[4]].nombre}; al anochecer cierra la ${L[cv[5]].nombre}.`);
+      for (let d = 1; d <= (v.hasta || R.DIAS); d++) {
+        if (!R.FRANJAS.some((fr, f) => `${d}|${f}` in v.rondas)) continue;
+        const fila = R.FRANJAS.map((fr, f) => {
+          const k = `${d}|${f}`;
+          if (!(k in v.rondas)) return `${fr.nombre}: —`;
+          const p = v.rondas[k];
+          return `${fr.nombre}: ${p ? L[p].corto : "comiendo"}${v.rondasPorque[k] === "aviso" ? " (aviso)" : v.rondasPorque[k] === "aprendido" ? " (tu costumbre)" : ""}`;
+        });
+        L2.push(`Día ${d}: ` + fila.join(" · "));
+      }
     }
     L2.push("");
     L2.push("== Datos en bruto ==");
-    L2.push(JSON.stringify({ v: s.v, modo: s.modo, semilla: s.semilla, circuito: s.circuito, conTuyos: !!s.conTuyos,
+    L2.push(JSON.stringify(Object.assign({ v: s.v, modo: s.modo, semilla: s.semilla, circuito: s.circuito, conTuyos: !!s.conTuyos,
       tuyos: s.conTuyos ? s.tuyos.map((tu) => ({ id: tu.id, estado: tu.estado, fin: tu.fin, cuerpo: tu.cuerpo, detenciones: tu.detenciones, noches: tu.noches, recibido: tu.recibido, negadas: tu.negadas, avisado: tu.avisado })) : null,
-      final: s.final, porDia: s.porDia, encuesta: s.encuesta, rondas: s.rondas, rondasPorque: s.rondasPorque, habitos: s.habitos, vistas: s.vistas, recuerdaAbierto: s.recuerdaAbierto, conLlaga: !!s.conLlaga, llaga: s.llaga || null }));
+      final: s.final, porDia: s.porDia, encuesta: s.encuesta, rondas: s.rondas, rondasPorque: s.rondasPorque, habitos: s.habitos, vistas: s.vistas, recuerdaAbierto: s.recuerdaAbierto, conLlaga: !!s.conLlaga, llaga: s.llaga || null },
+      cad ? { cadena: { anio: s.anio, quien: s.quien, anales: s.cadena.anales, vidas: s.cadena.vidas, heredados: s.heredados || [], circuitos: s.cadena.archivo.map((a) => ({ anio: a.anio, circuito: a.circuito })) } } : {})));
     return L2.join("\n");
   }
 
@@ -1046,6 +1391,8 @@
     nueva, opciones, previsionPedir, mover, pedir, pedirTrabajo, esperar, acabarDia, seguir, comprobarNoche, cenar, circuitoDia,
     informe, resumenDias, momentoTxt, riesgoNoche, saberNoche, puedeLlaga, hacerLlaga, cuerpoMax,
     darPan, tuyosEn, tuyosVivos, hayQuejas, DIST, PUERTAS,
+    // la cadena de veranos (j0.11)
+    calendario, escasez, escasezDesde, esHombre, elegirHeredero, siguienteVerano, resumenCadena, recorridoVerano,
     empezarJornada(s) { if (s.fase === "amanecer") { s.fase = "dia"; s.noche = null; } },
   };
 })();

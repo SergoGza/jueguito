@@ -120,7 +120,7 @@ Decidido por rondas del 5 al 9 de noviembre de 2026 (ver «El relevo» en `claud
 - **La cadena dura lo que dure tu gente.** Si mueres y uno de los tuyos ha dormido a tu lado esa noche (la ribera o el mismo portal; en la cárcel se muere solo), sigues como él el verano siguiente; si estaban los dos, eliges. Si mueres solo, se acaba. El destierro y las galeras no son morir: sigue uno de los tuyos, el que elijas. Los días que faltan para la siega se viven sin ti: los tuyos siguen con las mismas reglas y nadie les da pan; si el que ha de seguir se va, sigue el otro con la misma regla.
 - **La siega decide cómo llegas al verano siguiente:** con hoz, 5 de cuerpo y 2 pedazos; espigando, 4 y 1; sin nada, 3 y 0 (`PARAMS.cadena.inicio`). Vale igual para los tuyos.
 - **Entre veranos:** la cara se olvida y las detenciones quedan; al que azotaron, el alguacil le mira la espalda y es como si le conociera. La ronda saca costumbres nuevas, inclinadas hacia donde te vio pedir y la puerta por la que más pasabas (`PARAMS.cadena.reaccion`). Recuerdos guarda los veranos anteriores, con lo que vio el heredero.
-- **Hombre y mujer** (solo con varios veranos). El hombre (tú y Pedro) puede trabajar en las obras y segar con hoz; si la ronda le para por la calle sin conocerle y con 5 o más de cuerpo, lo manda a las obras sin paga hasta la noche (`PARAMS.cadena.obrasForzadas`). La mujer (Catalina) no va a las obras y en la siega espiga; la ronda, si la para por la calle, solo la echa, aunque la conozca. Pedir delante de la ronda y la noche, igual para los dos. Nada de esto se explica: lo dicen el capataz, el alguacil, el mayoral y el pregón.
+- **Hombre y mujer** (solo con varios veranos). El hombre (tú y Pedro) puede trabajar en las obras y segar con hoz; si la ronda le para por la calle sin conocerle y con 5 o más de cuerpo, lo manda a las obras sin paga hasta la noche (`PARAMS.cadena.obrasForzadas`). La mujer (Catalina) no va a las obras y en la siega espiga; la ronda, si la para por la calle, no la lleva a la cárcel: la echa, y si ya la conoce (o le ve la espalda), la azota allí mismo (−1 de cuerpo esa noche), sin quitarle el pan ni contar para el destierro. Pedir delante de la ronda y la noche, igual para los dos. Nada de esto se explica: lo dicen el capataz, el alguacil, el mayoral y el pregón.
 - **Al final,** cuánto aguantó tu gente («Tu gente aguantó de 1545 a 1552») y lo que fue de cada uno, verano a verano. Es un final provisional: el de 1565 vendrá después.
 - **Textos de los tuyos** (también sin varios veranos): el cuerpo se les nota por grados («se le ve flaco» con 3, «muy flaco» con 2, «no se tiene en pie» con 1), y «¿Tampoco hoy?» solo sale si la última vez que te pidieron se lo negaste; si no, «Acuérdate de lo que te dije».
 
@@ -128,15 +128,17 @@ Decidido por rondas del 5 al 9 de noviembre de 2026 (ver «El relevo» en `claud
 
 | | Veterano: llega a 1557 / completa | Novato: llega a 1557 / completa |
 |---|---|---|
-| No les da nunca | 31 % / 7 % | 34 % / 18 % |
-| A los dos lo que piden, guardándose su ración | 36 % / 9 % | 39 % / 22 % |
-| Solo a Catalina | 38 % / 10 % | 42 % / 23 % |
-| Lo que piden, aunque se quede sin cenar | 39 % / 9 % | 40 % / 22 % |
+| No les da nunca | 26 % / 4 % | 20 % / 5 % |
+| A los dos lo que piden, guardándose su ración | 30 % / 5 % | 23 % / 6 % |
+| Solo a Catalina | 31 % / 6 % | 25 % / 7 % |
 
-- **Con la cadena, dar pan compensa** (unos 2 a 5 puntos en completar, 5 a 8 en llegar a 1557), y dejarse morir para que siga otro no es lo mejor.
-- **Agujero cerrado:** al principio, los días que faltaban se saltaban y el heredero llegaba a la siega descansado. El bot que no sale de la ribera llevaba a su gente hasta 1557 en el 80 % de las cadenas. Viviendo esos días, el 18 %, y nunca completa.
-- **Elegir heredero sale parejo:** Pedro primero, 10 % (veterano) y 20 % (novato); Catalina primero, 8 % y 22 %. El hombre aguanta mejor 1545; la mujer, las galeras.
-- **Pendiente de Sergio: la mujer sale mejor en casi todo.** Para ella la ronda deja de ser una amenaza. Empezando como moza, llega a la siega de 1545 el 42 % (el mozo, el 30 %) con el veterano, y el 52 % (frente al 16 %) con el novato. Y en la cadena el arrojo gana a la prudencia, al revés que en un verano: novato 22 %, osado 19 %, veterano 9 %, prudente 0 %. Las cifras de la siega no lo arreglan (la hoz a 6 no cambia nada: con dos pedazos, la primera noche ya estás a 6).
+- **Con la cadena, dar pan compensa**, y dejarse morir para que siga otro no es lo mejor.
+- **Agujero cerrado:** al principio, los días que faltaban se saltaban y el heredero llegaba a la siega descansado. El bot que no sale de la ribera llevaba a su gente hasta 1557 en el 80 % de las cadenas. Viviendo esos días, el 14 %, y nunca completa.
+- **Hombre y mujer, parejos** desde que a la mujer conocida la azotan (pregunta 12, opción B). Llega a la siega de 1545 con el veterano el mozo el 30 % y la moza el 28 %; completan la cadena el 5 % los dos. Antes, con «solo la echa», la moza llegaba el 42 % y la ronda dejaba de ser una amenaza para ella.
+- **La prudencia ya no pierde frente al arrojo** (prudente 0 %, veterano 5 %, osado 4 %, novato 6 %); antes, el novato completaba el 22 % y el veterano el 9 %. El prudente se muere de hambre en 1557, con el pan caro todo el verano.
+- **Elegir heredero sale casi parejo:** Pedro primero, 6 % (veterano y novato); Catalina primero, 4 % y 5 %.
+- **La cadena es dura para los bots** (completa 1 de cada 20). Son el suelo: Sergio saca 1,9 pedazos al día y el veterano, 1,4.
+- **Las cifras de la siega pesan por el pan, no por el cuerpo** (la hoz a 6 no cambia nada: con dos pedazos, la primera noche ya estás a 6).
 
 ## El informe
 

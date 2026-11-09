@@ -276,7 +276,8 @@
       reaccion: 0.5,
       // el hombre al que la ronda para por la calle sin conocerle, con el cuerpo así o más, va a las obras sin paga
       // hasta la noche (Briviesca, 1387: servir sin soldada). La mujer no va a las obras y en la siega espiga; la ronda,
-      // si la para por la calle, solo la echa, aunque la conozca. Pedir delante de la ronda y la noche, igual.
+      // si la para por la calle, no la lleva a la cárcel: la echa, y si ya la conoce (o le ve la espalda), la azota allí
+      // mismo (PARAMS.carcel.azotes de cuerpo esa noche; pregunta 12, opción B). Pedir delante de la ronda y la noche, igual.
       obrasForzadas: 5,
     },
   };
@@ -294,7 +295,7 @@
     "Las galeras son de la pragmática de 1552 (el vagabundo sano de más de veinte años, cuatro años de galeras en lugar de azotes). En el juego, todos los hombres pasan de veinte y basta una detención.",
     "El pan caro de 1557 sale de la crisis de grano de 1557-1558; que la gente dé menos desde el 1 de junio es del juego.",
     "Que el alguacil mande a las obras sin paga al mozo sano que para por la calle sale de una ley más vieja (Briviesca, 1387: servir sin soldada); en Salamanca es del juego.",
-    "Que a la mujer la ronda solo la eche cuando la para por la calle es del juego. No había galeras para mujeres.",
+    "A la mujer, la ronda no la lleva a la cárcel cuando la para por la calle: la echa y, si ya la conoce, la azota (para las mujeres no había nada entre los azotes y la horca). Que no haya cárcel es del juego. No había galeras para mujeres.",
     "Entre un verano y otro, lo que pasa en el invierno se resume en cómo llegas: con hoz, espigando o sin nada.",
   ];
 

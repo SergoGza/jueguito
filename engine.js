@@ -202,7 +202,7 @@
   }
   function empezarDia(s) {
     s.t = 0; s.avisos = {}; s.avisosT = {}; s.pedidoHoy = []; s.trabajoHoy = false; s.trabajoPedido = false;
-    s.detenidoHoy = null; s.hoy = nuevoHoy(); s.aviso = null; s.fase = "amanecer";
+    s.detenidoHoy = null; s.hoy = nuevoHoy(); s.aviso = null; s.fase = "amanecer"; s.azotesHoy = 0;
     rondaFranja(s, s.dia, 0);
     if (s.conTuyos) { tuyosAmanecer(s); for (const tu of s.tuyos) tuyoFranja(s, tu, s.dia, 0); s.tuyosF = 0; }
     observar(s);
@@ -347,10 +347,10 @@
     const dice = pierna && sabia ? `«Otra vez tú, el de la pierna. Esa llaga ya me la sé, y ${contado ? "ya me han contado dónde pides" : "sabía que te encontraría aquí"}»`
       : pierna ? "«Otra vez tú, el de la pierna. Esa llaga ya me la sé»"
       : sabia ? (contado ? "«Ya me han contado dónde pides»" : "«Sabía que te encontraría aquí»") : null;
-    // con la cadena (j0.11): a la mujer solo la echa; al que azotaron otro verano le mira la espalda; al hombre sano que
-    // no conoce lo manda a las obras sin paga
+    // con la cadena (j0.11): a la mujer no la detiene: la echa, y si ya la conoce, la azota y la echa; al que azotaron
+    // otro verano le mira la espalda (es como si le conociera); al hombre sano que no conoce lo manda a las obras sin paga
     const mujer = rasgos(s) && !esHombre(s);
-    const espalda = rasgos(s) && !mujer && !s.conocido && !!s.azotado;
+    const espalda = rasgos(s) && !s.conocido && !!s.azotado;
     if ((s.conocido || espalda) && !mujer) {
       detener(s, "parado", [espalda ? `En ${L[r].nombre} te para el alguacil. Te levanta la camisa y te mira la espalda: «Tú ya has pasado por mis manos». Te llevan a la cárcel.`
         : pierna ? `El alguacil se planta delante: ${dice}. Te llevan a la cárcel.`
@@ -358,18 +358,28 @@
       return;
     }
     if (rasgos(s) && !mujer && !s.llaga && s.cuerpo >= (CA.obrasForzadas || 99)) { obrasForzadas(s, r, dice); return; }
-    const yaTeConoce = s.conocido;
+    const azota = mujer && (s.conocido || espalda); // a la mujer que ya conoce, azotes (pregunta 12, opción B)
+    const conocia = s.conocido;
     s.conocido = true;
     const antes = s.lugar;
     pasar(s, 3, "perdido", false);
     s.lugar = "puente";
     observar(s);
-    apunta(s, "echado", `Te para la ronda en ${L[antes].corto} y te echan de la ciudad.`);
+    if (azota) { s.azotesHoy = (s.azotesHoy || 0) + 1; s.azotado = true; }
+    apunta(s, "echado", azota ? `Te para la ronda en ${L[antes].corto}, te azotan y te echan de la ciudad.` : `Te para la ronda en ${L[antes].corto} y te echan de la ciudad.`);
+    if (azota) {
+      resultado(s, "Te para la ronda", [
+        conocia ? `En ${L[r].nombre} te para el alguacil y te reconoce: «¿Otra vez tú? Te dije que no volvieras».` : `En ${L[r].nombre} te para el alguacil. Te baja el cuello de la camisa y te mira la espalda: «Tú ya has pasado por mis manos».`,
+        "Te azotan allí mismo, a la vista de todos, y te echan por la puerta al puente. Pierdes media franja.",
+        "La espalda te arde.",
+      ], "mal");
+      return;
+    }
     if (mujer) {
       resultado(s, "Te para la ronda", [
-        yaTeConoce ? `En ${L[r].nombre} te para el alguacil y te reconoce: «¿Otra vez tú? Fuera de aquí, mujer».` : dice ? `En ${L[r].nombre} te para el alguacil: ${dice}. Le dices de dónde eres y adónde vas.` : `En ${L[r].nombre} te para el alguacil. Le dices de dónde eres y adónde vas.`,
+        dice ? `En ${L[r].nombre} te para el alguacil: ${dice}. Le dices de dónde eres y adónde vas.` : `En ${L[r].nombre} te para el alguacil. Le dices de dónde eres y adónde vas.`,
         "No te detiene: te acompaña hasta la puerta y te echa al puente. Pierdes media franja.",
-        yaTeConoce ? "Ya te conoce de sobra." : "Ya te conoce la cara.",
+        "Ya te conoce la cara.",
       ], "mal");
       return;
     }
@@ -623,6 +633,7 @@
         } else lin.push(`Duermes en un portal de ${L[s.lugar].nombre}. Nadie te molesta.`);
       } else lin.push("Duermes al raso en la ribera.");
     }
+    if (s.azotesHoy) { dc += P.carcel.azotes * s.azotesHoy; azotes = true; lin.push("La espalda te arde de los azotes."); } // la mujer azotada por la calle (j0.11)
     if (s.llaga && s.llaga === s.dia) { dc += LL.cuerpo; lin.push("La llaga te da fiebre toda la noche."); }
     else if (s.llaga && LL.encona && tirar(s, "encona") < LL.encona) { dc -= 1; lin.push("La llaga se te ha enconado: supura y te sube la fiebre."); }
     s.cuerpo = clamp(s.cuerpo + dc, 0, cuerpoMax(s));
@@ -932,7 +943,7 @@
         continue;
       }
       if (tu.detenido) { tu.lugar = "puerta"; tu.detenido = null; }
-      tu.obrasHoy = false; tu.trabajoHoy = false; tu.trabajaHasta = null;
+      tu.obrasHoy = false; tu.trabajoHoy = false; tu.trabajaHasta = null; tu.azotesHoy = 0;
       tu.hoy = { log: [], pide: [], lugares: {}, encuentros: 0 };
       tu.quieto = !L[tu.lugar].dentro && tu.cuerpo <= TU.quieto;
     }
@@ -963,11 +974,14 @@
           tu.vistas.push({ dia: d, f, lugar: sig });
           tu.hoy.encuentros++;
           if (rnd(`parar|${i}`) < (tu.conocido ? P.pararAlLlegar.conocido : P.pararAlLlegar.desconocido)) {
-            // con la cadena (j0.11): a la mujer solo la echa; al azotado le mira la espalda; al hombre sano, a las obras
+            // con la cadena (j0.11): a la mujer la echa, y si ya la conoce, la azota; al azotado le mira la espalda; al
+            // hombre sano, a las obras
             const mujer = rasgos(s) && !tu.el;
-            const espalda = rasgos(s) && !mujer && !tu.conocido && tu.azotado;
+            const espalda = rasgos(s) && !tu.conocido && tu.azotado;
             if (mujer || (!tu.conocido && !espalda)) {
+              const azota = mujer && (tu.conocido || espalda);
               tu.conocido = true;
+              if (azota) { tu.azotesHoy = (tu.azotesHoy || 0) + 1; tu.azotado = true; tu.lugar = "puente"; tu.hoy.log.push({ f, lugar: sig, tipo: "azotada" }); return "echado"; }
               if (!mujer && rasgos(s) && tu.cuerpo >= (CA.obrasForzadas || 99)) {
                 tu.obrasHoy = true; tu.lugar = "ribera"; tu.hoy.log.push({ f, lugar: sig, tipo: "obras" });
                 return "obras";
@@ -1154,11 +1168,12 @@
         if (g.tipo === "pide") frases.push(`A ${fr(f)} pedí en ${L[g.lugar].nombre}: ${g.gana ? (g.gana === 1 ? "un pedazo" : g.gana + " pedazos") : "nada"}.`);
         else if (g.tipo === "echado") frases.push(`A ${fr(f)} me paró el alguacil en ${L[g.lugar].nombre} y me echó de la ciudad.`);
         else if (g.tipo === "detenido") frases.push(`A ${fr(f)} me cogió la ronda en ${L[g.lugar].nombre}.`);
+        else if (g.tipo === "azotada") frases.push(`A ${fr(f)} me paró el alguacil en ${L[g.lugar].nombre}, me azotaron allí mismo y me echó de la ciudad.`);
         else if (g.tipo === "obras") frases.push(`A ${fr(f)} me paró el alguacil en ${L[g.lugar].nombre} y me mandó a cargar piedra a las obras hasta la noche, sin paga.`);
         else if (g.tipo === "trabajo") frases.push(`A ${fr(f)} me cogieron de peón en las obras: ${P.trabajo.paga} pedazos.`);
         else if (g.ronda) frases.push(`A ${fr(f)} vi la ronda en ${L[g.lugar].nombre}.`);
         else if (!sinF.includes(g.lugar)) sinF.push(g.lugar);
-        if (g.tipo !== "echado" && g.tipo !== "detenido" && g.tipo !== "obras") items.push({ dia: d, f, lugar: g.lugar, ronda: !!g.ronda });
+        if (!["echado", "detenido", "obras", "azotada"].includes(g.tipo)) items.push({ dia: d, f, lugar: g.lugar, ronda: !!g.ronda });
       }
       const sinR = sinF.filter((l) => !tu.hoy.log.some((x) => x.f === f && x.lugar === l && (x.tipo || x.ronda)));
       if (sinR.length) sin.push(`${listaY(sinR.map((l) => L[l].corto))} (${fr(f)})`);
@@ -1209,6 +1224,7 @@
       const x = (s.nocheTuyos || []).find((y) => y.id === tu.id) || {};
       const antes = tu.cuerpo;
       let dc = 0, azotes = false;
+      if (tu.azotesHoy) { dc += P.carcel.azotes * tu.azotesHoy; azotes = true; } // azotada por la calle (j0.11)
       if (tu.duerme === "carcel") {
         dc += P.carcel.cuerpo;
         if (tu.detenciones === 2 && !tu.galeras) { dc += P.carcel.azotes; azotes = true; tu.azotado = true; }

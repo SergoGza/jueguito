@@ -90,8 +90,16 @@ module.exports = function (R, E) {
   const ULT = R.VERANOS[R.VERANOS.length - 1].anio;
   const LLEGA = ["siega", "aguanta", "espiga"];
   const nueva = () => ({ n: 0, fin: {}, hasta: {}, visto: {}, pena: {}, motivo: {}, vidas: {}, tuyos: {}, penaAnio: {}, hurtoAnio: {} });
+  // PORSEM=fichero: una línea por partida (semilla, final, si llega o completa, hurtos), para comparar por parejas
+  const porSem = [];
   function cuenta(A, s) {
     mas(A, "n");
+    if (process.env.PORSEM) {
+      const fc = s.conCadena ? s.final.cadena || { hasta: s.anio } : null;
+      const bien = ["siega", "aguanta", "espiga"].includes(s.final.tipo) && (!s.conCadena || fc.hasta === R.VERANOS[R.VERANOS.length - 1].anio);
+      const hs = s.cronica.filter((c) => c.tipo === "hurto");
+      porSem.push([s.semilla, s.final.tipo, bien ? 1 : 0, hs.length, hs.length ? `${hs[0].anio || ""}|${hs[0].dia}` : "", fc ? fc.hasta : ""].join("\t"));
+    }
     const t = s.final.tipo;
     mas(A.fin, t);
     if (LLEGA.includes(t)) { mas(A, "llega"); mas(A, "cuerpoLlega", s.cuerpo); }
@@ -157,6 +165,7 @@ module.exports = function (R, E) {
     return t;
   }
   function guarda(A, extra) {
+    if (process.env.PORSEM) fs.writeFileSync(process.env.PORSEM, porSem.join("\n") + "\n");
     if (!process.env.JSONL) return;
     fs.appendFileSync(process.env.JSONL, JSON.stringify(registro(A, extra)) + "\n");
   }

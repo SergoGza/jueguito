@@ -46,8 +46,14 @@ const fs = require("fs");
 const RAIZ = path.resolve(__dirname, "..");
 global.window = {};
 require(path.join(RAIZ, "rules.js"));
+// palancas en PAL (un JSON, como el tercer argumento de bot.js): PAL='{"PARAMS.hurto.escalera":"dos"}'
+if (process.env.PAL) for (const [k, v] of Object.entries(JSON.parse(process.env.PAL))) { const ks = k.split("."); let x = window.RULES; while (ks.length > 1) x = x[ks.shift()]; x[ks[0]] = v; }
 require(path.join(RAIZ, "engine.js"));
 const R = window.RULES, E = window.ENGINE, P = R.PARAMS;
+// prototipo de hurto (rama claude/hurto-prototipo): HURTO=nunca|apuro|grave|hambre|siempre activa las reglas de hurto y
+// dice cuándo hurta el oficio (solo con OFICIO=1: la búsqueda no sabe valorar el hurto). SIN_TABLA=1 se salta la tabla
+// de valor (el oficio solo la usa para decidir si cena con un pedazo), para medir muchas variantes deprisa.
+const HC = require("./hurto-comun.js")(R, E);
 const LL = P.llaga, AP = R.RONDA.aprende, PERS = R.RONDA.persigue, DESVIO = R.RONDA.desvio;
 const FIN = E.FIN, FR = R.RATOS, NF = R.FRANJAS.length, PASO = R.MODOS.A.paso;
 
@@ -255,6 +261,7 @@ function costeDetencion(s) {
 }
 // lo que cuesta que te pare la ronda al llegar, por la probabilidad de que lo haga si está
 function costeParada(s) {
+  if (s.buscado) return P.hurto.pararBuscado * 30; // le buscan por ladrón: que le paren es que le prendan
   if (s.llaga && (!LL.protege || (s.llagaPasadas || 0) < LL.protege)) return 0.05;
   const ras = !!s.conCadena, conoce = s.conocido || (ras && !!s.azotado);
   if (ras && !E.esHombre(s)) return (conoce ? P.pararAlLlegar.conocido : P.pararAlLlegar.desconocido) * (conoce ? 2.5 : 1);
@@ -416,6 +423,8 @@ function oficio(s, K) {
   return encargo(s, cx, C) || oficioLibre(s, cx, C);
 }
 function ejecutar(s, j) {
+  if (j.a === "hurtar") return E.hurtar(s);
+  if (j.a === "restituir") return E.restituir(s);
   if (j.a === "mover") return E.mover(s, j.d);
   if (j.a === "pedir") return E.pedir(s);
   if (j.a === "esperar") return E.esperar(s);
@@ -521,7 +530,7 @@ function firma() {
 }
 // empezar un verano de la cadena como se quiera: se monta el invierno anterior y se deja que el motor haga el resto
 function empezarVerano(y, el, sem, yo, det, azot, bits, clases) {
-  const s = E.nueva("A", "v", sem, { cadena: CFG.cadena, tuyos: CFG.tuyos, llaga: CFG.llaga, mujer: !el });
+  const s = E.nueva("A", "v", sem, { cadena: CFG.cadena, tuyos: CFG.tuyos, llaga: CFG.llaga, mujer: !el, hurto: HC.activo });
   if (y === 0) return s;
   s.verano = y - 1; s.anio = R.VERANOS[y - 1].anio;
   s.detenciones = det; s.azotado = azot;
@@ -861,7 +870,7 @@ function pensarRelevo(s, B, rng, traza) {
 
 // ------------------------------------------------------------------ una partida
 function jugar(sem, ver) {
-  const s = E.nueva("A", "aplicado", String(sem), { llaga: CFG.llaga, tuyos: CFG.tuyos, cadena: CFG.cadena, mujer: CFG.mujer });
+  const s = E.nueva("A", "aplicado", String(sem), { llaga: CFG.llaga, tuyos: CFG.tuyos, cadena: CFG.cadena, mujer: CFG.mujer, hurto: HC.activo });
   const rng = azar(`aplicado|${sem}`);
   const busca = !CFG.soloOficio;
   let B = nuevoSaber(s);
@@ -919,7 +928,10 @@ function jugar(sem, ver) {
         s._meta = m ? Object.assign({ dia: s.dia, par: s.hoy.paradas, vista: s._rv === s.dia * 10 + E.franja(s.t) }, m) : null;
         dice(`piensa: ${j.k}`, tr);
       }
-    } else j = oficio(s, B);
+    } else {
+      j = HC.decidir(s); // si la política de hurto dice que ahora toca, hurta o va a hurtar; si no, el oficio
+      if (j) s._meta = null; else j = oficio(s, B);
+    }
     ejecutar(s, j);
     mirar(s, B);
   }
@@ -1006,6 +1018,7 @@ function tanda(desde, hasta) {
   for (let i = desde; i <= hasta; i++) {
     const s = jugar(i);
     contar(A, s);
+    HC.cuenta((A.hurto = A.hurto || HC.nueva()), s);
     // semillas de muestra para el informe
     const t = "final: " + (s.conCadena ? (utilidad(s) ? "completa" : "acaba en " + s.final.cadena.hasta + ", " + s.final.tipo) : s.final.tipo);
     (A.semillas[t] = A.semillas[t] || []).length < 8 && A.semillas[t].push(i);
@@ -1061,7 +1074,7 @@ if (require.main === module) (async () => {
     return;
   }
   const t0 = Date.now();
-  await cargarV(process.send ? null : (y, d) => process.stderr.write(`  tabla de valor: ${R.VERANOS[y].anio}, día ${d} (${((Date.now() - t0) / 1000).toFixed(0)} s)\n`));
+  if (!process.env.SIN_TABLA) await cargarV(process.send ? null : (y, d) => process.stderr.write(`  tabla de valor: ${R.VERANOS[y].anio}, día ${d} (${((Date.now() - t0) / 1000).toFixed(0)} s)\n`));
   if (process.env.SEMILLA) {
     // una partida a la vista: qué pensó en cada jugada y la crónica
     const lineas = [];
@@ -1079,6 +1092,8 @@ if (require.main === module) (async () => {
   const acaba = (A) => {
     console.log(`${N} partidas (semillas ${desde} a ${desde + N - 1}) · versión ${R.version} · ${variante} · AGUANTA=${CFG.uAguanta} · MUNDOS=${CFG.mundos} · ${((Date.now() - t0) / 1000).toFixed(0)} s\n`);
     pinta(A, nombre);
+    if (HC.activo) console.log(HC.linea(A.hurto, { bot: nombre, variante: process.env.VAR || "base" }));
+    HC.guarda(A.hurto, { bot: nombre, variante: process.env.VAR || "base" });
     if (process.env.JSON) fs.writeFileSync(process.env.JSON, JSON.stringify(A));
   };
   if (np === 1) return acaba(tanda(desde, desde + N - 1));

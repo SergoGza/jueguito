@@ -280,6 +280,60 @@
       // mismo (PARAMS.carcel.azotes de cuerpo esa noche; pregunta 12, opción B). Pedir delante de la ronda y la noche, igual.
       obrasForzadas: 5,
     },
+    // HURTAR Y LA HORCA · PROTOTIPO PARA BOTS (rama claude/hurto-prototipo; no está en main ni tiene pantalla).
+    // Se activa al empezar (opts.hurto). Cada palanca es una de las opciones que se miden antes de decidir; los valores
+    // de aquí son la «base» de las tablas del registro, no una decisión. Lo castiga la justicia, no la ronda de pobres:
+    // quien te ve es el dueño o el vecino, y la pena es una escalera aparte de las detenciones por pedir.
+    hurto: {
+      // qué se hurta: «hogaza» (pan del mercado y de las tiendas), «olla» (la comida de una casa, a sexta) o
+      // «ropa» (algo que dura: no da pan, da un invierno mejor; solo pesa con varios veranos)
+      que: "hogaza",
+      // dónde y a qué franjas, según lo que se hurta
+      donde: {
+        hogaza: { plaza: [0, 1], rua: [1, 3, 4] },
+        olla: { rua: [2], sanpablo: [2], sanmartin: [2], plaza: [2], escuelas: [2] },
+        ropa: { orilla: [0, 1, 2, 3], rua: [1, 3, 4] },
+      },
+      ratos: 2,   // lo que tarda (pedir tarda una franja: 6)
+      gana: 2,    // pedazos (hogaza y olla)
+      ropa: { cuerpo: 1, pan: 1 }, // con ropa hurtada, el invierno se pasa un escalón mejor
+      // ¿te ven? Con «bulto», la gente tapa (mucha gente, menos ojos sobre ti); con «ojos», la gente mira.
+      ojos: "bulto",
+      visto: { bulto: { 2: 0.35, 3: 0.25 }, ojos: { 2: 0.2, 3: 0.4 } },
+      vistoFijo: { olla: 0.3, ropa: 0.3 },
+      riesgo: 1,          // multiplica todo lo anterior (para barrer el riesgo)
+      repite: 2,          // multiplica si ya has hurtado hoy en ese sitio
+      rondaDelante: { 2: 1, 3: 0.5 }, // con la ronda en el sitio, te coge ella (como al pedir)
+      aviso: 3,           // las voces que quedan en el sitio: la ronda acude
+      // si te ven: «prendido» (te cogen allí mismo), «huye» (escapas con lo hurtado y te buscan por tus señas)
+      // o «mixto» (mitad y mitad)
+      siVisto: "mixto", prendido: 0.5,
+      // si te buscan: la ronda te para más (llegar a donde está) y, si te para o te coge por otra cosa, es por ladrón
+      pararBuscado: 0.5,
+      // la escalera: lo que le toca al ladrón cada vez que lo prenden. «tres»: azotes, oreja, horca. «dos»: oreja, horca.
+      escalera: "tres",
+      escaleras: { tres: ["azotes", "oreja", "horca"], dos: ["oreja", "horca"] },
+      escaleraMujer: null, // null: la misma; o p. ej. ["azotes", "horca"] (nada entre los azotes y la horca)
+      // si el alcalde lee la espalda azotada venga de donde venga: al que ya azotó la ronda por pedir, el primer hurto le cuenta como segundo
+      espalda: false,
+      cuenta: false,       // si prenderte por ladrón cuenta además como detención (camino del destierro)
+      galeras1552: true,   // desde 1552, al ladrón varón lo mandan a galeras en vez de subir la escalera
+      // la oreja cortada: quién la lee. conoce: la ronda te trata como conocido (como la espalda azotada);
+      // limosna: puntos que baja la tirada de limosna; siega: si aún te dan hoz u obra
+      oreja: { conoce: true, limosna: 0, siega: true },
+      // la necesidad extrema: null (no hace nada) o { cuerpo, visto }: con el cuerpo así o menos, los vecinos miran
+      // a otro lado (multiplica la probabilidad de que te vean). La justicia no cambia.
+      necesidad: null,
+      // restituir: null, o { lugar, devuelve, ratos }: si te buscan, en ese sitio devuelves lo hurtado y la parte perdona
+      sagrado: null,
+      // morir ahorcado en la cadena: «solo» (se acaba la cadena), «acompanado» (sigues como uno de los tuyos que quede libre)
+      // o «anoche» (sigues como el que durmió contigo la última noche que dormiste libre, si sigue libre)
+      horca: "solo",
+      // los tuyos: si la que se arriesga hurta cuando pasa hambre, con estas mismas reglas
+      tuyosHurtan: false, tuyosCuerpo: 2,
+      // malsinar: si el que te vende cuenta también lo que has hurtado este verano (te buscan)
+      malsinar: false,
+    },
   };
 
   const LICENCIAS = [

@@ -45,11 +45,15 @@ const RAIZ = path.resolve(__dirname, "..");
 const N = +process.argv[2] || 1000;
 global.window = {};
 require(path.join(RAIZ, "rules.js"));
-const pal = process.argv[3] ? JSON.parse(process.argv[3]) : {};
+// las palancas van como tercer argumento o en PAL (así se le pasan igual a aplicado.js)
+const pal = Object.assign({}, process.env.PAL ? JSON.parse(process.env.PAL) : {}, process.argv[3] ? JSON.parse(process.argv[3]) : {});
 const poner = (o, k, v) => { const ks = k.split("."); let x = o; while (ks.length > 1) x = x[ks.shift()]; x[ks[0]] = v; };
 for (const [k, v] of Object.entries(pal)) poner(window.RULES, k, v);
 require(path.join(RAIZ, "engine.js"));
 const R = window.RULES, E = window.ENGINE, P = R.PARAMS;
+// prototipo de hurto (rama claude/hurto-prototipo): HURTO=nunca|apuro|grave|hambre|siempre activa las reglas de hurto y
+// dice cuándo hurta el bot; VAR=nombre es la etiqueta de la variante y JSONL=fichero guarda una línea por tanda
+const HC = require("./hurto-comun.js")(R, E);
 
 // ------------------------------------------------------------------ lo que sabe de la ronda
 // Devuelve, para una franja, dónde cree que estará la ronda por costumbre: { sitio: probabilidad } ({} si come).
@@ -197,7 +201,7 @@ function azar(s, rnd) {
   const o = E.opciones(s);
   const ok = o.movs.filter((x) => x.ok).map((x) => ["m", x.destino]).concat(o.acc.filter((x) => x.ok).map((x) => ["a", x.id]));
   const [k, v] = ok[Math.floor(rnd() * ok.length)];
-  if (k === "m") E.mover(s, v); else ({ pedir: E.pedir, trabajo: E.pedirTrabajo, esperar: E.esperar, acabar: E.acabarDia })[v](s);
+  if (k === "m") E.mover(s, v); else ({ pedir: E.pedir, trabajo: E.pedirTrabajo, esperar: E.esperar, acabar: E.acabarDia, hurtar: E.hurtar })[v](s);
 }
 
 function novato(s, rnd, g) {
@@ -316,7 +320,7 @@ const SOLO = process.env.BOTS ? process.env.BOTS.split(",") : process.env.LLAGA 
 function jugar(modo, bot, sem) {
   let st = 12345 + sem * 7919;
   const rnd = () => { st = (st * 1103515245 + 12345) & 0x7fffffff; return st / 0x7fffffff; };
-  const s = E.nueva(modo, "bot", String(sem), { llaga: !!LLAGA[bot], tuyos: !!process.env.TUYOS, cadena: !!process.env.CADENA, mujer: process.env.SEXO === "mujer" });
+  const s = E.nueva(modo, "bot", String(sem), { llaga: !!LLAGA[bot], tuyos: !!process.env.TUYOS, cadena: !!process.env.CADENA, mujer: process.env.SEXO === "mujer", hurto: HC.activo });
   s._sabe = SABE[bot] || "aprende";
   s._veranos = []; // lo que le pasa en cada verano al que juega (para medir la cadena)
   const g = { clave: null, libres: 0 };
@@ -345,7 +349,8 @@ function jugar(modo, bot, sem) {
     const clave = s.dia * 100 + s.t;
     g.libres = g.clave === clave ? g.libres + 1 : 0; g.clave = clave; // en B, moverse dentro del barrio no gasta tiempo
     apuntarVisto(s);
-    BOTS[bot](s, rnd, g);
+    const jh = HC.decidir(s); // si la política de hurto dice que ahora toca, hurta o va a hurtar; si no, lo suyo
+    if (jh) HC.hacer(s, jh); else BOTS[bot](s, rnd, g);
     apuntarVisto(s);
     E.comprobarNoche(s);
   }
@@ -355,7 +360,7 @@ function jugar(modo, bot, sem) {
     const ult = s._veranos[s._veranos.length - 1];
     const enResto = ult && ult.anio === s.anio && ult.quien === s.quien.id && s.final.cadena && s.final.cadena.quien !== s.quien.nombre;
     if (enResto) s._veranos.push({ anio: s.anio, quien: s.final.cadena.quien.toLowerCase(), fin: "heredero:" + s.final.tipo, dia: s.final.dia });
-    else if (!(ult && ult.anio === s.anio && ult.quien === s.quien.id && s.cadena.vidas.length && s.cadena.vidas[s.cadena.vidas.length - 1].anio === s.anio && ["hambre", "muerto", "desterrado", "galeras"].includes(ult.fin)))
+    else if (!(ult && ult.anio === s.anio && ult.quien === s.quien.id && s.cadena.vidas.length && s.cadena.vidas[s.cadena.vidas.length - 1].anio === s.anio && ["hambre", "muerto", "desterrado", "galeras", "ahorcado"].includes(ult.fin)))
       s._veranos.push({ anio: s.anio, quien: s.quien.id, el: E.esHombre(s), fin: s.final.tipo, dia: s.final.dia });
   }
   return s;
@@ -412,9 +417,11 @@ const finales = {}; // bot → semilla → partida (para comparar por parejas co
 for (const modo of (process.env.PRUEBAS || "A").split(",")) {
   for (const bot of SOLO || Object.keys(BOTS)) {
     const fin = {}; let dias = 0, cuerpo = 0, llegan = 0, llagados = 0, T = null;
+    const AH = HC.nueva();
     finales[bot] = [];
     for (let i = 1; i <= N; i++) {
       const s = jugar(modo, bot, i);
+      HC.cuenta(AH, s);
       if (s.conCadena) sumarCadena(bot, s);
       finales[bot][i] = { tipo: s.final.tipo, llaga: s.llaga || 0, dia: s.final.dia };
       if (process.env.CIERRA) { const c = s.circuito[5]; const x = ((fin.cierra = fin.cierra || {})[c] = fin.cierra[c] || { n: 0, llega: 0 }); x.n++; if (llega(s)) x.llega++; }
@@ -446,6 +453,8 @@ for (const modo of (process.env.PRUEBAS || "A").split(",")) {
       console.log(`         por partida: pan dado ${(Tt.dado / N).toFixed(1)} · cosas contadas ${(Tt.contado / N).toFixed(0)} · malsinadas ${(Tt.malsina / N).toFixed(2)} · paradas por lo que contó un malsín ${(Tt.contadoAlg / N).toFixed(2)}`);
     }
     if (fin.det) console.log("         detenciones por partida: " + Object.entries(fin.det).map(([k, v]) => `${k} ${(v / N).toFixed(2)}`).join(" · "));
+    if (HC.activo) console.log(HC.linea(AH, { bot, variante: process.env.VAR || "base" }));
+    HC.guarda(AH, { bot, variante: process.env.VAR || "base" });
     informeCadena(bot);
   }
   console.log("");

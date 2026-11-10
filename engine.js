@@ -585,7 +585,8 @@
       return true;
     }
     if (tirar(s, "hurtoVisto") < pv) {
-      const coge = HU.siVisto === "prendido" || (HU.siVisto === "mixto" && tirar(s, "hurtoCoge") < HU.prendido);
+      // «gente»: con mucha gente te sujetan allí mismo; con poca, nadie te alcanza y te buscan
+      const coge = HU.siVisto === "prendido" || (HU.siVisto === "gente" && e0.gente >= 3) || (HU.siVisto === "mixto" && tirar(s, "hurtoCoge") < HU.prendido);
       if (coge) {
         apunta(s, "hurto", `Hurta en ${L[lugar].corto}: le ven y le cogen.`, { visto: "prendido", t: t0 });
         prender(s, "hurtando", [`Coges ${que} en ${L[lugar].nombre}. «¡Al ladrón!». Te sujetan entre dos antes de que des tres pasos y te entregan a la justicia.`]);
@@ -1227,7 +1228,7 @@
       if (HU.necesidad && tu.cuerpo <= HU.necesidad.cuerpo) pv *= HU.necesidad.visto;
       if (HU.aviso && TU.mundo !== false) { s.avisos[tu.lugar] = (s.avisos[tu.lugar] || 0) + HU.aviso; s.avisosT[tu.lugar] = d * 100 + f * R.RATOS; }
       if (rnd("hurtoVisto") < pv) {
-        if (HU.siVisto === "prendido" || (HU.siVisto === "mixto" && rnd("hurtoCoge") < HU.prendido)) { prenderTuyo(s, tu, "hurtando", f, tu.lugar); return; }
+        if (HU.siVisto === "prendido" || (HU.siVisto === "gente" && genteBase(s, tu.lugar, d, f) >= 3) || (HU.siVisto === "mixto" && rnd("hurtoCoge") < HU.prendido)) { prenderTuyo(s, tu, "hurtando", f, tu.lugar); return; }
         tu.buscado = true;
         tu.pan = Math.min(P.panMax, tu.pan + HU.gana);
         tu.hoy.log.push({ f, lugar: tu.lugar, tipo: "hurto", visto: true });

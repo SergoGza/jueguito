@@ -7,7 +7,7 @@
 - **Reglas** en `rules.js` (`PARAMS.hurto`) y `engine.js`, detrás de `opts.hurto`. Sin esa opción, el motor da exactamente lo mismo que la j0.11 (comprobado con el veterano y el novato, un verano, con los tuyos y la cadena).
 - **Política del bot y cuentas** en `herramientas/hurto-comun.js`: `HURTO=nunca|apuro|grave|hambre|siempre` (apuro: sin ración y cuerpo ≤ 2; grave: sin ración y cuerpo ≤ 3; hambre: desde sexta, sin la ración; siempre: en vez de pedir).
 - **Lanzador** en `herramientas/hurto-tanda.js`: una tanda por variante, política, bot (veterano de `bot.js` y oficio de `aplicado.js`) y escenario (un verano, con los tuyos, cadena como mozo, cadena como moza). Cada variante cambia una palanca respecto de la base.
-- **Medidas** en `claude/hurto-medidas.jsonl`: 320 tandas de 2.000 partidas (semillas 1 a 2.000), una línea por tanda.
+- **Medidas** en `claude/hurto-medidas.jsonl`: 332 tandas de 2.000 partidas (semillas 1 a 2.000), una línea por tanda.
 
 ```
 PROCESOS=2 node herramientas/hurto-tanda.js claude/hurto-medidas.jsonl 2000   # no repite las tandas que ya están
@@ -23,7 +23,7 @@ Base: se hurta una hogaza (2 pedazos en 2 ratos) en la Plaza o la Rúa cuando ha
 | Variante | Qué cambia |
 |---|---|
 | `olla`, `ropa`, `lento` | la olla de una casa a sexta; ropa (no da pan, da mejor invierno); hurtar tarda una franja |
-| `ojos`, `prendido`, `huye` | con mucha gente te ven más; si te ven te cogen siempre; si te ven escapas siempre |
+| `ojos`, `prendido`, `huye`, `gente` | con mucha gente te ven más; si te ven te cogen siempre; si te ven escapas siempre; con mucha gente te sujetan y con poca escapas |
 | `riesgo05`, `riesgo15`, `riesgo2` | el riesgo de que te vean, por 0,5, 1,5 y 2 |
 | `dos`, `castellana`, `cuenta` | oreja y horca; azotes, azotes y horca; prenderte cuenta además como detención |
 | `orejaTodos`, `orejaJusticia`, `espalda` | la oreja la lee todo el mundo (menos limosna, ni obra ni hoz); solo el alcalde; el alcalde lee como primer hurto la espalda azotada por pedir |
@@ -44,6 +44,10 @@ Base: se hurta una hogaza (2 pedazos en 2 ratos) en la Plaza o la Rúa cuando ha
 - Pragmática de 3 de mayo de 1566: seis años desde los diecisiete; el tercer hurto, pena de muerte.
 - Fuente: «Algunas consideraciones sobre la pena de azotes durante los siglos XVI-XVIII», *Hispania* LXII/3 (2002), pp. 858-873 (leída la primera mitad).
 
-## Orden propuesto de las preguntas (pendiente del visto bueno de Sergio)
+## Decisiones (Sergio, por rondas)
+
+- **Ronda 1 (10 de noviembre): A, pan de un puesto.** Una hogaza (2 pedazos) en la Plaza o la Rúa cuando hay mercado o tienda abierta. Descartadas: la olla de una casa a sexta (B: mismos números, pero el riesgo no se lee en el mapa; la cita de Robles puede quedar como texto) y la ropa para el invierno (C: no compensa a nadie con el premio medido y el momento es obvio). Que hurtar tarde 2 ratos o una franja no cambia nada. Medido por parejas (las mismas partidas, solo las que llegan a estar sin ración y con cuerpo 2 o menos, un verano): veterano, 14 % sin hurtar y 63 % hurtando; oficio, 77 % y 65 % (con el riesgo a la mitad, 83 %).
+
+## Orden de las preguntas
 
 1. Qué se coge y qué da que no dé pedir. 2. Quién te ve y qué pasa si te ven. 3. La escalera de la justicia. 4. Qué es morir ahorcado: solo o acompañado. 5. Las marcas en el cuerpo y quién las lee. 6. Hombre y mujer, y 1552. 7. La necesidad extrema. 8. Los tuyos y malsinar. 9. Cierre: números y «ni siempre ni nunca».

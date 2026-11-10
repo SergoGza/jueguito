@@ -27,6 +27,7 @@ const V = {
   ojos: { [H + "ojos"]: "ojos" },                // con mucha gente te ven más (en la base, la gente tapa)
   prendido: { [H + "siVisto"]: "prendido" },     // si te ven, te cogen allí mismo
   huye: { [H + "siVisto"]: "huye" },             // si te ven, escapas siempre y te buscan
+  gente: { [H + "siVisto"]: "gente" },           // con mucha gente te sujetan allí mismo; con poca, escapas y te buscan
   riesgo05: { [H + "riesgo"]: 0.5 },
   riesgo15: { [H + "riesgo"]: 1.5 },
   riesgo2: { [H + "riesgo"]: 2 },
@@ -59,6 +60,7 @@ const PLAN = [];
 const pon = (v, esc, pols, bots) => { for (const pol of pols) for (const bot of bots || ["veterano", "oficio"]) PLAN.push({ v, esc, pol, bot }); };
 pon("base", "verano", TODAS); pon("base", "cadena", TODAS); pon("base", "cadena-mujer", TODAS); pon("base", "tuyos", TODAS);
 for (const v of ["olla", "lento", "ojos", "prendido", "huye", "riesgo05", "riesgo15", "riesgo2"]) { pon(v, "verano", TRES); pon(v, "cadena", TRES, ["veterano"]); }
+pon("gente", "verano", TRES); pon("gente", "cadena", TRES);
 for (const v of ["dos", "cuenta", "orejaTodos", "orejaJusticia", "espalda", "necesidad", "restituir"]) { pon(v, "verano", TRES); pon(v, "cadena", TRES); }
 pon("espalda", "cadena-mujer", TRES);
 pon("castellana", "verano", TRES); pon("castellana", "cadena", TRES); pon("castellana", "cadena-mujer", TRES);

@@ -317,12 +317,16 @@
       escaleras: { verguenza: ["verguenza", "azotes", "horca"], vergOreja: ["verguenza", "oreja", "horca"], tres: ["azotes", "oreja", "horca"], dos: ["oreja", "horca"], castellana: ["azotes", "azotes", "horca"] },
       escaleraMujer: null, // null: la misma; o p. ej. ["azotes", "horca"] (nada entre los azotes y la horca)
       // si el alcalde lee la espalda azotada venga de donde venga: al que ya azotó la ronda por pedir, el primer hurto le cuenta como segundo
-      espalda: false, espaldaQue: "todas", // ver penaHurto en engine.js
+      // DECIDIDO (ronda 5, 11 de noviembre): la justicia no recuerda más que lo que lleva el cuerpo, y la espalda azotada
+      // (por lo que sea, también los varazos de la calle) quita el peldaño de en medio: vergüenza y, a la segunda, la horca
+      espalda: "acorta", espaldaQue: "todas", // ver penaHurto en engine.js
       // qué recuerda la justicia de un verano a otro: «libro» (la cuenta de veces que te ha prendido no se pierde) o
       // «cuerpo» (solo lo que llevas encima: la oreja cortada y, si «espalda», los azotes; la vergüenza se olvida)
-      memoria: "libro",
+      memoria: "cuerpo",
       cuenta: false,       // si prenderte por ladrón cuenta además como detención (camino del destierro)
-      galeras1552: true,   // desde 1552, al ladrón varón lo mandan a galeras en vez de subir la escalera
+      // desde 1552, al ladrón varón lo mandan a galeras en vez de subir la escalera: true (al primer hurto, como dice la
+      // pragmática), "segunda" (la primera vez, a la vergüenza; galeras a la segunda) o false
+      galeras1552: true,
       // la oreja cortada: quién la lee. conoce: la ronda te trata como conocido (como la espalda azotada);
       // limosna: puntos que baja la tirada de limosna; siega: si aún te dan hoz u obra
       oreja: { conoce: true, limosna: 0, siega: true },

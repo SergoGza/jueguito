@@ -59,6 +59,9 @@ const V = {
   horcaAnoche: { [H + "horca"]: "anoche" },      // sigues como el que durmió contigo la última noche que dormiste libre
   // 1552 y hombre y mujer
   sinGaleras: { [H + "galeras1552"]: false },    // la escalera sigue igual para el hombre después de 1552
+  galerasSegunda: { [H + "galeras1552"]: "segunda" }, // desde 1552, la primera vez a la vergüenza; galeras a la segunda
+  // (variantes de antes de la ronda 5)
+  libro: { [H + "memoria"]: "libro", [H + "espalda"]: false },
   mujerDos: { [H + "escaleraMujer"]: ["azotes", "horca"] }, // para la mujer, nada entre los azotes y la horca
   mujerLarga: { [H + "escaleraMujer"]: ["azotes", "azotes", "azotes", "horca"] }, // a la mujer la azotan más veces antes de ahorcarla (Pérez de Herrera: ahorcada tras 1.500 azotes en diferentes veces)
   // los tuyos y malsinar
@@ -82,6 +85,7 @@ pon("tres", "verano", TRES); pon("tres", "cadena", TRES); pon("tres", "cadena-mu
 pon("castellana", "verano", TRES); pon("castellana", "cadena", TRES); pon("castellana", "cadena-mujer", TRES);
 pon("mujerLarga", "cadena", TRES); pon("mujerLarga", "cadena-mujer", TRES);
 pon("ropa", "cadena", ["apuro", "grave", "hambre", "siempre"]); pon("ropa", "cadena-mujer", ["apuro", "siempre"]);
+pon("galerasSegunda", "cadena", TRES); pon("galerasSegunda", "cadena-mujer", TRES);
 for (const v of ["horcaAcomp", "horcaAnoche", "sinGaleras", "mujerDos"]) { pon(v, "cadena", TRES); pon(v, "cadena-mujer", TRES); }
 pon("tuyosHurtan", "tuyos", ["nunca"].concat(TRES)); pon("tuyosHurtan", "cadena", ["nunca"].concat(TRES));
 pon("malsinar", "tuyos", TRES); pon("malsinar", "cadena", TRES);

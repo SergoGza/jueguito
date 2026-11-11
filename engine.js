@@ -527,7 +527,7 @@
   // (o es la persona: tú o uno de los tuyos; se le apunta el peldaño en o.hurtos)
   const marcada = (o) => (HU.espaldaQue === "verdugo" ? !!o.verdugo : !!o.azotado);
   function penaHurto(s, el, n, o) {
-    if (HU.galeras1552 && galeras(s, el)) return "galeras";
+    if (HU.galeras1552 && galeras(s, el) && !(HU.galeras1552 === "segunda" && n < 2)) return "galeras";
     const esc = (!el && HU.escaleraMujer) || HU.escaleras[HU.escalera];
     // si la palanca lo dice, el alcalde lee la espalda azotada venga de donde venga: al que ya azotó la ronda de
     // pobres por pedir, el primer hurto le cuenta como segundo

@@ -314,10 +314,13 @@
       // la escalera: lo que le toca al ladrón cada vez que lo prenden. «tres»: azotes, oreja, horca. «dos»: oreja, horca.
       // DECIDIDO (ronda 3, 11 de noviembre): «verguenza» — la primera vez, a la vergüenza (sin azotes); la segunda, azotes; la tercera, la horca
       escalera: "verguenza",
-      escaleras: { verguenza: ["verguenza", "azotes", "horca"], tres: ["azotes", "oreja", "horca"], dos: ["oreja", "horca"], castellana: ["azotes", "azotes", "horca"] },
+      escaleras: { verguenza: ["verguenza", "azotes", "horca"], vergOreja: ["verguenza", "oreja", "horca"], tres: ["azotes", "oreja", "horca"], dos: ["oreja", "horca"], castellana: ["azotes", "azotes", "horca"] },
       escaleraMujer: null, // null: la misma; o p. ej. ["azotes", "horca"] (nada entre los azotes y la horca)
       // si el alcalde lee la espalda azotada venga de donde venga: al que ya azotó la ronda por pedir, el primer hurto le cuenta como segundo
       espalda: false,
+      // qué recuerda la justicia de un verano a otro: «libro» (la cuenta de veces que te ha prendido no se pierde) o
+      // «cuerpo» (solo lo que llevas encima: la oreja cortada y, si «espalda», los azotes; la vergüenza se olvida)
+      memoria: "libro",
       cuenta: false,       // si prenderte por ladrón cuenta además como detención (camino del destierro)
       galeras1552: true,   // desde 1552, al ladrón varón lo mandan a galeras en vez de subir la escalera
       // la oreja cortada: quién la lee. conoce: la ronda te trata como conocido (como la espalda azotada);
@@ -330,7 +333,7 @@
       sagrado: null,
       // morir ahorcado en la cadena: «solo» (se acaba la cadena), «acompanado» (sigues como uno de los tuyos que quede libre)
       // o «anoche» (sigues como el que durmió contigo la última noche que dormiste libre, si sigue libre)
-      horca: "solo",
+      horca: "solo", // DECIDIDO (ronda 4, 11 de noviembre): ahorcado, mueres solo y se acaba la cadena
       // los tuyos: si la que se arriesga hurta cuando pasa hambre, con estas mismas reglas
       tuyosHurtan: false, tuyosCuerpo: 2,
       // malsinar: si el que te vende cuenta también lo que has hurtado este verano (te buscan)

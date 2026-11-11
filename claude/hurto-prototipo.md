@@ -26,7 +26,8 @@ Base: se hurta una hogaza (2 pedazos en 2 ratos) en la Plaza o la Rúa cuando ha
 | `ojos`, `prendido`, `huye`, `gente` | con mucha gente te ven más; si te ven te cogen siempre; si te ven escapas siempre; con mucha gente te sujetan y con poca escapas |
 | `riesgo05`, `riesgo15`, `riesgo2` | el riesgo de que te vean, por 0,5, 1,5 y 2 |
 | `tres`, `dos`, `castellana`, `cuenta` | azotes, oreja y horca; oreja y horca; azotes, azotes y horca; prenderte cuenta además como detención |
-| `orejaTodos`, `orejaJusticia`, `espalda` | la oreja la lee todo el mundo (menos limosna, ni obra ni hoz); solo el alcalde; el alcalde lee como primer hurto la espalda azotada por pedir |
+| `cuerpoOreja`, `cuerpoOrejaTodos`, `cuerpoEspalda` | entre veranos la justicia solo sabe lo que lleva el cuerpo: el segundo peldaño corta la oreja (la lee solo la justicia, o todo el mundo), o no hay oreja y la espalda azotada, venga de donde venga, gasta el aviso |
+| `orejaTodos`, `orejaJusticia`, `espalda` (de antes de la ronda 3) | la oreja la lee todo el mundo (menos limosna, ni obra ni hoz); solo el alcalde; el alcalde lee como primer hurto la espalda azotada por pedir |
 | `necesidad`, `restituir` | con cuerpo ≤ 2 te ven la mitad; si te buscan, en San Esteban devuelves 2 pedazos y la parte perdona |
 | `horcaAcomp`, `horcaAnoche` | ahorcado, sigue quien quede libre; sigue quien durmió contigo la última noche |
 | `sinGaleras`, `mujerDos`, `mujerLarga` | sin galeras para el ladrón en 1552 (contra la fuente); mujer: azotes y horca; mujer: tres veces azotes y horca |
@@ -53,6 +54,8 @@ Base: se hurta una hogaza (2 pedazos en 2 ratos) en la Plaza o la Rúa cuando ha
 
 - **Ronda 3 (11 de noviembre): D, vergüenza, azotes y horca** («ya iremos ajustando»). La primera vez que te prenden te sacan a la vergüenza (en un asno, con el pregonero delante, sin azotes): pierdes el pan, el día y la noche de cárcel, y el alcalde dice «A la segunda, el verdugo». La segunda, azotes; la tercera, la horca. Va aparte de las detenciones por pedir. Descartadas: azotes, segundo castigo y horca (A: al que cogen flaco lo mata el primer peldaño; 141 de 715 veteranos en apuros), castigo y horca (B: la única en que la horca sale de verdad, pero un solo castigo te deja a un hurto de la horca toda la vida) y que prenderte cuente para el destierro (C: el ladrón acaba desterrado antes que ahorcado). Medido por parejas en apuros (un verano): veterano, 14 % sin hurtar y 75 % hurtando; oficio, 77 % y 91 %. En la cadena, el oficio que hurta solo en apuros completa el 52,4 % (sin hurtar, 50,6 %). Pendiente: la horca casi no sale si se hurta con cabeza (4,6 % de las cadenas del veterano que hurta cuando le falta la ración), y la vergüenza no deja marca en el cuerpo (ronda 5).
 - Las medidas con la escalera decidida están en `claude/hurto-medidas-r3.jsonl`.
+
+- **Ronda 4 (11 de noviembre): A, ahorcado se muere solo.** Te sacan de la cárcel a la horca, se acaba la cadena y el siguiente es el anónimo (el testigo de la horca). No pide regla nueva: ya estaba decidido que en la cárcel se muere solo. Descartadas: que siga uno de los tuyos que quede libre (B) o quien durmió contigo la última noche libre (C): con cualquiera de las dos la horca es un relevo más y hurtar siempre sube de 5,5 % a 26-28 % para la veterana y de 15 % a 26-28 % para la moza del oficio. Que los tuyos estén entre la gente puede darse por texto, sin que hereden.
 
 ## Orden de las preguntas
 

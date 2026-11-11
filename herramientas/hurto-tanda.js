@@ -43,6 +43,10 @@ const V = {
   orejaTodos: { [H + "oreja"]: { conoce: true, limosna: 1, siega: false } },   // la lee todo el mundo: menos limosna, ni obra ni hoz
   orejaJusticia: { [H + "oreja"]: { conoce: false, limosna: 0, siega: true } }, // solo la lee el juez, la próxima vez
   espalda: { [H + "espalda"]: true },            // el alcalde lee la espalda azotada venga de donde venga: los azotes por pedir cuentan como primer hurto
+  // qué recuerda la justicia de un verano a otro, con la escalera decidida (vergüenza, azotes, horca)
+  cuerpoOreja: { [H + "memoria"]: "cuerpo", [H + "escalera"]: "vergOreja", [H + "oreja"]: { conoce: true, limosna: 0, siega: true } },      // el segundo peldaño corta la oreja; solo la lee la justicia
+  cuerpoOrejaTodos: { [H + "memoria"]: "cuerpo", [H + "escalera"]: "vergOreja", [H + "oreja"]: { conoce: true, limosna: 1, siega: false } }, // la oreja la lee todo el mundo
+  cuerpoEspalda: { [H + "memoria"]: "cuerpo", [H + "espalda"]: true },   // sin oreja: la espalda azotada, venga de donde venga, dice que el aviso ya lo tuviste
   // la necesidad extrema
   necesidad: { [H + "necesidad"]: { cuerpo: 2, visto: 0.5 } }, // con el cuerpo a 2 o menos, los vecinos miran a otro lado la mitad de las veces
   restituir: { [H + "sagrado"]: { lugar: "sanesteban", devuelve: 2, ratos: 3 } }, // si te buscan, en San Esteban devuelves lo hurtado y la parte perdona
@@ -67,6 +71,7 @@ pon("gente", "verano", TRES); pon("gente", "cadena", TRES);
 for (const v of ["dos", "cuenta", "orejaTodos", "orejaJusticia", "espalda", "necesidad", "restituir"]) { pon(v, "verano", TRES); pon(v, "cadena", TRES); }
 pon("espalda", "cadena-mujer", TRES);
 pon("dos", "cadena-mujer", TRES); pon("cuenta", "cadena-mujer", TRES);
+for (const v of ["cuerpoOreja", "cuerpoOrejaTodos", "cuerpoEspalda"]) { pon(v, "cadena", TRES); pon(v, "cadena-mujer", TRES); pon(v, "verano", TRES); }
 pon("tres", "verano", TRES); pon("tres", "cadena", TRES); pon("tres", "cadena-mujer", TRES);
 pon("castellana", "verano", TRES); pon("castellana", "cadena", TRES); pon("castellana", "cadena-mujer", TRES);
 pon("mujerLarga", "cadena", TRES); pon("mujerLarga", "cadena-mujer", TRES);

@@ -533,6 +533,14 @@
     if (HU.espalda && o && o.azotado && n < 2) { n = 2; o.hurtos = 2; o.espaldaLeida = true; }
     return esc[Math.min(n, esc.length) - 1];
   }
+  // lo que el cuerpo le dice al alcalde (si la justicia no tiene más memoria que el cuerpo): la oreja cortada dice que ya
+  // pasaste por ese peldaño; la espalda azotada (si la palanca lo dice), que el aviso ya lo tuviste
+  function peldanoDelCuerpo(o, el) {
+    const esc = (!el && HU.escaleraMujer) || HU.escaleras[HU.escalera];
+    if (o.oreja && esc.includes("oreja")) return esc.indexOf("oreja") + 1;
+    if (HU.espalda && o.azotado) return 1;
+    return 0;
+  }
   function prender(s, motivo, lineas) {
     s.hurtos = (s.hurtos || 0) + 1; s.buscado = false; s.conocido = true;
     if (HU.cuenta) s.detenciones++;
@@ -1014,6 +1022,7 @@
     // con ropa hurtada, el invierno se pasa mejor (prototipo de hurto)
     if (s.ropa && HU.ropa) { s.cuerpo = Math.min(cuerpoMax(s), s.cuerpo + HU.ropa.cuerpo); s.pan = Math.min(P.panMax, s.pan + HU.ropa.pan); }
     s.ropa = false; s.buscado = false; s.hurtosVerano = 0; s.penaHurto = null; s.horca = false; s.conQuien = null;
+    if (HU.memoria === "cuerpo") { s.hurtos = peldanoDelCuerpo(s, esHombre(s)); for (const tu of tuyosVivos(s)) tu.hurtos = peldanoDelCuerpo(tu, tu.el); }
     for (const tu of tuyosVivos(s)) {
       const x = ini[s.siega.tuyos[tu.id]] || ini.nada;
       Object.assign(tu, { cuerpo: x.cuerpo, pan: x.pan, conocido: false, lugar: "ribera", habitos: {}, vistas: [], detenido: null, quieto: false,

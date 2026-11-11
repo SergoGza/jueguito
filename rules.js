@@ -317,7 +317,7 @@
       escaleras: { verguenza: ["verguenza", "azotes", "horca"], vergOreja: ["verguenza", "oreja", "horca"], tres: ["azotes", "oreja", "horca"], dos: ["oreja", "horca"], castellana: ["azotes", "azotes", "horca"] },
       escaleraMujer: null, // null: la misma; o p. ej. ["azotes", "horca"] (nada entre los azotes y la horca)
       // si el alcalde lee la espalda azotada venga de donde venga: al que ya azotó la ronda por pedir, el primer hurto le cuenta como segundo
-      espalda: false,
+      espalda: false, espaldaQue: "todas", // ver penaHurto en engine.js
       // qué recuerda la justicia de un verano a otro: «libro» (la cuenta de veces que te ha prendido no se pierde) o
       // «cuerpo» (solo lo que llevas encima: la oreja cortada y, si «espalda», los azotes; la vergüenza se olvida)
       memoria: "libro",

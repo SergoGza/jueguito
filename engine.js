@@ -525,12 +525,17 @@
   }
   // lo que le toca al ladrón la vez n que lo prenden
   // (o es la persona: tú o uno de los tuyos; se le apunta el peldaño en o.hurtos)
+  const marcada = (o) => (HU.espaldaQue === "verdugo" ? !!o.verdugo : !!o.azotado);
   function penaHurto(s, el, n, o) {
     if (HU.galeras1552 && galeras(s, el)) return "galeras";
     const esc = (!el && HU.escaleraMujer) || HU.escaleras[HU.escalera];
     // si la palanca lo dice, el alcalde lee la espalda azotada venga de donde venga: al que ya azotó la ronda de
     // pobres por pedir, el primer hurto le cuenta como segundo
-    if (HU.espalda && o && o.azotado && n < 2) { n = 2; o.hurtos = 2; o.espaldaLeida = true; }
+    //   espalda: true    → «gasta el aviso»: el primer hurto ya le cuenta como segundo
+    //   espalda: "acorta" → conserva el aviso, pero azotes ya lleva: después de la vergüenza viene la horca
+    //   espaldaQue: "todas" (cualquier azote, también los varazos de la calle a la mujer) o "verdugo" (solo los de cárcel o justicia)
+    if (HU.espalda === true && o && marcada(o) && n < 2) { n = 2; o.hurtos = 2; o.espaldaLeida = true; }
+    if (HU.espalda === "acorta" && o && marcada(o)) { const corta = esc.filter((x) => x !== "azotes"); if (corta.length < esc.length) o.espaldaLeida = true; return corta[Math.min(n, corta.length) - 1]; }
     return esc[Math.min(n, esc.length) - 1];
   }
   // lo que el cuerpo le dice al alcalde (si la justicia no tiene más memoria que el cuerpo): la oreja cortada dice que ya
@@ -538,7 +543,7 @@
   function peldanoDelCuerpo(o, el) {
     const esc = (!el && HU.escaleraMujer) || HU.escaleras[HU.escalera];
     if (o.oreja && esc.includes("oreja")) return esc.indexOf("oreja") + 1;
-    if (HU.espalda && o.azotado) return 1;
+    if (HU.espalda === true && marcada(o)) return 1;
     return 0;
   }
   function prender(s, motivo, lineas) {
@@ -565,8 +570,8 @@
     const pena = o.penaHurto;
     // la vergüenza sola: paseado en un asno con el pregonero delante, sin azotes; no deja marca en el cuerpo
     if (pena === "verguenza") { if (lin) lin.push("Por la mañana te sacan a la vergüenza: en un asno, con las manos atadas y el pregonero delante diciendo tu hurto por las calles acostumbradas. «A la segunda, el verdugo», dice el alcalde."); return { dc: 0, azotes: false }; }
-    if (pena === "azotes") { o.azotado = true; if (lin) lin.push("Por la mañana te sacan a la vergüenza, en un asno, con el pregonero delante diciendo tu hurto, y te azotan por las calles."); return { dc: P.carcel.azotes, azotes: true }; }
-    if (pena === "oreja") { o.azotado = true; o.oreja = true; if (lin) lin.push("Por la mañana, en el rollo de la plaza, te azotan y el verdugo te corta una oreja, para que se te conozca."); return { dc: P.carcel.azotes, azotes: true }; }
+    if (pena === "azotes") { o.azotado = true; o.verdugo = true; if (lin) lin.push("Por la mañana te sacan a la vergüenza, en un asno, con el pregonero delante diciendo tu hurto, y te azotan por las calles."); return { dc: P.carcel.azotes, azotes: true }; }
+    if (pena === "oreja") { o.azotado = true; o.verdugo = true; o.oreja = true; if (lin) lin.push("Por la mañana, en el rollo de la plaza, te azotan y el verdugo te corta una oreja, para que se te conozca."); return { dc: P.carcel.azotes, azotes: true }; }
     if (pena === "horca") { o.horca = true; if (lin) lin.push("No hay más que oír. Mañana, la horca."); }
     return { dc: 0, azotes: false };
   }
@@ -753,7 +758,7 @@
       if (lleva) { lleva.pan--; lleva.debe--; dc += 1; lin.push(`${lleva.nombre} te ha traído un pedazo de pan a la cárcel.`); }
       if (s.galeras) lin.push("Mañana sales con la cadena de galeotes, camino del mar.");
       else if (s.penaHurto) { const x = penaNoche(s, lin); dc += x.dc; azotes = azotes || x.azotes; }
-      else if (s.detenciones === 2) { dc += P.carcel.azotes; azotes = true; s.azotado = true; lin.push("Antes de soltarte, te azotan."); }
+      else if (s.detenciones === 2) { dc += P.carcel.azotes; azotes = true; s.azotado = true; s.verdugo = true; lin.push("Antes de soltarte, te azotan."); }
     } else {
       comido = clamp(n | 0, 0, Math.min(2, s.pan));
       s.pan -= comido;
@@ -784,7 +789,7 @@
           else if (rn.nivel === "pobres") lin.push("«Venimos a limpiar esto de pordioseros. Tú también vienes», dice el alguacil.");
           apunta(s, "detenido", `Detenido de noche en ${L[s.lugar].corto}. Detención ${s.detenciones} de ${P.detencionesMax}.`, { motivo: "de noche" });
           if (galeras(s, esHombre(s))) { s.galeras = true; lin.push("Por la mañana el alcalde te condena a cuatro años de galeras, como manda la pragmática."); }
-          else if (s.detenciones === 2) { dc += P.carcel.azotes; azotes = true; s.azotado = true; lin.push(`Detención 2 de ${P.detencionesMax}: te azotan. A la tercera, destierro.`); }
+          else if (s.detenciones === 2) { dc += P.carcel.azotes; azotes = true; s.azotado = true; s.verdugo = true; lin.push(`Detención 2 de ${P.detencionesMax}: te azotan. A la tercera, destierro.`); }
           else if (s.detenciones === 1) lin.push(`Detención 1 de ${P.detencionesMax}. A la segunda, azotes; a la tercera, destierro. Ya te tienen fichado.`);
           }
         } else lin.push(`Duermes en un portal de ${L[s.lugar].nombre}. Nadie te molesta.`);
@@ -951,7 +956,7 @@
     const antes = s.quien;
     s.vistasHeredero = { id: tu.id, nombre: tu.nombre, vistas: tu.vistas.map((v) => Object.assign({}, v)) };
     s.quien = { id: tu.id, nombre: tu.nombre, el: tu.el, manera: tu.manera, desde: s.anio, antes: antes.nombre, antesEl: antes.el !== false, antesFin: tipo };
-    s.cuerpo = tu.cuerpo; s.pan = tu.pan; s.detenciones = tu.detenciones; s.azotado = !!tu.azotado;
+    s.cuerpo = tu.cuerpo; s.pan = tu.pan; s.detenciones = tu.detenciones; s.azotado = !!tu.azotado; s.verdugo = !!tu.verdugo;
     s.llaga = 0; s.llagaPasadas = 0; s.galeras = false; s.trabajoHoy = false; s.conocido = false;
     s.hurtos = tu.hurtos || 0; s.oreja = !!tu.oreja; s.buscado = false; s.ropa = false; s.horca = false; s.penaHurto = null; s.hurtosVerano = 0; s.conQuien = null;
     s.heredados = (s.heredados || []).concat([{ id: tu.id, nombre: tu.nombre, manera: tu.manera, anio: s.anio, detenciones: tu.detenciones, recibido: tu.recibido, negadas: tu.negadas, noches: tu.noches }]);
@@ -1441,7 +1446,7 @@
           tu.ayer = tu.oreja && tu.penaHurto === "oreja" ? `${tu.nombre} vuelve con un trapo atado a la cabeza: «Me cogieron con el pan en la mano. Me han azotado y me han cortado la oreja».`
             : `${tu.nombre}: «Me cogieron con el pan en la mano. Me sacaron a la vergüenza y me azotaron».`;
         } else {
-        if (tu.detenciones === 2 && !tu.galeras) { dc += P.carcel.azotes; azotes = true; tu.azotado = true; }
+        if (tu.detenciones === 2 && !tu.galeras) { dc += P.carcel.azotes; azotes = true; tu.azotado = true; tu.verdugo = true; }
         tu.ayer = `${tu.nombre}: «Ayer me cogió la ronda${azotes ? " y me azotaron" : ""}. He pasado la noche en la cárcel».`;
         }
       } else {
@@ -1460,7 +1465,7 @@
               tu.hurtos = (tu.hurtos || 0) + 1; tu.buscado = false; tu.penaHurto = penaHurto(s, tu.el, tu.hurtos, tu);
               if (tu.penaHurto === "galeras") tu.galeras = true; else { const x = penaNoche(tu, null); dc += x.dc; azotes = azotes || x.azotes; }
             } else if (galeras(s, tu.el)) tu.galeras = true;
-            else if (tu.detenciones === 2) { dc += P.carcel.azotes; azotes = true; tu.azotado = true; }
+            else if (tu.detenciones === 2) { dc += P.carcel.azotes; azotes = true; tu.azotado = true; tu.verdugo = true; }
             tu.ayer = `${tu.nombre}: «Anoche la ronda me sacó de un portal${azotes ? " y me azotaron" : ""}».`;
             tu.lugar = "puerta";
           } else tu.ayer = `${tu.nombre}: «Anoche dormí en un portal de ${L[tu.lugar].nombre}».`;

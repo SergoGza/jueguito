@@ -69,6 +69,8 @@ const V = {
   // los tuyos y malsinar
   tuyosHurtan: { [H + "tuyosHurtan"]: true },
   malsinar: { [H + "malsinar"]: true },
+  tuyosHurtanMalsinar: { [H + "tuyosHurtan"]: true, [H + "malsinar"]: true },
+  sinNecesidad: { [H + "necesidad"]: null },    // (era la base hasta la ronda 7)
 };
 const TODAS = ["nunca", "apuro", "grave", "hambre", "siempre"], TRES = ["apuro", "hambre", "siempre"];
 // qué escenarios y políticas se miden de cada variante
@@ -94,6 +96,8 @@ pon("galerasSegunda", "cadena", TRES); pon("galerasSegunda", "cadena-mujer", TRE
 for (const v of ["horcaAcomp", "horcaAnoche", "sinGaleras", "mujerDos"]) { pon(v, "cadena", TRES); pon(v, "cadena-mujer", TRES); }
 pon("tuyosHurtan", "tuyos", ["nunca"].concat(TRES)); pon("tuyosHurtan", "cadena", ["nunca"].concat(TRES));
 pon("malsinar", "tuyos", TRES); pon("malsinar", "cadena", TRES);
+pon("tuyosHurtan", "cadena-mujer", ["nunca"].concat(TRES)); pon("malsinar", "cadena-mujer", TRES);
+for (const e of ["tuyos", "cadena", "cadena-mujer"]) pon("tuyosHurtanMalsinar", e, ["nunca"].concat(TRES));
 
 const hechas = new Set();
 if (fs.existsSync(OUT)) for (const l of fs.readFileSync(OUT, "utf8").split("\n")) if (l.trim()) { const r = JSON.parse(l); hechas.add(`${r.variante}|${r.escenario}|${r.politica}|${r.bot}`); }

@@ -332,7 +332,8 @@
       oreja: { conoce: true, limosna: 0, siega: true },
       // la necesidad extrema: null (no hace nada) o { cuerpo, visto }: con el cuerpo así o menos, los vecinos miran
       // a otro lado (multiplica la probabilidad de que te vean). La justicia no cambia.
-      necesidad: null,
+      // DECIDIDO (ronda 7, 12 de noviembre): con el cuerpo a 2 o menos te ven la mitad de las veces
+      necesidad: { cuerpo: 2, visto: 0.5 },
       // restituir: null, o { lugar, devuelve, ratos }: si te buscan, en ese sitio devuelves lo hurtado y la parte perdona
       sagrado: null,
       // morir ahorcado en la cadena: «solo» (se acaba la cadena), «acompanado» (sigues como uno de los tuyos que quede libre)

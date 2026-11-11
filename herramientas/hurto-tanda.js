@@ -54,6 +54,8 @@ const V = {
   // la necesidad extrema
   necesidad: { [H + "necesidad"]: { cuerpo: 2, visto: 0.5 } }, // con el cuerpo a 2 o menos, los vecinos miran a otro lado la mitad de las veces
   restituir: { [H + "sagrado"]: { lugar: "sanesteban", devuelve: 2, ratos: 3 } }, // si te buscan, en San Esteban devuelves lo hurtado y la parte perdona
+  restituirUna: { [H + "sagrado"]: { lugar: "sanesteban", devuelve: 2, ratos: 3, veces: 1 } }, // lo mismo, una sola vez cada verano
+  necesidadRestituir: { [H + "necesidad"]: { cuerpo: 2, visto: 0.5 }, [H + "sagrado"]: { lugar: "sanesteban", devuelve: 2, ratos: 3 } }, // las dos
   // la horca y el relevo
   horcaAcomp: { [H + "horca"]: "acompanado" },   // sigues como uno de los tuyos que quede libre
   horcaAnoche: { [H + "horca"]: "anoche" },      // sigues como el que durmió contigo la última noche que dormiste libre
@@ -85,6 +87,9 @@ pon("tres", "verano", TRES); pon("tres", "cadena", TRES); pon("tres", "cadena-mu
 pon("castellana", "verano", TRES); pon("castellana", "cadena", TRES); pon("castellana", "cadena-mujer", TRES);
 pon("mujerLarga", "cadena", TRES); pon("mujerLarga", "cadena-mujer", TRES);
 pon("ropa", "cadena", ["apuro", "grave", "hambre", "siempre"]); pon("ropa", "cadena-mujer", ["apuro", "siempre"]);
+for (const v of ["necesidad", "restituir", "necesidadRestituir"]) pon(v, "cadena-mujer", TRES);
+pon("restituirUna", "verano", TRES); pon("restituirUna", "cadena", TRES); pon("restituirUna", "cadena-mujer", TRES);
+pon("necesidadRestituir", "verano", TRES); pon("necesidadRestituir", "cadena", TRES);
 pon("galerasSegunda", "cadena", TRES); pon("galerasSegunda", "cadena-mujer", TRES);
 for (const v of ["horcaAcomp", "horcaAnoche", "sinGaleras", "mujerDos"]) { pon(v, "cadena", TRES); pon(v, "cadena-mujer", TRES); }
 pon("tuyosHurtan", "tuyos", ["nunca"].concat(TRES)); pon("tuyosHurtan", "cadena", ["nunca"].concat(TRES));

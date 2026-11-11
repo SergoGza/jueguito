@@ -61,7 +61,8 @@ module.exports = function (R, E) {
   function decidir(s) {
     // si le buscan y se puede restituir (palanca sagrado), en cuanto tiene con qué va a San Esteban y devuelve
     const SG = HU.sagrado;
-    if (s.conHurto && SG && s.buscado && s.pan >= SG.devuelve && E.L[s.lugar].dentro) {
+    // (solo cuando le sobra: lo que devuelve y además la ración de esta noche; antes devolvía el pan que acababa de coger)
+    if (s.conHurto && SG && s.buscado && s.pan >= SG.devuelve + 2 && !(SG.veces && (s.restituidoVerano || 0) >= SG.veces) && E.L[s.lugar].dentro) {
       if (E.puedeRestituir(s)) return { a: "restituir" };
       if (s.lugar !== SG.lugar && s.t + E.DIST[s.lugar][SG.lugar] * PASO + SG.ratos + salir(SG.lugar) <= FIN) {
         let sig = null;

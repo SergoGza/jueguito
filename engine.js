@@ -625,13 +625,14 @@
   // dueño; devuelves lo que cogiste y la parte perdona. Solo vale antes de que te prenda la justicia.
   function puedeRestituir(s) {
     const SG = HU.sagrado;
+    if (SG && SG.veces && (s.restituidoVerano || 0) >= SG.veces) return false; // el fraile responde por ti un número de veces cada verano
     return !!(s.conHurto && SG && s.buscado && s.fase === "dia" && s.lugar === SG.lugar && s.pan >= SG.devuelve && s.t + SG.ratos <= FIN);
   }
   function restituir(s) {
     if (!puedeRestituir(s)) return false;
     const SG = HU.sagrado, t0 = s.t;
     pasar(s, SG.ratos, "esperar", true);
-    s.pan -= SG.devuelve; s.buscado = false; s.restituido = (s.restituido || 0) + 1;
+    s.pan -= SG.devuelve; s.buscado = false; s.restituido = (s.restituido || 0) + 1; s.restituidoVerano = (s.restituidoVerano || 0) + 1;
     apunta(s, "restituye", `Restituye en ${L[s.lugar].corto}: devuelve ${SG.devuelve} pedazos y la parte perdona.`, { t: t0 });
     resultado(s, "Restituyes", ["Un fraile te oye en la portería. «Lo que tomaste con hambre no fue hurto ante Dios; ante el alcalde, sí». Va él a hablar con el dueño, le lleva el pan que traes y vuelve: la parte perdona. Ya no te buscan."], "bien");
     return true;
@@ -958,7 +959,7 @@
     s.quien = { id: tu.id, nombre: tu.nombre, el: tu.el, manera: tu.manera, desde: s.anio, antes: antes.nombre, antesEl: antes.el !== false, antesFin: tipo };
     s.cuerpo = tu.cuerpo; s.pan = tu.pan; s.detenciones = tu.detenciones; s.azotado = !!tu.azotado; s.verdugo = !!tu.verdugo;
     s.llaga = 0; s.llagaPasadas = 0; s.galeras = false; s.trabajoHoy = false; s.conocido = false;
-    s.hurtos = tu.hurtos || 0; s.oreja = !!tu.oreja; s.buscado = false; s.ropa = false; s.horca = false; s.penaHurto = null; s.hurtosVerano = 0; s.conQuien = null;
+    s.hurtos = tu.hurtos || 0; s.oreja = !!tu.oreja; s.buscado = false; s.ropa = false; s.horca = false; s.penaHurto = null; s.hurtosVerano = 0; s.conQuien = null; s.restituidoVerano = 0;
     s.heredados = (s.heredados || []).concat([{ id: tu.id, nombre: tu.nombre, manera: tu.manera, anio: s.anio, detenciones: tu.detenciones, recibido: tu.recibido, negadas: tu.negadas, noches: tu.noches }]);
     s.tuyos = s.tuyos.filter((t) => t.id !== tu.id);
   }
@@ -1026,7 +1027,7 @@
     s.cuerpo = Math.min(cuerpoMax(s), yo.cuerpo); s.pan = yo.pan;
     // con ropa hurtada, el invierno se pasa mejor (prototipo de hurto)
     if (s.ropa && HU.ropa) { s.cuerpo = Math.min(cuerpoMax(s), s.cuerpo + HU.ropa.cuerpo); s.pan = Math.min(P.panMax, s.pan + HU.ropa.pan); }
-    s.ropa = false; s.buscado = false; s.hurtosVerano = 0; s.penaHurto = null; s.horca = false; s.conQuien = null;
+    s.ropa = false; s.buscado = false; s.hurtosVerano = 0; s.penaHurto = null; s.horca = false; s.conQuien = null; s.restituidoVerano = 0;
     if (HU.memoria === "cuerpo") { s.hurtos = peldanoDelCuerpo(s, esHombre(s)); for (const tu of tuyosVivos(s)) tu.hurtos = peldanoDelCuerpo(tu, tu.el); }
     for (const tu of tuyosVivos(s)) {
       const x = ini[s.siega.tuyos[tu.id]] || ini.nada;

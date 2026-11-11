@@ -326,7 +326,7 @@
       cuenta: false,       // si prenderte por ladrón cuenta además como detención (camino del destierro)
       // desde 1552, al ladrón varón lo mandan a galeras en vez de subir la escalera: true (al primer hurto, como dice la
       // pragmática), "segunda" (la primera vez, a la vergüenza; galeras a la segunda) o false
-      galeras1552: true,
+      galeras1552: true, // DECIDIDO (ronda 6, 11 de noviembre): al primer hurto, como dice la pragmática
       // la oreja cortada: quién la lee. conoce: la ronda te trata como conocido (como la espalda azotada);
       // limosna: puntos que baja la tirada de limosna; siega: si aún te dan hoz u obra
       oreja: { conoce: true, limosna: 0, siega: true },

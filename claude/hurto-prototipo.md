@@ -25,7 +25,7 @@ Base: se hurta una hogaza (2 pedazos en 2 ratos) en la Plaza o la Rúa cuando ha
 | `olla`, `ropa`, `lento` | la olla de una casa a sexta; ropa (no da pan, da mejor invierno); hurtar tarda una franja |
 | `ojos`, `prendido`, `huye`, `gente` | con mucha gente te ven más; si te ven te cogen siempre; si te ven escapas siempre; con mucha gente te sujetan y con poca escapas |
 | `riesgo05`, `riesgo15`, `riesgo2` | el riesgo de que te vean, por 0,5, 1,5 y 2 |
-| `dos`, `castellana`, `verguenza`, `cuenta` | oreja y horca; azotes, azotes y horca; vergüenza (sin azotes), azotes y horca; prenderte cuenta además como detención |
+| `tres`, `dos`, `castellana`, `cuenta` | azotes, oreja y horca; oreja y horca; azotes, azotes y horca; prenderte cuenta además como detención |
 | `orejaTodos`, `orejaJusticia`, `espalda` | la oreja la lee todo el mundo (menos limosna, ni obra ni hoz); solo el alcalde; el alcalde lee como primer hurto la espalda azotada por pedir |
 | `necesidad`, `restituir` | con cuerpo ≤ 2 te ven la mitad; si te buscan, en San Esteban devuelves 2 pedazos y la parte perdona |
 | `horcaAcomp`, `horcaAnoche` | ahorcado, sigue quien quede libre; sigue quien durmió contigo la última noche |
@@ -50,6 +50,9 @@ Base: se hurta una hogaza (2 pedazos en 2 ratos) en la Plaza o la Rúa cuando ha
 
 - **Ronda 2 (11 de noviembre): D, según la gente.** Te ve el dueño o el vecino. Con mucha gente te ven menos (1 de cada 4), pero si te ven te sujetan allí mismo; con poca te ven más (1 de cada 3), pero escapas con lo hurtado y te buscan por tus señas (la ronda te para la mitad de las veces que llegas donde está, y cualquier parada o noche en un portal acaba ante la justicia; dura hasta que te prenden o hasta el invierno). Descartadas: te cogen siempre allí (A: para quien juega bien es «nunca», y no usa nada de lo construido), escapas siempre (B: para el que pasa hambre hurtar siempre ya gana a no hurtar) y mitad y mitad (C: la segunda tirada es a ciegas). Pendiente para el cierre: con estos números, poca gente es mejor siempre (que te busquen cuesta menos que te cojan), y «te buscan» aprieta sin freno (quien se sabe buscado deja de entrar y pasa hambre). Medido por parejas en apuros (un verano): veterano, 14 % sin hurtar y 67 % hurtando; oficio, 77 % y 78 %.
 - Desde aquí las medidas llevan D fija y están en `claude/hurto-medidas-d.jsonl`; las de antes de la ronda 2 (con «mitad y mitad» de base), en `claude/hurto-medidas.jsonl`.
+
+- **Ronda 3 (11 de noviembre): D, vergüenza, azotes y horca** («ya iremos ajustando»). La primera vez que te prenden te sacan a la vergüenza (en un asno, con el pregonero delante, sin azotes): pierdes el pan, el día y la noche de cárcel, y el alcalde dice «A la segunda, el verdugo». La segunda, azotes; la tercera, la horca. Va aparte de las detenciones por pedir. Descartadas: azotes, segundo castigo y horca (A: al que cogen flaco lo mata el primer peldaño; 141 de 715 veteranos en apuros), castigo y horca (B: la única en que la horca sale de verdad, pero un solo castigo te deja a un hurto de la horca toda la vida) y que prenderte cuente para el destierro (C: el ladrón acaba desterrado antes que ahorcado). Medido por parejas en apuros (un verano): veterano, 14 % sin hurtar y 75 % hurtando; oficio, 77 % y 91 %. En la cadena, el oficio que hurta solo en apuros completa el 52,4 % (sin hurtar, 50,6 %). Pendiente: la horca casi no sale si se hurta con cabeza (4,6 % de las cadenas del veterano que hurta cuando le falta la ración), y la vergüenza no deja marca en el cuerpo (ronda 5).
+- Las medidas con la escalera decidida están en `claude/hurto-medidas-r3.jsonl`.
 
 ## Orden de las preguntas
 

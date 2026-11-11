@@ -35,9 +35,9 @@ const V = {
   // la escalera
   dos: { [H + "escalera"]: "dos" },              // oreja y horca (en la base: azotes, oreja y horca)
   // la de Castilla por escrito: vergüenza y azotes, otra vez azotes, y a la tercera la horca (sin oreja: Partida 7,14,18 prohíbe cortar miembro por hurto)
-  castellana: { [H + "escaleras"]: { tres: ["azotes", "oreja", "horca"], dos: ["oreja", "horca"], castellana: ["azotes", "azotes", "horca"] }, [H + "escalera"]: "castellana" },
+  castellana: { [H + "escalera"]: "castellana" },
   // el primer peldaño sin azotes: a la vergüenza (en un asno, con pregonero); después azotes y horca
-  verguenza: { [H + "escaleras"]: { tres: ["azotes", "oreja", "horca"], dos: ["oreja", "horca"], verguenza: ["verguenza", "azotes", "horca"] }, [H + "escalera"]: "verguenza" },
+  tres: { [H + "escalera"]: "tres" },            // azotes, oreja y horca (era la base hasta la ronda 3)
   cuenta: { [H + "cuenta"]: true },              // prenderte por ladrón cuenta además como detención
   // la marca
   orejaTodos: { [H + "oreja"]: { conoce: true, limosna: 1, siega: false } },   // la lee todo el mundo: menos limosna, ni obra ni hoz
@@ -67,7 +67,7 @@ pon("gente", "verano", TRES); pon("gente", "cadena", TRES);
 for (const v of ["dos", "cuenta", "orejaTodos", "orejaJusticia", "espalda", "necesidad", "restituir"]) { pon(v, "verano", TRES); pon(v, "cadena", TRES); }
 pon("espalda", "cadena-mujer", TRES);
 pon("dos", "cadena-mujer", TRES); pon("cuenta", "cadena-mujer", TRES);
-pon("verguenza", "verano", TRES); pon("verguenza", "cadena", TRES); pon("verguenza", "cadena-mujer", TRES);
+pon("tres", "verano", TRES); pon("tres", "cadena", TRES); pon("tres", "cadena-mujer", TRES);
 pon("castellana", "verano", TRES); pon("castellana", "cadena", TRES); pon("castellana", "cadena-mujer", TRES);
 pon("mujerLarga", "cadena", TRES); pon("mujerLarga", "cadena-mujer", TRES);
 pon("ropa", "cadena", ["apuro", "grave", "hambre", "siempre"]); pon("ropa", "cadena-mujer", ["apuro", "siempre"]);
@@ -78,13 +78,15 @@ pon("malsinar", "tuyos", TRES); pon("malsinar", "cadena", TRES);
 const hechas = new Set();
 if (fs.existsSync(OUT)) for (const l of fs.readFileSync(OUT, "utf8").split("\n")) if (l.trim()) { const r = JSON.parse(l); hechas.add(`${r.variante}|${r.escenario}|${r.politica}|${r.bot}`); }
 const solo = process.env.SOLO ? process.env.SOLO.split(",") : null;
-const cola = PLAN.filter((j) => (!solo || solo.includes(j.v)) && !hechas.has(`${j.v}|${j.esc}|${j.pol}|${j.bot}`));
+// ESCS=cadena,cadena-mujer y POLS=apuro,hambre limitan los escenarios y las políticas
+const escs = process.env.ESCS ? process.env.ESCS.split(",") : null, pols = process.env.POLS ? process.env.POLS.split(",") : null;
+const cola = PLAN.filter((j) => (!solo || solo.includes(j.v)) && (!escs || escs.includes(j.esc)) && (!pols || pols.includes(j.pol)) && !hechas.has(`${j.v}|${j.esc}|${j.pol}|${j.bot}`));
 console.log(`${cola.length} tandas por hacer (${PLAN.length - cola.length} ya hechas o fuera de SOLO) → ${OUT}`);
 
 function lanzar(j) {
   return new Promise((ok) => {
     const env = Object.assign({}, process.env, { HURTO: j.pol, VAR: j.v, ESC: j.esc, PAL: JSON.stringify(V[j.v]), JSONL: OUT });
-    delete env.CADENA; delete env.TUYOS; delete env.SEXO; delete env.SOLO; delete env.PROCESOS;
+    delete env.CADENA; delete env.TUYOS; delete env.SEXO; delete env.SOLO; delete env.PROCESOS; delete env.ESCS; delete env.POLS;
     if (j.esc.startsWith("cadena")) env.CADENA = "1";
     if (j.esc === "cadena-mujer") env.SEXO = "mujer";
     if (j.esc === "tuyos") env.TUYOS = "1";

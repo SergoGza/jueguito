@@ -312,8 +312,9 @@
       // si te buscan: la ronda te para más (llegar a donde está) y, si te para o te coge por otra cosa, es por ladrón
       pararBuscado: 0.5,
       // la escalera: lo que le toca al ladrón cada vez que lo prenden. «tres»: azotes, oreja, horca. «dos»: oreja, horca.
-      escalera: "tres",
-      escaleras: { tres: ["azotes", "oreja", "horca"], dos: ["oreja", "horca"] },
+      // DECIDIDO (ronda 3, 11 de noviembre): «verguenza» — la primera vez, a la vergüenza (sin azotes); la segunda, azotes; la tercera, la horca
+      escalera: "verguenza",
+      escaleras: { verguenza: ["verguenza", "azotes", "horca"], tres: ["azotes", "oreja", "horca"], dos: ["oreja", "horca"], castellana: ["azotes", "azotes", "horca"] },
       escaleraMujer: null, // null: la misma; o p. ej. ["azotes", "horca"] (nada entre los azotes y la horca)
       // si el alcalde lee la espalda azotada venga de donde venga: al que ya azotó la ronda por pedir, el primer hurto le cuenta como segundo
       espalda: false,

@@ -25,7 +25,7 @@ Base: se hurta una hogaza (2 pedazos en 2 ratos) en la Plaza o la Rúa cuando ha
 | `olla`, `ropa`, `lento` | la olla de una casa a sexta; ropa (no da pan, da mejor invierno); hurtar tarda una franja |
 | `ojos`, `prendido`, `huye`, `gente` | con mucha gente te ven más; si te ven te cogen siempre; si te ven escapas siempre; con mucha gente te sujetan y con poca escapas |
 | `riesgo05`, `riesgo15`, `riesgo2` | el riesgo de que te vean, por 0,5, 1,5 y 2 |
-| `dos`, `castellana`, `cuenta` | oreja y horca; azotes, azotes y horca; prenderte cuenta además como detención |
+| `dos`, `castellana`, `verguenza`, `cuenta` | oreja y horca; azotes, azotes y horca; vergüenza (sin azotes), azotes y horca; prenderte cuenta además como detención |
 | `orejaTodos`, `orejaJusticia`, `espalda` | la oreja la lee todo el mundo (menos limosna, ni obra ni hoz); solo el alcalde; el alcalde lee como primer hurto la espalda azotada por pedir |
 | `necesidad`, `restituir` | con cuerpo ≤ 2 te ven la mitad; si te buscan, en San Esteban devuelves 2 pedazos y la parte perdona |
 | `horcaAcomp`, `horcaAnoche` | ahorcado, sigue quien quede libre; sigue quien durmió contigo la última noche |
@@ -47,6 +47,9 @@ Base: se hurta una hogaza (2 pedazos en 2 ratos) en la Plaza o la Rúa cuando ha
 ## Decisiones (Sergio, por rondas)
 
 - **Ronda 1 (10 de noviembre): A, pan de un puesto.** Una hogaza (2 pedazos) en la Plaza o la Rúa cuando hay mercado o tienda abierta. Descartadas: la olla de una casa a sexta (B: mismos números, pero el riesgo no se lee en el mapa; la cita de Robles puede quedar como texto) y la ropa para el invierno (C: no compensa a nadie con el premio medido y el momento es obvio). Que hurtar tarde 2 ratos o una franja no cambia nada. Medido por parejas (las mismas partidas, solo las que llegan a estar sin ración y con cuerpo 2 o menos, un verano): veterano, 14 % sin hurtar y 63 % hurtando; oficio, 77 % y 65 % (con el riesgo a la mitad, 83 %).
+
+- **Ronda 2 (11 de noviembre): D, según la gente.** Te ve el dueño o el vecino. Con mucha gente te ven menos (1 de cada 4), pero si te ven te sujetan allí mismo; con poca te ven más (1 de cada 3), pero escapas con lo hurtado y te buscan por tus señas (la ronda te para la mitad de las veces que llegas donde está, y cualquier parada o noche en un portal acaba ante la justicia; dura hasta que te prenden o hasta el invierno). Descartadas: te cogen siempre allí (A: para quien juega bien es «nunca», y no usa nada de lo construido), escapas siempre (B: para el que pasa hambre hurtar siempre ya gana a no hurtar) y mitad y mitad (C: la segunda tirada es a ciegas). Pendiente para el cierre: con estos números, poca gente es mejor siempre (que te busquen cuesta menos que te cojan), y «te buscan» aprieta sin freno (quien se sabe buscado deja de entrar y pasa hambre). Medido por parejas en apuros (un verano): veterano, 14 % sin hurtar y 67 % hurtando; oficio, 77 % y 78 %.
+- Desde aquí las medidas llevan D fija y están en `claude/hurto-medidas-d.jsonl`; las de antes de la ronda 2 (con «mitad y mitad» de base), en `claude/hurto-medidas.jsonl`.
 
 ## Orden de las preguntas
 

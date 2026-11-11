@@ -287,7 +287,7 @@
     hurto: {
       // qué se hurta: «hogaza» (pan del mercado y de las tiendas), «olla» (la comida de una casa, a sexta) o
       // «ropa» (algo que dura: no da pan, da un invierno mejor; solo pesa con varios veranos)
-      que: "hogaza",
+      que: "hogaza", // DECIDIDO (ronda 1, 10 de noviembre): pan de un puesto
       // dónde y a qué franjas, según lo que se hurta
       donde: {
         hogaza: { plaza: [0, 1], rua: [1, 3, 4] },
@@ -307,7 +307,8 @@
       aviso: 3,           // las voces que quedan en el sitio: la ronda acude
       // si te ven: «prendido» (te cogen allí mismo), «huye» (escapas con lo hurtado y te buscan por tus señas)
       // o «mixto» (mitad y mitad)
-      siVisto: "mixto", prendido: 0.5,
+      // DECIDIDO (ronda 2, 11 de noviembre): «gente» — con mucha gente te sujetan allí mismo; con poca, escapas y te buscan
+      siVisto: "gente", prendido: 0.5,
       // si te buscan: la ronda te para más (llegar a donde está) y, si te para o te coge por otra cosa, es por ladrón
       pararBuscado: 0.5,
       // la escalera: lo que le toca al ladrón cada vez que lo prenden. «tres»: azotes, oreja, horca. «dos»: oreja, horca.

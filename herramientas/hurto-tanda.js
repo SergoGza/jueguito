@@ -27,6 +27,7 @@ const V = {
   ojos: { [H + "ojos"]: "ojos" },                // con mucha gente te ven más (en la base, la gente tapa)
   prendido: { [H + "siVisto"]: "prendido" },     // si te ven, te cogen allí mismo
   huye: { [H + "siVisto"]: "huye" },             // si te ven, escapas siempre y te buscan
+  mixto: { [H + "siVisto"]: "mixto" },           // mitad y mitad (era la base hasta la ronda 2)
   gente: { [H + "siVisto"]: "gente" },           // con mucha gente te sujetan allí mismo; con poca, escapas y te buscan
   riesgo05: { [H + "riesgo"]: 0.5 },
   riesgo15: { [H + "riesgo"]: 1.5 },
@@ -35,6 +36,8 @@ const V = {
   dos: { [H + "escalera"]: "dos" },              // oreja y horca (en la base: azotes, oreja y horca)
   // la de Castilla por escrito: vergüenza y azotes, otra vez azotes, y a la tercera la horca (sin oreja: Partida 7,14,18 prohíbe cortar miembro por hurto)
   castellana: { [H + "escaleras"]: { tres: ["azotes", "oreja", "horca"], dos: ["oreja", "horca"], castellana: ["azotes", "azotes", "horca"] }, [H + "escalera"]: "castellana" },
+  // el primer peldaño sin azotes: a la vergüenza (en un asno, con pregonero); después azotes y horca
+  verguenza: { [H + "escaleras"]: { tres: ["azotes", "oreja", "horca"], dos: ["oreja", "horca"], verguenza: ["verguenza", "azotes", "horca"] }, [H + "escalera"]: "verguenza" },
   cuenta: { [H + "cuenta"]: true },              // prenderte por ladrón cuenta además como detención
   // la marca
   orejaTodos: { [H + "oreja"]: { conoce: true, limosna: 1, siega: false } },   // la lee todo el mundo: menos limosna, ni obra ni hoz
@@ -63,6 +66,8 @@ for (const v of ["olla", "lento", "ojos", "prendido", "huye", "riesgo05", "riesg
 pon("gente", "verano", TRES); pon("gente", "cadena", TRES);
 for (const v of ["dos", "cuenta", "orejaTodos", "orejaJusticia", "espalda", "necesidad", "restituir"]) { pon(v, "verano", TRES); pon(v, "cadena", TRES); }
 pon("espalda", "cadena-mujer", TRES);
+pon("dos", "cadena-mujer", TRES); pon("cuenta", "cadena-mujer", TRES);
+pon("verguenza", "verano", TRES); pon("verguenza", "cadena", TRES); pon("verguenza", "cadena-mujer", TRES);
 pon("castellana", "verano", TRES); pon("castellana", "cadena", TRES); pon("castellana", "cadena-mujer", TRES);
 pon("mujerLarga", "cadena", TRES); pon("mujerLarga", "cadena-mujer", TRES);
 pon("ropa", "cadena", ["apuro", "grave", "hambre", "siempre"]); pon("ropa", "cadena-mujer", ["apuro", "siempre"]);

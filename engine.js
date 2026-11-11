@@ -548,12 +548,15 @@
     if (pena === "galeras") { s.galeras = true; extra.push("El alcalde no manda azotarte: a la vergüenza y cuatro años de galeras, como manda la pragmática. Mañana sales con la cadena de galeotes."); }
     else if (pena === "horca") extra.push("Te llevan a la cárcel de la justicia. El alcalde te mira la espalda y la oreja y no pregunta más: la horca.");
     else if (pena === "oreja") extra.push("Te llevan a la cárcel de la justicia. Mañana, en el rollo, azotes y la oreja.");
+    else if (pena === "verguenza") extra.push("Te llevan a la cárcel de la justicia. Mañana te sacan a la vergüenza.");
     else extra.push("Te llevan a la cárcel de la justicia. Mañana te sacan a la vergüenza y te azotan por las calles.");
     resultado(s, "Te prenden por ladrón", lineas.concat(extra), "mal");
   }
   // la noche en la cárcel del que han prendido por ladrón: lo que cuesta de cuerpo y lo que deja
   function penaNoche(o, lin) {
     const pena = o.penaHurto;
+    // la vergüenza sola: paseado en un asno con el pregonero delante, sin azotes; no deja marca en el cuerpo
+    if (pena === "verguenza") { if (lin) lin.push("Por la mañana te sacan a la vergüenza: en un asno, con las manos atadas y el pregonero delante diciendo tu hurto por las calles acostumbradas. «A la segunda, el verdugo», dice el alcalde."); return { dc: 0, azotes: false }; }
     if (pena === "azotes") { o.azotado = true; if (lin) lin.push("Por la mañana te sacan a la vergüenza, en un asno, con el pregonero delante diciendo tu hurto, y te azotan por las calles."); return { dc: P.carcel.azotes, azotes: true }; }
     if (pena === "oreja") { o.azotado = true; o.oreja = true; if (lin) lin.push("Por la mañana, en el rollo de la plaza, te azotan y el verdugo te corta una oreja, para que se te conozca."); return { dc: P.carcel.azotes, azotes: true }; }
     if (pena === "horca") { o.horca = true; if (lin) lin.push("No hay más que oír. Mañana, la horca."); }

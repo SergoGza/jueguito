@@ -15,6 +15,9 @@ const fs = require("fs");
 module.exports = function (R, E) {
   const P = R.PARAMS, HU = P.hurto, PASO = R.MODOS.A.paso, FIN = E.FIN, FR = R.RATOS;
   const POL = process.env.HURTO || "";
+  // HGENTE=poca|mucha: el bot solo hurta con poca gente (si le ven, escapa y le buscan) o con mucha (si le ven, le cogen)
+  const HG = process.env.HGENTE || "";
+  const casa = (g) => (HG === "poca" ? g === 2 : HG === "mucha" ? g >= 3 : g >= 2);
   const activo = !!POL;
   const mas = (o, k, n) => { o[k] = (o[k] || 0) + (n == null ? 1 : n); };
   const salir = (l) => (E.L[l].dentro ? Math.min(...E.PUERTAS.map((g) => E.DIST[l][g] + 1)) * PASO : 0);
@@ -49,7 +52,7 @@ module.exports = function (R, E) {
       let tb = s.t + E.DIST[s.lugar][l] * PASO;
       while (tb < FIN) {
         const f = E.franja(tb);
-        if (frs.includes(f) && (HU.que !== "hogaza" || genteBase(s, l, f) >= 2)) break;
+        if (frs.includes(f) && (HU.que !== "hogaza" || casa(genteBase(s, l, f)))) break;
         tb = (Math.floor(tb / FR) + 1) * FR;
       }
       if (tb + HU.ratos + salir(l) > FIN) continue;
@@ -72,7 +75,10 @@ module.exports = function (R, E) {
     }
     if (!quiere(s)) return null;
     if (E.rondaEnTuZona(s)) return null; // con la ronda delante, no
-    if (E.puedeHurtar(s) && !(s.hurtadoHoy || []).includes(s.lugar)) return { a: "hurtar" }; // no repite sitio el mismo día
+    if (E.puedeHurtar(s) && !(s.hurtadoHoy || []).includes(s.lugar)) { // no repite sitio el mismo día
+      if (!HG || casa(E.estado(s, s.lugar, s.dia, E.franja(s.t)).gente)) return { a: "hurtar" };
+      return null; // hoy no hay aquí la gente que busca: sigue con lo suyo
+    }
     const d = destino(s);
     if (!d) return null;
     if (d.l === s.lugar) return { a: "esperar" };
@@ -135,7 +141,7 @@ module.exports = function (R, E) {
   // lo que se guarda de una tanda
   function registro(A, extra) {
     const N = A.n || 1, H = A.hurtos || 0;
-    const r = Object.assign({ n: A.n, politica: POL || "sin hurto", cadena: !!process.env.CADENA, sexo: process.env.SEXO || "hombre", tuyos: !!process.env.TUYOS || !!process.env.CADENA, dar: process.env.DAR || "", escenario: process.env.ESC || "" }, extra, {
+    const r = Object.assign({ n: A.n, politica: POL || "sin hurto", conGente: process.env.HGENTE || "", cadena: !!process.env.CADENA, sexo: process.env.SEXO || "hombre", tuyos: !!process.env.TUYOS || !!process.env.CADENA, dar: process.env.DAR || "", escenario: process.env.ESC || "" }, extra, {
       llega: pc(A.llega, N), hoz: pc(A.hoz, N),
       hambre: pc(A.fin.hambre, N), destierro: pc(A.fin.desterrado, N), azotes: pc(A.fin.muerto, N), galeras: pc(A.fin.galeras, N), ahorcado: pc(A.fin.ahorcado, N),
       cuerpoLlega: A.llega ? +(A.cuerpoLlega / A.llega).toFixed(2) : null,

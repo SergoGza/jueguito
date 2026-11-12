@@ -207,6 +207,9 @@
     s.t = 0; s.avisos = {}; s.avisosT = {}; s.pedidoHoy = []; s.trabajoHoy = false; s.trabajoPedido = false;
     s.detenidoHoy = null; s.hoy = nuevoHoy(); s.aviso = null; s.fase = "amanecer"; s.azotesHoy = 0;
     s.hurtadoHoy = []; s.penaHurto = null;
+    // (prototipo de hurto) si las señas caducan, a los tantos días dejan de buscarte
+    if (HU.buscaDias && s.buscado && s.dia - (s.buscadoDia || 0) >= HU.buscaDias) s.buscado = false;
+    if (HU.buscaDias) for (const tu of s.tuyos || []) if (tu.buscado && s.dia - (tu.buscadoDia || 0) >= HU.buscaDias) tu.buscado = false;
     rondaFranja(s, s.dia, 0);
     if (s.conTuyos) { tuyosAmanecer(s); for (const tu of s.tuyos) tuyoFranja(s, tu, s.dia, 0); s.tuyosF = 0; }
     observar(s);
@@ -609,7 +612,7 @@
         return true;
       }
       // escapas con lo hurtado, pero te han visto la cara: desde ahora te buscan
-      s.buscado = true;
+      s.buscado = true; s.buscadoDia = s.dia;
       const gana = coger();
       apunta(s, "hurto", `Hurta en ${L[lugar].corto}: le ven y escapa.`, { visto: "huye", gana, t: t0 });
       resultado(s, "Te han visto", [`Coges ${que} en ${L[lugar].nombre}. «¡Al ladrón!». Corres y no te alcanzan.`, "Te han visto la cara. Darán tus señas a la justicia."], "mal");
@@ -1122,7 +1125,7 @@
         }
         s.malsinado = { por: tu.nombre, dia: s.dia };
         // si la palanca lo dice, cuenta también lo que has hurtado este verano: desde hoy te buscan
-        if (s.conHurto && HU.malsinar && (s.hurtosVerano || 0) > 0) { s.buscado = true; s.malsinado.hurto = true; }
+        if (s.conHurto && HU.malsinar && (s.hurtosVerano || 0) > 0) { s.buscado = true; s.buscadoDia = s.dia; s.malsinado.hurto = true; }
         tuyoSeVa(s, tu, "malsino", s.dia);
         apunta(s, "tuyos", `${tu.nombre} va al alguacil y le cuenta dónde pides.`);
         continue;
@@ -1247,7 +1250,7 @@
       if (HU.aviso && TU.mundo !== false) { s.avisos[tu.lugar] = (s.avisos[tu.lugar] || 0) + HU.aviso; s.avisosT[tu.lugar] = d * 100 + f * R.RATOS; }
       if (rnd("hurtoVisto") < pv) {
         if (HU.siVisto === "prendido" || (HU.siVisto === "gente" && genteBase(s, tu.lugar, d, f) >= 3) || (HU.siVisto === "mixto" && rnd("hurtoCoge") < HU.prendido)) { prenderTuyo(s, tu, "hurtando", f, tu.lugar); return; }
-        tu.buscado = true;
+        tu.buscado = true; tu.buscadoDia = d;
         tu.pan = Math.min(P.panMax, tu.pan + HU.gana);
         tu.hoy.log.push({ f, lugar: tu.lugar, tipo: "hurto", visto: true });
         return;

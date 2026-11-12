@@ -70,6 +70,15 @@ const V = {
   tuyosHurtan: { [H + "tuyosHurtan"]: true },
   malsinar: { [H + "malsinar"]: true },
   tuyosHurtanMalsinar: { [H + "tuyosHurtan"]: true, [H + "malsinar"]: true },
+  // el cierre: ajustes de números
+  poca50: { [H + "visto"]: { bulto: { 2: 0.5, 3: 0.25 }, ojos: { 2: 0.2, 3: 0.4 } } },   // con poca gente te ven 1 de cada 2
+  poca65: { [H + "visto"]: { bulto: { 2: 0.65, 3: 0.25 }, ojos: { 2: 0.2, 3: 0.4 } } },  // con poca gente te ven 2 de cada 3
+  gente10: { [H + "visto"]: { bulto: { 2: 0.5, 3: 0.1 }, ojos: { 2: 0.2, 3: 0.4 } } },   // poca: 1 de cada 2; mucha: 1 de cada 10
+  gente15: { [H + "visto"]: { bulto: { 2: 0.5, 3: 0.15 }, ojos: { 2: 0.2, 3: 0.4 } } },  // poca: 1 de cada 2; mucha: 1 de cada 7
+  cierreC: { [H + "buscaDias"]: 3, [H + "tuyosCuerpo"]: 3 },   // te buscan tres días y Catalina hurta antes
+  cierreD: { [H + "buscaDias"]: 3, [H + "tuyosCuerpo"]: 3, [H + "visto"]: { bulto: { 2: 0.5, 3: 0.25 }, ojos: { 2: 0.2, 3: 0.4 } } }, // y con poca gente te ven 1 de cada 2
+  busca3: { [H + "buscaDias"]: 3 },              // te buscan tres días
+  catalina3: { [H + "tuyosCuerpo"]: 3 },         // Catalina hurta antes (con el cuerpo en 3 o menos)
   sinNecesidad: { [H + "necesidad"]: null },    // (era la base hasta la ronda 7)
 };
 const TODAS = ["nunca", "apuro", "grave", "hambre", "siempre"], TRES = ["apuro", "hambre", "siempre"];
@@ -93,18 +102,20 @@ for (const v of ["necesidad", "restituir", "necesidadRestituir"]) pon(v, "cadena
 pon("restituirUna", "verano", TRES); pon("restituirUna", "cadena", TRES); pon("restituirUna", "cadena-mujer", TRES);
 pon("necesidadRestituir", "verano", TRES); pon("necesidadRestituir", "cadena", TRES);
 pon("galerasSegunda", "cadena", TRES); pon("galerasSegunda", "cadena-mujer", TRES);
+for (const v of ["riesgo05", "riesgo2"]) pon(v, "cadena-mujer", TRES);
 for (const v of ["horcaAcomp", "horcaAnoche", "sinGaleras", "mujerDos"]) { pon(v, "cadena", TRES); pon(v, "cadena-mujer", TRES); }
 pon("tuyosHurtan", "tuyos", ["nunca"].concat(TRES)); pon("tuyosHurtan", "cadena", ["nunca"].concat(TRES));
 pon("malsinar", "tuyos", TRES); pon("malsinar", "cadena", TRES);
 pon("tuyosHurtan", "cadena-mujer", ["nunca"].concat(TRES)); pon("malsinar", "cadena-mujer", TRES);
 for (const e of ["tuyos", "cadena", "cadena-mujer"]) pon("tuyosHurtanMalsinar", e, ["nunca"].concat(TRES));
+for (const v of ["poca50", "poca65", "gente10", "gente15", "busca3", "catalina3", "cierreC", "cierreD"]) for (const e of ["verano", "cadena", "cadena-mujer"]) pon(v, e, ["nunca"].concat(TRES));
 
 const hechas = new Set();
-if (fs.existsSync(OUT)) for (const l of fs.readFileSync(OUT, "utf8").split("\n")) if (l.trim()) { const r = JSON.parse(l); hechas.add(`${r.variante}|${r.escenario}|${r.politica}|${r.bot}`); }
+if (fs.existsSync(OUT)) for (const l of fs.readFileSync(OUT, "utf8").split("\n")) if (l.trim()) { const r = JSON.parse(l); hechas.add(`${r.variante}|${r.escenario}|${r.politica}|${r.bot}|${r.conGente || ""}`); }
 const solo = process.env.SOLO ? process.env.SOLO.split(",") : null;
 // ESCS=cadena,cadena-mujer y POLS=apuro,hambre limitan los escenarios y las políticas
 const escs = process.env.ESCS ? process.env.ESCS.split(",") : null, pols = process.env.POLS ? process.env.POLS.split(",") : null;
-const cola = PLAN.filter((j) => (!solo || solo.includes(j.v)) && (!escs || escs.includes(j.esc)) && (!pols || pols.includes(j.pol)) && !hechas.has(`${j.v}|${j.esc}|${j.pol}|${j.bot}`));
+const cola = PLAN.filter((j) => (!solo || solo.includes(j.v)) && (!escs || escs.includes(j.esc)) && (!pols || pols.includes(j.pol)) && !hechas.has(`${j.v}|${j.esc}|${j.pol}|${j.bot}|${process.env.HGENTE || ""}`));
 console.log(`${cola.length} tandas por hacer (${PLAN.length - cola.length} ya hechas o fuera de SOLO) → ${OUT}`);
 
 function lanzar(j) {

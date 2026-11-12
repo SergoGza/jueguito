@@ -65,6 +65,19 @@ Base: se hurta una hogaza (2 pedazos en 2 ratos) en la Plaza o la Rúa cuando ha
 - **Ronda 7 (12 de noviembre): B, los vecinos miran a otro lado.** Con el cuerpo en 2 o menos te ven la mitad de las veces; el alcalde no cambia: si te ven, todo sigue igual. Se dice por el mundo después de que pase (el panadero te mira las costillas y vuelve la cabeza). Ayuda solo al que hurta por necesidad (veterana en apuros, de 38,6 % a 49,6 %; moza del oficio, de 89,1 % a 91,8 %) y no mueve nada para el que hurta siempre. Descartadas: nada, solo se dice (A) y restituir en San Esteban (C: no llega a quien la necesita, porque el que hurtó por hambre no tiene dos pedazos que devolver, y sí al que hurta con pan de sobra: hurtar siempre sube de 8 % a 20 % para la veterana; el hallazgo puede quedar como texto del fraile). Pendiente: con B el necesitado casi deja de llegar a la horca (de 12 % a 3,5 % de las cadenas), no está medido si tienta quedarse flaco para hurtar más seguro, y «te buscan» sigue sin freno.
 - Las medidas con las rondas 1 a 7 fijas están en `claude/hurto-medidas-r7.jsonl`.
 
+- **Ronda 8 (12 de noviembre): D, las dos.** Catalina (la que se arriesga) hurta cuando pasa hambre (cuerpo 2 o menos y sin cena), con tus mismas reglas, y de noche te lo cuenta; Pedro no hurta. Y el que te vende cuenta también lo que has hurtado ese verano: desde ese día te buscan. Con Catalina hurtando se le mueren menos tuyos al veterano (de 0,48 a 0,30 por cadena) y la cadena sube (veterano en apuros, de 25,5 % a 34,5 %; oficio, de 54,2 % a 58,8 %); el malsín resta alrededor de un punto y pasa en 7-9 de cada 100 cadenas si hurtas en apuros. Avisos: hace la cadena más fácil, y a Catalina la ahorcan en 1 de cada 200 cadenas (la horca sigue sin verse).
+- Las medidas con las rondas 1 a 8 fijas, y las del cierre, están en `claude/hurto-medidas-r8.jsonl` (las tandas hechas con `HGENTE=poca|mucha` llevan `conGente`).
+
+### Lo medido para el cierre (ronda 9, sin decidir)
+
+- **Ni siempre ni nunca, con todo lo decidido** (llega o completa: nunca / en apuros / cuando falta la ración / siempre). Un verano: veterano 52,6 / 74,9 / 73,6 / 56,5; oficio 98,1 / 98,3 / 85,4 / 59,8. Cadena como mozo: 6,8 / 34,3 / 34,0 / 18,4 y 55,1 / 58,3 / 29,1 / 18,4. Cadena como moza: 6,9 / 52,3 / 36,1 / 9,2 y 87,4 / 91,3 / 38,9 / 20,4.
+- **La gente (ronda 2).** El bot que solo hurta con mucha gente sale peor con todos los números probados (veterano hurtando siempre: 19-32 % frente a 49-62 % con poca; en apuros, 68 % frente a 73-74 %), no porque le cojan más sino porque hay menos ocasiones y que te cojan cuesta el pan y el día en el acto. La regla funciona como restricción legible («con el mercado lleno, no»), no como elección entre dos riesgos.
+- **Te buscan tres días** (`busca3`): quita el apretón al que se sabe buscado (oficio que hurta cuando le falta la ración: un verano, de 85,4 % a 96,7 %; cadena, de 29,1 % a 43,7 %; como moza, de 38,9 % a 73,9 %) y sube «siempre» entre 1 y 4 puntos.
+- **Catalina hurta antes**, con el cuerpo en 3 o menos (`catalina3`): la ahorcan en 3-6 de cada 100 cadenas (antes, 1 de cada 200).
+- **Con poca gente te ven 1 de cada 2** (`poca50`): baja «siempre» 4-5 puntos y casi no toca «en apuros».
+- **Paquetes:** `cierreC` (tres días y Catalina antes) y `cierreD` (lo mismo y poca gente 1 de cada 2).
+- **Barrido del riesgo** (×0,5 y ×2 sobre la base): con la mitad, el veterano que hurta siempre llega el 67 % (nunca, 53 %); con el doble, a la moza del oficio en apuros le queda un margen de 0,8 puntos sobre no hurtar.
+
 ## Orden de las preguntas
 
 1. Qué se coge y qué da que no dé pedir. 2. Quién te ve y qué pasa si te ven. 3. La escalera de la justicia. 4. Qué es morir ahorcado: solo o acompañado. 5. Las marcas en el cuerpo y quién las lee. 6. Hombre y mujer, y 1552. 7. La necesidad extrema. 8. Los tuyos y malsinar. 9. Cierre: números y «ni siempre ni nunca».

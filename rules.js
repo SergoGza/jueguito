@@ -340,9 +340,12 @@
       // o «anoche» (sigues como el que durmió contigo la última noche que dormiste libre, si sigue libre)
       horca: "solo", // DECIDIDO (ronda 4, 11 de noviembre): ahorcado, mueres solo y se acaba la cadena
       // los tuyos: si la que se arriesga hurta cuando pasa hambre, con estas mismas reglas
-      tuyosHurtan: false, tuyosCuerpo: 2,
+      // DECIDIDO (ronda 8, 12 de noviembre): Catalina hurta cuando pasa hambre, y el que te vende cuenta también tus hurtos
+      tuyosHurtan: true, tuyosCuerpo: 2,
       // malsinar: si el que te vende cuenta también lo que has hurtado este verano (te buscan)
-      malsinar: false,
+      malsinar: true,
+      // cuántos días te buscan por tus señas (null: hasta que te prenden o hasta el invierno)
+      buscaDias: null,
     },
   };
 

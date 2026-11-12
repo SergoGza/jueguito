@@ -299,7 +299,8 @@
       ropa: { cuerpo: 1, pan: 1 }, // con ropa hurtada, el invierno se pasa un escalón mejor
       // ¿te ven? Con «bulto», la gente tapa (mucha gente, menos ojos sobre ti); con «ojos», la gente mira.
       ojos: "bulto",
-      visto: { bulto: { 2: 0.35, 3: 0.25 }, ojos: { 2: 0.2, 3: 0.4 } },
+      // DECIDIDO (ronda 9, 12 de noviembre): con poca gente te ven 1 de cada 2; con mucha, 1 de cada 4
+      visto: { bulto: { 2: 0.5, 3: 0.25 }, ojos: { 2: 0.2, 3: 0.4 } },
       vistoFijo: { olla: 0.3, ropa: 0.3 },
       riesgo: 1,          // multiplica todo lo anterior (para barrer el riesgo)
       repite: 2,          // multiplica si ya has hurtado hoy en ese sitio
@@ -341,11 +342,12 @@
       horca: "solo", // DECIDIDO (ronda 4, 11 de noviembre): ahorcado, mueres solo y se acaba la cadena
       // los tuyos: si la que se arriesga hurta cuando pasa hambre, con estas mismas reglas
       // DECIDIDO (ronda 8, 12 de noviembre): Catalina hurta cuando pasa hambre, y el que te vende cuenta también tus hurtos
-      tuyosHurtan: true, tuyosCuerpo: 2,
+      // (ronda 9: Catalina hurta antes, con el cuerpo en 3 o menos)
+      tuyosHurtan: true, tuyosCuerpo: 3,
       // malsinar: si el que te vende cuenta también lo que has hurtado este verano (te buscan)
       malsinar: true,
       // cuántos días te buscan por tus señas (null: hasta que te prenden o hasta el invierno)
-      buscaDias: null,
+      buscaDias: 3, // DECIDIDO (ronda 9): te buscan tres días
     },
   };
 

@@ -1,5 +1,7 @@
 # Hurtar y la horca: prototipo para bots
 
+**12 de noviembre de 2026: montado en la j0.12.** Lo decidido en las nueve rondas tiene ya pantalla (botón «Activar hurtar» al empezar) y está en `main`; ver «Hurtar y la horca» en el README y «Montado en la j0.12» al final de esta nota. Lo que sigue es el registro del prototipo y de las medidas, tal como se escribió.
+
 10 de noviembre de 2026. Rama `claude/hurto-prototipo`, sobre la j0.11 más el bot aplicado (`f0fe327`). No va a `main`, no tiene pantalla y no decide nada: son palancas para medir las opciones antes de que Sergio decida por rondas.
 
 ## Qué hay
@@ -69,7 +71,7 @@ Base: se hurta una hogaza (2 pedazos en 2 ratos) en la Plaza o la Rúa cuando ha
 - Las medidas con las rondas 1 a 8 fijas, y las del cierre, están en `claude/hurto-medidas-r8.jsonl` (las tandas hechas con `HGENTE=poca|mucha` llevan `conGente`).
 
 - **Ronda 9 (12 de noviembre): D, los tres ajustes.** Te buscan tres días; Catalina hurta antes (con el cuerpo en 3 o menos); con poca gente te ven 1 de cada 2 (con mucha, 1 de cada 4). Quedan fijados en `rules.js`, y las medidas finales están en `claude/hurto-medidas-final.jsonl`. Comprobación final (% que llega o completa: nunca / en apuros / cuando falta la ración / siempre): un verano, veterano 52,6 / 75,0 / 73,3 / 53,0 y oficio 98,1 / 98,3 / 96,3 / 59,6; con los tuyos, 37,2 / 62,4 / 63,3 / 46,5 y 87,3 / 90,4 / 83,4 / 61,1; cadena como mozo, 8,5 / 36,5 / 34,4 / 13,8 y 57,4 / 60,9 / 45,6 / 17,3; cadena como moza, 8,3 / 49,5 / 31,4 / 6,1 y 86,6 / 91,3 / 69,0 / 17,6. A Catalina la ahorcan en 4-9 de cada 100 cadenas. Sin la opción de hurto, el motor sigue dando lo mismo que `main` (comprobado con un verano y con la cadena).
-- Las nueve decisiones están pasadas al proyecto, en `claude/decisiones-replanteamiento.md` («Hurtar y la horca»). Falta aprobar el contenido de la j0.12 y montarlo.
+- Las nueve decisiones están pasadas al proyecto, en `claude/decisiones-replanteamiento.md` («Hurtar y la horca»).
 
 ### Lo medido para el cierre (ronda 9)
 
@@ -84,3 +86,26 @@ Base: se hurta una hogaza (2 pedazos en 2 ratos) en la Plaza o la Rúa cuando ha
 ## Orden de las preguntas
 
 1. Qué se coge y qué da que no dé pedir. 2. Quién te ve y qué pasa si te ven. 3. La escalera de la justicia. 4. Qué es morir ahorcado: solo o acompañado. 5. Las marcas en el cuerpo y quién las lee. 6. Hombre y mujer, y 1552. 7. La necesidad extrema. 8. Los tuyos y malsinar. 9. Cierre: números y «ni siempre ni nunca».
+
+## Montado en la j0.12 (12 de noviembre)
+
+Rama `claude/j0.12-hurto`, subida a `main`. Las reglas no cambian respecto de lo medido: con las mismas semillas, los bots dan exactamente los mismos resultados que el prototipo (y, sin hurtar, los de la j0.11). Lo nuevo es pantalla y texto:
+
+- **Al empezar:** botón «Activar hurtar», que vale solo o con la llaga, los tuyos o varios veranos.
+- **De día:** botón «Hurtar una hogaza» en la Plaza y la Rúa cuando hay qué coger, y una línea en «Antes de actuar» que dice el trato (poca gente: más ojos, pero puedes correr; mucha: menos ojos, pero manos que te sujetan).
+- **«Te busca la justicia · día 1 de 3»** en la cabecera, solo si lo sabes: porque te vieron la cara o porque en la ribera te dicen que quien te vendió sabía lo del pan. Si te malsinan y no duermes en la ribera esa noche, te enteras cuando te para el alguacil. Al caducar: «por las tuyas no pregunta nadie».
+- **El alcalde dice la escalera:** «A la segunda, el verdugo»; después de los azotes, «A la tercera, la soga»; al azotado, levantándole la camisa, «Azotes ya llevas. A la segunda, la soga».
+- **La necesidad:** cuando te habrían visto y no te ven por flaco, «El panadero te ha visto la mano. Te mira las costillas y vuelve la cabeza».
+- **La horca:** final propio («La horca»). Con los tuyos libres: «Catalina está entre la gente. No puede acercarse».
+- **1552:** el pregón nombra a los ladrones y dice que de las mujeres no dice nada.
+- **Catalina:** cuenta sus hurtos de noche («Me vieron la cara: me andarán buscando», «El panadero me vio. Me miró y se volvió para otro lado») y, si la prenden, lo que le dijo el alcalde.
+- **El malsín:** el alguacil, al que le han contado tus hurtos: «A ti te conozco yo de oídas: alargas la mano en los puestos».
+- **Informe y encuesta:** sección «Hurtar y la horca» (cada hurto con cuerpo, pan, gente y cómo acabó; las penas; los hurtos de Catalina) y una pregunta más: «¿Cuándo decidiste hurtar, o no hacerlo, y por qué?».
+- **Ayuda y licencias:** apartado «Hurtar» y cinco licencias nuevas (`LICENCIAS_HURTO`).
+
+Probado en Chromium sin ventana: 54 partidas enteras pulsando los botones de la app (solo hurtar, con los tuyos, con la llaga y con varios veranos), más los casos sueltos (caducan las señas, condenan a Catalina, final de la horca con los tuyos, pantalla ancha). Sin errores.
+
+Cosas que quedan como estaban y conviene saber:
+
+- Si te condenan a la horca con el cuerpo en 1, la noche de cárcel te deja en 0 y aun así el final es la horca, no el hambre (así se midió; en los dos casos la cadena se acaba).
+- Se puede hurtar con el zurrón lleno (4 pedazos): corres el riesgo y no ganas nada. Pedir hace lo mismo.

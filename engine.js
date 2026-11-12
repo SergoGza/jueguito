@@ -38,7 +38,7 @@
   const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
   const LL = P.llaga || {};
   const CA = P.cadena || {};
-  const HU = P.hurto || {}; // hurtar y la horca: prototipo para bots (rama claude/hurto-prototipo)
+  const HU = P.hurto || {}; // hurtar y la horca (j0.12; se activa al empezar)
   const cuerpoMax = (s) => (s.llaga ? LL.cuerpoMax : P.cuerpoMax);
 
   // ------------------------------------------------------------------ tiempo
@@ -186,7 +186,7 @@
       conLlaga: !!(opts && opts.llaga), // la llaga se activa al empezar (prueba de fingir)
       conTuyos: !!(opts && (opts.tuyos || opts.cadena)) && modo === "A", // los tuyos se activan al empezar (j0.10); solo en la prueba A
       conCadena: !!(opts && opts.cadena) && modo === "A", // varios veranos (j0.11), siempre con los tuyos
-      conHurto: !!(opts && opts.hurto) && modo === "A" && !!P.hurto, // hurtar y la horca (prototipo para bots)
+      conHurto: !!(opts && opts.hurto) && modo === "A" && !!P.hurto, // hurtar y la horca (j0.12; se activa al empezar); solo en la prueba A
       hurtos: 0, oreja: false, buscado: false, ropa: false,
       verano: 0, anio: R.VERANOS ? R.VERANOS[0].anio : 1545,
       // quién eres: el mozo de La Armuña; en la cadena, después, el heredero (los bots pueden empezar con una moza)
@@ -207,8 +207,10 @@
     s.t = 0; s.avisos = {}; s.avisosT = {}; s.pedidoHoy = []; s.trabajoHoy = false; s.trabajoPedido = false;
     s.detenidoHoy = null; s.hoy = nuevoHoy(); s.aviso = null; s.fase = "amanecer"; s.azotesHoy = 0;
     s.hurtadoHoy = []; s.penaHurto = null;
-    // (prototipo de hurto) si las señas caducan, a los tantos días dejan de buscarte
-    if (HU.buscaDias && s.buscado && s.dia - (s.buscadoDia || 0) >= HU.buscaDias) s.buscado = false;
+    // las señas caducan: a los tantos días dejan de buscarte (si sabías que te buscaban, te enteras al amanecer)
+    s.yaNoBuscan = false;
+    if (HU.buscaDias && s.buscado && s.dia - (s.buscadoDia || 0) >= HU.buscaDias) { s.buscado = false; s.yaNoBuscan = !!s.buscadoSabe; }
+    if (!s.buscado) { s.buscadoSabe = false; s.buscadoPor = null; }
     if (HU.buscaDias) for (const tu of s.tuyos || []) if (tu.buscado && s.dia - (tu.buscadoDia || 0) >= HU.buscaDias) tu.buscado = false;
     rondaFranja(s, s.dia, 0);
     if (s.conTuyos) { tuyosAmanecer(s); for (const tu of s.tuyos) tuyoFranja(s, tu, s.dia, 0); s.tuyosF = 0; }
@@ -360,7 +362,7 @@
     // con la cadena (j0.11): a la mujer no la detiene: la echa, y si ya la conoce, la azota y la echa; al que azotaron
     // otro verano le mira la espalda (es como si le conociera); al hombre sano que no conoce lo manda a las obras sin paga
     // al que buscan por ladrón no lo para la ronda de pobres: lo prende la justicia (hombre o mujer)
-    if (s.buscado) { prender(s, "le reconoce la ronda", [`En ${L[r].nombre} te para el alguacil. Te mira despacio: «Tú eres el de las señas. A ti te busca la justicia».`]); return; }
+    if (s.buscado) { prender(s, "le reconoce la ronda", [`En ${L[r].nombre} te para el alguacil. Te mira despacio: ${senas(s)}.`]); return; }
     const mujer = rasgos(s) && !esHombre(s);
     // la espalda azotada (con la cadena) y la oreja cortada se leen aunque no te conozcan la cara
     const espalda = !s.conocido && ((rasgos(s) && !!s.azotado) || (!!s.oreja && (HU.oreja || {}).conoce));
@@ -482,7 +484,7 @@
       const kp = `${s.dia}|${pillado === "llega" ? f0 + 1 : f0}`;
       const lin = [l1];
       if (esTuCostumbre(s, kp)) lin.push((s.rondasContado || {})[kp] ? "«Ya me han contado dónde pides», dice el alguacil." : "«Sabía que te encontraría aquí», dice el alguacil.");
-      if (s.buscado) { lin.push("El alguacil te mira despacio: «Tú eres el de las señas. A ti te busca la justicia»."); prender(s, "pidiendo, le reconoce la ronda", lin); return true; }
+      if (s.buscado) { lin.push(`El alguacil te mira despacio: ${senas(s)}.`); prender(s, "pidiendo, le reconoce la ronda", lin); return true; }
       lin.push("Pedir está prohibido en la ciudad desde la orden de pobres.");
       detener(s, pillado === "llega" ? "pidiendo, llegó la ronda" : "pidiendo delante de la ronda", lin);
       return true;
@@ -504,11 +506,14 @@
     return true;
   }
 
-  // ------------------------------------------------------------------ hurtar y la horca (prototipo para bots)
+  // ------------------------------------------------------------------ hurtar y la horca (j0.12)
   // Lo castiga la justicia, no la ronda de pobres. Quien te ve es el dueño o el vecino; si te ven, o te cogen allí
   // mismo o escapas y te buscan por tus señas (y entonces cualquier encuentro con la ronda es con la justicia).
   // La pena es una escalera aparte de las detenciones por pedir, y lo que deja se lleva en el cuerpo.
+  // Las palancas que no se eligieron (olla, ropa, oreja, restituir…) siguen en rules.js para los bots; están apagadas.
   const dondeHurto = () => (HU.donde || {})[HU.que] || {};
+  // lo que te dice el alguacil cuando te reconoce: por las señas que dio quien te vio, o por lo que contó quien te vendió
+  const senas = (s) => (s.buscadoPor === "malsin" ? "«A ti te conozco yo de oídas: alargas la mano en los puestos. A ti te busca la justicia»" : "«Tú eres el de las señas. A ti te busca la justicia»");
   function puedeHurtar(s) {
     if (!s.conHurto || s.fase === "noche" || s.t + HU.ratos > FIN) return false;
     const f = franja(s.t), fs = dondeHurto()[s.lugar];
@@ -562,7 +567,8 @@
     const extra = [];
     if (lleva) extra.push("Te quitan lo que llevas.");
     if (pena === "galeras") { s.galeras = true; extra.push("El alcalde no manda azotarte: a la vergüenza y cuatro años de galeras, como manda la pragmática. Mañana sales con la cadena de galeotes."); }
-    else if (pena === "horca") extra.push("Te llevan a la cárcel de la justicia. El alcalde te mira la espalda y la oreja y no pregunta más: la horca.");
+    else if (pena === "horca") extra.push(s.oreja ? "Te llevan a la cárcel de la justicia. El alcalde te mira la espalda y la oreja y no pregunta más: la horca."
+      : "Te llevan a la cárcel de la justicia. El alcalde te manda levantar la camisa, te mira la espalda y no pregunta más: la horca.");
     else if (pena === "oreja") extra.push("Te llevan a la cárcel de la justicia. Mañana, en el rollo, azotes y la oreja.");
     else if (pena === "verguenza") extra.push("Te llevan a la cárcel de la justicia. Mañana te sacan a la vergüenza.");
     else extra.push("Te llevan a la cárcel de la justicia. Mañana te sacan a la vergüenza y te azotan por las calles.");
@@ -572,8 +578,14 @@
   function penaNoche(o, lin) {
     const pena = o.penaHurto;
     // la vergüenza sola: paseado en un asno con el pregonero delante, sin azotes; no deja marca en el cuerpo
-    if (pena === "verguenza") { if (lin) lin.push("Por la mañana te sacan a la vergüenza: en un asno, con las manos atadas y el pregonero delante diciendo tu hurto por las calles acostumbradas. «A la segunda, el verdugo», dice el alcalde."); return { dc: 0, azotes: false }; }
-    if (pena === "azotes") { o.azotado = true; o.verdugo = true; if (lin) lin.push("Por la mañana te sacan a la vergüenza, en un asno, con el pregonero delante diciendo tu hurto, y te azotan por las calles."); return { dc: P.carcel.azotes, azotes: true }; }
+    // lo que viene después lo dice el alcalde: al limpio, «el verdugo»; al que ya lleva azotes (de lo que sea), «la soga»
+    if (pena === "verguenza") {
+      const soga = HU.espalda === "acorta" && marcada(o);
+      if (lin) lin.push("Por la mañana te sacan a la vergüenza: en un asno, con las manos atadas y el pregonero delante diciendo tu hurto por las calles acostumbradas. "
+        + (soga ? "Antes de soltarte, el alcalde te levanta la camisa: «Azotes ya llevas. A la segunda, la soga»." : "«A la segunda, el verdugo», dice el alcalde."));
+      return { dc: 0, azotes: false };
+    }
+    if (pena === "azotes") { o.azotado = true; o.verdugo = true; if (lin) lin.push("Por la mañana te sacan a la vergüenza, en un asno, con el pregonero delante diciendo tu hurto, y el verdugo te azota por las calles. «A la tercera, la soga», dice el alcalde."); return { dc: P.carcel.azotes, azotes: true }; }
     if (pena === "oreja") { o.azotado = true; o.verdugo = true; o.oreja = true; if (lin) lin.push("Por la mañana, en el rollo de la plaza, te azotan y el verdugo te corta una oreja, para que se te conozca."); return { dc: P.carcel.azotes, azotes: true }; }
     if (pena === "horca") { o.horca = true; if (lin) lin.push("No hay más que oír. Mañana, la horca."); }
     return { dc: 0, azotes: false };
@@ -584,6 +596,7 @@
     const e0 = estado(s, lugar, s.dia, f0);
     const r0 = rondaEnTuZona(s);
     const pv = probVisto(s, lugar, f0);
+    const ctx = { f: f0, cuerpo: s.cuerpo, panAntes: s.pan, gente: e0.gente >= 3 ? "mucha" : "poca", ronda: !!r0 }; // para el informe
     s.hoy.hurtos++;
     s.hurtosVerano = (s.hurtosVerano || 0) + 1;
     s.hurtadoHoy.push(lugar);
@@ -599,32 +612,41 @@
     };
     // con la ronda delante, te coge ella
     if (r0 && tirar(s, "hurtoRonda") < HU.rondaDelante[e0.gente >= 3 ? 3 : 2]) {
-      apunta(s, "hurto", `Hurta en ${L[lugar].corto} con la ronda delante.`, { visto: "ronda", t: t0 });
+      apunta(s, "hurto", `Hurta en ${L[lugar].corto} con la ronda delante.`, Object.assign({ visto: "ronda", t: t0 }, ctx));
       prender(s, "hurtando delante de la ronda", [`Alargas la mano en ${L[lugar].nombre} con la ronda delante. El alguacil te coge del brazo antes de que la escondas.`]);
       return true;
     }
-    if (tirar(s, "hurtoVisto") < pv) {
+    // la necesidad extrema: sin ella te habrían visto igual, pero con el cuerpo así el dueño mira a otro lado
+    const nec = HU.necesidad && s.cuerpo <= HU.necesidad.cuerpo && HU.necesidad.visto > 0;
+    const pvSin = nec ? Math.min(1, pv / HU.necesidad.visto) : pv;
+    const rv = tirar(s, "hurtoVisto");
+    if (rv < pv) {
       // «gente»: con mucha gente te sujetan allí mismo; con poca, nadie te alcanza y te buscan
       const coge = HU.siVisto === "prendido" || (HU.siVisto === "gente" && e0.gente >= 3) || (HU.siVisto === "mixto" && tirar(s, "hurtoCoge") < HU.prendido);
       if (coge) {
-        apunta(s, "hurto", `Hurta en ${L[lugar].corto}: le ven y le cogen.`, { visto: "prendido", t: t0 });
+        apunta(s, "hurto", `Hurta en ${L[lugar].corto}: le ven y le cogen.`, Object.assign({ visto: "prendido", t: t0 }, ctx));
         prender(s, "hurtando", [`Coges ${que} en ${L[lugar].nombre}. «¡Al ladrón!». Te sujetan entre dos antes de que des tres pasos y te entregan a la justicia.`]);
         return true;
       }
       // escapas con lo hurtado, pero te han visto la cara: desde ahora te buscan
-      s.buscado = true; s.buscadoDia = s.dia;
+      s.buscado = true; s.buscadoDia = s.dia; s.buscadoSabe = true; s.buscadoPor = "visto";
       const gana = coger();
-      apunta(s, "hurto", `Hurta en ${L[lugar].corto}: le ven y escapa.`, { visto: "huye", gana, t: t0 });
-      resultado(s, "Te han visto", [`Coges ${que} en ${L[lugar].nombre}. «¡Al ladrón!». Corres y no te alcanzan.`, "Te han visto la cara. Darán tus señas a la justicia."], "mal");
+      apunta(s, "hurto", `Hurta en ${L[lugar].corto}: le ven y escapa.`, Object.assign({ visto: "huye", gana, t: t0 }, ctx));
+      resultado(s, "Te han visto", [`Coges ${que} en ${L[lugar].nombre}. «¡Al ladrón!». Corres y no te alcanzan.`, "Te han visto la cara. Darán tus señas a la justicia, y unos días te buscarán por ellas."], "mal");
       return true;
     }
     const gana = coger();
-    apunta(s, "hurto", `Hurta en ${L[lugar].corto}: nadie le ve.`, { visto: "no", gana, t: t0 });
+    if (rv < pvSin) {
+      apunta(s, "hurto", `Hurta en ${L[lugar].corto}: le ven y miran a otro lado.`, Object.assign({ visto: "perdona", gana, t: t0 }, ctx));
+      resultado(s, "Vuelve la cabeza", [`Coges ${que} en ${L[lugar].nombre}. El panadero te ha visto la mano. Te mira las costillas y vuelve la cabeza.`], "bien");
+      return true;
+    }
+    apunta(s, "hurto", `Hurta en ${L[lugar].corto}: nadie le ve.`, Object.assign({ visto: "no", gana, t: t0 }, ctx));
     resultado(s, "Nadie te ve", [`Coges ${que} en ${L[lugar].nombre} y te la metes bajo la ropa. Nadie grita.`], "bien");
     return true;
   }
 
-  // (prototipo de hurto) restituir: si te buscan y la palanca lo dice, en San Esteban un fraile habla por ti con el
+  // restituir (palanca apagada en la j0.12; quedó para los bots): si te buscan y la palanca lo dice, en San Esteban un fraile habla por ti con el
   // dueño; devuelves lo que cogiste y la parte perdona. Solo vale antes de que te prenda la justicia.
   function puedeRestituir(s) {
     const SG = HU.sagrado;
@@ -783,7 +805,7 @@
           if (ladron) {
             s.hurtos = (s.hurtos || 0) + 1; s.buscado = false; s.ropa = false;
             s.penaHurto = penaHurto(s, esHombre(s), s.hurtos, s);
-            lin.push("«Tú eres el de las señas», dice el alguacil. «A ti te busca la justicia».");
+            lin.push(`El alguacil te acerca el farol a la cara: ${senas(s)}.`);
             apunta(s, "prendido", `Prendido por ladrón (de noche) en ${L[s.lugar].corto}: ${s.penaHurto}.`, { motivo: "de noche", pena: s.penaHurto });
             if (s.penaHurto === "galeras") { s.galeras = true; lin.push("Por la mañana el alcalde te condena a la vergüenza y a cuatro años de galeras, como manda la pragmática."); }
             else { const x = penaNoche(s, lin); dc += x.dc; azotes = azotes || x.azotes; }
@@ -803,7 +825,7 @@
     if (s.llaga && s.llaga === s.dia) { dc += LL.cuerpo; lin.push("La llaga te da fiebre toda la noche."); }
     else if (s.llaga && LL.encona && tirar(s, "encona") < LL.encona) { dc -= 1; lin.push("La llaga se te ha enconado: supura y te sube la fiebre."); }
     s.cuerpo = clamp(s.cuerpo + dc, 0, cuerpoMax(s));
-    // (prototipo de hurto) con quién has dormido la última noche que has dormido libre: es quien te ve ahorcar si la palanca dice «anoche»
+    // (palanca apagada) con quién has dormido la última noche que has dormido libre: es quien te ve ahorcar si la palanca dice «anoche»
     if (s.conTuyos && s.duerme !== "carcel") s.conQuien = (s.tuyos || []).filter((tu) => juntos(s, tu)).map((tu) => tu.id);
     if (s.conTuyos) { tuyosNoche(s, lin); s.nocheTuyos = null; }
     s.porDia.push(Object.assign({ anio: s.anio, dia: s.dia, modo: s.modo, cuerpoNoche: s.cuerpo, comido, duerme: s.duerme, detenido: s.detenidoHoy || (detenidoNoche ? "de noche" : null) }, s.hoy, { lugares: Object.keys(s.hoy.lugares).length }));
@@ -896,7 +918,10 @@
       : horca ? (HU.horca === "acompanado" ? vivos.filter((tu) => !tu.detenido) : HU.horca === "anoche" ? vivos.filter((tu) => !tu.detenido && (!s.conQuien || s.conQuien.includes(tu.id))) : []) : vivos;
     const nombres = (xs) => listaY(xs.map((t) => t.nombre));
     let cola;
-    if (horca) cola = cands.length ? `${nombres(cands)} ${cands.length > 1 ? "están" : "está"} entre la gente, al pie de la horca.` : "Entre la gente que mira no hay nadie que te conozca.";
+    // ahorcado mueres solo: los tuyos que quedan libres pueden estar entre la gente, pero no heredan
+    const miran = vivos.filter((tu) => !tu.detenido);
+    if (horca) cola = cands.length ? `${nombres(cands)} ${cands.length > 1 ? "están" : "está"} entre la gente, al pie de la horca.`
+      : miran.length ? `${nombres(miran)} ${miran.length > 1 ? "están" : "está"} entre la gente. No ${miran.length > 1 ? "pueden" : "puede"} acercarse.` : "Entre la gente que mira no hay nadie que te conozca.";
     else if (muere) cola = cands.length ? `${nombres(cands)} ${cands.length > 1 ? "estaban" : "estaba"} contigo.` : "Nadie te ha visto morir.";
     else if (tipo === "desterrado") cola = vivos.length ? `${nombres(vivos)} se ${vivos.length > 1 ? "quedan" : "queda"} en la ribera.` : `Te vas ${esHombre(s) ? "solo" : "sola"}.`;
     else cola = vivos.length ? `${nombres(vivos)} te ${vivos.length > 1 ? "ven" : "ve"} pasar desde el puente.` : "Nadie te ve salir.";
@@ -963,7 +988,7 @@
     s.cuerpo = tu.cuerpo; s.pan = tu.pan; s.detenciones = tu.detenciones; s.azotado = !!tu.azotado; s.verdugo = !!tu.verdugo;
     s.llaga = 0; s.llagaPasadas = 0; s.galeras = false; s.trabajoHoy = false; s.conocido = false;
     s.hurtos = tu.hurtos || 0; s.oreja = !!tu.oreja; s.buscado = false; s.ropa = false; s.horca = false; s.penaHurto = null; s.hurtosVerano = 0; s.conQuien = null; s.restituidoVerano = 0;
-    s.heredados = (s.heredados || []).concat([{ id: tu.id, nombre: tu.nombre, manera: tu.manera, anio: s.anio, detenciones: tu.detenciones, recibido: tu.recibido, negadas: tu.negadas, noches: tu.noches }]);
+    s.heredados = (s.heredados || []).concat([{ id: tu.id, nombre: tu.nombre, manera: tu.manera, anio: s.anio, detenciones: tu.detenciones, recibido: tu.recibido, negadas: tu.negadas, noches: tu.noches, hurtosHechos: tu.hurtosHechos || 0 }]);
     s.tuyos = s.tuyos.filter((t) => t.id !== tu.id);
   }
   function elegirHeredero(s, id) {
@@ -1028,7 +1053,7 @@
     if (s.llaga) s.llaga = -1; // la llaga sigue abierta; se la hizo otro verano
     const yo = ini[s.siega.yo] || ini.nada;
     s.cuerpo = Math.min(cuerpoMax(s), yo.cuerpo); s.pan = yo.pan;
-    // con ropa hurtada, el invierno se pasa mejor (prototipo de hurto)
+    // con ropa hurtada, el invierno se pasa mejor (palanca apagada)
     if (s.ropa && HU.ropa) { s.cuerpo = Math.min(cuerpoMax(s), s.cuerpo + HU.ropa.cuerpo); s.pan = Math.min(P.panMax, s.pan + HU.ropa.pan); }
     s.ropa = false; s.buscado = false; s.hurtosVerano = 0; s.penaHurto = null; s.horca = false; s.conQuien = null; s.restituidoVerano = 0;
     if (HU.memoria === "cuerpo") { s.hurtos = peldanoDelCuerpo(s, esHombre(s)); for (const tu of tuyosVivos(s)) tu.hurtos = peldanoDelCuerpo(tu, tu.el); }
@@ -1125,7 +1150,11 @@
         }
         s.malsinado = { por: tu.nombre, dia: s.dia };
         // si la palanca lo dice, cuenta también lo que has hurtado este verano: desde hoy te buscan
-        if (s.conHurto && HU.malsinar && (s.hurtosVerano || 0) > 0) { s.buscado = true; s.buscadoDia = s.dia; s.malsinado.hurto = true; }
+        // (tú no lo sabes hasta que te lo dicen en la ribera esa noche, o hasta que te para el alguacil)
+        if (s.conHurto && HU.malsinar && (s.hurtosVerano || 0) > 0) {
+          if (!s.buscado) { s.buscadoSabe = false; s.buscadoPor = "malsin"; }
+          s.buscado = true; s.buscadoDia = s.dia; s.malsinado.hurto = true;
+        }
         tuyoSeVa(s, tu, "malsino", s.dia);
         apunta(s, "tuyos", `${tu.nombre} va al alguacil y le cuenta dónde pides.`);
         continue;
@@ -1239,16 +1268,18 @@
       }
       return mejor && mejor.l;
     };
-    // (prototipo de hurto) la que se arriesga, cuando pasa hambre y no tiene para cenar, hurta donde hay qué coger,
+    // hurtar (j0.12): la que se arriesga, cuando pasa hambre y no tiene para cenar, hurta donde hay qué coger,
     // con las mismas reglas que tú: la pueden ver, coger o buscar
     if (s.conHurto && HU.tuyosHurtan && HU.que !== "ropa" && !prudente && !tu.hurtoHoy && tu.cuerpo <= HU.tuyosCuerpo && tu.pan < 2 && f >= 1 && f <= 4
       && L[tu.lugar].dentro && rf !== tu.lugar && genteBase(s, tu.lugar, d, f) >= 2) {
-      tu.hurtoHoy = true;
+      tu.hurtoHoy = true; tu.hurtosHechos = (tu.hurtosHechos || 0) + 1;
       marcar(tu.lugar, false);
       let pv = (HU.que === "hogaza" ? HU.visto[HU.ojos][genteBase(s, tu.lugar, d, f) >= 3 ? 3 : 2] : HU.vistoFijo[HU.que]) * HU.riesgo;
+      const pvSin = pv;
       if (HU.necesidad && tu.cuerpo <= HU.necesidad.cuerpo) pv *= HU.necesidad.visto;
       if (HU.aviso && TU.mundo !== false) { s.avisos[tu.lugar] = (s.avisos[tu.lugar] || 0) + HU.aviso; s.avisosT[tu.lugar] = d * 100 + f * R.RATOS; }
-      if (rnd("hurtoVisto") < pv) {
+      const rv = rnd("hurtoVisto");
+      if (rv < pv) {
         if (HU.siVisto === "prendido" || (HU.siVisto === "gente" && genteBase(s, tu.lugar, d, f) >= 3) || (HU.siVisto === "mixto" && rnd("hurtoCoge") < HU.prendido)) { prenderTuyo(s, tu, "hurtando", f, tu.lugar); return; }
         tu.buscado = true; tu.buscadoDia = d;
         tu.pan = Math.min(P.panMax, tu.pan + HU.gana);
@@ -1256,7 +1287,7 @@
         return;
       }
       tu.pan = Math.min(P.panMax, tu.pan + HU.gana);
-      tu.hoy.log.push({ f, lugar: tu.lugar, tipo: "hurto", visto: false });
+      tu.hoy.log.push({ f, lugar: tu.lugar, tipo: "hurto", visto: false, perdona: rv < pvSin });
       return;
     }
     // con la cadena (j0.11), el hombre que ha dormido dentro y tiene las obras a un paso pide trabajo a prima
@@ -1316,7 +1347,7 @@
     if (galeras(s, tu.el)) tu.galeras = true; // desde 1552, el hombre detenido va a galeras (j0.11)
     tu.hoy.log.push({ f, lugar, tipo: "detenido", motivo });
   }
-  // (prototipo de hurto) a uno de los tuyos lo prenden por ladrón: la misma escalera que a ti
+  // a uno de los tuyos lo prenden por ladrón: la misma escalera que a ti
   function prenderTuyo(s, tu, motivo, f, lugar) {
     tu.hurtos = (tu.hurtos || 0) + 1; tu.buscado = false; tu.conocido = true; tu.pan = 0; tu.detenido = "ladrón: " + motivo;
     if (HU.cuenta) tu.detenciones++;
@@ -1337,7 +1368,15 @@
     const nt = [];
     for (const tu of s.tuyos) {
       if (tu.estado !== "vive") {
-        if (tu.fin && tu.fin.dia === d && tu.estado === "malsino" && conmigo) nt.push({ id: tu.id, nombre: tu.nombre, presente: false, lineas: [`${tu.nombre} no ha vuelto a la ribera. Dicen que ${tu.el ? "lo" : "la"} vieron hablando con el alguacil.`] });
+        if (tu.fin && tu.fin.dia === d && tu.estado === "malsino" && conmigo) {
+          const lineas = [`${tu.nombre} no ha vuelto a la ribera. Dicen que ${tu.el ? "lo" : "la"} vieron hablando con el alguacil.`];
+          // si contó también lo que has hurtado, en la ribera se sabe: desde ahora sabes que te buscan
+          if (s.malsinado && s.malsinado.hurto && s.malsinado.dia === d && s.malsinado.por === tu.nombre) {
+            lineas.push(`${tu.nombre} sabía lo del pan que cogiste. Si lo ha contado, te andarán buscando.`);
+            if (s.buscado) s.buscadoSabe = true;
+          }
+          nt.push({ id: tu.id, nombre: tu.nombre, presente: false, lineas });
+        }
         continue;
       }
       tu.duerme = tu.detenido ? "carcel" : L[tu.lugar].dentro ? "portal" : "raso";
@@ -1388,7 +1427,7 @@
         else if (g.tipo === "azotada") frases.push(`A ${fr(f)} me paró el alguacil en ${L[g.lugar].nombre}, me azotaron allí mismo y me echó de la ciudad.`);
         else if (g.tipo === "obras") frases.push(`A ${fr(f)} me paró el alguacil en ${L[g.lugar].nombre} y me mandó a cargar piedra a las obras hasta la noche, sin paga.`);
         else if (g.tipo === "trabajo") frases.push(`A ${fr(f)} me cogieron de peón en las obras: ${P.trabajo.paga} pedazos.`);
-        else if (g.tipo === "hurto") frases.push(g.visto ? `A ${fr(f)} cogí pan de un puesto en ${L[g.lugar].nombre}. Me vieron la cara.` : `A ${fr(f)} cogí pan de un puesto en ${L[g.lugar].nombre}. No me vio nadie.`);
+        else if (g.tipo === "hurto") frases.push(`A ${fr(f)} cogí pan de un puesto en ${L[g.lugar].nombre}. ` + (g.visto ? "Me vieron la cara: me andarán buscando." : g.perdona ? "El panadero me vio. Me miró y se volvió para otro lado." : "No me vio nadie."));
         else if (g.ronda) frases.push(`A ${fr(f)} vi la ronda en ${L[g.lugar].nombre}.`);
         else if (!sinF.includes(g.lugar)) sinF.push(g.lugar);
         if (!["echado", "detenido", "obras", "azotada"].includes(g.tipo)) items.push({ dia: d, f, lugar: g.lugar, ronda: !!g.ronda });
@@ -1434,6 +1473,14 @@
     apunta(s, "dar", `Da ${n === 1 ? "un pedazo" : n + " pedazos"} a ${tu.nombre}.`, { quien: id, n });
     return true;
   }
+  // lo que cuenta al día siguiente aquel de los tuyos al que prendieron por ladrón: cómo fue y lo que le dijo el alcalde
+  function cuentaPena(tu, como, soga) {
+    const pena = tu.penaHurto;
+    if (pena === "oreja") return `${tu.nombre} vuelve con un trapo atado a la cabeza: «${como}. Me han azotado y me han cortado la oreja».`;
+    if (pena === "azotes") return `${tu.nombre}: «${como}. Me han sacado a la vergüenza y me ha azotado el verdugo. El alcalde dice que a la tercera, la soga».`;
+    if (pena === "verguenza") return `${tu.nombre}: «${como}. Me han sacado a la vergüenza en un asno, con el pregonero delante. El alcalde ${soga ? "me levantó la camisa: que azotes ya llevo, y que a la segunda, la soga" : "dice que a la segunda, el verdugo"}».`;
+    return `${tu.nombre}: «${como}».`; // galeras u horca: no vuelve a contarlo
+  }
   // la noche de los tuyos: cenan lo suyo y lo que les diste, duermen donde les pilla, y deciden si te venden
   function tuyosNoche(s, lin) {
     const d = s.dia;
@@ -1446,9 +1493,9 @@
       if (tu.duerme === "carcel") {
         dc += P.carcel.cuerpo;
         if (tu.penaHurto) {
+          const soga = HU.espalda === "acorta" && marcada(tu); // antes de la pena de hoy: si ya llevaba azotes
           if (!tu.galeras) { const x = penaNoche(tu, null); dc += x.dc; azotes = azotes || x.azotes; }
-          tu.ayer = tu.oreja && tu.penaHurto === "oreja" ? `${tu.nombre} vuelve con un trapo atado a la cabeza: «Me cogieron con el pan en la mano. Me han azotado y me han cortado la oreja».`
-            : `${tu.nombre}: «Me cogieron con el pan en la mano. Me sacaron a la vergüenza y me azotaron».`;
+          tu.ayer = cuentaPena(tu, tu.detenido === "ladrón: hurtando" ? "Me cogieron con el pan en la mano" : "Me paró el alguacil: me buscaban por el pan que cogí", soga);
         } else {
         if (tu.detenciones === 2 && !tu.galeras) { dc += P.carcel.azotes; azotes = true; tu.azotado = true; tu.verdugo = true; }
         tu.ayer = `${tu.nombre}: «Ayer me cogió la ronda${azotes ? " y me azotaron" : ""}. He pasado la noche en la cárcel».`;
@@ -1465,12 +1512,15 @@
             const ladron = !!tu.buscado;
             if (!ladron || HU.cuenta) tu.detenciones++;
             tu.conocido = true; tu.pan = 0; tu.durmio = "carcel";
+            let ayerLadron = null;
             if (ladron) {
+              const soga = HU.espalda === "acorta" && marcada(tu);
               tu.hurtos = (tu.hurtos || 0) + 1; tu.buscado = false; tu.penaHurto = penaHurto(s, tu.el, tu.hurtos, tu);
               if (tu.penaHurto === "galeras") tu.galeras = true; else { const x = penaNoche(tu, null); dc += x.dc; azotes = azotes || x.azotes; }
+              ayerLadron = cuentaPena(tu, "Anoche la ronda me sacó de un portal. Me buscaban por el pan que cogí", soga);
             } else if (galeras(s, tu.el)) tu.galeras = true;
             else if (tu.detenciones === 2) { dc += P.carcel.azotes; azotes = true; tu.azotado = true; tu.verdugo = true; }
-            tu.ayer = `${tu.nombre}: «Anoche la ronda me sacó de un portal${azotes ? " y me azotaron" : ""}».`;
+            tu.ayer = ayerLadron || `${tu.nombre}: «Anoche la ronda me sacó de un portal${azotes ? " y me azotaron" : ""}».`;
             tu.lugar = "puerta";
           } else tu.ayer = `${tu.nombre}: «Anoche dormí en un portal de ${L[tu.lugar].nombre}».`;
         }
@@ -1521,6 +1571,10 @@
       return `Llegáis a la siega tú y ${vivos.map((t) => t.nombre).join(" y ")}.${resto}`;
     }
     if (tipo === "desterrado") return vivos.length ? `${vivos.map((t) => t.nombre).join(" y ")} se ${vivos.length > 1 ? "quedan" : "queda"} en la ribera.${resto}` : `Te vas solo.${resto}`;
+    if (tipo === "ahorcado") {
+      const miran = vivos.filter((t) => !t.detenido);
+      return miran.length ? `${miran.map((t) => t.nombre).join(" y ")} ${miran.length > 1 ? "están" : "está"} entre la gente. No ${miran.length > 1 ? "pueden" : "puede"} acercarse.${resto}` : `Entre la gente que mira no hay nadie que te conozca.${resto}`;
+    }
     const contigo = vivos.filter((t) => s.duerme === "raso" && t.duerme === "raso");
     if (contigo.length) return `${contigo.map((t) => t.nombre).join(" y ")} ${contigo.length > 1 ? "estaban" : "estaba"} contigo.${resto}`;
     return `Mueres solo.${resto}`;
@@ -1558,7 +1612,7 @@
     L2.push(`Empezada: ${s.empezada}`);
     if (cad && s.final && s.final.cadena) L2.push(`Final: tu gente, de ${s.final.cadena.desde} a ${s.final.cadena.hasta}. El último, ${s.final.cadena.quien}: ${(FINALES[s.final.tipo] || s.final.tipo).toLowerCase()}, día ${s.final.dia} de ${s.final.cadena.hasta}. ${s.final.texto}`);
     else L2.push(`Final: ${s.final ? `${FINALES[s.final.tipo] || s.final.tipo}, día ${s.final.dia}${cad ? " de " + s.anio : ""}. ${s.final.texto}` : "sin acabar"}`);
-    L2.push(`Cuerpo al final: ${s.cuerpo} · detenciones: ${s.detenciones} · llaga: ${!s.conLlaga ? "no activada" : s.llaga < 0 ? "activada; se la hizo otro verano" : s.llaga ? "activada; se la hizo la noche del día " + s.llaga : "activada; no se la hizo"} · los tuyos: ${s.conTuyos ? "activados" : "no activados"} · varios veranos: ${cad ? `activado (va por ${s.anio}, juega ${s.quien.nombre})` : "no activado"}`);
+    L2.push(`Cuerpo al final: ${s.cuerpo} · detenciones: ${s.detenciones} · llaga: ${!s.conLlaga ? "no activada" : s.llaga < 0 ? "activada; se la hizo otro verano" : s.llaga ? "activada; se la hizo la noche del día " + s.llaga : "activada; no se la hizo"} · los tuyos: ${s.conTuyos ? "activados" : "no activados"} · varios veranos: ${cad ? `activado (va por ${s.anio}, juega ${s.quien.nombre})` : "no activado"} · hurtar: ${s.conHurto ? "activado" : "no activado"}`);
     L2.push("");
     L2.push("== Encuesta ==");
     const E = s.encuesta || {};
@@ -1568,6 +1622,7 @@
     L2.push(`4. Qué sobraba, estorbaba o no entendió: ${E.sobro || "—"}`);
     L2.push(`5. Otros: ${E.otros || "—"}`);
     if (cad) L2.push(`6. Si pesó saber que seguiría como uno de los tuyos: ${E.cadena || "—"}`);
+    if (s.conHurto) L2.push(`${cad ? 7 : 6}. Cuándo decidió hurtar, o no hacerlo, y por qué: ${E.hurto || "—"}`);
     L2.push("");
     if (cad) {
       L2.push("== La cadena ==");
@@ -1576,15 +1631,28 @@
       L2.push("");
     }
     L2.push("== Para los criterios de la prueba ==");
-    L2.push(`Tiempo: moverse ${pct(T.mover)} · pedir ${pct(T.pedir)} · trabajar ${pct(T.trabajar)} · esperar o acabar antes ${pct(T.esperar)} · perdido ${pct(T.perdido)}`);
+    L2.push(`Tiempo: moverse ${pct(T.mover)} · pedir ${pct(T.pedir)} · trabajar ${pct(T.trabajar)} · esperar o acabar antes ${pct(T.esperar)} · perdido ${pct(T.perdido)}${s.conHurto ? ` · hurtar ${pct(T.hurtar)}` : ""}`);
     if (s.modo === "A") L2.push(`Pasos: ${T.pasos} (${(T.pasos / Math.max(1, s.porDia.length)).toFixed(1)} por día)`);
     else L2.push(`Cruces de barrio: ${T.cruces} (${(T.cruces / Math.max(1, s.porDia.length)).toFixed(1)} por día) · movimientos dentro del barrio: ${T.libres}`);
-    L2.push(`Pedir: ${T.pedidas} veces, ${T.panPedido} pedazos · trabajo: ${T.panTrabajo} pedazos`);
+    L2.push(`Pedir: ${T.pedidas} veces, ${T.panPedido} pedazos · trabajo: ${T.panTrabajo} pedazos${s.conHurto ? ` · hurtar: ${T.hurtos} ${T.hurtos === 1 ? "vez" : "veces"}, ${T.panHurtado} pedazos` : ""}`);
     L2.push(`Llegó donde estaba la ronda: ${T.encuentros} veces (le pararon ${T.paradas}) · vio llegar la ronda estando quieto: ${T.rondaVista}`);
     L2.push(`Abrió «Lo que recuerdas»: ${s.recuerdaAbierto || 0} veces · vio la ronda en ${(s.vistas || []).length} franjas`);
     const det = s.cronica.filter((c) => c.tipo === "detenido");
     if (det.length) L2.push("Detenciones: " + det.map((c) => `día ${c.dia}${cad ? " de " + c.anio : ""}, ${c.motivo}`).join(" · "));
     L2.push("");
+    if (s.conHurto) {
+      L2.push("== Hurtar y la horca ==");
+      const hs = s.cronica.filter((c) => c.tipo === "hurto");
+      const VIO = { no: "nadie le ve", perdona: "le ven y miran a otro lado", huye: "le ven y escapa (le buscan)", prendido: "le ven y le cogen", ronda: "le coge la ronda" };
+      if (!hs.length) L2.push("No hurtó.");
+      for (const c of hs) L2.push(`${cad ? c.anio + " · " : ""}día ${c.dia}, ${nombreFranja(c.f).toLowerCase()}, ${L[c.lugar].corto}: cuerpo ${c.cuerpo}, ${c.panAntes} ${c.panAntes === 1 ? "pedazo" : "pedazos"} encima, ${c.gente} gente${c.ronda ? ", la ronda delante" : ""} · ${VIO[c.visto] || c.visto}`);
+      const pr = s.cronica.filter((c) => c.tipo === "prendido");
+      const PENA = { verguenza: "a la vergüenza", azotes: "vergüenza y azotes", oreja: "azotes y oreja", horca: "la horca", galeras: "galeras" };
+      if (pr.length) L2.push("Prendido por ladrón: " + pr.map((c) => `${cad ? c.anio + ", " : ""}día ${c.dia} (${c.motivo}): ${PENA[c.pena] || c.pena}`).join(" · "));
+      if (s.malsinado && s.malsinado.hurto) L2.push(`${s.malsinado.por} contó también sus hurtos al alguacil el día ${s.malsinado.dia}.`);
+      if (s.conTuyos) for (const tu of s.tuyos.concat(s.heredados || [])) if (tu.hurtosHechos) L2.push(`${tu.nombre} hurtó ${tu.hurtosHechos} ${tu.hurtosHechos === 1 ? "vez" : "veces"}.`);
+      L2.push("");
+    }
     if (s.conTuyos) {
       L2.push("== Los tuyos ==");
       for (const tu of s.tuyos) {
@@ -1597,9 +1665,9 @@
       L2.push("");
     }
     L2.push("== Por día ==");
-    L2.push((cad ? "año | " : "") + "día | mover | pedir | trabajar | esperar | " + (s.modo === "A" ? "pasos" : "cruces") + " | sitios | pan pedido | pan trabajo | come | duerme | cuerpo | ronda al llegar");
+    L2.push((cad ? "año | " : "") + "día | mover | pedir | trabajar | esperar | " + (s.modo === "A" ? "pasos" : "cruces") + " | sitios | pan pedido | pan trabajo | " + (s.conHurto ? "pan hurtado | " : "") + "come | duerme | cuerpo | ronda al llegar");
     s.porDia.forEach((d) => {
-      L2.push(`${cad ? d.anio + " | " : ""}${d.dia} | ${d.mover} | ${d.pedir} | ${d.trabajar} | ${d.esperar + d.perdido} | ${s.modo === "A" ? d.pasos : d.cruces} | ${d.lugares} | ${d.panPedido} | ${d.panTrabajo} | ${d.comido} | ${DUERME[d.duerme]}${d.detenido ? " (" + d.detenido + ")" : ""} | ${d.cuerpoNoche} | ${d.encuentros}`);
+      L2.push(`${cad ? d.anio + " | " : ""}${d.dia} | ${d.mover} | ${d.pedir} | ${d.trabajar} | ${d.esperar + d.perdido} | ${s.modo === "A" ? d.pasos : d.cruces} | ${d.lugares} | ${d.panPedido} | ${d.panTrabajo} | ${s.conHurto ? (d.panHurtado || 0) + " | " : ""}${d.comido} | ${DUERME[d.duerme]}${d.detenido ? " (" + d.detenido + ")" : ""} | ${d.cuerpoNoche} | ${d.encuentros}`);
     });
     L2.push("");
     L2.push("== Crónica ==");
@@ -1640,7 +1708,7 @@
     nueva, opciones, previsionPedir, mover, pedir, pedirTrabajo, esperar, acabarDia, seguir, comprobarNoche, cenar, circuitoDia,
     informe, resumenDias, momentoTxt, riesgoNoche, saberNoche, puedeLlaga, hacerLlaga, cuerpoMax,
     darPan, tuyosEn, tuyosVivos, hayQuejas, DIST, PUERTAS,
-    // hurtar y la horca (prototipo para bots)
+    // hurtar y la horca (j0.12)
     puedeHurtar, hurtar, probVisto, penaHurto, puedeRestituir, restituir,
     // la cadena de veranos (j0.11)
     calendario, escasez, escasezDesde, esHombre, elegirHeredero, siguienteVerano, resumenCadena, recorridoVerano,

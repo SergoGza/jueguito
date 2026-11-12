@@ -57,6 +57,9 @@ p { margin: 0.4em 0; }
 .chip { border: 1px solid var(--line); background: var(--surface); border-radius: 8px; padding: 4px 6px; text-align: center; font-size: 0.76rem; line-height: 1.2; }
 .chip b { display: block; font-size: 1.1rem; }
 .chip.alerta { background: var(--bad-bg); border-color: var(--bad); }
+/* hurtar (j0.12): «te busca la justicia», una fila entera bajo los demás */
+.chip.ancha { grid-column: 1 / -1; }
+.chip.ancha b { display: inline; font-size: 0.9rem; margin-left: 6px; }
 
 /* el día: seis franjas de seis ratos */
 .dia-barra { display: grid; grid-template-columns: repeat(6, 1fr); gap: 3px; margin-top: 6px; }

@@ -1,6 +1,6 @@
-# Liber Vagatorum · el juguete (j0.11)
+# Liber Vagatorum · el juguete (j0.12)
 
-Prueba mínima del núcleo del juego, tras el replanteamiento de octubre de 2026: **un mendigo, una necesidad (el hambre) y una amenaza (la ronda)**. Encima, tres pruebas que se activan al empezar: la llaga (fingir), los tuyos y varios veranos (el relevo). Ni más tretas ni exámenes. Si el núcleo solo no obliga a exponerse para comer, los sistemas de encima no lo van a arreglar.
+Prueba mínima del núcleo del juego, tras el replanteamiento de octubre de 2026: **un mendigo, una necesidad (el hambre) y una amenaza (la ronda)**. Encima, cuatro pruebas que se activan al empezar: la llaga (fingir), los tuyos, varios veranos (el relevo) y hurtar (la justicia y la horca). Ni más tretas ni exámenes. Si el núcleo solo no obliga a exponerse para comer, los sistemas de encima no lo van a arreglar.
 
 Es una página estática, sin servidor, instalable en el móvil y jugable sin conexión. Te mueves tocando el mapa (o con la lista «Adónde vas»); en el móvil, pedir, esperar y acabar el día van en una barra fija abajo, y solo se desplaza la pantalla para leer. Se publica en GitHub Pages desde `main`: https://sergogza.github.io/jueguito/
 
@@ -140,9 +140,37 @@ Decidido por rondas del 5 al 9 de noviembre de 2026 (ver «El relevo» en `claud
 - **La cadena es dura para los bots** (completa 1 de cada 20). Son el suelo: Sergio saca 1,9 pedazos al día y el veterano, 1,4.
 - **Las cifras de la siega pesan por el pan, no por el cuerpo** (la hoz a 6 no cambia nada: con dos pedazos, la primera noche ya estás a 6).
 
+## Hurtar y la horca (j0.12; se activa al empezar)
+
+Decidido por rondas del 10 al 12 de noviembre de 2026, con cada opción medida antes de elegir (ver «Hurtar y la horca» en `claude/decisiones-replanteamiento.md`, en el proyecto, y `claude/hurto-prototipo.md` aquí). **Se activa con el botón «Activar hurtar»** de la pantalla de inicio, solo o con lo demás, y solo en la prueba A. Sin activarlo, la partida es la de la j0.11 (los bots dan exactamente lo mismo).
+
+- **Qué se coge.** Una hogaza de un puesto (2 pedazos, 2 ratos) en la Plaza (prima y tercia) o en la Rúa (tercia, nona y vísperas), cuando hay mercado o tienda abierta. El botón «Hurtar una hogaza» solo sale entonces.
+- **Quién te ve.** No la ronda de pobres: el dueño o el vecino. Con poca gente te ven 1 de cada 2 veces; con mucha, 1 de cada 4; el doble si ya has hurtado hoy ahí. Con la ronda delante, te coge ella. Si te ven con mucha gente, te sujetan allí mismo; con poca, escapas con el pan y te buscan por tus señas.
+- **Te buscan tres días.** Sale en la cabecera («Te busca la justicia · día 1 de 3»). En esos días, la ronda te para la mitad de las veces que llegas adonde está, y cualquier parada, o que te encuentre de noche en un portal, acaba ante la justicia. Al cuarto día, al amanecer, se dice que ya no preguntan por ti.
+- **La escalera de la justicia** va aparte de las detenciones por pedir, y la dice el alcalde cuando te tiene delante. Al limpio: la primera vez, a la vergüenza en un asno, sin azotes («A la segunda, el verdugo»); la segunda, vergüenza y azotes («A la tercera, la soga»); la tercera, la horca. Al que ya lleva la espalda azotada, de lo que sea (la segunda detención, la justicia o los varazos de la ronda a la mujer), le queda la vergüenza y después la horca («Azotes ya llevas. A la segunda, la soga»). Cada vez te quitan lo que llevas y pasas la noche en la cárcel.
+- **De un verano a otro** la justicia no recuerda más que lo que lleva el cuerpo: la vergüenza se olvida; los azotes, no. No hay oreja cortada ni otra marca de ladrón.
+- **Desde 1552,** al hombre que prenden por ladrón lo mandan a galeras al primer hurto, como dice la pragmática (el pregón de ese año lo dice). La mujer sigue en la escalera: desde 1552, la horca es cosa de mujeres.
+- **La necesidad extrema.** Con el cuerpo en 2 o menos, te ven la mitad de las veces: «El panadero te ha visto la mano. Te mira las costillas y vuelve la cabeza». El alcalde no cambia.
+- **Ahorcado, mueres solo.** Se acaba la cadena aunque los tuyos sigan vivos: «Catalina está entre la gente. No puede acercarse».
+- **Los tuyos.** Catalina, la que se arriesga, hurta cuando pasa hambre (cuerpo en 3 o menos y sin ración), con tus mismas reglas, y de noche te lo cuenta; si la prenden, vuelve contando lo que le dijo el alcalde, y pueden ahorcarla. Pedro no hurta. El que te vende cuenta también lo que has hurtado ese verano: desde ese día te buscan, y te enteras esa noche en la ribera o cuando te para el alguacil («A ti te conozco yo de oídas: alargas la mano en los puestos»).
+- **Palancas** en `PARAMS.hurto`. Las que no se eligieron (la olla, la ropa, la oreja, restituir en San Esteban, que siga uno de los tuyos tras la horca…) siguen ahí, apagadas, para los bots.
+
+**Bots** (2.000 partidas por casilla; % que llega a la siega o completa la cadena, según cuándo hurta: nunca / en apuros (sin ración y con el cuerpo en 2 o menos) / cuando falta la ración / siempre). El «oficio» es la heurística del bot aplicado, que come casi siempre.
+
+| | Veterano | Oficio |
+|---|---|---|
+| Un verano | 52,6 / 75,0 / 73,3 / 53,0 | 98,1 / 98,3 / 96,3 / 59,6 |
+| Un verano con los tuyos | 37,2 / 62,4 / 63,3 / 46,5 | 87,3 / 90,4 / 83,4 / 61,1 |
+| Cadena, como mozo | 8,5 / 36,5 / 34,4 / 13,8 | 57,4 / 60,9 / 45,6 / 17,3 |
+| Cadena, como moza | 8,3 / 49,5 / 31,4 / 6,1 | 86,6 / 91,3 / 69,0 / 17,6 |
+
+- **Ni siempre ni nunca:** lo mejor es hurtar en apuros en los ocho casos (o cuando falta la ración, para el veterano con los tuyos). Al que juega bien le da entre 0 y 5 puntos y hurtar siempre lo hunde; al que pasa hambre lo salva.
+- **Lo que queda flojo:** para el que juega mal con los tuyos, hurtar siempre todavía gana a no hurtar nunca.
+- **Sin medir:** ningún bot elige por sí mismo el mejor momento de hurtar, y nada de esto dice si se entiende jugando. Para eso está la pregunta nueva del informe.
+
 ## El informe
 
-Al acabar (o al abandonar), cinco preguntas (seis con varios veranos) y el informe: la partida entera, el tiempo repartido entre moverse, pedir, trabajar y esperar, los pasos o cruces por día, las veces que llegó donde estaba la ronda, la crónica, dónde estuvo la ronda en cada franja (que el jugador no veía) y los datos en bruto.
+Al acabar (o al abandonar), cinco preguntas (una más con varios veranos y otra con hurtar) y el informe: la partida entera, el tiempo repartido entre moverse, pedir, trabajar y esperar, los pasos o cruces por día, las veces que llegó donde estaba la ronda, la crónica, dónde estuvo la ronda en cada franja (que el jugador no veía) y los datos en bruto. Con hurtar, cada hurto con el cuerpo y el pan que llevaba, la gente que había y cómo acabó.
 
 - **Móvil:** «Compartir informe» adjunta un `.txt` y deja elegir la app de correo.
 - **Ordenador:** «Descargar» y luego «Abrir el correo», y adjunta el archivo.
@@ -153,8 +181,8 @@ El correo de destino está en `rules.js` (`CONFIG.email`); en GitHub Pages queda
 
 Todo en `rules.js`. **Cada vez que cambies algo, sube la versión en dos sitios**, o los móviles seguirán con la copia vieja:
 
-1. `rules.js` → `version: "j0.11"`, por ejemplo a `"j0.12"`.
-2. `sw.js` → `const VERSION = "lv-j0.11-1"`, por ejemplo a `"lv-j0.12-1"`.
+1. `rules.js` → `version: "j0.12"`, por ejemplo a `"j0.13"`.
+2. `sw.js` → `const VERSION = "lv-j0.12-1"`, por ejemplo a `"lv-j0.13-1"`.
 
 ## Probarlo en local
 
@@ -168,4 +196,5 @@ y abre `http://localhost:8000`. Con `?semilla=7` la partida nueva sale siempre i
 
 - `herramientas/bot.js`: diez bots (escondido, azar, novato, veterano, prudente, osado, vidente, memorioso y dos que duermen siempre dentro: uno elige dónde y otro no) que juegan miles de partidas con el motor real y sacan porcentajes. El veterano y el prudente salen siempre antes de que cierren, eligen puerta por el riesgo que esperan y aprenden las costumbres de la ronda de lo que ven; el novato sale por la más cercana. `node herramientas/bot.js 1000` (solo A; `PRUEBAS=A,B` para las dos; `RUTINA=1` para que el veterano y el prudente no se den cuenta de que la ronda aprende; `CIERRA=1` para separar los veranos según la puerta que cierra la ronda; `TUYOS=1` con los tuyos, y `DAR=nadie|todos|ojos|hambre|generoso` para cómo les da pan; `CADENA=1` para varios veranos, con `HEREDERO=cuerpo|pedro|catalina` para a quién elige y `SEXO=mujer` para empezar como moza; `BOTS=veterano,…` para jugar solo con algunos bots). Admite palancas para probar cambios sin tocar `rules.js`. No son personas: sirven para ver si una regla rompe algo, no para fijar la dificultad.
 - `herramientas/aplicado.js`: el bot que busca el techo en vez del suelo. Juega solo con lo que sabe un jugador (lo que ve en su sitio, Recuerdos, lo que le cuentan los tuyos, el esqueleto de la ronda y las reglas) y decide buscando hacia delante sobre el motor en mundos compatibles con lo que sabe. Mismas variantes que `bot.js` (`TUYOS=1`, `LLAGA=1`, `CADENA=1`, `SEXO=mujer`); `OFICIO=1` juega solo su heurística; `SEMILLA=3 PIENSA=1` enseña una partida con lo que pensó. Cifras, estrategia y agujeros en `claude/informe-bot-aplicado.md`.
+- `herramientas/hurto-tanda.js` y `herramientas/hurto-comun.js`: las tandas con las que se midió hurtar. `HURTO=nunca|apuro|grave|hambre|siempre` hace hurtar a los bots de `bot.js` y `aplicado.js`; `node herramientas/hurto-tanda.js fichero.jsonl 2000` lanza las variantes (una palanca cada vez) y guarda una línea por tanda. Las medidas están en `claude/hurto-medidas-*.jsonl`.
 - `herramientas/agentes/`: agentes de Claude que juegan la app real y escriben un diario (`/agentes prueba` desde Claude Code). Ver su README.

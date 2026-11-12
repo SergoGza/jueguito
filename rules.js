@@ -280,10 +280,11 @@
       // mismo (PARAMS.carcel.azotes de cuerpo esa noche; pregunta 12, opción B). Pedir delante de la ronda y la noche, igual.
       obrasForzadas: 5,
     },
-    // HURTAR Y LA HORCA · PROTOTIPO PARA BOTS (rama claude/hurto-prototipo; no está en main ni tiene pantalla).
-    // Se activa al empezar (opts.hurto). Cada palanca es una de las opciones que se miden antes de decidir; los valores
-    // de aquí son la «base» de las tablas del registro, no una decisión. Lo castiga la justicia, no la ronda de pobres:
-    // quien te ve es el dueño o el vecino, y la pena es una escalera aparte de las detenciones por pedir.
+    // hurtar y la horca (j0.12; se activa al empezar, sola o con lo demás; solo en la prueba A). Decidido por rondas
+    // del 10 al 12 de noviembre de 2026 (ver «Hurtar y la horca» en claude/decisiones-replanteamiento.md, en el proyecto).
+    // Lo castiga la justicia, no la ronda de pobres: quien te ve es el dueño o el vecino, y la pena es una escalera
+    // aparte de las detenciones por pedir. Los valores marcados DECIDIDO son los del juego; las demás palancas son las
+    // opciones que se midieron y no se eligieron: están apagadas y quedan para los bots (herramientas/hurto-tanda.js).
     hurto: {
       // qué se hurta: «hogaza» (pan del mercado y de las tiendas), «olla» (la comida de una casa, a sexta) o
       // «ropa» (algo que dura: no da pan, da un invierno mejor; solo pesa con varios veranos)
@@ -359,6 +360,14 @@
     "La Puerta de San Pablo existió, del lado del río y al este del puente; que sus guardas no avisen a la ronda es del juego. Había más puertas, que el juego deja fuera.",
     "Las cifras (gente, limosna, probabilidades) son del juego.",
   ];
+  // solo con «Hurtar»
+  const LICENCIAS_HURTO = [
+    "Que al ladrón lo saquen a la vergüenza, en un asno y con el pregonero delante, está en las leyes y en los pleitos; que la primera vez sea solo eso, sin azotes, es del juego.",
+    "La horca al segundo hurto del que ya lleva azotes es del juego: por escrito, la muerte por hurto simple llega en 1566 y al tercero. Las Partidas mandaban azotar al ladrón y prohibían matarlo o cortarle miembro.",
+    "Que te busquen por tus señas sale de las listas de señas de la época; que a los tres días dejen de buscarte es del juego.",
+    "Que el dueño vuelva la cabeza ante el que se muere de hambre sale de la doctrina (en necesidad extrema, tomar no es hurtar, y el hambriento puede suponer que el dueño se lo permitiría); que pase la mitad de las veces es del juego.",
+    "Desde 1552, al ladrón varón de más de veinte años, vergüenza y cuatro años de galeras la primera vez: es la pragmática. La mujer quedaba fuera de las galeras.",
+  ];
   // solo con «Jugar varios veranos»
   const LICENCIAS_CADENA = [
     "Las galeras son de la pragmática de 1552 (el vagabundo sano de más de veinte años, cuatro años de galeras en lugar de azotes). En el juego, todos los hombres pasan de veinte y basta una detención.",
@@ -369,8 +378,8 @@
   ];
 
   window.RULES = {
-    version: "j0.11", CONFIG, FRANJAS, RATOS, DIAS, MODOS, BARRIOS, LUGARES, CAMINOS, CALENDARIO, VERANOS, DIAS_SENALADOS,
-    RONDA, PARAMS, LICENCIAS, LICENCIAS_CADENA,
+    version: "j0.12", CONFIG, FRANJAS, RATOS, DIAS, MODOS, BARRIOS, LUGARES, CAMINOS, CALENDARIO, VERANOS, DIAS_SENALADOS,
+    RONDA, PARAMS, LICENCIAS, LICENCIAS_CADENA, LICENCIAS_HURTO,
     // la mesa de los agentes pregunta por PERSONAJES: en el juguete, cada «personaje» es una prueba
     PERSONAJES: [
       { id: "A", nombre: "Mozo de La Armuña", origen: "Forastero", cuerpoTipo: "Válido", resumen: MODOS.A.resumen, claves: ["Prueba A · calles"] },

@@ -1,7 +1,7 @@
 /* Liber Vagatorum · el juguete. Pantallas y botones. Las reglas están en rules.js y el motor en engine.js. */
 (function () {
-  const R = window.RULES, E = window.ENGINE, P = R.PARAMS;
-  const LS = { partida: "lvj-partida", historial: "lvj-historial", tema: "lvj-tema", nombre: "lvj-nombre", llaga: "lvj-llaga", tuyos: "lvj-tuyos", cadena: "lvj-cadena" };
+  const R = window.RULES, E = window.ENGINE, P = R.PARAMS, HU = P.hurto || {};
+  const LS = { partida: "lvj-partida", historial: "lvj-historial", tema: "lvj-tema", nombre: "lvj-nombre", llaga: "lvj-llaga", tuyos: "lvj-tuyos", cadena: "lvj-cadena", hurto: "lvj-hurto" };
   const load = (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } };
   const store = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* sin almacenamiento */ } };
   const esc = (t) => String(t == null ? "" : t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -40,6 +40,8 @@
       `<div class="chip${s.pan === 0 ? " alerta" : ""}">Pan<b>${s.pan}</b></div>`,
       `<div class="chip${s.conocido ? " alerta" : ""}">Fichado<b>${s.conocido ? "sí" : "no"}</b></div>`,
       `<div class="chip${s.detenciones ? " alerta" : ""}">Detenciones<b>${s.detenciones}/${P.detencionesMax}</b></div>`,
+      // hurtar (j0.12): te buscan por tus señas, y lo sabes (te vieron la cara, o te lo han dicho en la ribera)
+      s.conHurto && s.buscado && s.buscadoSabe ? `<div class="chip alerta ancha">Te busca la justicia<b>día ${Math.min(HU.buscaDias, s.dia - (s.buscadoDia || s.dia) + 1)} de ${HU.buscaDias}</b></div>` : "",
     ].join("");
     let barra = "";
     if (s.fase === "dia" || s.fase === "resultado") {
@@ -147,10 +149,11 @@
       <label class="campo" for="nombre">Tu nombre (para el informe)</label>
       <input type="text" id="nombre" value="${esc(nombre)}" autocomplete="name">
       <div class="btns">
-        ${enCurso ? btn("continuar", "Seguir la partida en curso", `${R.MODOS[s.modo].nombre} · ${s.conCadena ? `${s.anio} · ` : ""}día ${s.dia}${s.conLlaga ? " · con llaga" : ""}${s.conCadena ? " · varios veranos" : s.conTuyos ? " · con los tuyos" : ""}`, { cls: "primary" }) : ""}
+        ${enCurso ? btn("continuar", "Seguir la partida en curso", `${R.MODOS[s.modo].nombre} · ${s.conCadena ? `${s.anio} · ` : ""}día ${s.dia}${s.conLlaga ? " · con llaga" : ""}${s.conCadena ? " · varios veranos" : s.conTuyos ? " · con los tuyos" : ""}${s.conHurto ? " · con hurtar" : ""}`, { cls: "primary" }) : ""}
         ${load(LS.llaga, false) ? btn("llagaOnOff", "Llaga activada", "La tendrán las partidas que empieces. Toca para quitarla.", { cls: "activo" }) : btn("llagaOnOff", "Activar llaga", "Prueba nueva: fingir. Mejor si ya has jugado sin ella.")}
         ${load(LS.cadena, false) ? "" : load(LS.tuyos, false) ? btn("tuyosOnOff", "Con los tuyos", "Las partidas que empieces los tendrán. Toca para quitarlos.", { cls: "activo" }) : btn("tuyosOnOff", "Jugar con los tuyos", "Prueba nueva: dos que bajaron contigo. Mejor si ya has jugado sin ellos.")}
         ${load(LS.cadena, false) ? btn("cadenaOnOff", "Varios veranos", "1545, 1552 y 1557, con los tuyos. Toca para jugar uno solo.", { cls: "activo" }) : btn("cadenaOnOff", "Jugar varios veranos", "Prueba nueva: 1545, 1552 y 1557, con los tuyos. Mejor si ya has jugado con ellos.")}
+        ${load(LS.hurto, false) ? btn("hurtoOnOff", "Hurtar activado", "Lo tendrán las partidas que empieces, solo o con lo demás. Toca para quitarlo.", { cls: "activo" }) : btn("hurtoOnOff", "Activar hurtar", "Prueba nueva: coger pan de un puesto, y la justicia. Vale solo o con lo demás.")}
         ${pruebasVisibles().map((id) => btn("empezar", pruebasVisibles().length > 1 ? `Empezar la ${R.MODOS[id].nombre.toLowerCase()}` : "Empezar una partida", pruebasVisibles().length > 1 ? R.MODOS[id].resumen : "", { data: { id }, cls: enCurso ? "" : "primary" })).join("")}
         ${btn("ayuda", "Cómo se juega", "")}
       </div>`;
@@ -172,6 +175,8 @@
   const ANIOS = (n) => ["cero", "un", "dos", "tres", "cuatro", "cinco", "seis", "siete", "ocho", "nueve", "diez"][n] || String(n);
   const PREGON = {
     1552: "En la plaza han pregonado una pragmática del rey: a los vagabundos sanos de más de veinte años, en lugar de azotes, cuatro años de galeras.",
+    // con hurtar (j0.12): la pragmática nombra también a los ladrones
+    "1552h": "En la plaza han pregonado una pragmática del rey: a los vagabundos sanos de más de veinte años, en lugar de azotes, cuatro años de galeras. Y a los ladrones, lo mismo: a la vergüenza y, desde el primer hurto, cuatro años al remo. De las mujeres, el pregón no dice nada: para ellas sigue el verdugo.",
     1557: "El año pasado la cosecha fue mala y el pan está carísimo: en la ciudad la gente da poco desde el primer día. En la ribera cuentan que este invierno se llevaron a galeras a varios mozos.",
   };
   function introVerano() {
@@ -186,11 +191,12 @@
     }
     const vivos = E.tuyosVivos(s).map((t) => t.nombre);
     p.push(vivos.length ? `Contigo ${vivos.length > 1 ? "bajan" : "baja"} ${vivos.join(" y ")}.` : `Bajas ${el ? "solo" : "sola"}.`);
-    if (PREGON[s.anio]) p.push(PREGON[s.anio]);
+    const pregon = (s.conHurto && PREGON[s.anio + "h"]) || PREGON[s.anio];
+    if (pregon) p.push(pregon);
     return p.map((x) => `<p>${esc(x)}</p>`).join("") + `<p><b>Aguanta diez días.</b> El 11 de junio empieza la siega${el ? ", y en la siega hay trabajo para quien pueda con la hoz" : ", y en la siega se puede espigar detrás de los segadores"}.</p>`;
   }
   const TIT = (tipo) => ({ siega: "Te cogen para la siega", aguanta: "Aguantas, pero no te cogen", espiga: "Espigas en la siega", hambre: "Mueres de hambre", muerto: "Mueres",
-    desterrado: s && E.esHombre(s) ? "Desterrado" : "Desterrada", galeras: "A galeras", abandona: "Partida abandonada" }[tipo] || "Fin");
+    desterrado: s && E.esHombre(s) ? "Desterrado" : "Desterrada", galeras: "A galeras", ahorcado: "La horca", abandona: "Partida abandonada" }[tipo] || "Fin");
   function panelNoche(mal) {
     if (!s.noche) return "";
     return `<div class="panel${mal || s.noche.detenido ? " res mal" : ""}"><h3>La noche</h3>${s.noche.lineas.map((x) => `<p>${esc(x)}</p>`).join("")}<p>Cuerpo: ${s.noche.antes} → <b>${s.noche.despues}</b>.</p></div>`;
@@ -240,7 +246,9 @@
     if (d.tipo === "domingo") notas.push(`Es domingo${d.fiesta && d.fiesta !== "Domingo" ? " de " + d.fiesta : ""}: no hay obra. Las iglesias se llenan a prima y a tercia; la plaza está tranquila.`);
     if (d.tipo === "corpus") notas.push("Es Corpus Christi: procesión por la Rúa y la plaza a tercia y a sexta, y la ronda va con ella. No hay obra.");
     if (s.dia === E.escasezDesde(s) && s.dia > 1) notas.push("El pan ha subido en la plaza. Desde hoy, la gente da menos.");
-    if (s.lugar === "puerta" && s.cronica.some((c) => c.dia === s.dia - 1 && c.anio === s.anio && c.tipo === "detenido")) notas.push("Te sueltan al amanecer en la Puerta del Río.");
+    if (s.yaNoBuscan) notas.push("Han pasado tres días de aquello. En la plaza ya han dado otras señas: por las tuyas no pregunta nadie.");
+    if (s.lugar === "puerta" && s.cronica.some((c) => c.dia === s.dia - 1 && c.anio === s.anio && c.tipo === "prendido")) notas.push("Después, te sueltan en la Puerta del Río.");
+    else if (s.lugar === "puerta" && s.cronica.some((c) => c.dia === s.dia - 1 && c.anio === s.anio && c.tipo === "detenido")) notas.push("Te sueltan al amanecer en la Puerta del Río.");
     else if (L[s.lugar].dentro) notas.push(`Te despiertas en un portal de ${L[s.lugar].nombre}.`);
     else notas.push("Te despiertas en la ribera.");
     h += `<div class="panel">${notas.map((x) => `<p>${esc(x)}</p>`).join("")}</div>`;
@@ -281,6 +289,8 @@
     const lin = pd.ok ? E.previsionPedir(s) : [`Pedir: ${pd.porque}.`];
     const tr = o.acc.find((a) => a.id === "trabajo");
     if (tr) lin.push(tr.ok ? `Obras: si te cogen, cargas piedra hasta el final de nona por ${P.trabajo.paga} pedazos de pan. Preguntar cuesta 1 rato.` : `Obras: ${tr.porque}.`);
+    const hu = o.acc.find((a) => a.id === "hurtar");
+    if (hu) lin.push(hu.ok ? `Hurtar: una hogaza de un puesto, ${HU.gana} pedazos, ${HU.ratos} ratos. Con poca gente hay más ojos sobre ti, pero si gritan puedes correr; con mucha te ven menos, pero si te ven hay manos para sujetarte.` : `Hurtar: ${hu.porque}.`);
     lin.push("Esperar: quieto, la ronda no te para; si llega, la verás.");
     lin.push(L[s.lugar].dentro ? "Si acabas el día aquí, dormirás en un portal, dentro de la muralla." : s.lugar === "ribera" ? "Si acabas el día aquí, dormirás al raso en la ribera." : `${s.lugar === "puente" ? "En el puente" : "Aquí"} no se puede dormir: si acabas el día aquí, bajarás a la ribera.`);
     return h + `<ul class="prev">${lin.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div>`;
@@ -294,6 +304,9 @@
     // el trabajo solo aparece aquí cuando se puede pedir; por qué no se puede está en «Antes de actuar»
     if (tr && tr.ok) h += btn("trabajo", "Pedir trabajo en las obras", "1 rato · si te cogen, hasta nona", { cls: "accion" });
     h += btn("pedir", "Pedir aquí", pd.ok ? `1 franja · ${e.da >= 3 ? "mucha gente" : "poca gente"}${r ? " · ¡ronda!" : ""}` : pd.porque, { disabled: !pd.ok, cls: pd.ok ? (r ? "riesgo" : "accion") : "" });
+    // hurtar (j0.12): solo aparece cuando hay qué coger; por qué no, en «Antes de actuar»
+    const hu = o.acc.find((a) => a.id === "hurtar");
+    if (hu && hu.ok) h += btn("hurtar", "Hurtar una hogaza", `${HU.ratos} ratos · ${e.gente >= 3 ? "mucha gente" : "poca gente"}${r ? " · ¡ronda!" : ""}`, { cls: r ? "riesgo" : "" });
     if (s.t < E.FIN) {
       const f = E.franja(s.t), es = o.acc.find((a) => a.id === "esperar");
       h += btn("esperar", f + 1 < R.FRANJAS.length ? `Esperar a ${R.FRANJAS[f + 1].nombre.toLowerCase()}` : "Esperar a la noche", `${es.coste} ${es.coste === 1 ? "rato" : "ratos"}`);
@@ -390,7 +403,7 @@
 
   function pantallaFin() {
     const T = E.resumenDias(s);
-    const ratos = T.mover + T.pedir + T.trabajar + T.esperar + T.perdido || 1;
+    const ratos = T.mover + T.pedir + T.trabajar + T.esperar + T.perdido + T.hurtar || 1;
     const pct = (x) => Math.round((100 * x) / ratos) + " %";
     const enc = s.encuesta || {};
     let h = cabecera() + `<div class="wrap">`;
@@ -404,14 +417,15 @@
       h += `<div class="panel res ${s.final.tipo === "siega" ? "bien" : "mal"}"><h2>${esc(TIT(s.final.tipo))}</h2><p>${esc(s.final.texto)}</p><p class="small">Día ${s.final.dia} · ${esc(R.MODOS[s.modo].nombre)}</p></div>`;
     }
     h += `<div class="panel"><h3>Tu partida</h3>
-      <p class="small">Tiempo: moverte ${pct(T.mover)} · pedir ${pct(T.pedir)} · trabajar ${pct(T.trabajar)} · esperar ${pct(T.esperar + T.perdido)}.</p>
-      <p class="small">${s.modo === "A" ? `${T.pasos} ${T.pasos === 1 ? "paso" : "pasos"}` : `${T.cruces} ${T.cruces === 1 ? "cruce" : "cruces"} de barrio`} · pediste ${T.pedidas} veces (${T.panPedido} pedazos) · llegaste ${T.encuentros} ${T.encuentros === 1 ? "vez" : "veces"} donde estaba la ronda · ${s.detenciones} ${s.detenciones === 1 ? "detención" : "detenciones"}.</p></div>`;
-    h += `<div class="panel"><h3>${s.conCadena ? "Seis" : "Cinco"} preguntas</h3><p class="small muted">Van en el informe. Contesta con lo que te salga; no hay respuestas buenas.</p>
+      <p class="small">Tiempo: moverte ${pct(T.mover)} · pedir ${pct(T.pedir)} · trabajar ${pct(T.trabajar)}${s.conHurto ? ` · hurtar ${pct(T.hurtar)}` : ""} · esperar ${pct(T.esperar + T.perdido)}.</p>
+      <p class="small">${s.modo === "A" ? `${T.pasos} ${T.pasos === 1 ? "paso" : "pasos"}` : `${T.cruces} ${T.cruces === 1 ? "cruce" : "cruces"} de barrio`} · pediste ${T.pedidas} veces (${T.panPedido} pedazos) · llegaste ${T.encuentros} ${T.encuentros === 1 ? "vez" : "veces"} donde estaba la ronda · ${s.detenciones} ${s.detenciones === 1 ? "detención" : "detenciones"}${s.conHurto ? ` · hurtaste ${T.hurtos} ${T.hurtos === 1 ? "vez" : "veces"} (${T.panHurtado} pedazos)` : ""}.</p></div>`;
+    h += `<div class="panel"><h3>${["Cinco", "Seis", "Siete"][(s.conCadena ? 1 : 0) + (s.conHurto ? 1 : 0)]} preguntas</h3><p class="small muted">Van en el informe. Contesta con lo que te salga; no hay respuestas buenas.</p>
       <label class="campo" for="e_dolio">¿Qué decisión te dolió o te costó tomar?</label><textarea id="e_dolio" data-enc="dolio">${esc(enc.dolio)}</textarea>
       <label class="campo" for="e_ir">¿Cómo decidías adónde ir?</label><textarea id="e_ir" data-enc="ir">${esc(enc.ir)}</textarea>
       <label class="campo" for="e_sorpresa">Si la ronda te sorprendió alguna vez, ¿lo sentiste como una mala decisión tuya o como mala suerte?</label><textarea id="e_sorpresa" data-enc="sorpresa">${esc(enc.sorpresa)}</textarea>
       <label class="campo" for="e_sobro">¿Qué sobraba, estorbaba o no entendiste?</label><textarea id="e_sobro" data-enc="sobro">${esc(enc.sobro)}</textarea>
       ${s.conCadena ? `<label class="campo" for="e_cadena">¿Pesó en lo que hacías saber que, si morías con uno de los tuyos al lado, seguirías como él o ella?</label><textarea id="e_cadena" data-enc="cadena">${esc(enc.cadena)}</textarea>` : ""}
+      ${s.conHurto ? `<label class="campo" for="e_hurto">¿Cuándo decidiste hurtar, o no hacerlo, y por qué?</label><textarea id="e_hurto" data-enc="hurto">${esc(enc.hurto)}</textarea>` : ""}
       <label class="campo" for="e_otros">Otros comentarios (opcional)</label><textarea id="e_otros" data-enc="otros">${esc(enc.otros)}</textarea>
       <div class="btns" style="margin-top:12px">
         ${navigator.share ? btn("compartir", "Compartir informe", "Elige tu correo y envíalo", { cls: "primary" }) : ""}
@@ -431,6 +445,7 @@
     if (ver.includes("A")) mover.push(`<p>${etiqueta("A")}Cada paso a un sitio vecino cuesta 2 ratos (tres pasos, una franja). Solo ves el sitio donde estás, y la ronda igual: solo te ve si estáis en el mismo sitio.</p>`);
     if (ver.includes("B")) mover.push(`<p>${etiqueta("B")}Dentro de tu barrio te mueves sin gastar tiempo y lo ves entero. Pasar a un barrio vecino cuesta una franja. La ronda ve igual que tú: todo su barrio.</p>`);
     const conCadena = s && ui.pantalla === "juego" ? !!s.conCadena : load(LS.cadena, false);
+    const conHurto = s && ui.pantalla === "juego" ? !!s.conHurto : load(LS.hurto, false);
     const anio = s && ui.pantalla === "juego" && s.anio ? s.anio : 1545;
     const cal = s && ui.pantalla === "juego" ? E.calendario(s) : R.CALENDARIO;
     const fiestas = cal.filter((d) => d.tipo !== "laborable").map((d) => (d.tipo === "corpus" ? `El ${d.fecha.split(" ")[0]} ${d.dia} es Corpus Christi` : `El ${d.dia}, domingo${d.fiesta && d.fiesta !== "Domingo" ? " de " + d.fiesta : ""}`));
@@ -451,8 +466,10 @@
       <h3>Los tuyos</h3><p>Si juegas con ellos: Pedro y Catalina bajaron contigo de tu aldea. Viven como tú: piden, se esconden de la ronda y duermen en la ribera. Si dormís allí, de noche te cuentan lo que han visto, y el que no ha sacado para cenar te pide pan. Lo que te cuentan queda en «Recuerdos».</p>
       <h3>La noche</h3><p>Una ración son 2 pedazos de pan. Ración entera: +1 de cuerpo. Media: −1. Nada: −2. Puedes guardar hasta ${P.panMax} pedazos. Si el cuerpo llega a 0, mueres.</p>
       ${conCadena ? `<h3>Varios veranos</h3><p>Después de 1545 vienen 1552 y 1557, con años de por medio. Si mueres y uno de los tuyos ha dormido a tu lado esa noche, sigues como él o ella el verano siguiente (si estaban los dos, eliges). Si mueres solo, se acaba. Si te destierran, sigue uno de los tuyos. Lo que sacas en la siega decide cómo llegas al verano siguiente. En «Recuerdos» quedan los veranos anteriores.</p>` : ""}
+      ${conHurto ? `<h3>Hurtar</h3><p>En la Plaza y en la Rúa, cuando hay mercado o tienda abierta, puedes coger una hogaza de un puesto: ${HU.gana} pedazos en ${HU.ratos} ratos. No te vigila la ronda de pobres: te ve el dueño o el vecino. Con poca gente te ven más; con mucha, menos. Si te ven con mucha gente, te sujetan allí mismo; con poca, escapas con el pan, pero dan tus señas y la justicia te busca ${HU.buscaDias} días: si en esos días la ronda te para o te encuentra de noche en un portal, te entrega. Si hurtas con la ronda delante, te coge ella.</p>
+      <p>La justicia no es la ronda y lleva su cuenta aparte de las detenciones. Te quita lo que llevas y pasas la noche en su cárcel. Lo que viene después te lo dice el alcalde cuando te tiene delante.</p>` : ""}
       <h3>Lo que sabe cualquiera en Salamanca</h3><p>Las iglesias se llenan a la hora de misa (prima) y a vísperas. El mercado de la plaza, por la mañana. Los estudiantes salen a tercia y a nona. A vísperas, la gente pasea por la Rúa. ${esc(fiestasTxt)}</p>
-      <h3>Licencias históricas</h3><ul class="small">${R.LICENCIAS.concat(conCadena ? R.LICENCIAS_CADENA : []).map((x) => `<li>${esc(x)}</li>`).join("")}</ul>
+      <h3>Licencias históricas</h3><ul class="small">${R.LICENCIAS.concat(conHurto ? R.LICENCIAS_HURTO.filter((x) => conCadena || !x.startsWith("Desde 1552")) : [], conCadena ? R.LICENCIAS_CADENA : []).map((x) => `<li>${esc(x)}</li>`).join("")}</ul>
       <div class="btns">${btn("cerrar", "Cerrar", "", { cls: "primary" })}</div></div>`;
   }
   // lo que el mozo recuerda: no lo lleva escrito, lo ha visto con sus ojos
@@ -599,7 +616,7 @@
       store(LS.nombre, nombre.trim());
       if (s && s.fase !== "fin" && !confirm("Hay una partida a medias. ¿Empezar otra? La de ahora se perderá.")) return;
       const sem = new URLSearchParams(location.search).get("semilla");
-      s = E.nueva(R.MODOS[d.id] ? d.id : "A", nombre.trim(), sem || null, { llaga: load(LS.llaga, false), tuyos: load(LS.tuyos, false), cadena: load(LS.cadena, false) });
+      s = E.nueva(R.MODOS[d.id] ? d.id : "A", nombre.trim(), sem || null, { llaga: load(LS.llaga, false), tuyos: load(LS.tuyos, false), cadena: load(LS.cadena, false), hurto: load(LS.hurto, false) });
       ui.pantalla = "juego";
     },
     cadenaOnOff() {
@@ -620,10 +637,16 @@
       if (nombre != null) store(LS.nombre, nombre.trim()); // que no se pierda lo escrito al repintar
       store(LS.tuyos, !load(LS.tuyos, false));
     },
+    hurtoOnOff() {
+      const nombre = (document.getElementById("nombre") || {}).value;
+      if (nombre != null) store(LS.nombre, nombre.trim()); // que no se pierda lo escrito al repintar
+      store(LS.hurto, !load(LS.hurto, false));
+    },
     pestana(d) { ui.pestana = d.id === "ciudad" ? "ciudad" : "acciones"; render(); return "modal"; },
     empezarDia() { E.empezarJornada(s); },
     mover(d) { E.mover(s, d.id); E.comprobarNoche(s); },
     pedir() { E.pedir(s); },
+    hurtar() { E.hurtar(s); E.comprobarNoche(s); },
     trabajo() { E.pedirTrabajo(s); },
     esperar() { E.esperar(s); E.comprobarNoche(s); },
     acabar() { E.acabarDia(s); E.comprobarNoche(s); },

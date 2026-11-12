@@ -147,7 +147,7 @@ module.exports = function (R, E) {
       cuerpoLlega: A.llega ? +(A.cuerpoLlega / A.llega).toFixed(2) : null,
       panDia: +(A.pan / (A.dias || 1)).toFixed(2), panHurtadoDia: +((A.panHurtado || 0) / (A.dias || 1)).toFixed(2),
       hurtosPartida: +(H / N).toFixed(2), partidasConHurto: pc(A.conHurto, N),
-      limpio: pc(A.visto.no, H), huye: pc(A.visto.huye, H), cogido: pc((A.visto.prendido || 0) + (A.visto.ronda || 0), H),
+      limpio: pc(A.visto.no, H), perdona: pc(A.visto.perdona, H), huye: pc(A.visto.huye, H), cogido: pc((A.visto.prendido || 0) + (A.visto.ronda || 0), H),
       prendidosPartida: +((A.prendidos || 0) / N).toFixed(3), prendidoBuscado: +((A.motivo.buscado || 0) / N).toFixed(3),
       penas: Object.fromEntries(Object.entries(A.pena).map(([k, v]) => [k, +(v / N).toFixed(3)])),
       detencionesPartida: +((A.detenciones || 0) / N).toFixed(2),
@@ -167,7 +167,7 @@ module.exports = function (R, E) {
     const r = registro(A, extra);
     const penas = Object.entries(r.penas).map(([k, v]) => `${k} ${v}`).join(", ") || "ninguna";
     let t = `         HURTO (${r.politica}): llega ${r.llega} % (con hoz ${r.hoz} %) · hambre ${r.hambre} · destierro ${r.destierro} · azotes ${r.azotes} · galeras ${r.galeras} · ahorcado ${r.ahorcado} · pan/día ${r.panDia} (hurtado ${r.panHurtadoDia})`
-      + `\n         hurtos por partida ${r.hurtosPartida} (hurta alguna vez el ${r.partidasConHurto} %): nadie le ve ${r.limpio} %, le ven y escapa ${r.huye} %, le cogen ${r.cogido} % · prendido por ladrón ${r.prendidosPartida} por partida (${r.prendidoBuscado} porque le buscaban) · penas por partida: ${penas} · acaba desorejado ${r.orejaFinal} %`;
+      + `\n         hurtos por partida ${r.hurtosPartida} (hurta alguna vez el ${r.partidasConHurto} %): nadie le ve ${r.limpio} %, le ven y miran a otro lado ${r.perdona} %, le ven y escapa ${r.huye} %, le cogen ${r.cogido} % · prendido por ladrón ${r.prendidosPartida} por partida (${r.prendidoBuscado} porque le buscaban) · penas por partida: ${penas} · acaba desorejado ${r.orejaFinal} %`;
     if (r.cadena) t += `\n         cadena: completa ${r.completa} % · su gente llega a ${ULT} ${r.gente} % · la cadena se acaba en la horca ${r.cadenaAcabaEnHorca} % · vidas: ${Object.entries(r.vidas).map(([k, v]) => `${k} ${v}`).join(", ")}`;
     return t;
   }

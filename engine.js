@@ -47,7 +47,8 @@
   const nombreFranja = (f) => R.FRANJAS[f].nombre;
   // cada verano tiene su calendario (j0.11); las partidas sin año son de 1545
   const VERANO = Object.fromEntries((R.VERANOS || []).map((v) => [v.anio, v]));
-  const verano = (s) => VERANO[(s && s.anio) || 1545] || { anio: 1545, calendario: R.CALENDARIO };
+  // (una partida guardada antes de la j0.13 en 1552 sigue con el verano que ocupa su lugar, 1553)
+  const verano = (s) => VERANO[(s && s.anio) || 1545] || (s && s.verano != null && (R.VERANOS || [])[s.verano]) || { anio: 1545, calendario: R.CALENDARIO };
   const calendario = (s) => verano(s).calendario || R.CALENDARIO;
   const dia = (s, d) => calendario(s)[(d || s.dia) - 1];
   const escasezDesde = (s) => verano(s).escasezDesde || P.escasezDesde;
@@ -56,13 +57,25 @@
   const rasgos = (s) => !!s.conCadena;
   const esHombre = (s) => !s.quien || s.quien.el !== false;
   const galeras = (s, el) => rasgos(s) && el && !!verano(s).galeras;
+  // jueves de mercado (j0.13): un día laborable con la plaza llena hasta nona. En Corpus no hay mercado.
+  const mercado = (s, d) => { const x = dia(s, d); return !!x.mercado && x.tipo === "laborable"; };
+  // los cambios de gente de ese día: los del tipo de día y, si es jueves de mercado, los del mercado
+  function senalados(s, d) {
+    const a = R.DIAS_SENALADOS[dia(s, d).tipo];
+    return mercado(s, d) ? [a, R.DIAS_SENALADOS.mercado] : [a];
+  }
+  function genteDelDia(s, lugar, d, f) {
+    let g = L[lugar].gente[f];
+    for (const mod of senalados(s, d)) if (mod && mod[lugar] && mod[lugar][f] != null) g = mod[lugar][f];
+    return g;
+  }
+  // el texto de un sitio ese verano (j0.13: San Esteban cambia con Soto)
+  const descLugar = (s, lugar) => ((verano(s).desc || {})[lugar]) || L[lugar].desc;
 
   // ------------------------------------------------------------------ el mundo
   function gente(s, lugar, d, f) {
     const l = L[lugar];
-    let g = l.gente[f];
-    const mod = R.DIAS_SENALADOS[dia(s, d).tipo];
-    if (mod && mod[lugar] && mod[lugar][f] != null) g = mod[lugar][f];
+    let g = genteDelDia(s, lugar, d, f);
     if (l.dentro) {
       const r = mundo(s, `gente|${d}|${f}|${lugar}`);
       if (r < 0.15) g -= 1;
@@ -433,8 +446,9 @@
     s.t = FIN;
     const extra = [];
     if (pan) extra.push(`Te quitan el pan (${pan} ${pan === 1 ? "pedazo" : "pedazos"}).`);
-    // desde 1552, al hombre lo mandan a galeras (j0.11)
-    if (galeras(s, esHombre(s))) { s.galeras = true; extra.push("El alcalde no te manda azotar: te condena a cuatro años de galeras, como manda la pragmática. Mañana sales con la cadena de galeotes."); }
+    // desde la pragmática de 1552 (en el juego, desde el verano de 1553), al hombre lo mandan a galeras (j0.11);
+    // con la vergüenza, como dice la pragmática, y a la primera (j0.13)
+    if (galeras(s, esHombre(s))) { s.galeras = true; extra.push(`${s.detenciones === 1 ? "Es la primera vez que te prenden, y basta. " : ""}El alcalde no te manda azotar: a la vergüenza y cuatro años de galeras, como manda la pragmática a los vagabundos. Mañana te sacan a la vergüenza y sales con la cadena de galeotes.`); }
     else if (s.detenciones >= P.detencionesMax) extra.push(`Detención ${s.detenciones} de ${P.detencionesMax}: mañana te sacan de la ciudad con destierro.`);
     else if (s.detenciones === 2) extra.push(`Detención 2 de ${P.detencionesMax}: esta noche te azotan. A la tercera, destierro.`);
     else extra.push(`Detención 1 de ${P.detencionesMax}: pasas la noche en la cárcel y mañana te sueltan en la puerta. A la segunda, azotes; a la tercera, destierro.`);
@@ -514,10 +528,16 @@
   const dondeHurto = () => (HU.donde || {})[HU.que] || {};
   // lo que te dice el alguacil cuando te reconoce: por las señas que dio quien te vio, o por lo que contó quien te vendió
   const senas = (s) => (s.buscadoPor === "malsin" ? "«A ti te conozco yo de oídas: alargas la mano en los puestos. A ti te busca la justicia»" : "«Tú eres el de las señas. A ti te busca la justicia»");
+  // en qué franjas se puede hurtar en un sitio ese día: los jueves de mercado, la plaza tiene puestos hasta nona (j0.13)
+  function franjasHurto(s, lugar, d) {
+    const fs = dondeHurto()[lugar] || [];
+    const m = mercado(s, d || s.dia) ? ((HU.mercado || {})[HU.que] || {})[lugar] : null;
+    return m ? fs.concat(m) : fs;
+  }
   function puedeHurtar(s) {
     if (!s.conHurto || s.fase === "noche" || s.t + HU.ratos > FIN) return false;
-    const f = franja(s.t), fs = dondeHurto()[s.lugar];
-    if (!fs || !fs.includes(f)) return false;
+    const f = franja(s.t), fs = franjasHurto(s, s.lugar);
+    if (!fs.includes(f)) return false;
     if (HU.que === "ropa") return !s.ropa;
     if (HU.que === "hogaza") return estado(s, s.lugar, s.dia, f).gente >= 2; // hay mercado o tienda abierta
     return true;
@@ -814,7 +834,7 @@
           if (rn.nivel === "vigilada") lin.push("«Ya me han dicho que andabas pidiendo por aquí», dice el alguacil.");
           else if (rn.nivel === "pobres") lin.push("«Venimos a limpiar esto de pordioseros. Tú también vienes», dice el alguacil.");
           apunta(s, "detenido", `Detenido de noche en ${L[s.lugar].corto}. Detención ${s.detenciones} de ${P.detencionesMax}.`, { motivo: "de noche" });
-          if (galeras(s, esHombre(s))) { s.galeras = true; lin.push("Por la mañana el alcalde te condena a cuatro años de galeras, como manda la pragmática."); }
+          if (galeras(s, esHombre(s))) { s.galeras = true; lin.push(`Por la mañana el alcalde te condena a la vergüenza y a cuatro años de galeras, como manda la pragmática a los vagabundos${s.detenciones === 1 ? ". Basta la primera vez" : ""}.`); }
           else if (s.detenciones === 2) { dc += P.carcel.azotes; azotes = true; s.azotado = true; s.verdugo = true; lin.push(`Detención 2 de ${P.detencionesMax}: te azotan. A la tercera, destierro.`); }
           else if (s.detenciones === 1) lin.push(`Detención 1 de ${P.detencionesMax}. A la segunda, azotes; a la tercera, destierro. Ya te tienen fichado.`);
           }
@@ -834,7 +854,7 @@
     // finales
     if (s.horca) return acaba(s, "ahorcado", "Al amanecer te sacan de la cárcel a la horca, fuera de la puerta, con el pregonero delante. Te ahorcan a la vista de todos.");
     if (s.galeras) {
-      return acaba(s, "galeras", "Al amanecer te sacan de la cárcel con la cadena de galeotes, camino del mar. Cuatro años al remo.");
+      return acaba(s, "galeras", "Al amanecer te sacan de la cárcel a la vergüenza y después con la cadena de galeotes, camino del mar. Cuatro años al remo.");
     }
     if (s.detenciones >= P.detencionesMax) {
       return acaba(s, "desterrado", "Te sacan de Salamanca con destierro. Si vuelves, la horca.");
@@ -1108,12 +1128,7 @@
     }
     return mejor;
   };
-  function genteBase(s, lugar, d, f) {
-    let g = L[lugar].gente[f];
-    const mod = R.DIAS_SENALADOS[dia(s, d).tipo];
-    if (mod && mod[lugar] && mod[lugar][f] != null) g = mod[lugar][f];
-    return g;
-  }
+  const genteBase = genteDelDia;
   const tuyosVivos = (s) => (s.tuyos || []).filter((t) => t.estado === "vive");
   function tuyoPide(s, lugar, d, f, excluir) {
     const a = (s.tuyosAqui || {})[`${d}|${f}`];
@@ -1344,7 +1359,7 @@
   }
   function detenerTuyo(s, tu, motivo, f, lugar) {
     tu.detenciones++; tu.conocido = true; tu.pan = 0; tu.detenido = motivo;
-    if (galeras(s, tu.el)) tu.galeras = true; // desde 1552, el hombre detenido va a galeras (j0.11)
+    if (galeras(s, tu.el)) tu.galeras = true; // desde la pragmática de 1552 (en el juego, 1553), el hombre detenido va a galeras (j0.11)
     tu.hoy.log.push({ f, lugar, tipo: "detenido", motivo });
   }
   // a uno de los tuyos lo prenden por ladrón: la misma escalera que a ti
@@ -1709,9 +1724,11 @@
     informe, resumenDias, momentoTxt, riesgoNoche, saberNoche, puedeLlaga, hacerLlaga, cuerpoMax,
     darPan, tuyosEn, tuyosVivos, hayQuejas, DIST, PUERTAS,
     // hurtar y la horca (j0.12)
-    puedeHurtar, hurtar, probVisto, penaHurto, puedeRestituir, restituir,
+    puedeHurtar, hurtar, probVisto, penaHurto, puedeRestituir, restituir, franjasHurto,
     // la cadena de veranos (j0.11)
     calendario, escasez, escasezDesde, esHombre, elegirHeredero, siguienteVerano, resumenCadena, recorridoVerano,
+    // jueves de mercado y textos de cada verano (j0.13)
+    mercado, genteDelDia, descLugar, verano,
     empezarJornada(s) { if (s.fase === "amanecer") { s.fase = "dia"; s.noche = null; } },
   };
 })();

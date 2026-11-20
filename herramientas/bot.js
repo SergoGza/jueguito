@@ -15,7 +15,7 @@
 //                                                  que más ve; hambre, primero al más flaco; generoso, lo que piden aunque
 //                                                  se quede sin cenar
 //     OIDOS=0                                      el bot no usa lo que le cuentan para aprender la ronda
-//   CADENA=1 ...                                   (varios veranos, 1545, 1552 y 1557, con los tuyos y los rasgos; j0.11)
+//   CADENA=1 ...                                   (varios veranos, 1545, 1553 y 1557, con los tuyos y los rasgos; j0.11; 1553 desde la j0.13)
 //     HEREDERO=cuerpo|pedro|catalina               a quién elige el bot cuando puede elegir (por defecto, el de más cuerpo)
 //     SEXO=mujer                                   el bot empieza como una moza (solo para medir los rasgos)
 //   node herramientas/bot.js 1000 '{"PARAMS.pararAlLlegar":{"desconocido":0.3,"conocido":0.4}}'
@@ -189,11 +189,9 @@ function volver(s) {
   if (mv && mv.coste <= E.opciones(s).quedan && dd[mv.destino] < dd[s.lugar]) return E.mover(s, mv.destino);
   return E.acabarDia(s);
 }
+// la gente que suele haber (con los jueves de mercado desde la j0.13: la misma cuenta que el motor)
 function genteBase(s, l, d, f) {
-  let g = E.L[l].gente[f];
-  const mod = R.DIAS_SENALADOS[E.dia(s, d).tipo];
-  if (mod && mod[l] && mod[l][f] != null) g = mod[l][f];
-  return g;
+  return E.genteDelDia(s, l, d, f);
 }
 
 // ------------------------------------------------------------------ bots

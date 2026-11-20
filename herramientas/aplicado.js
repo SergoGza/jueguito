@@ -114,7 +114,7 @@ function ganancias(tipo, esc, ll) {
     out[f] = {};
     for (const l of DENTRO) {
       const b = genteBase(l, tipo, f);
-      const pp = Math.min(1, E.L[l].pobres + (tipo !== "laborable" && IGLESIAS.includes(l) ? 0.2 : 0));
+      const pp = Math.min(1, E.L[l].pobres + (tipo !== "laborable" && tipo !== "mercado" && IGLESIAS.includes(l) ? 0.2 : 0));
       let g = 0, mucha = 0;
       for (const [dg, pg] of [[-1, 0.15], [0, 0.75], [1, 0.1]]) {
         const x = Math.max(1, Math.min(3, b + dg));
@@ -271,7 +271,8 @@ function costeParada(s) {
 }
 function contexto(s, K) {
   const f = E.franja(s.t), d = s.dia, tipo = E.dia(s, d).tipo;
-  const cx = { s, d, f, t: s.t, aqui: s.lugar, tipo, G: ganancias(tipo, E.escasez(s, d), !!s.llaga), rho0: tipo === "corpus" ? K.rhoCorpus : K.rho,
+  // el jueves de mercado (j0.13) es laborable, con la plaza llena hasta nona: sus ganancias van aparte
+  const cx = { s, d, f, t: s.t, aqui: s.lugar, tipo, G: ganancias(E.mercado(s, d) ? "mercado" : tipo, E.escasez(s, d), !!s.llaga), rho0: tipo === "corpus" ? K.rhoCorpus : K.rho,
     av: {}, hab: misCostumbres(s), vista: null, cpar: costeParada(s), cdet: costeDetencion(s) };
   const r = E.rondaEnTuZona(s);
   cx.rondaAqui = !!r;

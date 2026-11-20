@@ -104,7 +104,8 @@
     {
       id: "sanesteban", nombre: "Convento de San Esteban", corto: "S. Esteban", barrio: "sanesteban", dentro: true, x: 300, y: 196,
       gente: [2, 1, 1, 1, 2, 1], pobres: 0.5, aviso: 0, quien: "frailes y devotos",
-      desc: "El convento de los dominicos. Su prior, fray Domingo de Soto, ha escrito contra la orden de pobres: aquí nadie avisa a la ronda. Pero acuden muchos pobres.",
+      // j0.13: en junio de 1545 Soto ya no está en Salamanca: en mayo salió hacia Trento (cada verano tiene su texto, en VERANOS)
+      desc: "El convento de los dominicos. Su prior, fray Domingo de Soto, escribió contra la orden de pobres y se ha ido al concilio: aquí nadie avisa a la ronda. Pero acuden muchos pobres.",
     },
   ];
 
@@ -132,40 +133,49 @@
   ];
 
   // Varios veranos (j0.11; se activa al empezar, con los tuyos). Salamanca juega los años que cuentan:
-  // 1545 la orden, 1552 las galeras, 1557 el hambre. Calendario juliano: en 1552 y 1557 el Corpus cae después
-  // del día 10 (16 y 17 de junio) y el domingo es el de Pentecostés.
+  // 1545 la orden, 1553 las galeras, 1557 el hambre. Calendario juliano: en 1553 el Corpus cae el día 1 (jueves) y en
+  // 1557 después del día 10 (el 17), y el domingo de 1557 es el de Pentecostés.
+  // j0.13: el verano de las galeras pasa de 1552 a 1553. La pragmática se dio en Monzón el 25 de noviembre de 1552 y se
+  // pregonó en la Corte el 3 de diciembre: en junio de 1552 aún no regía (decidido por Sergio el 20 de noviembre de 2026).
   //  galeras: una detención manda a galeras a los hombres (pragmática de 1552; sigue en vigor después).
   //  escasezDesde: desde qué día la gente da menos (si no está, PARAMS.escasezDesde).
+  //  desc: el texto de algún sitio que cambia ese verano.
+  // En el calendario, mercado: true es jueves de mercado en la plaza (j0.13; ver DIAS_SENALADOS). Si cae en Corpus,
+  // no hay mercado: es fiesta (en 1545, el único jueves es el Corpus).
+  const SOTO_VUELTO = "El convento de los dominicos. Fray Domingo de Soto, que escribió contra la orden de pobres, volvió del concilio hace años: aquí nadie avisa a la ronda. Pero acuden muchos pobres.";
   const VERANOS = [
     { anio: 1545, calendario: CALENDARIO },
     {
-      anio: 1552, galeras: true,
+      anio: 1553, galeras: true,
+      // Soto volvió a España en enero de 1550 y en septiembre de 1552 ganó la cátedra de prima
+      desc: { sanesteban: "El convento de los dominicos. Fray Domingo de Soto, que escribió contra la orden de pobres, volvió del concilio y lee prima en las Escuelas: aquí nadie avisa a la ronda. Pero acuden muchos pobres." },
       calendario: [
-        { dia: 1, fecha: "miércoles 1 de junio", tipo: "laborable" },
-        { dia: 2, fecha: "jueves 2 de junio", tipo: "laborable" },
-        { dia: 3, fecha: "viernes 3 de junio", tipo: "laborable" },
-        { dia: 4, fecha: "sábado 4 de junio", tipo: "laborable" },
-        { dia: 5, fecha: "domingo 5 de junio", tipo: "domingo", fiesta: "Pentecostés" },
-        { dia: 6, fecha: "lunes 6 de junio", tipo: "laborable" },
-        { dia: 7, fecha: "martes 7 de junio", tipo: "laborable" },
-        { dia: 8, fecha: "miércoles 8 de junio", tipo: "laborable" },
-        { dia: 9, fecha: "jueves 9 de junio", tipo: "laborable" },
-        { dia: 10, fecha: "viernes 10 de junio", tipo: "laborable" },
+        { dia: 1, fecha: "jueves 1 de junio", tipo: "corpus", fiesta: "Corpus Christi" },
+        { dia: 2, fecha: "viernes 2 de junio", tipo: "laborable" },
+        { dia: 3, fecha: "sábado 3 de junio", tipo: "laborable" },
+        { dia: 4, fecha: "domingo 4 de junio", tipo: "domingo", fiesta: "Domingo" },
+        { dia: 5, fecha: "lunes 5 de junio", tipo: "laborable" },
+        { dia: 6, fecha: "martes 6 de junio", tipo: "laborable" },
+        { dia: 7, fecha: "miércoles 7 de junio", tipo: "laborable" },
+        { dia: 8, fecha: "jueves 8 de junio", tipo: "laborable", mercado: true },
+        { dia: 9, fecha: "viernes 9 de junio", tipo: "laborable" },
+        { dia: 10, fecha: "sábado 10 de junio", tipo: "laborable" },
       ],
     },
     {
       anio: 1557, galeras: true, escasezDesde: 1,
+      desc: { sanesteban: SOTO_VUELTO },
       calendario: [
         { dia: 1, fecha: "martes 1 de junio", tipo: "laborable" },
         { dia: 2, fecha: "miércoles 2 de junio", tipo: "laborable" },
-        { dia: 3, fecha: "jueves 3 de junio", tipo: "laborable" },
+        { dia: 3, fecha: "jueves 3 de junio", tipo: "laborable", mercado: true },
         { dia: 4, fecha: "viernes 4 de junio", tipo: "laborable" },
         { dia: 5, fecha: "sábado 5 de junio", tipo: "laborable" },
         { dia: 6, fecha: "domingo 6 de junio", tipo: "domingo", fiesta: "Pentecostés" },
         { dia: 7, fecha: "lunes 7 de junio", tipo: "laborable" },
         { dia: 8, fecha: "martes 8 de junio", tipo: "laborable" },
         { dia: 9, fecha: "miércoles 9 de junio", tipo: "laborable" },
-        { dia: 10, fecha: "jueves 10 de junio", tipo: "laborable" },
+        { dia: 10, fecha: "jueves 10 de junio", tipo: "laborable", mercado: true },
       ],
     },
   ];
@@ -179,6 +189,11 @@
     corpus: {
       catedral: { 0: 3, 1: 3, 2: 3 }, rua: { 1: 3, 2: 3 }, plaza: { 1: 3, 2: 3 },
       sanmartin: { 0: 3 }, escuelas: { 1: 1, 3: 1 },
+    },
+    // jueves de mercado (j0.13; decidido por Sergio el 20 de noviembre de 2026): la plaza sigue llena hasta nona.
+    // Se suma a lo del tipo de día. Cifras de Claude, sin revisar.
+    mercado: {
+      plaza: { 2: 3, 3: 3 },
     },
   };
 
@@ -295,6 +310,8 @@
         olla: { rua: [2], sanpablo: [2], sanmartin: [2], plaza: [2], escuelas: [2] },
         ropa: { orilla: [0, 1, 2, 3], rua: [1, 3, 4] },
       },
+      // los jueves de mercado (j0.13), franjas de más en que se puede hurtar: hay puestos en la plaza hasta nona
+      mercado: { hogaza: { plaza: [2, 3] } },
       ratos: 2,   // lo que tarda (pedir tarda una franja: 6)
       gana: 2,    // pedazos (hogaza y olla)
       ropa: { cuerpo: 1, pan: 1 }, // con ropa hurtada, el invierno se pasa un escalón mejor
@@ -326,8 +343,9 @@
       // «cuerpo» (solo lo que llevas encima: la oreja cortada y, si «espalda», los azotes; la vergüenza se olvida)
       memoria: "cuerpo",
       cuenta: false,       // si prenderte por ladrón cuenta además como detención (camino del destierro)
-      // desde 1552, al ladrón varón lo mandan a galeras en vez de subir la escalera: true (al primer hurto, como dice la
-      // pragmática), "segunda" (la primera vez, a la vergüenza; galeras a la segunda) o false
+      // desde la pragmática de 1552 (en el juego, desde el verano de 1553), al ladrón varón lo mandan a galeras en vez de
+      // subir la escalera: true (al primer hurto, como dice la pragmática), "segunda" (la primera vez, a la vergüenza;
+      // galeras a la segunda) o false
       galeras1552: true, // DECIDIDO (ronda 6, 11 de noviembre): al primer hurto, como dice la pragmática
       // la oreja cortada: quién la lee. conoce: la ronda te trata como conocido (como la espalda azotada);
       // limosna: puntos que baja la tirada de limosna; siega: si aún te dan hoz u obra
@@ -359,31 +377,33 @@
     "La siega empieza el 11 de junio; en Castilla solía empezar a finales de junio o en julio.",
     "La Puerta de San Pablo existió, del lado del río y al este del puente; que sus guardas no avisen a la ronda es del juego. Había más puertas, que el juego deja fuera.",
     "Las cifras (gente, limosna, probabilidades) son del juego.",
+    "La Armuña era tierra de Salamanca, a menos de seis leguas: por la ley de 1540, su pobre podía pedir en la ciudad con licencia. La orden de 1544 prohibió pedir a todos; si su ración llegaba a los pobres de la Tierra o solo a los de la ciudad no se sabe. En el juego, no les llega.",
   ];
   // solo con «Hurtar»
   const LICENCIAS_HURTO = [
     "Que al ladrón lo saquen a la vergüenza, en un asno y con el pregonero delante, está en las leyes y en los pleitos; que la primera vez sea solo eso, sin azotes, es del juego.",
-    "La horca al segundo hurto del que ya lleva azotes es del juego: por escrito, la muerte por hurto simple llega en 1566 y al tercero. Las Partidas mandaban azotar al ladrón y prohibían matarlo o cortarle miembro.",
+    "La horca al segundo hurto del que ya lleva azotes es del juego. Por ley, el hurto simple no llevaba a la horca: las Partidas mandaban azotar al ladrón y prohibían matarlo o cortarle miembro, y la pragmática de 1566 solo alargó las galeras. Ahorcar al tercer hurto era costumbre de los jueces.",
     "Que te busquen por tus señas sale de las listas de señas de la época; que a los tres días dejen de buscarte es del juego.",
     "Que el dueño vuelva la cabeza ante el que se muere de hambre sale de la doctrina (en necesidad extrema, tomar no es hurtar, y el hambriento puede suponer que el dueño se lo permitiría); que pase la mitad de las veces es del juego.",
-    "Desde 1552, al ladrón varón de más de veinte años, vergüenza y cuatro años de galeras la primera vez: es la pragmática. La mujer quedaba fuera de las galeras.",
+    "Desde la pragmática de 1552, al ladrón varón de más de veinte años, vergüenza y cuatro años de galeras la primera vez. La mujer quedaba fuera de las galeras, para castigarla conforme a las leyes.",
   ];
   // solo con «Jugar varios veranos»
   const LICENCIAS_CADENA = [
-    "Las galeras son de la pragmática de 1552 (el vagabundo sano de más de veinte años, cuatro años de galeras en lugar de azotes). En el juego, todos los hombres pasan de veinte y basta una detención.",
-    "El pan caro de 1557 sale de la crisis de grano de 1557-1558; que la gente dé menos desde el 1 de junio es del juego.",
+    "Las galeras son de la pragmática dada en Monzón el 25 de noviembre de 1552: al vagabundo sano de más de veinte años, la primera vez, vergüenza y cuatro años de galeras en lugar de azotes. Por eso el segundo verano es 1553. En el juego, todos los hombres pasan de veinte y basta una detención.",
+    "El pan caro de 1557 sale de la cosecha de 1556, de las peores del siglo; que la gente dé menos desde el 1 de junio es del juego.",
+    "El mercado de los jueves en la plaza de San Martín está documentado en la Edad Media; que siguiera en el siglo XVI y que llene la plaza hasta nona es del juego.",
     "Que el alguacil mande a las obras sin paga al mozo sano que para por la calle sale de una ley más vieja (Briviesca, 1387: servir sin soldada); en Salamanca es del juego.",
     "A la mujer, la ronda no la lleva a la cárcel cuando la para por la calle: la echa y, si ya la conoce, la azota (para las mujeres no había nada entre los azotes y la horca). Que no haya cárcel es del juego. No había galeras para mujeres.",
     "Entre un verano y otro, lo que pasa en el invierno se resume en cómo llegas: con hoz, espigando o sin nada.",
   ];
 
   window.RULES = {
-    version: "j0.12", CONFIG, FRANJAS, RATOS, DIAS, MODOS, BARRIOS, LUGARES, CAMINOS, CALENDARIO, VERANOS, DIAS_SENALADOS,
+    version: "j0.13", CONFIG, FRANJAS, RATOS, DIAS, MODOS, BARRIOS, LUGARES, CAMINOS, CALENDARIO, VERANOS, DIAS_SENALADOS,
     RONDA, PARAMS, LICENCIAS, LICENCIAS_CADENA, LICENCIAS_HURTO,
     // la mesa de los agentes pregunta por PERSONAJES: en el juguete, cada «personaje» es una prueba
     PERSONAJES: [
-      { id: "A", nombre: "Mozo de La Armuña", origen: "Forastero", cuerpoTipo: "Válido", resumen: MODOS.A.resumen, claves: ["Prueba A · calles"] },
-      { id: "B", nombre: "Mozo de La Armuña", origen: "Forastero", cuerpoTipo: "Válido", resumen: MODOS.B.resumen, claves: ["Prueba B · barrios"] },
+      { id: "A", nombre: "Mozo de La Armuña", origen: "De la Tierra", cuerpoTipo: "Válido", resumen: MODOS.A.resumen, claves: ["Prueba A · calles"] },
+      { id: "B", nombre: "Mozo de La Armuña", origen: "De la Tierra", cuerpoTipo: "Válido", resumen: MODOS.B.resumen, claves: ["Prueba B · barrios"] },
     ],
   };
 })();

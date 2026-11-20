@@ -152,7 +152,7 @@
         ${enCurso ? btn("continuar", "Seguir la partida en curso", `${R.MODOS[s.modo].nombre} · ${s.conCadena ? `${s.anio} · ` : ""}día ${s.dia}${s.conLlaga ? " · con llaga" : ""}${s.conCadena ? " · varios veranos" : s.conTuyos ? " · con los tuyos" : ""}${s.conHurto ? " · con hurtar" : ""}`, { cls: "primary" }) : ""}
         ${load(LS.llaga, false) ? btn("llagaOnOff", "Llaga activada", "La tendrán las partidas que empieces. Toca para quitarla.", { cls: "activo" }) : btn("llagaOnOff", "Activar llaga", "Prueba nueva: fingir. Mejor si ya has jugado sin ella.")}
         ${load(LS.cadena, false) ? "" : load(LS.tuyos, false) ? btn("tuyosOnOff", "Con los tuyos", "Las partidas que empieces los tendrán. Toca para quitarlos.", { cls: "activo" }) : btn("tuyosOnOff", "Jugar con los tuyos", "Prueba nueva: dos que bajaron contigo. Mejor si ya has jugado sin ellos.")}
-        ${load(LS.cadena, false) ? btn("cadenaOnOff", "Varios veranos", "1545, 1552 y 1557, con los tuyos. Toca para jugar uno solo.", { cls: "activo" }) : btn("cadenaOnOff", "Jugar varios veranos", "Prueba nueva: 1545, 1552 y 1557, con los tuyos. Mejor si ya has jugado con ellos.")}
+        ${load(LS.cadena, false) ? btn("cadenaOnOff", "Varios veranos", "1545, 1553 y 1557, con los tuyos. Toca para jugar uno solo.", { cls: "activo" }) : btn("cadenaOnOff", "Jugar varios veranos", "Prueba nueva: 1545, 1553 y 1557, con los tuyos. Mejor si ya has jugado con ellos.")}
         ${load(LS.hurto, false) ? btn("hurtoOnOff", "Hurtar activado", "Lo tendrán las partidas que empieces, solo o con lo demás. Toca para quitarlo.", { cls: "activo" }) : btn("hurtoOnOff", "Activar hurtar", "Prueba nueva: coger pan de un puesto, y la justicia. Vale solo o con lo demás.")}
         ${pruebasVisibles().map((id) => btn("empezar", pruebasVisibles().length > 1 ? `Empezar la ${R.MODOS[id].nombre.toLowerCase()}` : "Empezar una partida", pruebasVisibles().length > 1 ? R.MODOS[id].resumen : "", { data: { id }, cls: enCurso ? "" : "primary" })).join("")}
         ${btn("ayuda", "Cómo se juega", "")}
@@ -174,9 +174,11 @@
   const mayus = (t) => t.charAt(0).toUpperCase() + t.slice(1);
   const ANIOS = (n) => ["cero", "un", "dos", "tres", "cuatro", "cinco", "seis", "siete", "ocho", "nueve", "diez"][n] || String(n);
   const PREGON = {
-    1552: "En la plaza han pregonado una pragmática del rey: a los vagabundos sanos de más de veinte años, en lugar de azotes, cuatro años de galeras.",
-    // con hurtar (j0.12): la pragmática nombra también a los ladrones
-    "1552h": "En la plaza han pregonado una pragmática del rey: a los vagabundos sanos de más de veinte años, en lugar de azotes, cuatro años de galeras. Y a los ladrones, lo mismo: a la vergüenza y, desde el primer hurto, cuatro años al remo. De las mujeres, el pregón no dice nada: para ellas sigue el verdugo.",
+    // j0.13: el verano de las galeras es 1553. La pragmática se pregonó en la Corte en diciembre de 1552; que se pregonara
+    // en Salamanca ese invierno es inferido. Con la vergüenza y a la primera, como dice el impreso.
+    1553: "En la ribera cuentan que este invierno pregonaron en la plaza una pragmática del rey: al vagabundo sano de más de veinte años ya no lo azotan. La primera vez que lo prenden, a la vergüenza y cuatro años de galeras.",
+    // con hurtar (j0.12): la pragmática nombra también a los ladrones, y a las mujeres las deja fuera de las galeras
+    "1553h": "En la ribera cuentan que este invierno pregonaron en la plaza una pragmática del rey: al vagabundo sano de más de veinte años ya no lo azotan. La primera vez que lo prenden, a la vergüenza y cuatro años de galeras. Y al ladrón, lo mismo desde el primer hurto. A las mujeres las deja fuera de las galeras, para castigarlas conforme a las leyes: para ellas sigue el verdugo.",
     1557: "El año pasado la cosecha fue mala y el pan está carísimo: en la ciudad la gente da poco desde el primer día. En la ribera cuentan que este invierno se llevaron a galeras a varios mozos.",
   };
   function introVerano() {
@@ -245,6 +247,7 @@
     const notas = [];
     if (d.tipo === "domingo") notas.push(`Es domingo${d.fiesta && d.fiesta !== "Domingo" ? " de " + d.fiesta : ""}: no hay obra. Las iglesias se llenan a prima y a tercia; la plaza está tranquila.`);
     if (d.tipo === "corpus") notas.push("Es Corpus Christi: procesión por la Rúa y la plaza a tercia y a sexta, y la ronda va con ella. No hay obra.");
+    if (E.mercado(s)) notas.push("Es jueves, día de mercado: la plaza está llena de puestos hasta nona.");
     if (s.dia === E.escasezDesde(s) && s.dia > 1) notas.push("El pan ha subido en la plaza. Desde hoy, la gente da menos.");
     if (s.yaNoBuscan) notas.push("Han pasado tres días de aquello. En la plaza ya han dado otras señas: por las tuyas no pregunta nadie.");
     if (s.lugar === "puerta" && s.cronica.some((c) => c.dia === s.dia - 1 && c.anio === s.anio && c.tipo === "prendido")) notas.push("Después, te sueltan en la Puerta del Río.");
@@ -258,7 +261,7 @@
 
   function panelAqui(o) {
     const l = L[s.lugar], f = franjaAct();
-    let h = `<div class="panel"><h2>${esc(l.nombre)}</h2><p class="small muted">${esc(E.BARRIO[l.barrio].nombre)}${l.dentro ? "" : " · fuera de la muralla"}</p><p class="small">${esc(l.desc)}</p>`;
+    let h = `<div class="panel"><h2>${esc(l.nombre)}</h2><p class="small muted">${esc(E.BARRIO[l.barrio].nombre)}${l.dentro ? "" : " · fuera de la muralla"}</p><p class="small">${esc(E.descLugar(s, s.lugar))}</p>`;
     if (s.t < E.FIN) {
       const zona = E.lugaresZona(s, E.zonaDe(s, s.lugar));
       const r = E.rondaEnTuZona(s);
@@ -448,10 +451,11 @@
     const conHurto = s && ui.pantalla === "juego" ? !!s.conHurto : load(LS.hurto, false);
     const anio = s && ui.pantalla === "juego" && s.anio ? s.anio : 1545;
     const cal = s && ui.pantalla === "juego" ? E.calendario(s) : R.CALENDARIO;
-    const fiestas = cal.filter((d) => d.tipo !== "laborable").map((d) => (d.tipo === "corpus" ? `El ${d.fecha.split(" ")[0]} ${d.dia} es Corpus Christi` : `El ${d.dia}, domingo${d.fiesta && d.fiesta !== "Domingo" ? " de " + d.fiesta : ""}`));
+    // los jueves de mercado van en la misma lista (j0.13)
+    const fiestas = cal.filter((d) => d.tipo !== "laborable" || d.mercado).map((d) => (d.tipo === "corpus" ? `El ${d.fecha.split(" ")[0]} ${d.dia} es Corpus Christi` : d.tipo === "laborable" ? `El jueves ${d.dia} hay mercado` : `El ${d.dia}, domingo${d.fiesta && d.fiesta !== "Domingo" ? " de " + d.fiesta : ""}`));
     const fiestasTxt = fiestas.map((x, i) => (i ? x.replace(/^El/, "el") : x)).join("; ") + ".";
     return `<div class="modal-in"><h2>Cómo se juega</h2>
-      <p>Eres ${s && ui.pantalla === "juego" && !E.esHombre(s) ? "una pobre forastera" : "un pobre forastero"} en Salamanca, en junio de ${anio}. Desde la orden de pobres ${anio === 1545 ? "del año pasado" : "de 1544"}, pedir en la ciudad está prohibido. Duermes fuera de la muralla, en la ribera; el pan está dentro. <b>Objetivo: aguantar diez días, hasta la siega.</b> En la siega cogen segadores, pero no a cualquiera: quieren brazos que puedan con la hoz.</p>
+      <p>Eres ${s && ui.pantalla === "juego" && !E.esHombre(s) ? "una pobre" : "un pobre"} de La Armuña, en la Tierra de Salamanca, y has bajado a la ciudad en junio de ${anio}. Desde la orden de pobres ${anio === 1545 ? "del año pasado" : "de 1544"}, pedir en la ciudad está prohibido. Duermes fuera de la muralla, en la ribera; el pan está dentro. <b>Objetivo: aguantar diez días, hasta la siega.</b> En la siega cogen segadores, pero no a cualquiera: quieren brazos que puedan con la hoz.</p>
       <h3>El día</h3><p>Seis franjas, de prima a completas, de seis ratos cada una. Pedir ocupa una franja entera. Al acabar completas cierran las puertas de la muralla: quien se queda dentro duerme en un portal.</p>
       <h3>Moverte</h3>${mover.join("")}
       <h3>Lo que ves</h3><p>La gente, los otros pobres y la ronda cambian al empezar cada franja. Lo que viste vale para la franja en que lo viste. En el mapa, lo visto hace rato se ve más claro. En «Recuerdos» tienes dónde y cuándo has visto a la ronda, y dónde has pedido tú.</p>
@@ -465,11 +469,11 @@
       <h3>Dormir dentro</h3><p>Ahorra el camino de vuelta, pero de noche también hay ronda.</p>
       <h3>Los tuyos</h3><p>Si juegas con ellos: Pedro y Catalina bajaron contigo de tu aldea. Viven como tú: piden, se esconden de la ronda y duermen en la ribera. Si dormís allí, de noche te cuentan lo que han visto, y el que no ha sacado para cenar te pide pan. Lo que te cuentan queda en «Recuerdos».</p>
       <h3>La noche</h3><p>Una ración son 2 pedazos de pan. Ración entera: +1 de cuerpo. Media: −1. Nada: −2. Puedes guardar hasta ${P.panMax} pedazos. Si el cuerpo llega a 0, mueres.</p>
-      ${conCadena ? `<h3>Varios veranos</h3><p>Después de 1545 vienen 1552 y 1557, con años de por medio. Si mueres y uno de los tuyos ha dormido a tu lado esa noche, sigues como él o ella el verano siguiente (si estaban los dos, eliges). Si mueres solo, se acaba. Si te destierran, sigue uno de los tuyos. Lo que sacas en la siega decide cómo llegas al verano siguiente. En «Recuerdos» quedan los veranos anteriores.</p>` : ""}
+      ${conCadena ? `<h3>Varios veranos</h3><p>Después de 1545 vienen 1553 y 1557, con años de por medio. Si mueres y uno de los tuyos ha dormido a tu lado esa noche, sigues como él o ella el verano siguiente (si estaban los dos, eliges). Si mueres solo, se acaba. Si te destierran, sigue uno de los tuyos. Lo que sacas en la siega decide cómo llegas al verano siguiente. En «Recuerdos» quedan los veranos anteriores.</p>` : ""}
       ${conHurto ? `<h3>Hurtar</h3><p>En la Plaza y en la Rúa, cuando hay mercado o tienda abierta, puedes coger una hogaza de un puesto: ${HU.gana} pedazos en ${HU.ratos} ratos. No te vigila la ronda de pobres: te ve el dueño o el vecino. Con poca gente te ven más; con mucha, menos. Si te ven con mucha gente, te sujetan allí mismo; con poca, escapas con el pan, pero dan tus señas y la justicia te busca ${HU.buscaDias} días: si en esos días la ronda te para o te encuentra de noche en un portal, te entrega. Si hurtas con la ronda delante, te coge ella.</p>
       <p>La justicia no es la ronda y lleva su cuenta aparte de las detenciones. Te quita lo que llevas y pasas la noche en su cárcel. Lo que viene después te lo dice el alcalde cuando te tiene delante.</p>` : ""}
-      <h3>Lo que sabe cualquiera en Salamanca</h3><p>Las iglesias se llenan a la hora de misa (prima) y a vísperas. El mercado de la plaza, por la mañana. Los estudiantes salen a tercia y a nona. A vísperas, la gente pasea por la Rúa. ${esc(fiestasTxt)}</p>
-      <h3>Licencias históricas</h3><ul class="small">${R.LICENCIAS.concat(conHurto ? R.LICENCIAS_HURTO.filter((x) => conCadena || !x.startsWith("Desde 1552")) : [], conCadena ? R.LICENCIAS_CADENA : []).map((x) => `<li>${esc(x)}</li>`).join("")}</ul>
+      <h3>Lo que sabe cualquiera en Salamanca</h3><p>Las iglesias se llenan a la hora de misa (prima) y a vísperas. El mercado de la plaza, por la mañana; los jueves de mercado, hasta nona. Los estudiantes salen a tercia y a nona. A vísperas, la gente pasea por la Rúa. ${esc(fiestasTxt)}</p>
+      <h3>Licencias históricas</h3><ul class="small">${R.LICENCIAS.concat(conHurto ? R.LICENCIAS_HURTO.filter((x) => conCadena || !x.startsWith("Desde la pragmática de 1552")) : [], conCadena ? R.LICENCIAS_CADENA : []).map((x) => `<li>${esc(x)}</li>`).join("")}</ul>
       <div class="btns">${btn("cerrar", "Cerrar", "", { cls: "primary" })}</div></div>`;
   }
   // lo que el mozo recuerda: no lo lleva escrito, lo ha visto con sus ojos

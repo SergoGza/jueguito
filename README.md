@@ -1,4 +1,4 @@
-# Liber Vagatorum · el juguete (j0.12)
+# Liber Vagatorum · el juguete (j0.13)
 
 Prueba mínima del núcleo del juego, tras el replanteamiento de octubre de 2026: **un mendigo, una necesidad (el hambre) y una amenaza (la ronda)**. Encima, cuatro pruebas que se activan al empezar: la llaga (fingir), los tuyos, varios veranos (el relevo) y hurtar (la justicia y la horca). Ni más tretas ni exámenes. Si el núcleo solo no obliga a exponerse para comer, los sistemas de encima no lo van a arreglar.
 
@@ -116,12 +116,12 @@ Decidido por rondas el 31 de octubre y el 1 de noviembre de 2026 (ver `claude/de
 
 Decidido por rondas del 5 al 9 de noviembre de 2026 (ver «El relevo» en `claude/decisiones-replanteamiento.md`, en el proyecto). **Se activa con el botón «Jugar varios veranos»** de la pantalla de inicio; lleva siempre a los tuyos y solo existe en la prueba A. Sin activarlo, la partida es la de la j0.10 (los bots dan exactamente lo mismo).
 
-- **Tres veranos de Salamanca:** 1545 (la orden), 1552 (las galeras) y 1557 (el hambre), cada uno con su calendario juliano (en 1552 y 1557 el Corpus cae después del día 10 y el domingo es el de Pentecostés). En 1552 se pregona la pragmática: al hombre, una detención lo manda a galeras (se va como el desterrado). Las galeras siguen en 1557, y ese año la gente da poco desde el primer día.
+- **Tres veranos de Salamanca:** 1545 (la orden), 1553 (las galeras; hasta la j0.12, 1552) y 1557 (el hambre), cada uno con su calendario juliano (en 1553 el Corpus cae el día 1; en 1557, después del día 10, y el domingo es el de Pentecostés). En 1553 cuentan en la ribera la pragmática pregonada ese invierno: al hombre, una detención lo manda a la vergüenza y a galeras (se va como el desterrado). Las galeras siguen en 1557, y ese año la gente da poco desde el primer día.
 - **La cadena dura lo que dure tu gente.** Si mueres y uno de los tuyos ha dormido a tu lado esa noche (la ribera o el mismo portal; en la cárcel se muere solo), sigues como él el verano siguiente; si estaban los dos, eliges. Si mueres solo, se acaba. El destierro y las galeras no son morir: sigue uno de los tuyos, el que elijas. Los días que faltan para la siega se viven sin ti: los tuyos siguen con las mismas reglas y nadie les da pan; si el que ha de seguir se va, sigue el otro con la misma regla.
 - **La siega decide cómo llegas al verano siguiente:** con hoz, 5 de cuerpo y 2 pedazos; espigando, 4 y 1; sin nada, 3 y 0 (`PARAMS.cadena.inicio`). Vale igual para los tuyos.
 - **Entre veranos:** la cara se olvida y las detenciones quedan; al que azotaron, el alguacil le mira la espalda y es como si le conociera. La ronda saca costumbres nuevas, inclinadas hacia donde te vio pedir y la puerta por la que más pasabas (`PARAMS.cadena.reaccion`). Recuerdos guarda los veranos anteriores, con lo que vio el heredero.
 - **Hombre y mujer** (solo con varios veranos). El hombre (tú y Pedro) puede trabajar en las obras y segar con hoz; si la ronda le para por la calle sin conocerle y con 5 o más de cuerpo, lo manda a las obras sin paga hasta la noche (`PARAMS.cadena.obrasForzadas`). La mujer (Catalina) no va a las obras y en la siega espiga; la ronda, si la para por la calle, no la lleva a la cárcel: la echa, y si ya la conoce (o le ve la espalda), la azota allí mismo (−1 de cuerpo esa noche), sin quitarle el pan ni contar para el destierro. Pedir delante de la ronda y la noche, igual para los dos. Nada de esto se explica: lo dicen el capataz, el alguacil, el mayoral y el pregón.
-- **Al final,** cuánto aguantó tu gente («Tu gente aguantó de 1545 a 1552») y lo que fue de cada uno, verano a verano. Es un final provisional: el de 1565 vendrá después.
+- **Al final,** cuánto aguantó tu gente («Tu gente aguantó de 1545 a 1553») y lo que fue de cada uno, verano a verano. Es un final provisional: el de 1565 vendrá después.
 - **Textos de los tuyos** (también sin varios veranos): el cuerpo se les nota por grados («se le ve flaco» con 3, «muy flaco» con 2, «no se tiene en pie» con 1), y «¿Tampoco hoy?» solo sale si la última vez que te pidieron se lo negaste; si no, «Acuérdate de lo que te dije».
 
 **Bots** (`CADENA=1`; 2.000 cadenas; «completa» = el que juega llega a la siega de 1557):
@@ -144,12 +144,12 @@ Decidido por rondas del 5 al 9 de noviembre de 2026 (ver «El relevo» en `claud
 
 Decidido por rondas del 10 al 12 de noviembre de 2026, con cada opción medida antes de elegir (ver «Hurtar y la horca» en `claude/decisiones-replanteamiento.md`, en el proyecto, y `claude/hurto-prototipo.md` aquí). **Se activa con el botón «Activar hurtar»** de la pantalla de inicio, solo o con lo demás, y solo en la prueba A. Sin activarlo, la partida es la de la j0.11 (los bots dan exactamente lo mismo).
 
-- **Qué se coge.** Una hogaza de un puesto (2 pedazos, 2 ratos) en la Plaza (prima y tercia) o en la Rúa (tercia, nona y vísperas), cuando hay mercado o tienda abierta. El botón «Hurtar una hogaza» solo sale entonces.
+- **Qué se coge.** Una hogaza de un puesto (2 pedazos, 2 ratos) en la Plaza (prima y tercia; los jueves de mercado, también sexta y nona, desde la j0.13) o en la Rúa (tercia, nona y vísperas), cuando hay mercado o tienda abierta. El botón «Hurtar una hogaza» solo sale entonces.
 - **Quién te ve.** No la ronda de pobres: el dueño o el vecino. Con poca gente te ven 1 de cada 2 veces; con mucha, 1 de cada 4; el doble si ya has hurtado hoy ahí. Con la ronda delante, te coge ella. Si te ven con mucha gente, te sujetan allí mismo; con poca, escapas con el pan y te buscan por tus señas.
 - **Te buscan tres días.** Sale en la cabecera («Te busca la justicia · día 1 de 3»). En esos días, la ronda te para la mitad de las veces que llegas adonde está, y cualquier parada, o que te encuentre de noche en un portal, acaba ante la justicia. Al cuarto día, al amanecer, se dice que ya no preguntan por ti.
 - **La escalera de la justicia** va aparte de las detenciones por pedir, y la dice el alcalde cuando te tiene delante. Al limpio: la primera vez, a la vergüenza en un asno, sin azotes («A la segunda, el verdugo»); la segunda, vergüenza y azotes («A la tercera, la soga»); la tercera, la horca. Al que ya lleva la espalda azotada, de lo que sea (la segunda detención, la justicia o los varazos de la ronda a la mujer), le queda la vergüenza y después la horca («Azotes ya llevas. A la segunda, la soga»). Cada vez te quitan lo que llevas y pasas la noche en la cárcel.
 - **De un verano a otro** la justicia no recuerda más que lo que lleva el cuerpo: la vergüenza se olvida; los azotes, no. No hay oreja cortada ni otra marca de ladrón.
-- **Desde 1552,** al hombre que prenden por ladrón lo mandan a galeras al primer hurto, como dice la pragmática (el pregón de ese año lo dice). La mujer sigue en la escalera: desde 1552, la horca es cosa de mujeres.
+- **Desde la pragmática de 1552** (en el juego, desde el verano de 1553), al hombre que prenden por ladrón lo mandan a galeras al primer hurto, como dice la pragmática (el pregón lo dice). La mujer sigue en la escalera: desde entonces, la horca es cosa de mujeres.
 - **La necesidad extrema.** Con el cuerpo en 2 o menos, te ven la mitad de las veces: «El panadero te ha visto la mano. Te mira las costillas y vuelve la cabeza». El alcalde no cambia.
 - **Ahorcado, mueres solo.** Se acaba la cadena aunque los tuyos sigan vivos: «Catalina está entre la gente. No puede acercarse».
 - **Los tuyos.** Catalina, la que se arriesga, hurta cuando pasa hambre (cuerpo en 3 o menos y sin ración), con tus mismas reglas, y de noche te lo cuenta; si la prenden, vuelve contando lo que le dijo el alcalde, y pueden ahorcarla. Pedro no hurta. El que te vende cuenta también lo que has hurtado ese verano: desde ese día te buscan, y te enteras esa noche en la ribera o cuando te para el alguacil («A ti te conozco yo de oídas: alargas la mano en los puestos»).
@@ -168,6 +168,32 @@ Decidido por rondas del 10 al 12 de noviembre de 2026, con cada opción medida a
 - **Lo que queda flojo:** para el que juega mal con los tuyos, hurtar siempre todavía gana a no hurtar nunca.
 - **Sin medir:** ningún bot elige por sí mismo el mejor momento de hurtar, y nada de esto dice si se entiende jugando. Para eso está la pregunta nueva del informe.
 
+## La j0.13: lo que pidió la historia (20 de noviembre de 2026)
+
+Decidido por Sergio el 20 de noviembre, tras leer los impresos de 1552 y 1566 (ver `claude/borrador-veranos-salamanca.md` y `claude/borrador-fichas-normas.md`, en el proyecto).
+
+- **El verano de las galeras es 1553, no 1552.** La pragmática se dio en Monzón el 25 de noviembre de 1552: en junio de 1552 aún no regía. En 1553 el 1 de junio es jueves de Corpus y el 4, domingo. El pregón ya no se oye ese junio: lo cuentan en la ribera, pregonado ese invierno.
+- **Vagabundo, a la vergüenza y a galeras**, y a la primera vez, como dice la pragmática; antes el pregón decía «en lugar de azotes» y se podía leer como que la primera detención seguía siendo cárcel.
+- **Las mujeres en el pregón con hurtar:** la pragmática las nombra y las deja fuera de las galeras, «conforme a las leyes»; ya no dice que no diga nada.
+- **La licencia del tercer hurto:** por ley el hurto simple no llevaba a la horca; ahorcar al tercero era costumbre de los jueces (la de 1566 solo alarga las galeras).
+- **San Esteban:** en junio de 1545 Soto ya se ha ido al concilio; en 1553 ha vuelto y lee prima; en 1557 volvió hace años.
+- **El mozo es de la Tierra, no forastero:** La Armuña está a menos de seis leguas. Licencia nueva sobre la ración de la orden.
+- **Jueves de mercado** (1553: el 8; 1557: el 3 y el 10; en 1545 el único jueves es Corpus): la plaza tiene mucha gente también a sexta y a nona, y se puede hurtar allí esas franjas (`DIAS_SENALADOS.mercado`, `PARAMS.hurto.mercado`; cifras sin revisar). Lo dice el amanecer y la ayuda.
+- Una partida guardada en 1552 sigue con las reglas de 1553.
+
+**Bots** (cadena; % de cadenas en que tu gente llega a 1557 / el que juega completa):
+
+| | j0.12 (1552) | j0.13 sin mercado | j0.13 |
+|---|---|---|---|
+| Veterano (2.000) | 30 / 5 | 33 / 5 | 37 / 10 |
+| Prudente (2.000) | 21 / 0 | 24 / 1 | 32 / 1 |
+| Osado (2.000) | 22 / 4 | 22 / 5 | 24 / 6 |
+| Oficio sin tabla, como mozo (4.000) | 67 / 50 | — | 68 / 50 |
+| Oficio sin tabla, mozo que hurta en apuros (4.000) | 78 / 61 | — | 80 / 61 |
+| Oficio sin tabla, moza que hurta en apuros (4.000) | 96 / 92 | — | 96 / 92 |
+
+- **Para el que juega bien no cambia nada.** Para los bots flojos, el jueves de mercado alivia 1553 y 1557: la plaza llena a sexta coincide con la hora en que la ronda come.
+
 ## El informe
 
 Al acabar (o al abandonar), cinco preguntas (una más con varios veranos y otra con hurtar) y el informe: la partida entera, el tiempo repartido entre moverse, pedir, trabajar y esperar, los pasos o cruces por día, las veces que llegó donde estaba la ronda, la crónica, dónde estuvo la ronda en cada franja (que el jugador no veía) y los datos en bruto. Con hurtar, cada hurto con el cuerpo y el pan que llevaba, la gente que había y cómo acabó.
@@ -181,8 +207,8 @@ El correo de destino está en `rules.js` (`CONFIG.email`); en GitHub Pages queda
 
 Todo en `rules.js`. **Cada vez que cambies algo, sube la versión en dos sitios**, o los móviles seguirán con la copia vieja:
 
-1. `rules.js` → `version: "j0.12"`, por ejemplo a `"j0.13"`.
-2. `sw.js` → `const VERSION = "lv-j0.12-1"`, por ejemplo a `"lv-j0.13-1"`.
+1. `rules.js` → `version: "j0.13"`, por ejemplo a `"j0.14"`.
+2. `sw.js` → `const VERSION = "lv-j0.13-1"`, por ejemplo a `"lv-j0.14-1"`.
 
 ## Probarlo en local
 

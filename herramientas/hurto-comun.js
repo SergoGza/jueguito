@@ -21,12 +21,7 @@ module.exports = function (R, E) {
   const activo = !!POL;
   const mas = (o, k, n) => { o[k] = (o[k] || 0) + (n == null ? 1 : n); };
   const salir = (l) => (E.L[l].dentro ? Math.min(...E.PUERTAS.map((g) => E.DIST[l][g] + 1)) * PASO : 0);
-  const genteBase = (s, l, f) => {
-    let g = E.L[l].gente[f];
-    const mod = R.DIAS_SENALADOS[E.dia(s, s.dia).tipo];
-    if (mod && mod[l] && mod[l][f] != null) g = mod[l][f];
-    return g;
-  };
+  const genteBase = (s, l, f) => E.genteDelDia(s, l, s.dia, f); // con los jueves de mercado (j0.13)
   function quiere(s) {
     if (!s.conHurto || !POL || POL === "nunca") return false;
     if (HU.que === "ropa") {
@@ -47,7 +42,8 @@ module.exports = function (R, E) {
   // el sitio donde antes puede hurtar, dejando tiempo para salir de la muralla después
   function destino(s) {
     let best = null;
-    for (const [l, frs] of Object.entries(HU.donde[HU.que])) {
+    for (const l of Object.keys(HU.donde[HU.que])) {
+      const frs = E.franjasHurto(s, l, s.dia); // los jueves de mercado, la plaza hasta nona (j0.13)
       if ((s.hurtadoHoy || []).includes(l)) continue;
       let tb = s.t + E.DIST[s.lugar][l] * PASO;
       while (tb < FIN) {

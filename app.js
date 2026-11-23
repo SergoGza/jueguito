@@ -453,13 +453,16 @@
     const cal = s && ui.pantalla === "juego" ? E.calendario(s) : R.CALENDARIO;
     // los jueves de mercado van en la misma lista (j0.13)
     const fiestas = cal.filter((d) => d.tipo !== "laborable" || d.mercado).map((d) => (d.tipo === "corpus" ? `El ${d.fecha.split(" ")[0]} ${d.dia} es Corpus Christi` : d.tipo === "laborable" ? `El jueves ${d.dia} hay mercado` : `El ${d.dia}, domingo${d.fiesta && d.fiesta !== "Domingo" ? " de " + d.fiesta : ""}`));
+    // desde qué día da menos la gente: en 1557, desde el primero (antes la ayuda decía «desde el día 6» también ese verano)
+    const desde = s && ui.pantalla === "juego" ? E.escasezDesde(s) : P.escasezDesde;
+    const escasezTxt = desde <= 1 ? "Este verano el pan está caro desde el primer día y la gente da menos." : `Desde el día ${desde}, el pan sube y la gente da menos.`;
     const fiestasTxt = fiestas.map((x, i) => (i ? x.replace(/^El/, "el") : x)).join("; ") + ".";
     return `<div class="modal-in"><h2>Cómo se juega</h2>
       <p>Eres ${s && ui.pantalla === "juego" && !E.esHombre(s) ? "una pobre" : "un pobre"} de La Armuña, en la Tierra de Salamanca, y has bajado a la ciudad en junio de ${anio}. Desde la orden de pobres ${anio === 1545 ? "del año pasado" : "de 1544"}, pedir en la ciudad está prohibido. Duermes fuera de la muralla, en la ribera; el pan está dentro. <b>Objetivo: aguantar diez días, hasta la siega.</b> En la siega cogen segadores, pero no a cualquiera: quieren brazos que puedan con la hoz.</p>
       <h3>El día</h3><p>Seis franjas, de prima a completas, de seis ratos cada una. Pedir ocupa una franja entera. Al acabar completas cierran las puertas de la muralla: quien se queda dentro duerme en un portal.</p>
       <h3>Moverte</h3>${mover.join("")}
       <h3>Lo que ves</h3><p>La gente, los otros pobres y la ronda cambian al empezar cada franja. Lo que viste vale para la franja en que lo viste. En el mapa, lo visto hace rato se ve más claro. En «Recuerdos» tienes dónde y cuándo has visto a la ronda, y dónde has pedido tú.</p>
-      <h3>Pedir</h3><p>Solo dentro de la muralla y donde hay gente que dé. Con mucha gente suele caer algo; con poca, muchas veces nada; si hay otros pobres pidiendo, os repartís lo que hay. Desde el día ${P.escasezDesde}, el pan sube y la gente da menos.</p>
+      <h3>Pedir</h3><p>Solo dentro de la muralla y donde hay gente que dé. Con mucha gente suele caer algo; con poca, muchas veces nada; si hay otros pobres pidiendo, os repartís lo que hay. ${escasezTxt}</p>
       <p>Quien te ve pedir puede avisar a la ronda, y la ronda suele ir luego allí. En la Puerta del Río, las Escuelas y San Martín avisan enseguida; en San Esteban, nadie.</p>
       <h3>La ronda</h3><p>Un alguacil con sus corchetes. Tiene sus costumbres, que no son las mismas cada verano; a veces se desvía, acude adonde le avisan y a sexta se va a comer.</p>
       <p>Si te ve pedir, te detiene (con mucha gente, a veces no te ve). Si llegas a donde está, puede pararte: la primera vez te echa de la ciudad y te queda fichado; si ya te tiene fichado, te detiene. Si estás quieto cuando llega, no te para, pero no pidas delante de ella. Si empiezas a pedir a mitad de franja, puede llegar mientras pides.</p>

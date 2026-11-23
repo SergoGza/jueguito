@@ -368,6 +368,75 @@
       // cuántos días te buscan por tus señas (null: hasta que te prenden o hasta el invierno)
       buscaDias: 3, // DECIDIDO (ronda 9): te buscan tres días
     },
+    // las tretas (rama claude/tretas; se activan al empezar, como hurtar). Lo decidido es de Sergio (23-nov): un
+    // repertorio que se gana y se quema, que cuesta, que se paga en pan o en blancas y que el rasgo filtra. Las cifras
+    // y el detalle de cada una son de Claude (23-nov, sin revisar): las fichas están en claude/borrador-tretas.md.
+    // Nada se explica: lo dicen quien te la enseña o te la vende, la gente y el alguacil.
+    tretas: {
+      mazo: 3,            // cuántas llevas como mucho; para una cuarta hay que olvidar una
+      catalogo: 4,        // señas que junta una treta antes de que la autoridad la catalogue ese verano
+      senas: 2,           // señas que suma si la ronda te descubre con ella (al pedir o al pararte)
+      blancasPedazo: 2,   // lo que da en blancas cada pedazo de la tirada, en las tretas que dan blancas
+      ratos: 1,           // comprar, vender o quitarte el atrezo
+      registro: 6,        // con más blancas encima, si la ronda te para te las quita («mucho dinero para un pobre»)
+      // el pan también se compra y se vende (no al mismo precio, para que pan y blancas no sean la misma moneda)
+      pan: { compra: 2, compraEscasez: 3, venta: 1, compraEn: { plaza: [0, 1, 2, 3], rua: [0, 1, 2, 3, 4] }, ventaEn: { puerta: [0, 1, 2, 3, 4, 5] } },
+      lista: [
+        // la de entrada: gratis, la primera noche en la ribera
+        { id: "voto", pregon: "para la cera de los santos sin licencia del cura", nombre: "el voto", corto: "el voto", boton: "Pedir para la cera del santo", quien: "todos", primera: true,
+          aprende: { pan: 0, blancas: 0, quien: "una vieja",
+            dice: "Una vieja te enseña su estampa de San Roque: «Pide para la cera del santo, que a eso no se niega nadie, y lo que te den es dinero, no pan. Pide sencillo: al que habla mucho no le dan. Y no vuelvas a la misma calle, que el vecino se acuerda»." },
+          lugares: ["rua", "sanpablo", "plaza"], minDa: 2, bonus: 0, sitioNuevo: 1, repite: { aviso: 2, senas: 1 }, moneda: "blancas", fingir: true,
+          como: "para la cera de San Roque, con la estampa en la mano" },
+        { id: "atado", pregon: "fingiéndose tullidos, con miembros atados y muletas", nombre: "el miembro atado", corto: "las muletas", boton: "Pedir con el brazo atado", quien: "todos",
+          aprende: { pan: 1, blancas: 2, quien: "un tullido",
+            dice: "Un tullido que no es tan tullido te enseña a atarte el brazo a la espalda: «Una venda, dos muletas y cara de pena. A la puerta de la iglesia te dan más que a un sano, y la ronda no te manda a las obras. Pero con muletas se anda despacio, y si el alguacil te manda estirar el brazo, estás perdido». Por enseñarte y por las muletas pide un pedazo de pan y dos blancas." },
+          lugares: ["catedral", "sanmartin", "sanesteban"], minDa: 2, bonus: 2, moneda: "pan", fingir: true,
+          puesta: { paso: 1, descubre: 1 / 2, nombre: "las muletas", quitar: "Quitarte las muletas" },
+          como: "con el brazo atado a la espalda y las muletas" },
+        { id: "carta", pregon: "con cartas y sellos que no ha dado el obispo", nombre: "la carta y el sello", corto: "la carta", boton: "Pedir con la carta", quien: "todos",
+          compra: { lugar: "escuelas", franjas: [1, 3], blancas: 6, quien: "un estudiante pobre",
+            dice: "Un estudiante pobre escribe cartas de limosna, con sello y todo, por seis blancas: «Dice que eres cautivo rescatado y que el obispo te da licencia para pedir. En la Rúa y en San Pablo no saben leer. Si la lees en misa un domingo, en la catedral, a prima, sacas en una mañana lo de una semana; pero eso, una vez. Y no se la enseñes a nadie que sepa leer»." },
+          lugares: ["rua", "sanpablo"], minDa: 2, bonus: 1, moneda: "blancas", fingir: true,
+          misa: { lugar: "catedral", f: 0, tipos: ["domingo", "corpus"], tiradas: 3 },
+          descubreParar: 1 / 3, // la llevas siempre encima: si la ronda te para, a veces te la pide
+          como: "con tu carta de limosna, sello y todo" },
+        { id: "parida", pregon: "fingiéndose recién paridas a las puertas de las iglesias", nombre: "la parida", corto: "la parida", boton: "Tenderte de parida (dos franjas)", quien: "mujer",
+          aprende: { pan: 1, blancas: 2, quien: "una mujer",
+            dice: "Una mujer te enseña a hacerte la recién parida: «Una sábana, cera en la cara para estar pálida y una criatura de trapo. Te tiendes a la puerta de la iglesia dos franjas seguidas y te dan como a nadie. Pero tumbada no puedes correr: si viene la ronda, te levanta la sábana». Por enseñarte y por la sábana, un pedazo esta noche y dos blancas." },
+          lugares: ["catedral", "sanesteban"], minDa: 2, franjas: 2, bonus: 2, moneda: "mitad", sinHuir: true, fingir: true,
+          como: "tendida en una sábana, de recién parida, con la criatura de trapo" },
+        { id: "coplas", pregon: "cantando coplas sin licencia", nombre: "las coplas", corto: "las coplas", boton: "Cantar y vender coplas", quien: "todos",
+          compra: { lugar: "plaza", franjas: [0, 1], blancas: 3, usos: 3, quien: "el buhonero",
+            dice: "El buhonero vende pliegos de coplas de ciego, tres por tres blancas: «Cántalas donde haya mucha gente y vende los pliegos. Eso no es pedir: es vender. Pero el corro se oye de lejos»." },
+          lugares: ["plaza", "rua"], minDa: 3, bonus: 0, moneda: "blancas", avisoExtra: 2, fingir: false, sinUsos: "se te han acabado los pliegos",
+          como: "cantando coplas de ciego y vendiendo los pliegos" },
+        { id: "miedo", pregon: "con armas", nombre: "pedir con miedo", corto: "el cuchillo", boton: "Pedir con el cuchillo a la vista", quien: "hombre",
+          aprende: { pan: 2, blancas: 2, quien: "un mozo que vuelve de la guerra",
+            dice: "Un mozo que vuelve de la guerra te enseña su cuchillo: «Donde pasa poca gente, te pones delante y pides. Nadie te dice que no. Pero el que da por miedo va a la justicia, no a la ronda de pobres, y la justicia no azota: ahorca». Por enseñarte y por un cuchillo como el suyo, dos pedazos esta noche y dos blancas." },
+          lugares: ["sanpablo", "puerta", "sanesteban"], gente: [2], minDa: 1, bonus: 2, nuncaCero: true, moneda: "pan", blancasExtra: 1,
+          avisoExtra: 3, justicia: true, fingir: false,
+          como: "plantado delante, con el cuchillo a la vista" },
+        { id: "cautivo", pregon: "diciéndose cautivos de Argel, con cadenas", nombre: "el cautivo", corto: "las cadenas", boton: "Pedir con las cadenas de cautivo", quien: "hombre",
+          compra: { lugar: "puerta", franjas: [0, 1, 2, 3, 4, 5], blancas: 4, quien: "un mozo que dice venir de Argel",
+            dice: "Un mozo con cadenas al hombro dice que viene de Argel y te vende otras y la historia por cuatro blancas: «Cuéntala en la catedral y en la Rúa. Con una carta de rescate, mejor. Pesan, y si el alguacil te pregunta por el baño de Argel, más te vale saber qué decir»." },
+          lugares: ["catedral", "rua"], minDa: 2, bonus: 1, combo: { carta: 1 }, moneda: "blancas", fingir: true,
+          puesta: { paso: 1, descubre: 1 / 3, nombre: "las cadenas", quitar: "Quitarte las cadenas" },
+          como: "con las cadenas al hombro, contando tu cautiverio en Argel" },
+        { id: "vergonzante", pregon: "bien vestidos, fingiéndose vergonzantes", nombre: "el pobre vergonzante", corto: "la ropa buena", boton: "Pedir en voz baja, bien vestido", quien: "todos",
+          compra: { lugar: "rua", franjas: [0, 1, 2, 3, 4], blancas: 8, quien: "un ropavejero",
+            dice: "Un ropavejero te ofrece un sayo y unas calzas de buen paño, de segunda mano, por ocho blancas: «Con esto no pareces pobre. Pide en voz baja, como quien no está hecho a pedir: al vergonzante se le da. La ronda ni te mira. Pero no duermas con ella en la ribera, que allí te la roban»." },
+          lugares: ["rua", "sanpablo", "plaza"], minDa: 2, bonus: 0, moneda: "pan", fingir: true,
+          puesta: { noParan: true, pillar: { 2: 0.5, 3: 0 }, nombre: "la ropa buena" }, ribera: "roban",
+          como: "en voz baja, con tu ropa buena, como quien no está hecho a pedir" },
+        { id: "muerto", pregon: "para enterrar muertos que no lo están", nombre: "el muerto fingido", corto: "el muerto", boton: "Hacer el muerto", quien: "tuyo",
+          aprende: { pan: 0, blancas: 0, quien: "tuyo",
+            dice: "«Yo sé una que hacíamos en Madrid», dice {tuyo}. «Uno se tiende como muerto a la puerta de la iglesia, a la hora de vísperas, con una sábana, y el otro pide para enterrarlo. Con mucha gente se saca de una vez lo de un día. Hay que quedar la noche antes, y en cada iglesia, una vez. Y el muerto no puede correr»." },
+          lugares: ["catedral", "sanmartin"], minDa: 2, tiradas: 4, moneda: "blancas", mitadTuyo: true, unaVez: "sitio", sinHuir: true, fingir: true,
+          cita: { f: 4 }, // a vísperas: el otro tiene el día para llegar
+          como: "con {tuyo} tendido en el suelo como muerto, pidiendo para enterrarlo" },
+      ],
+    },
   };
 
   const LICENCIAS = [
@@ -397,9 +466,17 @@
     "Entre un verano y otro, lo que pasa en el invierno se resume en cómo llegas: con hoz, espigando o sin nada.",
   ];
 
+  // solo con «Tretas» (rama claude/tretas). La primera sustituye a la de la limosna en pan.
+  const LICENCIAS_TRETAS = [
+    "La limosna se da en pan, salvo en las tretas que piden para algo (la cera, el rescate, el entierro) o venden algo (las coplas), que dan blancas. Los precios en blancas son del juego.",
+    "Las tretas salen de los catálogos de mendigos de la época (el Liber vagatorum, Pérez de Herrera, los pleitos de Alcalá, Madrid y otras ciudades); que se usen en Salamanca en 1545 es del juego.",
+    "El estudiante que escribe cartas en las Escuelas, el buhonero de pliegos, el mozo que vende cadenas de Argel y el ropavejero de la Rúa son del juego.",
+    "Que la autoridad catalogue una treta y la pregone sale de lo que hacían los catálogos de mendigos; cuándo y cómo, es del juego.",
+  ];
+
   window.RULES = {
-    version: "j0.13", CONFIG, FRANJAS, RATOS, DIAS, MODOS, BARRIOS, LUGARES, CAMINOS, CALENDARIO, VERANOS, DIAS_SENALADOS,
-    RONDA, PARAMS, LICENCIAS, LICENCIAS_CADENA, LICENCIAS_HURTO,
+    version: "j0.13-tretas", CONFIG, FRANJAS, RATOS, DIAS, MODOS, BARRIOS, LUGARES, CAMINOS, CALENDARIO, VERANOS, DIAS_SENALADOS,
+    RONDA, PARAMS, LICENCIAS, LICENCIAS_CADENA, LICENCIAS_HURTO, LICENCIAS_TRETAS,
     // la mesa de los agentes pregunta por PERSONAJES: en el juguete, cada «personaje» es una prueba
     PERSONAJES: [
       { id: "A", nombre: "Mozo de La Armuña", origen: "De la Tierra", cuerpoTipo: "Válido", resumen: MODOS.A.resumen, claves: ["Prueba A · calles"] },

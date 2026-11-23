@@ -1053,7 +1053,9 @@
     const pedidas = s.cronica.filter((c) => c.anio === s.anio && (c.tipo === "pedir" || c.tipo === "pillado")).map((c) => ({ dia: c.dia, f: franja(c.t), lugar: c.lugar }));
     s.cadena.archivo.push({
       anio: s.anio, quien: Object.assign({}, s.quienVerano || s.quien),
-      vistas: (s.vistas || []).slice(), contado: (s.contado || []).filter((x) => x.ronda), heredero: s.vistasHeredero || null, pedidas,
+      vistas: (s.vistas || []).slice(), contado: (s.contado || []).filter((x) => x.ronda),
+      // cuántas cosas te contaron (solo las de la ronda pasan a Recuerdos; el informe suma toda la cadena)
+      nContado: (s.contado || []).length, nOidas: (s.contado || []).filter((x) => x.oidas).length, heredero: s.vistasHeredero || null, pedidas,
       circuito: (s.circuito || []).slice(), rondas: s.rondas, rondasPorque: s.rondasPorque,
     });
     s.vistasHeredero = null;
@@ -1651,7 +1653,10 @@
     else L2.push(`Cruces de barrio: ${T.cruces} (${(T.cruces / Math.max(1, s.porDia.length)).toFixed(1)} por día) · movimientos dentro del barrio: ${T.libres}`);
     L2.push(`Pedir: ${T.pedidas} veces, ${T.panPedido} pedazos · trabajo: ${T.panTrabajo} pedazos${s.conHurto ? ` · hurtar: ${T.hurtos} ${T.hurtos === 1 ? "vez" : "veces"}, ${T.panHurtado} pedazos` : ""}`);
     L2.push(`Llegó donde estaba la ronda: ${T.encuentros} veces (le pararon ${T.paradas}) · vio llegar la ronda estando quieto: ${T.rondaVista}`);
-    L2.push(`Abrió «Lo que recuerdas»: ${s.recuerdaAbierto || 0} veces · vio la ronda en ${(s.vistas || []).length} franjas`);
+    // con la cadena, lo de los veranos anteriores está en el archivo (siguienteVerano vacía vistas y contado)
+    const archivo = cad ? s.cadena.archivo : [];
+    const vistasTodas = archivo.reduce((n, a) => n + (a.vistas || []).length, 0) + (s.vistas || []).length;
+    L2.push(`Abrió «Lo que recuerdas»: ${s.recuerdaAbierto || 0} veces · vio la ronda en ${vistasTodas} franjas`);
     const det = s.cronica.filter((c) => c.tipo === "detenido");
     if (det.length) L2.push("Detenciones: " + det.map((c) => `día ${c.dia}${cad ? " de " + c.anio : ""}, ${c.motivo}`).join(" · "));
     L2.push("");
@@ -1676,7 +1681,10 @@
         L2.push(`${tu.nombre} (${tu.manera}): ${est} · detenciones ${tu.detenciones} · noches juntos ${tu.noches} · pan que le diste ${tu.recibido} · se lo negaste ${tu.negadas} ${tu.negadas === 1 ? "vez" : "veces"}${tu.avisado ? " · te avisó de que te vendería" : ""}`);
       }
       const c = s.contado || [];
-      L2.push(`Te contaron ${c.length} cosas (${c.filter((x) => x.ronda).length} con la ronda; ${c.filter((x) => x.oidas).length} de oídas)${s.malsinado ? ` · te malsinó ${s.malsinado.por} el día ${s.malsinado.dia}` : ""}`);
+      const nC = archivo.reduce((n, a) => n + (a.nContado != null ? a.nContado : (a.contado || []).length), 0) + c.length;
+      const nR = archivo.reduce((n, a) => n + (a.contado || []).length, 0) + c.filter((x) => x.ronda).length;
+      const nO = archivo.reduce((n, a) => n + (a.nOidas || 0), 0) + c.filter((x) => x.oidas).length;
+      L2.push(`Te contaron ${nC} cosas (${nR} con la ronda; ${nO} de oídas)${s.malsinado ? ` · te malsinó ${s.malsinado.por} el día ${s.malsinado.dia}` : ""}`);
       L2.push("");
     }
     L2.push("== Por día ==");

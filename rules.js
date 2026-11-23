@@ -379,6 +379,8 @@
       blancasPedazo: 2,   // lo que da en blancas cada pedazo de la tirada, en las tretas que dan blancas
       ratos: 1,           // comprar, vender o quitarte el atrezo
       registro: 6,        // con más blancas encima, si la ronda te para te las quita («mucho dinero para un pobre»)
+      // la posada (prototipo de presión, 23-nov): lo que las blancas dan y el pan no. Dormir dentro sin la ronda de noche
+      posada: { blancas: 3, en: ["rua", "plaza"] },
       // el pan también se compra y se vende (no al mismo precio, para que pan y blancas no sean la misma moneda)
       pan: { compra: 2, compraEscasez: 3, venta: 1, compraEn: { plaza: [0, 1, 2, 3], rua: [0, 1, 2, 3, 4] }, ventaEn: { puerta: [0, 1, 2, 3, 4, 5] } },
       lista: [
@@ -437,6 +439,19 @@
           como: "con {tuyo} tendido en el suelo como muerto, pidiendo para enterrarlo" },
       ],
     },
+    // la ciudad se endurece (prototipo, rama claude/tretas, 23-nov; se activa al empezar). Decidido por Sergio: corchetes
+    // que se suman durante el verano donde se acumulan quejas (tuyas, de los tuyos y de otros pobres), y uno en la puerta
+    // por la que más pasas. Las cifras son de Claude, sin revisar. Un corchete vigila un sitio a una hora todos los días
+    // desde que lo ponen: si pides delante te ve, y si llegas te puede parar, como la ronda. Se dice al amanecer.
+    presion: {
+      desde: 3,           // el primer día con corchetes (se ponen al amanecer, con las quejas de los días anteriores)
+      porDia: 1,          // corchetes nuevos cada mañana
+      max: 5,             // como mucho (con 5, el oficio sin tretas llega a la siega el 62 %; sin presión, el 92 %)
+      umbral: 2,          // quejas acumuladas que hacen falta en un sitio y hora
+      otros: 1,           // peso de las quejas de otros pobres (cada franja en que piden donde hay gente, lo que avisa el sitio)
+      franjas: [0, 1, 3, 4], // a sexta comen; a completas está la ronda en la puerta
+      puerta: { desde: 3, min: 2 }, // desde el día 3, uno en la puerta y la franja por la que más has pasado (si son 2 o más veces); se mueve si cambias
+    },
   };
 
   const LICENCIAS = [
@@ -472,11 +487,16 @@
     "Las tretas salen de los catálogos de mendigos de la época (el Liber vagatorum, Pérez de Herrera, los pleitos de Alcalá, Madrid y otras ciudades); que se usen en Salamanca en 1545 es del juego.",
     "El estudiante que escribe cartas en las Escuelas, el buhonero de pliegos, el mozo que vende cadenas de Argel y el ropavejero de la Rúa son del juego.",
     "Que la autoridad catalogue una treta y la pregone sale de lo que hacían los catálogos de mendigos; cuándo y cómo, es del juego.",
+    "Las posadas y mesones de la Rúa y la Plaza existían; que la ronda de noche no entre en ellas y lo que cuestan son del juego.",
+  ];
+  // solo con «Presión» (prototipo, rama claude/tretas)
+  const LICENCIAS_PRESION = [
+    "Que el corregidor sume corchetes durante el verano donde más quejas hay, y en la puerta por la que más pasas, es del juego.",
   ];
 
   window.RULES = {
     version: "j0.13-tretas", CONFIG, FRANJAS, RATOS, DIAS, MODOS, BARRIOS, LUGARES, CAMINOS, CALENDARIO, VERANOS, DIAS_SENALADOS,
-    RONDA, PARAMS, LICENCIAS, LICENCIAS_CADENA, LICENCIAS_HURTO, LICENCIAS_TRETAS,
+    RONDA, PARAMS, LICENCIAS, LICENCIAS_CADENA, LICENCIAS_HURTO, LICENCIAS_TRETAS, LICENCIAS_PRESION,
     // la mesa de los agentes pregunta por PERSONAJES: en el juguete, cada «personaje» es una prueba
     PERSONAJES: [
       { id: "A", nombre: "Mozo de La Armuña", origen: "De la Tierra", cuerpoTipo: "Válido", resumen: MODOS.A.resumen, claves: ["Prueba A · calles"] },

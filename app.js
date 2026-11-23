@@ -1,7 +1,7 @@
 /* Liber Vagatorum · el juguete. Pantallas y botones. Las reglas están en rules.js y el motor en engine.js. */
 (function () {
   const R = window.RULES, E = window.ENGINE, P = R.PARAMS, HU = P.hurto || {}, TR = P.tretas || {};
-  const LS = { partida: "lvj-partida", historial: "lvj-historial", tema: "lvj-tema", nombre: "lvj-nombre", llaga: "lvj-llaga", tuyos: "lvj-tuyos", cadena: "lvj-cadena", hurto: "lvj-hurto", tretas: "lvj-tretas" };
+  const LS = { partida: "lvj-partida", historial: "lvj-historial", tema: "lvj-tema", nombre: "lvj-nombre", llaga: "lvj-llaga", tuyos: "lvj-tuyos", cadena: "lvj-cadena", hurto: "lvj-hurto", tretas: "lvj-tretas", presion: "lvj-presion" };
   const load = (k, d) => { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } };
   const store = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* sin almacenamiento */ } };
   const esc = (t) => String(t == null ? "" : t).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
@@ -119,6 +119,8 @@
       g += `<circle cx="${l.x}" cy="${l.y}" r="10" fill="${fill}" fill-opacity="${m ? op : 1}" stroke="var(--wall)" stroke-width="1.2" stroke-dasharray="${m ? "" : "3 2"}"/>`;
       if (m && m.pobres && l.dentro) g += `<circle cx="${l.x - 4}" cy="${l.y + 4}" r="1.6" fill="var(--ink)" opacity="${op}"/><circle cx="${l.x + 1}" cy="${l.y + 5}" r="1.6" fill="var(--ink)" opacity="${op}"/><circle cx="${l.x + 5}" cy="${l.y + 2}" r="1.6" fill="var(--ink)" opacity="${op}"/>`;
       if (m && m.ronda) g += `<path d="M${l.x + 10},${l.y - 20} l7,7 l-7,7 l-7,-7z" fill="var(--bad)" opacity="${op}"/><text x="${l.x + 10}" y="${l.y - 10}" font-size="8" fill="#fff" text-anchor="middle" font-weight="700" opacity="${op}">R</text>`;
+      // la presión: los corchetes que vigilan a esta hora (se saben: los pregonaron)
+      if (s.conPresion && s.t < E.FIN && E.corcheteEn(s, l.id, E.franja(s.t))) g += `<rect x="${l.x - 21}" y="${l.y - 20}" width="11" height="11" rx="2" fill="var(--bad)"/><text x="${l.x - 15.5}" y="${l.y - 11.5}" font-size="8" fill="#fff" text-anchor="middle" font-weight="700">C</text>`;
       if (pedidos[l.id]) g += `<ellipse cx="${l.x - 13}" cy="${l.y - 12}" rx="6" ry="3.6" fill="none" stroke="var(--bad)" stroke-width="1.2"/><circle cx="${l.x - 13}" cy="${l.y - 12}" r="1.6" fill="var(--bad)"/>`;
       if (aqui) g += `<circle cx="${l.x}" cy="${l.y}" r="3.5" fill="var(--accent)"/>`;
       g += `<text x="${l.x}" y="${l.y + 25}" font-size="${fs}" text-anchor="middle" fill="var(--ink)" font-weight="${aqui ? 700 : 400}" paint-order="stroke" stroke="var(--surface)" stroke-width="3">${esc(l.corto)}</text>`;
@@ -126,7 +128,7 @@
       g += `</g>`;
     }
     g += `</svg>`;
-    const ley = `<div class="leyenda" aria-hidden="true"><span><i style="background:var(--g3)"></i>mucha gente</span><span><i style="background:var(--g2)"></i>poca</span><span><i style="background:var(--g1)"></i>nadie que dé</span><span><i style="border-style:dashed"></i>sin ver</span><span style="color:var(--bad)">◆ ronda</span><span style="color:var(--bad)">◉ te vieron pedir hoy</span><span>••• otros pobres pidiendo</span><span>Lo que no ves ahora sale más claro: es de cuando lo viste y puede haber cambiado.</span><span><b>Toca un sitio con borde discontinuo para ir.</b></span></div>`;
+    const ley = `<div class="leyenda" aria-hidden="true"><span><i style="background:var(--g3)"></i>mucha gente</span><span><i style="background:var(--g2)"></i>poca</span><span><i style="background:var(--g1)"></i>nadie que dé</span><span><i style="border-style:dashed"></i>sin ver</span><span style="color:var(--bad)">◆ ronda</span>${s.conPresion ? `<span style="color:var(--bad)">■ corchete (a esta hora)</span>` : ""}<span style="color:var(--bad)">◉ te vieron pedir hoy</span><span>••• otros pobres pidiendo</span><span>Lo que no ves ahora sale más claro: es de cuando lo viste y puede haber cambiado.</span><span><b>Toca un sitio con borde discontinuo para ir.</b></span></div>`;
     return `<div class="mapa">${g}${ley}</div>`;
   }
 
@@ -151,12 +153,13 @@
       <label class="campo" for="nombre">Tu nombre (para el informe)</label>
       <input type="text" id="nombre" value="${esc(nombre)}" autocomplete="name">
       <div class="btns">
-        ${enCurso ? btn("continuar", "Seguir la partida en curso", `${R.MODOS[s.modo].nombre} · ${s.conCadena ? `${s.anio} · ` : ""}día ${s.dia}${s.conLlaga ? " · con llaga" : ""}${s.conCadena ? " · varios veranos" : s.conTuyos ? " · con los tuyos" : ""}${s.conHurto ? " · con hurtar" : ""}${s.conTretas ? " · con tretas" : ""}`, { cls: "primary" }) : ""}
+        ${enCurso ? btn("continuar", "Seguir la partida en curso", `${R.MODOS[s.modo].nombre} · ${s.conCadena ? `${s.anio} · ` : ""}día ${s.dia}${s.conLlaga ? " · con llaga" : ""}${s.conCadena ? " · varios veranos" : s.conTuyos ? " · con los tuyos" : ""}${s.conHurto ? " · con hurtar" : ""}${s.conTretas ? " · con tretas" : ""}${s.conPresion ? " · con presión" : ""}`, { cls: "primary" }) : ""}
         ${load(LS.llaga, false) ? btn("llagaOnOff", "Llaga activada", "La tendrán las partidas que empieces. Toca para quitarla.", { cls: "activo" }) : btn("llagaOnOff", "Activar llaga", "Prueba nueva: fingir. Mejor si ya has jugado sin ella.")}
         ${load(LS.cadena, false) ? "" : load(LS.tuyos, false) ? btn("tuyosOnOff", "Con los tuyos", "Las partidas que empieces los tendrán. Toca para quitarlos.", { cls: "activo" }) : btn("tuyosOnOff", "Jugar con los tuyos", "Prueba nueva: dos que bajaron contigo. Mejor si ya has jugado sin ellos.")}
         ${load(LS.cadena, false) ? btn("cadenaOnOff", "Varios veranos", "1545, 1553 y 1557, con los tuyos. Toca para jugar uno solo.", { cls: "activo" }) : btn("cadenaOnOff", "Jugar varios veranos", "Prueba nueva: 1545, 1553 y 1557, con los tuyos. Mejor si ya has jugado con ellos.")}
         ${load(LS.hurto, false) ? btn("hurtoOnOff", "Hurtar activado", "Lo tendrán las partidas que empieces, solo o con lo demás. Toca para quitarlo.", { cls: "activo" }) : btn("hurtoOnOff", "Activar hurtar", "Prueba nueva: coger pan de un puesto, y la justicia. Vale solo o con lo demás.")}
         ${!P.tretas ? "" : load(LS.tretas, false) ? btn("tretasOnOff", "Tretas activadas", "Las tendrán las partidas que empieces, solas o con lo demás. Toca para quitarlas.", { cls: "activo" }) : btn("tretasOnOff", "Activar tretas", "Prueba nueva: maneras de pedir que se aprenden, cuestan y se queman, y las blancas. Trae la llaga.")}
+        ${!P.presion ? "" : load(LS.presion, false) ? btn("presionOnOff", "Presión activada", "La ciudad se endurece en las partidas que empieces. Toca para quitarla.", { cls: "activo" }) : btn("presionOnOff", "Activar presión", "Prueba nueva: el corregidor pone corchetes donde más quejas hay y en tu puerta. Mejor con las tretas.")}
         ${pruebasVisibles().map((id) => btn("empezar", pruebasVisibles().length > 1 ? `Empezar la ${R.MODOS[id].nombre.toLowerCase()}` : "Empezar una partida", pruebasVisibles().length > 1 ? R.MODOS[id].resumen : "", { data: { id }, cls: enCurso ? "" : "primary" })).join("")}
         ${btn("ayuda", "Cómo se juega", "")}
       </div>`;
@@ -256,9 +259,17 @@
     // las tretas: lo que la autoridad catalogó ayer se pregona hoy
     if (s.conTretas) for (const x of (s.pregon || []).filter((p) => p.anio === s.anio && p.dia === s.dia - 1)) notas.push(`Al amanecer pregonan en la plaza: la orden manda prender a los que piden ${E.TT[x.id].pregon}.`);
     if (s.conTretas && s.cita && s.cita.dia === s.dia) notas.push(`Quedaste con ${(s.tuyos.find((x) => x.id === s.cita.id) || {}).nombre} ${E.citaTxt(s.cita)}.`);
+    // la presión: los corchetes nuevos de hoy (se sabe por la ciudad)
+    if (s.conPresion && s.presion.hoy) {
+      const fr = (f) => R.FRANJAS[f].nombre.toLowerCase();
+      for (const c of s.presion.hoy.nuevos) notas.push(`Por la ciudad se dice que el corregidor ha puesto un corchete en ${L[c.lugar].nombre}, a ${fr(c.f)}: allí se quejaban mucho de los pobres.`);
+      const pu = s.presion.hoy.puerta, q = s.presion.hoy.quita;
+      if (pu) notas.push(`${q ? `Han quitado el corchete de ${L[q.lugar].nombre}. ` : ""}Desde hoy vigila un corchete en ${L[pu.lugar].nombre} a ${fr(pu.f)}: «Ese mozo pasa por aquí todos los días», le han dicho.`);
+    }
     if (s.yaNoBuscan) notas.push("Han pasado tres días de aquello. En la plaza ya han dado otras señas: por las tuyas no pregunta nadie.");
     if (s.lugar === "puerta" && s.cronica.some((c) => c.dia === s.dia - 1 && c.anio === s.anio && c.tipo === "prendido")) notas.push("Después, te sueltan en la Puerta del Río.");
     else if (s.lugar === "puerta" && s.cronica.some((c) => c.dia === s.dia - 1 && c.anio === s.anio && c.tipo === "detenido")) notas.push("Te sueltan al amanecer en la Puerta del Río.");
+    else if (L[s.lugar].dentro && (s.porDia[s.porDia.length - 1] || {}).duerme === "posada") notas.push(`Te despiertas en el pajar del mesón, en ${L[s.lugar].nombre}.`);
     else if (L[s.lugar].dentro) notas.push(`Te despiertas en un portal de ${L[s.lugar].nombre}.`);
     else notas.push("Te despiertas en la ribera.");
     h += `<div class="panel">${notas.map((x) => `<p>${esc(x)}</p>`).join("")}</div>`;
@@ -279,6 +290,7 @@
         if (e.pobres) partes.push("otros pobres pidiendo");
         if (e.trabajo) partes.push("las obras cogen peones");
         if (r === id) partes.push(`<span class="ronda-txt">la ronda</span>`);
+        if (s.conPresion && E.corcheteEn(s, id, f)) partes.push(`<span class="ronda-txt">un corchete vigilando</span>`);
         h += `<li>${zona.length > 1 ? `<b>${esc(li.corto)}${id === s.lugar ? " (aquí)" : ""}:</b> ` : ""}${partes.map((p) => (p.startsWith("<span") ? p : esc(p))).join(" · ")}</li>`;
       }
       h += `</ul>`;
@@ -305,12 +317,13 @@
     lin.push("Esperar: quieto, la ronda no te para; si llega, la verás.");
     lin.push(L[s.lugar].dentro ? "Si acabas el día aquí, dormirás en un portal, dentro de la muralla." : s.lugar === "ribera" ? "Si acabas el día aquí, dormirás al raso en la ribera." : `${s.lugar === "puente" ? "En el puente" : "Aquí"} no se puede dormir: si acabas el día aquí, bajarás a la ribera.`);
     if (s.conTretas && s.mazo.includes("vergonzante") && !L[s.lugar].dentro) lin.push("En la ribera te roban la ropa buena: no duermas con ella fuera de la muralla.");
+    if (s.conTretas && TR.posada && TR.posada.en.includes(s.lugar)) lin.push(`Aquí hay un mesón: si acabas el día aquí, por ${TR.posada.blancas} blancas duermes en el pajar y la ronda de noche no entra.`);
     return h + `<ul class="prev">${lin.map((x) => `<li>${esc(x)}</li>`).join("")}</ul></div>`;
   }
   function barraAcciones(o) {
     const pd = o.acc.find((a) => a.id === "pedir");
     const e = s.t < E.FIN ? E.estado(s, s.lugar, s.dia, E.franja(s.t)) : null;
-    const r = E.rondaEnTuZona(s);
+    const r = E.rondaEnTuZona(s) || (s.conPresion && s.t < E.FIN && E.corcheteEn(s, s.lugar, E.franja(s.t)) ? s.lugar : null);
     const tr = o.acc.find((a) => a.id === "trabajo");
     let h = `<div class="barra-acc">`;
     // el trabajo solo aparece aquí cuando se puede pedir; por qué no se puede está en «Antes de actuar»
@@ -329,7 +342,8 @@
       const f = E.franja(s.t), es = o.acc.find((a) => a.id === "esperar");
       h += btn("esperar", f + 1 < R.FRANJAS.length ? `Esperar a ${R.FRANJAS[f + 1].nombre.toLowerCase()}` : "Esperar a la noche", `${es.coste} ${es.coste === 1 ? "rato" : "ratos"}`);
     }
-    h += btn("acabar", "Acabar el día", L[s.lugar].dentro ? "en un portal: ronda de noche" : "dormir en la ribera");
+    const posadaAqui = s.conTretas && TR.posada && TR.posada.en.includes(s.lugar);
+    h += btn("acabar", "Acabar el día", posadaAqui ? (s.blancas >= TR.posada.blancas ? `aquí hay mesón: ${TR.posada.blancas} blancas, sin ronda de noche` : "en un portal (el mesón cuesta blancas)") : L[s.lugar].dentro ? "en un portal: ronda de noche" : "dormir en la ribera");
     return h + `</div>`;
   }
 
@@ -423,7 +437,7 @@
       h += `<div class="panel res mal"><p>Duermes en la cárcel. El pan${s.conTretas ? " y las blancas" : ""} te lo han quitado.</p></div><div class="btns">${btn("cenar", "Seguir", "", { cls: "primary", data: { n: 0 } })}</div></div>`;
       return h;
     }
-    const donde = s.duerme === "portal" ? `Duermes en un portal de ${L[s.lugar].nombre}, dentro de la muralla.` : `${s.bajaRibera ? (s.bajaDe === "puente" ? "En el puente no se puede dormir: toda la noche pasan carros y el portazguero echa a los que se tumban. Bajas a la ribera. " : "En la orilla no hay donde echarse. Bajas a la ribera. ") : ""}Duermes al raso en la ribera, fuera de la muralla.`;
+    const donde = s.duerme === "posada" ? `Duermes en el pajar del mesón, en ${L[s.lugar].nombre}. La ronda de noche no entra en las posadas.` : s.duerme === "portal" ? `Duermes en un portal de ${L[s.lugar].nombre}, dentro de la muralla.` : `${s.bajaRibera ? (s.bajaDe === "puente" ? "En el puente no se puede dormir: toda la noche pasan carros y el portazguero echa a los que se tumban. Bajas a la ribera. " : "En la orilla no hay donde echarse. Bajas a la ribera. ") : ""}Duermes al raso en la ribera, fuera de la muralla.`;
     const fiebre = s.llaga && s.llaga === s.dia;
     h += `<div class="panel"><p>${esc(donde)}</p><p>Tienes <b>${s.pan}</b> ${s.pan === 1 ? "pedazo" : "pedazos"} de pan. Una ración son 2 pedazos. Puedes guardar hasta ${P.panMax}.</p>${s.trabajoHoy ? `<p>Estás molido del trabajo: −${P.trabajo.cansancio} de cuerpo esta noche.</p>` : ""}</div>`;
     // el viejo de la ribera: lo que da la llaga lo dice él; lo que cuesta, nadie
@@ -435,8 +449,9 @@
     } else if (fiebre) {
       h += `<div class="panel res mal"><p>Te frotas la pierna con ranúnculo y sal hasta que se abre la carne. Arde. El viejo te ata un trapo encima.</p><p>Esta noche, fiebre: −${-P.llaga.cuerpo} de cuerpo.</p></div>`;
     }
-    // las tretas: te roban la ropa buena; alguien te ofrece una; quedas con uno de los tuyos para el muerto
+    // las tretas: te roban la ropa buena; alguien te ofrece una; quedas con uno de los tuyos para el muerto; la posada
     if (s.conTretas) {
+      if (E.puedePosada(s)) h += `<div class="panel"><p>El mesonero te mira de arriba abajo: «${TR.posada.blancas} blancas por el pajar. Aquí la ronda no entra»</p></div><div class="btns">${btn("posada", "Pagar la posada", `${TR.posada.blancas} blancas · te quedan ${s.blancas - TR.posada.blancas}`)}</div>`;
       if (s.robada) h += `<div class="panel res mal"><p>${esc(s.robada)}</p></div>`;
       const of = E.ofertaTxt(s);
       if (of) {
@@ -515,6 +530,7 @@
     const conCadena = s && ui.pantalla === "juego" ? !!s.conCadena : load(LS.cadena, false);
     const conHurto = s && ui.pantalla === "juego" ? !!s.conHurto : load(LS.hurto, false);
     const conTretas = s && ui.pantalla === "juego" ? !!s.conTretas : !!P.tretas && load(LS.tretas, false);
+    const conPresion = s && ui.pantalla === "juego" ? !!s.conPresion : !!P.presion && load(LS.presion, false);
     const anio = s && ui.pantalla === "juego" && s.anio ? s.anio : 1545;
     const cal = s && ui.pantalla === "juego" ? E.calendario(s) : R.CALENDARIO;
     // los jueves de mercado van en la misma lista (j0.13)
@@ -544,8 +560,10 @@
       ${conTretas ? `<h3>Las tretas</h3><p>Maneras de pedir que se aprenden de otros pobres (de noche, en la ribera, siempre hay alguien que enseña una) o se compran de día, en su sitio. Cada una tiene sus sitios, sus horas y su precio, en pan o en blancas; lo que da y lo que arriesga te lo dice quien te la enseña o te la vende. Llevas ${TR.mazo} como mucho: para otra, tienes que dejar una.</p>
       <p>Las blancas se guardan de un día para otro, pero si la ronda te para con muchas encima, te las quita, y si te detienen, también. El pan se compra en la Plaza y en la Rúa y se vende a la ventera de la Puerta del Río, pero no al mismo precio.</p>
       <p>Las tretas se gastan: cada vez que pides con una donde alguien avisa, la queja lleva tu descripción. Cuando la autoridad ya la conoce, la pregona: desde entonces no te dan más que pidiendo sin más, y el alguacil que te para con ella te detiene. Lo pregonado vale para toda tu gente.</p>` : ""}
+      ${conTretas && TR.posada ? `<p>En la Rúa y en la Plaza hay mesones: si acabas el día allí, por ${TR.posada.blancas} blancas duermes en el pajar y la ronda de noche no entra.</p>` : ""}
+      ${conPresion ? `<h3>La ciudad se endurece</h3><p>Durante el verano, el corregidor pone corchetes donde más se quejan de los pobres (de ti, de los tuyos y de los demás) y en la puerta por la que más pasas. Cada corchete vigila un sitio a una hora todos los días: si pides delante te ve, y si llegas te puede parar, como la ronda. De noche no vigilan. Se sabe al amanecer, y en el mapa se ven los de la hora en que estás.</p>` : ""}
       <h3>Lo que sabe cualquiera en Salamanca</h3><p>Las iglesias se llenan a la hora de misa (prima) y a vísperas. El mercado de la plaza, por la mañana; los jueves de mercado, hasta nona. Los estudiantes salen a tercia y a nona. A vísperas, la gente pasea por la Rúa. ${esc(fiestasTxt)}</p>
-      <h3>Licencias históricas</h3><ul class="small">${(conTretas ? R.LICENCIAS.filter((x) => !x.startsWith("La limosna se da en pan")).concat(R.LICENCIAS_TRETAS || []) : R.LICENCIAS).concat(conHurto ? R.LICENCIAS_HURTO.filter((x) => conCadena || !x.startsWith("Desde la pragmática de 1552")) : [], conCadena ? R.LICENCIAS_CADENA : []).map((x) => `<li>${esc(x)}</li>`).join("")}</ul>
+      <h3>Licencias históricas</h3><ul class="small">${(conTretas ? R.LICENCIAS.filter((x) => !x.startsWith("La limosna se da en pan")).concat(R.LICENCIAS_TRETAS || []) : R.LICENCIAS).concat(conPresion ? R.LICENCIAS_PRESION || [] : [], conHurto ? R.LICENCIAS_HURTO.filter((x) => conCadena || !x.startsWith("Desde la pragmática de 1552")) : [], conCadena ? R.LICENCIAS_CADENA : []).map((x) => `<li>${esc(x)}</li>`).join("")}</ul>
       <div class="btns">${btn("cerrar", "Cerrar", "", { cls: "primary" })}</div></div>`;
   }
   // lo que el mozo recuerda: no lo lleva escrito, lo ha visto con sus ojos
@@ -590,6 +608,10 @@
         });
         h += `</ul>`;
       }
+    }
+    if (s.conPresion) {
+      const cs = s.presion.corchetes.concat(s.presion.puerta ? [s.presion.puerta] : []);
+      h += `<h3>Dónde vigilan los corchetes</h3>${cs.length ? `<ul class="ciudad">${cs.map((c) => `<li><b>${esc(L[c.lugar].corto)}</b>, a ${R.FRANJAS[c.f].nombre.toLowerCase()} (desde el ${esc(corto(c.dia))})</li>`).join("")}</ul>` : `<p>Todavía no han puesto ninguno.</p>`}`;
     }
     const malos = s.cronica.filter((c) => (c.tipo === "echado" || c.tipo === "detenido" || c.tipo === "obras") && c.anio === s.anio);
     if (malos.length) {
@@ -692,7 +714,7 @@
       store(LS.nombre, nombre.trim());
       if (s && s.fase !== "fin" && !confirm("Hay una partida a medias. ¿Empezar otra? La de ahora se perderá.")) return;
       const sem = new URLSearchParams(location.search).get("semilla");
-      s = E.nueva(R.MODOS[d.id] ? d.id : "A", nombre.trim(), sem || null, { llaga: load(LS.llaga, false), tuyos: load(LS.tuyos, false), cadena: load(LS.cadena, false), hurto: load(LS.hurto, false), tretas: load(LS.tretas, false) });
+      s = E.nueva(R.MODOS[d.id] ? d.id : "A", nombre.trim(), sem || null, { llaga: load(LS.llaga, false), tuyos: load(LS.tuyos, false), cadena: load(LS.cadena, false), hurto: load(LS.hurto, false), tretas: load(LS.tretas, false), presion: load(LS.presion, false) });
       ui.pantalla = "juego";
     },
     cadenaOnOff() {
@@ -718,6 +740,12 @@
       if (nombre != null) store(LS.nombre, nombre.trim()); // que no se pierda lo escrito al repintar
       store(LS.hurto, !load(LS.hurto, false));
     },
+    presionOnOff() {
+      const nombre = (document.getElementById("nombre") || {}).value;
+      if (nombre != null) store(LS.nombre, nombre.trim()); // que no se pierda lo escrito al repintar
+      store(LS.presion, !load(LS.presion, false));
+    },
+    posada() { E.pagarPosada(s); },
     tretasOnOff() {
       const nombre = (document.getElementById("nombre") || {}).value;
       if (nombre != null) store(LS.nombre, nombre.trim()); // que no se pierda lo escrito al repintar

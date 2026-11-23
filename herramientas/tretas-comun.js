@@ -7,6 +7,8 @@
 // TRETAS=todas          todas las que puede usar
 // TVB=0.4               lo que vale una blanca frente a un pedazo de pan cuando aún le hace falta (por defecto 0.4: con
 //                       el pan a 2 blancas, media ración, menos el camino al mercado y el riesgo de llevarlas encima)
+// TDADA=1               empieza el verano con las tretas de su lista ya aprendidas o compradas (y sin el voto si no está
+//                       en la lista): mide lo que hace cada treta, sin lo que cuesta conseguirla
 // TSIEMPRE=1            usa las tretas de su lista siempre que puede, valgan o no más que pedir sin más (para medir
 //                       cada treta por sí misma)
 //
@@ -21,13 +23,15 @@ module.exports = function (R, E) {
   const activo = !!POL && !!P.tretas;
   const VB = process.env.TVB != null ? +process.env.TVB : 0.4;
   const SIEMPRE = !!process.env.TSIEMPRE;
+  const POSADA = process.env.POSADA || ""; // POSADA=nunca: no paga posada aunque le lleguen las blancas
   const COMPRA = new Set((TR.lista || []).filter((t) => t.compra).map((t) => t.id));
   const NO_SABE = new Set(["parida", "muerto"]); // no sabe medir el riesgo de no poder huir
   let quiere = new Set();
   if (POL === "todas") quiere = new Set((TR.lista || []).map((t) => t.id));
   else if (POL && POL !== "nunca") quiere = new Set(POL.split(","));
   // las primeras blancas salen del voto: si alguna se paga en blancas, aprende también el voto
-  if ([...quiere].some((id) => COMPRA.has(id) || ((TR.lista.find((t) => t.id === id) || {}).aprende || {}).blancas)) quiere.add("voto");
+  const DADA = !!process.env.TDADA;
+  if (!DADA && [...quiere].some((id) => COMPRA.has(id) || ((TR.lista.find((t) => t.id === id) || {}).aprende || {}).blancas)) quiere.add("voto");
   for (const x of NO_SABE) quiere.delete(x);
   const mas = (o, k, n) => { o[k] = (o[k] || 0) + (n == null ? 1 : n); };
   const valorPan = (pan) => (pan < 2 ? 1 : pan < 4 ? 0.55 : 0);
@@ -79,19 +83,34 @@ module.exports = function (R, E) {
     return best;
   }
   // para ocasiones(): el valor de pedir en (l, fb) con la mejor treta, frente a pedir sin más (g pedazos)
-  function valor(s, l, fb, g, mucha, vp, tb) {
+  // (pr: probabilidad de que la ronda o un corchete estén ahí; la ropa buena hace que con mucha gente no te vean)
+  function valor(s, l, fb, g, mucha, vp, tb, pr) {
     if (!activo || !s.conTretas || !s.mazo.length) return null;
     const da = mucha >= 0.5 ? 3 : 2;
-    const b = mejor(s, l, fb, da, vp, false, tb);
-    if (!b) return null;
-    if (g <= 0) return null; // si sin más no se espera nada, la treta tampoco (no hay gente)
-    return SIEMPRE ? b.v + 1 : b.v;
+    if (g <= 0 && !(pr > 0)) return null; // si sin más no se espera nada, la treta tampoco (no hay gente)
+    let best = null;
+    for (const id of s.mazo) {
+      const b = mejor({ ...s, mazo: [id] }, l, fb, da, vp, false, tb);
+      if (!b) continue;
+      const t = E.TT[id], ver = t.puesta && t.puesta.pillar ? t.puesta.pillar[da] : 1;
+      const v = b.v * (1 - (pr || 0) * ver);
+      if (!best || v > best) best = v;
+    }
+    if (best == null) return null;
+    return SIEMPRE ? best + 1 : best;
+  }
+  // con la ronda o un corchete delante, ¿puede pedir sin que le vean? (la ropa buena, con mucha gente)
+  function oculto(s, l, e) {
+    if (!activo || !s.conTretas) return false;
+    return s.mazo.some((id) => { const t = E.TT[id]; return t.puesta && t.puesta.pillar && t.puesta.pillar[e.da >= 3 ? 3 : 2] === 0 && E.tretaAqui(s, id).ok; });
   }
   const tieneBlancas = (s) => activo && !!s.conTretas && s.mazo.some((id) => E.TT[id].moneda !== "pan" && !NO_SABE.has(id));
   // al pedir: con qué treta (o null, sin ninguna)
   function elegir(s) {
     if (!activo || !s.conTretas) return null;
     const e = E.estado(s, s.lugar, s.dia, E.franja(s.t));
+    const vigilado = !!E.rondaEnTuZona(s) || (!!s.conPresion && E.corcheteEn(s, s.lugar, E.franja(s.t)));
+    if (vigilado) { const id = s.mazo.find((x) => { const t = E.TT[x]; return t.puesta && t.puesta.pillar && t.puesta.pillar[e.da >= 3 ? 3 : 2] === 0 && E.tretaAqui(s, x).ok; }); return id || null; }
     const vp = valorPan(s.pan);
     const b = mejor(s, s.lugar, E.franja(s.t), e.da >= 3 ? 3 : e.gente === 2 ? 2 : e.da, vp, true, s.t);
     if (!b) return null;
@@ -147,8 +166,22 @@ module.exports = function (R, E) {
     return null;
   }
   // antes de ejecutar lo que dice el oficio: pedir con treta, o quitarse lo que pesa para andar
+  // la posada: si iba a salir de la muralla (o a dormir en un portal) y le llegan las blancas, duerme en el mesón
+  const PO = TR.posada;
+  function quierePosada(s) {
+    if (!PO || !activo || !s.conTretas || POSADA === "nunca") return false;
+    const precioPan = E.escasez(s, s.dia) ? TR.pan.compraEscasez : TR.pan.compra;
+    return s.blancas >= PO.blancas + Math.max(0, 2 - s.pan) * precioPan;
+  }
   function cambia(s, j) {
     if (!activo || !s.conTretas || !j) return j;
+    const saliendo = (j.a === "mover" && ((j.plan && j.plan.tipo === "salir") || (s._meta && s._meta.tipo === "salir"))) || (j.a === "acabar" && E.L[s.lugar].dentro);
+    if (saliendo && quierePosada(s)) {
+      if (PO.en.includes(s.lugar)) { s._meta = null; return { a: "acabar" }; }
+      let best = null;
+      for (const l of PO.en) { const d = E.DIST[s.lugar][l]; if (s.t + d * (PASO + (pesa(s) ? 1 : 0)) <= FIN && (!best || d < best.d)) best = { l, d }; }
+      if (best) { s._meta = null; return { a: "mover", d: paso(s, best.l) }; }
+    }
     if (j.a === "pedir") { const id = elegir(s); if (id) return { a: "pedirCon", t: id }; }
     if (j.a === "mover" && pesa(s) && E.puedeQuitar(s)) return { a: "quitar", luego: j };
     return j;
@@ -156,6 +189,7 @@ module.exports = function (R, E) {
   // de noche: aprende lo que le ofrecen si está en su lista y no se queda sin cenar
   function noche(s) {
     if (!activo || !s.conTretas) return;
+    if (E.puedePosada(s)) E.pagarPosada(s);
     const o = E.ofertaTxt(s);
     if (o && quiere.has(o.id) && o.ok && (s.pan - o.pan >= 2 || o.pan === 0)) {
       if (!o.lleno) E.aprender(s, null);
@@ -171,7 +205,7 @@ module.exports = function (R, E) {
     return null;
   }
   // las cuentas de una tanda
-  const nueva = () => ({ n: 0, usos: {}, pan: {}, bl: {}, pillado: {}, descubierta: {}, catalogada: {}, diaCat: {}, tiene: {}, compras: {}, blFin: 0, quitadas: 0, panCompra: 0, panVenta: 0, robada: 0, aprende: 0 });
+  const nueva = () => ({ posadas: 0, n: 0, usos: {}, pan: {}, bl: {}, pillado: {}, descubierta: {}, catalogada: {}, diaCat: {}, tiene: {}, compras: {}, blFin: 0, quitadas: 0, panCompra: 0, panVenta: 0, robada: 0, aprende: 0 });
   function cuenta(A, s) {
     if (!s.conTretas) return;
     A.n++;
@@ -181,17 +215,22 @@ module.exports = function (R, E) {
       if (x.catalogada) { mas(A.catalogada, id); const d = +String(x.catalogada).replace(/.*día /, ""); mas(A.diaCat, id, d); }
     }
     A.blFin += s.blancas; A.quitadas += s.blancasQuitadas || 0;
-    for (const c of s.cronica) { if (c.tipo === "panCompra") A.panCompra++; if (c.tipo === "panVenta") A.panVenta++; if (c.tipo === "robada") A.robada++; if (c.tipo === "aprende") A.aprende++; }
+    for (const c of s.cronica) { if (c.tipo === "panCompra") A.panCompra++; if (c.tipo === "panVenta") A.panVenta++; if (c.tipo === "robada") A.robada++; if (c.tipo === "aprende") A.aprende++; if (c.tipo === "posada") A.posadas++; }
   }
   function linea(A, nombre) {
     if (!A || !A.n) return "";
     const N = A.n, ids = Object.keys(A.tiene).sort((a, b) => (A.usos[b] || 0) - (A.usos[a] || 0));
-    const out = [`  TRETAS (${POL}): blancas al acabar ${(A.blFin / N).toFixed(1)} · se las quita la ronda ${(A.quitadas / N).toFixed(1)} · pan comprado ${(A.panCompra / N).toFixed(1)} · tretas aprendidas de noche ${(A.aprende / N).toFixed(1)} (por partida)`];
+    const out = [`  TRETAS (${POL}): blancas al acabar ${(A.blFin / N).toFixed(1)} · se las quita la ronda ${(A.quitadas / N).toFixed(1)} · pan comprado ${(A.panCompra / N).toFixed(1)} · tretas aprendidas de noche ${(A.aprende / N).toFixed(1)} · noches en la posada ${(A.posadas / N).toFixed(1)} (por partida)`];
     for (const id of ids) {
       const u = A.usos[id] || 0;
       out.push(`    ${E.TT[id].nombre.padEnd(22)} la tiene el ${Math.round((100 * A.tiene[id]) / N)} % · la usa ${(u / N).toFixed(1)} veces · da ${(A.pan[id] / Math.max(1, u)).toFixed(2)} pedazos y ${(A.bl[id] / Math.max(1, u)).toFixed(1)} blancas por uso · le pillan ${A.pillado[id] || 0} · le descubren ${A.descubierta[id] || 0} · catalogada en el ${Math.round((100 * (A.catalogada[id] || 0)) / N)} % de las partidas${A.catalogada[id] ? ` (día ${(A.diaCat[id] / A.catalogada[id]).toFixed(1)} de media)` : ""}`);
     }
     return out.join("\n");
   }
-  return { activo, quiere, valor, tieneBlancas, elegir, decidir, cambia, noche, ejecutar, nueva, cuenta, linea };
+  // al empezar cada verano: con TDADA, las de su lista ya en el hatillo
+  function inicio(s) {
+    if (!activo || !DADA || !s.conTretas || s.dia !== 1) return;
+    for (const id of quiere) { const t = E.TT[id]; if (t && !s.mazo.includes(id) && s.mazo.length < TR.mazo && E.puedeUsarla(s, t) && !(s.quemadas || []).includes(id)) { s.mazo.push(id); if (t.usos) s.usos[id] = t.usos; } }
+  }
+  return { activo, quiere, inicio, valor, oculto, tieneBlancas, elegir, decidir, cambia, noche, ejecutar, nueva, cuenta, linea };
 };

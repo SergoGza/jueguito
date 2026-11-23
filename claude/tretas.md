@@ -92,3 +92,45 @@ Opcional: los agentes de Claude (`herramientas/agentes/`) juegan la app real, le
 - La economía deja de resolverse sola: con tretas, la mitad de las partidas no llega a cenar entero todas las noches desde el primer día. Pero es en parte porque el oficio gasta mal.
 - La ruta aprendida no se rompe: el oficio repite la salida igual (63-72 %). Las tretas cambian dónde pide (más sitios, menos pares repetidos), no por dónde sale. Puede ser el bot, que sale siempre igual.
 - No mide si divierte. Eso, jugando.
+
+## 6. La presión y la posada (prototipo, 23-nov)
+
+**Decidido (Sergio, 23-nov):** un prototipo de presión, en la rama y medido con bots, con tres condiciones: que no sea solo aprender antes, sino ir reduciendo los sitios seguros durante el verano (corchetes que se suman donde se acumulan quejas, tuyas y de otros pobres) y tocar la ruta (la puerta por la que más sales); que las blancas tengan ya un uso que el pan no da, uno solo para probar, la posada; y medir primero sin tretas (el oficio tiene que bajar al 60-70 %) y después con cada treta: cuáles solo suman pan y cuáles abren algo que la presión cierra. Nada de sucesos ni escenas hasta ver esto.
+
+**Montado** (botón «Activar presión»; cifras en `rules.js`, `PARAMS.presion` y `PARAMS.tretas.posada`) [Claude, 23-nov, sin revisar]:
+
+- **Corchetes por quejas.** Desde el día 3, cada mañana el corregidor pone un corchete en el sitio y la hora con más quejas acumuladas en lo que va de verano, si son 2 o más: las tuyas, las de los tuyos y las de otros pobres (cada franja en que piden donde hay gente, lo que avisa el sitio). Como mucho 5. Solo a prima, tercia, nona y vísperas (a sexta comen; a completas está la ronda en la puerta). Donde nadie avisa (San Esteban, la Puerta de San Pablo) no hay quejas, así que no hay corchetes.
+- **El corchete de la ruta.** Desde el día 3, uno en la puerta y la hora por la que más has pasado (2 veces o más), entrando o saliendo. Si cambias de costumbre, se mueve.
+- **Qué hace un corchete**: vigila su sitio a su hora todos los días, como la ronda: si pides delante te ve (siempre con poca gente; la mitad de las veces con mucha) y si llegas te puede parar (1 de cada 4; fichado, 1 de cada 3). De noche no vigila. Vigila también a los tuyos.
+- **Se sabe**: al amanecer («Por la ciudad se dice que el corregidor ha puesto un corchete en las Escuelas, a tercia»), en el mapa (los de la hora en que estás) y en Recuerdos.
+- **La posada** (con las tretas): en la Rúa y en la Plaza, si acabas el día allí, por 3 blancas duermes en el pajar del mesón y la ronda de noche no entra.
+
+**Cómo se ajustó** (el oficio sin tretas, 1.000 veranos de 1545): sin presión, 92 % de siega. Solo el corchete de la puerta, 81 %; solo los de las quejas (desde el día 2 y hasta 8), 75 %; los dos así, 51 %. Con los de las quejas desde el día 3 y hasta 5, **62 %** (sin siega 18 %, hambre 19 %): es lo que queda.
+
+**Cada treta, dada desde el primer día** (`TDADA=1`: el bot empieza con ella, sin el voto si no es la suya; así se mide lo que hace la treta y no lo que cuesta conseguirla; 1.000 veranos; siega):
+
+| | sin presión | con presión | lo que pasa |
+|---|---|---|---|
+| ninguna | 92 % | 62 % | |
+| el voto | 94 % | 75 % | blancas, y con ellas la posada (3,7 noches por verano) |
+| el cautivo | 95 % | 75 % | lo mismo: blancas y posada (2,9 noches) |
+| las coplas | 92 % | 69 % | blancas, pero solo tres pliegos (posada 1,3 noches) |
+| la carta | 91 % | 66 % | blancas y posada, pero 1 de cada 3 paradas te descubre |
+| el vergonzante | 91 % | 62 % | no la llega a usar: en la ribera le roban la ropa la primera noche |
+| el miembro atado | 72 % | 46 % | andar con muletas y quitárselas le quita unas 6 peticiones por verano |
+| pedir con miedo | 69 % | 41 % | le buscan tres días cada vez y se queda flaco para la siega |
+
+**Lo que abre la posada:** con presión, el voto sin posada da el 63 %, lo mismo que sin tretas; con posada, el 75 %. Las blancas, por sí solas, valen lo que el pan; lo que abre lo que la presión cierra es dormir dentro pagando: no cruzas la puerta vigilada, empiezas el día dentro y la ronda de noche no entra. Sin presión, la posada vale 2 puntos.
+
+**Conseguidas como se consiguen** (el bot las aprende o compra, con el voto para las primeras blancas; con presión / sin ella): el voto 74 / 94 %, las coplas 73 / 93 %, el vergonzante 73 / 94 %, la carta 71 / 92 %, pedir con miedo 71 / 92 %, el miembro atado 68 / 89 %, el cautivo 67 / 92 %, todas 58 / 83 %. El bot casi no compra las caras (la ropa buena, el 8 % de los veranos): se le van las blancas en pan y posada.
+
+**La medida de la diversión** (300 veranos): con la presión sola, el oficio sigue saliendo por el mismo camino (62 % de los días empiezan como otro), pide menos en los mismos sitios y horas (del 47 % al 37 %) y la comida deja de estar asegurada (en el 55 % de los veranos no llega a cenar entero todas las noches desde ningún día). Con presión, el voto y la posada, la ruta se rompe: el 39 % de los días empiezan como otro, y duerme en el mesón el 38 % de las noches.
+
+**Respuesta a la tercera condición:**
+
+- **Solo suman pan** (o blancas, que valen pan): el voto, el cautivo, las coplas y la carta, por sí mismas. Lo que les da valor con presión es la posada que pagan.
+- **Abre algo que la presión cierra:** la posada. En principio también la ropa buena (los corchetes y la ronda no te paran y con mucha gente no te ven), pero tal como está no se sostiene: sin blancas para la posada te la roban la primera noche. Haría falta llevarla junto a una treta de blancas, o que guardarla no dependa de dormir dentro.
+- **Restan:** el miembro atado y pedir con miedo, con presión y sin ella. Puede ser el bot, que no planea andar despacio ni esconderse tres días.
+
+**Valoración de Claude:** la presión hace lo que se pedía: el oficio baja del 92 % al 62 % y las tretas de blancas pasan de neutras a valer 12 o 13 puntos, pero por la posada, no por ellas. Eso apunta a que las tretas importan cuando lo que dan abre una salida que la presión cierra, no cuando dan más. Cuidado: la posada puede ser la nueva rutina (dormir en el mesón cada noche que se pueda). Y la ropa buena, que es la que mejor encaja con la presión, hoy no funciona.
+

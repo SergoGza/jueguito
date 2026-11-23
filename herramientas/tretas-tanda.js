@@ -7,6 +7,7 @@
 //   POLITICAS=nunca,voto,todas …                     qué políticas (por defecto: sin tretas, nunca, cada una y todas)
 //   TSIEMPRE=1 …                                     cada treta se usa siempre que se puede, valga o no la pena
 //   DETALLE=1 …                                      además, la salida entera de cada tanda
+//   PRESION=1 …                                      con la ciudad que se endurece (corchetes); POSADA=nunca, sin posada
 // Las políticas (ver tretas-comun.js): «sin» es el juego sin el botón; «nunca», con el botón y sin usar ninguna;
 // «<id>», solo esa (y el voto, si se compra); «todas», todas las que el oficio valora que convienen.
 // Lo que no mide: si divierte. Mide si alguna treta conviene siempre (principio 3), si alguna es una trampa, cuánto
@@ -35,7 +36,7 @@ for (const pol of POLS) {
 }
 const pc = (x, n) => `${Math.round((100 * (x || 0)) / n)} %`;
 const cad = !!process.env.CADENA;
-console.log(`${N} ${cad ? "cadenas" : "veranos de 1545"} por política · versión ${R.version} · el oficio${process.env.TSIEMPRE ? " · TSIEMPRE (usa la treta siempre que puede)" : ""}\n`);
+console.log(`${N} ${cad ? "cadenas" : "veranos de 1545"} por política · versión ${R.version} · el oficio${process.env.PRESION ? " · con presión (corchetes)" : ""}${process.env.TSIEMPRE ? " · TSIEMPRE (usa la treta siempre que puede)" : ""}\n`);
 const cab = ["política", cad ? "llega a 1557" : "siega", "sin siega", "hambre", "otros finales", "cena entera", "pan/día", "detenido/partida", "tretas/partida", "blancas quitadas", "catalogada (la de la política)"];
 console.log(cab.join(" | "));
 for (const { pol, A } of filas) {

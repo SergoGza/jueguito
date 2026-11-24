@@ -207,3 +207,46 @@ El novato acaba desterrado (83 %); el veterano, de hambre (57 %). Ninguna varian
 - **3. Las calles de parroquia ↔ la carta y el sello.** La calle de San Pablo, que no está en ninguna costumbre de la ronda, y la Puerta del Río a prima son los otros huecos fijos del oficio. El cierre: los diputados de la parroquia «escribiendo pobres» por la calle y pidiendo la cédula. Base documentada para estos años: Soto, en 1545, cuenta que van caballeros con su gente por las calles a escribir a los pobres (`empadronamiento-publico`); sin cédula de diputado no se pide (Cortes de 1525; ley de 1540; `cedula-de-pobre`). La llave: la carta y el sello, que ya existe, como cédula falsa. Se quema así: el diputado mira el sello y, a la tercera, lo conoce. Se compra en las Escuelas, así que las parejas 2 y 3 se tocan.
 
 **Qué se mediría:** el oficio sin tretas y con cada llave, el veterano y el novato, en un verano y en la cadena, con las mismas semillas. Lo que haría falta para cumplir el criterio: el oficio sin tretas en torno al 75-80 %, con las llaves cerca del 90 % y el veterano a 3 puntos o menos de su 24 %.
+
+## 9. Los cierres: las dos primeras parejas (24-nov, tarde)
+
+**Decidido (Sergio, 24-nov): A, con cuatro condiciones.** 1) Montar primero las dos parejas con llaves que ya existen (la puerta con el vergonzante; las parroquias con la carta) y medir; el estudiante, solo si con esas no se llega. 2) Los 17 puntos son el máximo: decir cuánto baja el oficio con dos cierres que se mueven y cuánto pierde el veterano; si hacen falta más cierres, preguntar antes. 3) Que las llaves se puedan pagar: las tretas de blancas (voto, coplas, cautivo) son el ingreso y las llaves el gasto; medir que el oficio llega a comprarlas y cuándo. 4) Medir empezando como mozo y como moza, y decir quién puede usar cada llave; si entra el estudiante, que sirva también para compensar que la mujer sale mejor en casi todo. Siempre el oficio y el veterano, un verano y la cadena.
+
+**Montado** (botón «Activar presión»; `PARAMS.presion.modo: "cierres"` y `PARAMS.presion.cierres`; commit en la rama) [Claude, 24-nov, sin revisar]:
+
+- **Sin corchetes por quejas** (quedan en el código con `modo: "corchetes"`, para repetir las medidas del 23-nov).
+- **El guarda de la puerta.** Aparece entre el día 2 y el 4 (cada verano, al azar) en la puerta que la ronda no cierra ese verano, a vísperas o a completas. Desde entonces, cada mañana se va a la puerta y la hora por la que más sales (dos veces o más), salvo la de la ronda a completas. A su hora no deja pasar a los pobres, ni entrar ni salir. Llave: la ropa buena puesta.
+- **Los diputados de la parroquia.** Aparecen entre el día 2 y el 4 en un hueco que deja la ronda ese verano (calle de San Pablo, Puerta del Río, Rúa, Plaza, Catedral o San Martín, a prima, tercia, nona o vísperas, con gente). Desde entonces, cada mañana se van al sitio y la hora donde más pan has sacado (tres pedazos o más). Si pides delante, te piden la cédula; sin ella te apuntan y te echan de la calle (pierdes media franja y no sacas nada; sin cárcel). Llave: la carta.
+- **Las llaves se queman.** Cada pase suma una seña a la treta; con cuatro, el guarda o el diputado te la quita y queda catalogada ese verano y quemada para tu gente.
+- **Se saben** al amanecer, en el mapa (G y D a su hora) y en Recuerdos. Los tuyos no los notan: no piden donde están los diputados ni cruzan donde está el guarda (simplificación).
+- **Quién puede usar cada llave:** la ropa buena y la carta, hombre y mujer.
+- **Los bots:** el oficio, el veterano y el novato no piden donde están los diputados ni salen por donde está el guarda (el novato solo ve lo que tiene delante); el oficio con tretas se pone la ropa buena si hay cierres, no pide con las llaves (no las gasta) y tira la carta si se la catalogan. Sin el botón, los bots dan lo mismo que en `main`.
+
+**Lo medido** (un verano de 1545, 1.000 partidas; siega; en un verano el mozo y la moza dan lo mismo, porque sin varios veranos no hay rasgos):
+
+| | sin presión | con los dos cierres |
+|---|---|---|
+| oficio, sin tretas | 92 % | 84 % |
+| oficio, la ropa buena dada | | 88 % |
+| oficio, la carta dada | | 81 % |
+| oficio, las dos dadas | | 88 % |
+| oficio, las dos conseguidas (con el voto) | 89 % | 82 % |
+| veterano (siega; llega a la siega con o sin hoz) | 24 %; 51 % | 29 %; 48 % |
+| novato (siega; llega) | 28 %; 39 % | 24 %; 32 % |
+
+**La cadena** (500; llega a la siega de 1557 el que juega):
+
+| | sin presión | cierres | cierres, llaves dadas | cierres, llaves conseguidas |
+|---|---|---|---|---|
+| oficio, empieza el mozo | 48 % | 36 % | 35 % | 30 % |
+| oficio, empieza la moza | 86 % | 65 % | 62 % | 50 % |
+| veterano, mozo / moza | 9 % / 13 % | 7 % / 10 % | | |
+| novato, mozo / moza | 6 % / 9 % | 4 % / 6 % | | |
+
+**Lo que dicen:**
+
+- **El oficio baja 8 puntos en un verano** (12 en la cadena con el mozo y 21 con la moza). Casi todo viene del guarda: le cierra la salida, duerme dentro 1,1 noches por verano (antes, ninguna) y le detienen de noche (destierro del 1 % al 10 %; en la cadena, galeras para el hombre).
+- **Los diputados no muerden:** con uno o con dos grupos, el oficio llega igual (84 %); no le echan nunca, porque tiene unos ocho huecos y se va al siguiente.
+- **El veterano no pierde casi nada:** llega a la siega 3 puntos menos en un verano (y siega 5 más, porque al quedarse dentro come más) y 2-3 en la cadena.
+- **Las llaves, tal como están, no recuperan:** la ropa buena dada sube al 88 %, pero se la roban en la ribera (al final la conserva el 27 %); la carta dada baja al 81 %, porque la llevas siempre y la ronda que te para mira el sello (fingidor). Con llaves más baratas y seguras (palanca: ropa a 5 blancas y robada 1 de cada 6 noches; carta a 4 y el sello mirado 1 de cada 6), las dos dadas recuperan del todo (92 %).
+- **No se pueden pagar:** conseguidas, el oficio queda por debajo de no usar tretas (82 % frente a 84 %; sin presión, 89 % frente a 92 %). Compra la carta en el 18 % de los veranos y la ropa en el 1 % (con las baratas, en el 33 % y el 44 %, hacia el día 4). El voto le cuesta más de lo que le da: lo catalogan el día 4 y las blancas se van en pan y en la posada.

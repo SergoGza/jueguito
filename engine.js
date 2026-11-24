@@ -277,7 +277,8 @@
       // con las cadenas puestas se anda más despacio (tretas)
       const paso = m.paso + (s.conTretas ? pesaPuesta(s) : 0);
       for (const d of VECINOS[s.lugar]) {
-        movs.push({ id: d, destino: d, tipo: "paso", coste: paso, ok: quedan >= paso, porque: quedan >= paso ? "" : "no te da tiempo" });
+        const guarda = s.conPresion && pasoCerrado(s, s.lugar, d, s.t); // con los cierres: el guarda de la puerta
+        movs.push({ id: d, destino: d, tipo: "paso", coste: paso, ok: quedan >= paso && !guarda, porque: guarda ? "el guarda de la puerta no deja pasar a los pobres a esta hora" : quedan >= paso ? "" : "no te da tiempo" });
       }
     } else {
       const b = L[s.lugar].barrio;
@@ -328,6 +329,7 @@
     else if (hayQuejas(s, s.lugar)) out.push("Hace poco han visto pedir aquí a otro.");
     if (s.t % R.RATOS !== 0) out.push("Empiezas a mitad de franja: la ronda puede llegar mientras pides.");
     // con la presión: el corchete de este sitio, ahora o a la franja siguiente (se sabe: lo pregonaron)
+    if (s.conPresion && diputadoCierra(s, s.lugar, s.t)) out.push(llaveAbre(s, "parroquia") ? "Aquí andan los diputados de la parroquia pidiendo la cédula: les enseñarás la carta." : "Aquí andan los diputados de la parroquia pidiendo la cédula: sin ella, te echarán de la calle.");
     if (s.conPresion && corcheteEn(s, s.lugar, f)) out.push("Aquí vigila un corchete a esta hora: si pides, te ve.");
     else if (s.conPresion && s.t % R.RATOS !== 0 && corcheteEn(s, s.lugar, f + 1)) out.push(`A ${nombreFranja(Math.min(f + 1, R.FRANJAS.length - 1)).toLowerCase()} vigila aquí un corchete: si empiezas ahora, te verá acabar.`);
     return out;
@@ -354,7 +356,14 @@
     const g = PUERTAS.includes(desde) && !L[destino].dentro ? desde : PUERTAS.includes(destino) && !L[desde].dentro ? destino : null;
     if (g) { const ds = ((s.salidas = s.salidas || {})[g] = s.salidas[g] || []); if (!ds.includes(s.dia)) ds.push(s.dia); }
     // con la presión: por qué puerta y a qué hora pasas (al salir, cuando dejas la puerta; al entrar, cuando llegas)
-    if (g && s.conPresion) { const fc = PUERTAS.includes(desde) && !L[destino].dentro ? franja(t0) : franja(Math.min(s.t, FIN - 1)); const k = `${g}|${fc}`; s.presion.cruces[k] = (s.presion.cruces[k] || 0) + 1; }
+    let llaveLin = null;
+    if (g && s.conPresion) {
+      const sale = PUERTAS.includes(desde) && !L[destino].dentro;
+      const fc = sale ? franja(t0) : franja(Math.min(s.t, FIN - 1)); const k = `${g}|${fc}`; s.presion.cruces[k] = (s.presion.cruces[k] || 0) + 1;
+      if (sale) s.presion.salidas[k] = (s.presion.salidas[k] || 0) + 1;
+      // con los cierres: pasas al guarda con la ropa buena (si no, opciones no te habría dejado)
+      if (cierreEn(s, g, fc, "puerta")) { llaveLin = ["El guarda de la puerta te mira el paño y te deja pasar."]; pasaConLlave(s, "puerta", llaveLin); }
+    }
     observar(s);
     apunta(s, "mover", `${L[desde].corto} → ${L[destino].corto}`, { coste: mv.coste, tipoMov: mv.tipo, t: t0 });
     s.aviso = null;
@@ -384,6 +393,7 @@
     } else if (mv.tipo !== "libre") {
       s.aviso = { texto: `Llegas a ${L[destino].nombre}.`, tono: "neutro" };
     }
+    if (llaveLin) s.aviso = { texto: llaveLin.concat(s.aviso ? [s.aviso.texto] : []).join(" "), tono: llaveLin.length > 1 ? "mal" : (s.aviso || {}).tono || "neutro" };
     return true;
   }
 
@@ -487,7 +497,17 @@
     resultado(s, "Te detienen", lineas.concat(extra), "mal");
   }
 
+  // con los cierres, antes de pedir pueden pedirte la cédula
   function pedir(s) {
+    const a = opciones(s).acc.find((x) => x.id === "pedir");
+    if (!a || !a.ok) return false;
+    const d = s.conPresion ? pasaDiputado(s) : null;
+    if (d === true) return true;
+    const r = pedirBase(s);
+    if (d && s.ultimo) s.ultimo.lineas = d.concat(s.ultimo.lineas);
+    return r;
+  }
+  function pedirBase(s) {
     const o = opciones(s);
     const a = o.acc.find((x) => x.id === "pedir");
     if (!a || !a.ok) return false;
@@ -543,6 +563,7 @@
     }
     const sobra = gana ? guardarPan(s, gana) : 0;
     s.hoy.panPedido += gana - sobra;
+    if (s.conPresion && gana) { const k = `${lugar}|${f0}`; s.presion.saca[k] = (s.presion.saca[k] || 0) + gana; } // adónde irán los diputados
     const lin = [];
     if (gana === 0) lin.push(`Pides en ${L[lugar].nombre}. No te dan nada.`);
     else if (s.llaga) lin.push(`Pides en ${L[lugar].nombre} con la pierna al aire. Te dan ${gana === 1 ? "un pedazo de pan" : gana + " pedazos de pan"}, sin mirarte a la cara.`);
@@ -838,10 +859,20 @@
     if (t.sinHuir) out.push("Tendido no puedes huir: si llega la ronda, te coge.");
     if (t.avisoExtra) out.push("El corro se oye de lejos: avisarán a la ronda.");
     if (t.puesta && t.puesta.paso && s.puesta !== id) out.push(`Te pondrás ${t.puesta.nombre}: andarás más despacio hasta que te las quites.`);
+    if (s.conPresion && diputadoCierra(s, s.lugar, s.t)) out.push(llaveAbre(s, "parroquia") ? "Aquí andan los diputados de la parroquia pidiendo la cédula: les enseñarás la carta." : "Aquí andan los diputados de la parroquia pidiendo la cédula: sin ella, te echarán de la calle.");
     return out;
   }
   // pedir con una treta: como pedir, con lo que la treta cambia
   function pedirCon(s, id) {
+    if (!tretaAqui(s, id).ok) return false;
+    const d = s.conPresion ? pasaDiputado(s) : null;
+    if (d === true) return true;
+    if (!tretaAqui(s, id).ok) { if (d) resultado(s, "Los diputados", d, "neutro"); return true; } // te han quitado la carta al pasar
+    const r = pedirConBase(s, id);
+    if (d && s.ultimo) s.ultimo.lineas = d.concat(s.ultimo.lineas);
+    return r;
+  }
+  function pedirConBase(s, id) {
     const x = tretaAqui(s, id);
     if (!x.ok) return false;
     const t = TT[id], cat = catalogada(s, id), misa = !!x.misa;
@@ -923,6 +954,7 @@
     }
     // el reparto: en pan, en blancas, o la mitad; el muerto, a medias con el tuyo (él en pan, tú en blancas)
     const total = tir.reduce((a, b) => a + b, 0);
+    if (s.conPresion && total && !misa) { const k = `${lugar}|${f0}`; s.presion.saca[k] = (s.presion.saca[k] || 0) + total; } // adónde irán los diputados
     let pan = 0, bl = 0, panTuyo = 0;
     if (t.mitadTuyo) { panTuyo = Math.floor(total / 2); bl = (total - panTuyo) * TR.blancasPedazo; }
     else if (t.moneda === "pan") pan = total;
@@ -1181,12 +1213,12 @@
   // llegas te puede parar, como la ronda. No va de noche. Se sabe: lo pregonan al amanecer.
   function iniciarPresion(s) {
     s.conPresion = true;
-    s.presion = { q: {}, cruces: {}, corchetes: [], puerta: null, hoy: null, otrosHasta: 0, historia: [] };
+    s.presion = { q: {}, cruces: {}, corchetes: [], puerta: null, hoy: null, otrosHasta: 0, historia: [], cierres: null, salidas: {}, saca: {}, pases: {} };
   }
   function corcheteEn(s, l, f) { return !!corcheteTipo(s, l, f); }
   // «puerta» (el de la ruta) o «quejas»; null si no hay
   function corcheteTipo(s, l, f) {
-    if (!s.conPresion || f == null || f < 0 || f >= R.FRANJAS.length) return null;
+    if (!s.conPresion || PR.modo === "cierres" || f == null || f < 0 || f >= R.FRANJAS.length) return null;
     const p = s.presion;
     if (p.puerta && p.puerta.lugar === l && p.puerta.f === f) return "puerta";
     return p.corchetes.some((c) => c.lugar === l && c.f === f) ? "quejas" : null;
@@ -1196,6 +1228,7 @@
   const corchetePara = (s, l, f) => { const k = corcheteTipo(s, l, f); return PR.paran !== "nunca" && (k === "puerta" || (k === "quejas" && PR.paran !== false)); };
   function sumaQueja(s, l, f, n) { if (!n || !L[l].dentro) return; const k = `${l}|${f}`; s.presion.q[k] = (s.presion.q[k] || 0) + n; }
   function presionAmanecer(s) {
+    if (PR.modo === "cierres") return cierresAmanecer(s);
     const p = s.presion;
     p.hoy = { nuevos: [], puerta: null, quita: null };
     if ((s.verano || 0) < (PR.desdeVerano || 0)) return; // (palanca) en la cadena, la ciudad se endurece desde ese verano
@@ -1234,6 +1267,115 @@
         p.historia.push(p.puerta);
         apunta(s, "corchete", `Ponen un corchete en ${L[mejor.l].corto} a ${nombreFranja(mejor.f).toLowerCase()} (ha pasado por ahí ${mejor.n} veces)${antes ? `; quitan el de ${L[antes.lugar].corto}` : ""}.`);
       }
+    }
+  }
+  // ------------------------------------------------------------------ los cierres (24-nov; rama claude/tretas)
+  // Decidido por Sergio (opción A de tres): sin corchetes por quejas, cierres que atacan los huecos y la ruta del que
+  // juega bien, cada uno con su llave, que se quema. Primero los dos con llaves que ya existen:
+  //   el guarda de la puerta: empieza en la puerta que la ronda no cierra ese verano y se va a la puerta y la hora por
+  //     la que más sales; no deja pasar a los pobres (ni entrar ni salir). Llave: la ropa buena puesta.
+  //   los diputados de la parroquia: empiezan en un hueco que la ronda deja ese verano y se van al sitio y la hora donde
+  //     más pan sacas; si pides delante, te piden la cédula y, sin ella, te echan de la calle. Llave: la carta.
+  // Cada pase suma señas a la llave; con PARAMS.tretas.catalogo, te la quitan y queda catalogada (y quemada para tu gente).
+  const CI = PR.cierres || {};
+  const LLAVE = { puerta: "vergonzante", parroquia: "carta" };
+  const conCierres = (s) => !!(s.conPresion && PR.modo === "cierres" && s.presion && s.presion.cierres);
+  function cierreEn(s, l, f, tipo) {
+    if (!conCierres(s) || f == null || f < 0 || f >= R.FRANJAS.length) return null;
+    return s.presion.cierres.find((c) => s.dia >= c.desde && c.lugar === l && c.f === f && (!tipo || c.tipo === tipo)) || null;
+  }
+  // ¿te abre la llave? (la ropa buena, puesta; la carta, en el zurrón; ninguna, si ya está catalogada)
+  function llaveAbre(s, tipo) {
+    const id = LLAVE[tipo];
+    if (!s.conTretas || !TT[id] || !s.mazo.includes(id) || catalogada(s, id)) return false;
+    return tipo === "puerta" ? s.puesta === id : true;
+  }
+  // ¿te cierra el paso el guarda? (al salir cuenta la franja en que dejas la puerta; al entrar, en la que llegas)
+  function pasoCerrado(s, desde, hacia, t) {
+    if (!conCierres(s)) return null;
+    const sale = PUERTAS.includes(desde) && !L[hacia].dentro, entra = PUERTAS.includes(hacia) && !L[desde].dentro;
+    if (!sale && !entra) return null;
+    const g = sale ? desde : hacia;
+    const f = franja(Math.min(sale ? t : t + R.MODOS[s.modo].paso, FIN - 1));
+    const c = cierreEn(s, g, f, "puerta");
+    return c && !llaveAbre(s, "puerta") ? c : null;
+  }
+  // ¿te echan los diputados si pides aquí ahora? (miran la franja en que empiezas y en la que acabas)
+  function diputadoCierra(s, l, t) {
+    if (!conCierres(s) || t >= FIN) return null;
+    const f0 = franja(t), f1 = franja(Math.min(t + R.RATOS - 1, FIN - 1));
+    return cierreEn(s, l, f0, "parroquia") || (f1 !== f0 ? cierreEn(s, l, f1, "parroquia") : null);
+  }
+  // pasar un cierre con la llave: suma señas; con bastantes, te la quitan y queda catalogada
+  function pasaConLlave(s, tipo, lin) {
+    const id = LLAVE[tipo];
+    s.senasTreta[id] = (s.senasTreta[id] || 0) + (CI.senas || 1);
+    s.presion.pases[tipo] = (s.presion.pases[tipo] || 0) + 1;
+    logTreta(s, id).pases = (logTreta(s, id).pases || 0) + 1;
+    apunta(s, "llave", `Pasa ${tipo === "puerta" ? "al guarda de la puerta con la ropa buena" : "a los diputados con la carta"}.`);
+    if (s.senasTreta[id] >= TR.catalogo) {
+      lin.push(tipo === "puerta" ? "Al pasar, el guarda te tira del paño: «Ese ya me lo sé. Harapos debajo». Te quita la ropa buena." : "El diputado mira el sello más despacio: «Este ya lo he visto. Esta carta no la ha firmado ningún cura». Se queda con ella.");
+      olvidarTreta(s, id, true);
+      catalogar(s, id, lin);
+    }
+  }
+  // pides donde andan los diputados: con la carta pasas; sin ella, te echan de la calle. true: te han echado
+  function pasaDiputado(s) {
+    const c = diputadoCierra(s, s.lugar, s.t);
+    if (!c) return null;
+    if (llaveAbre(s, "parroquia")) {
+      const lin = ["Un diputado de la parroquia anda escribiendo pobres. Le enseñas la carta: mira el sello, te apunta y te deja."];
+      pasaConLlave(s, "parroquia", lin);
+      return lin;
+    }
+    pasar(s, CI.echa || 3, "perdido", false);
+    s.presion.echado = (s.presion.echado || 0) + 1;
+    apunta(s, "echado", `Le echan los diputados de ${L[s.lugar].corto}.`);
+    resultado(s, "Te echan de la calle", [`Un diputado de la parroquia anda por ${L[s.lugar].nombre} escribiendo pobres. Te pide la cédula y no la tienes.`, "Te apunta en su lista y te echa de la calle: aquí, a esta hora, no pides."], "mal");
+    return true;
+  }
+  const rango = (s, clave, [a, b]) => a + Math.floor(mundo(s, clave) * (b - a + 1));
+  function crearCierres(s) {
+    const cierra = s.circuito && s.circuito[5]; // la puerta que cierra la ronda este verano
+    const fuga = PUERTAS.find((g) => g !== cierra) || PUERTAS[0];
+    const fp = CI.puerta.franjas, cp = CI.parroquia;
+    const huecos = [];
+    for (const l of cp.sitios) for (const f of cp.franjas) if ((s.circuito || [])[f] !== l && genteDelDia(s, l, s.dia, f) >= 2) huecos.push({ l, f });
+    const out = [{ tipo: "puerta", lugar: fuga, f: fp[Math.floor(mundo(s, "cierre|fp") * fp.length)], desde: rango(s, "cierre|dp", CI.desde) }];
+    // (palanca) cuántos grupos de diputados: cada uno en un hueco distinto
+    for (let i = 0; i < (cp.cuantos || 1); i++) {
+      const libres = huecos.filter((x) => !out.some((c) => c.lugar === x.l && c.f === x.f));
+      const h = libres.length ? libres[Math.floor(mundo(s, `cierre|hueco${i || ""}`) * libres.length)] : { l: cp.sitios[0], f: cp.franjas[0] };
+      out.push({ tipo: "parroquia", lugar: h.l, f: h.f, desde: rango(s, `cierre|dd${i || ""}`, CI.desde) });
+    }
+    return out;
+  }
+  // adónde va hoy cada cierre: el guarda, a la puerta y hora por la que más sales; los diputados, adonde más sacas
+  function adondeCierre(s, c) {
+    const p = s.presion, cierra = s.circuito && s.circuito[5];
+    let mejor = null;
+    const ver = (k, n, ok, min) => {
+      const [l, fs] = k.split("|"), f = +fs;
+      if (n < min || !ok(l, f)) return;
+      const v = n + mundo(s, `cierreM|${c.tipo}|${s.dia}|${k}`) * 0.5;
+      if (!mejor || v > mejor.v) mejor = { v, l, f };
+    };
+    if (c.tipo === "puerta") for (const [k, n] of Object.entries(p.salidas)) ver(k, n, (l, f) => !(l === cierra && f === 5), CI.puerta.min);
+    else for (const [k, n] of Object.entries(p.saca)) ver(k, n, (l, f) => CI.parroquia.sitios.includes(l) && CI.parroquia.franjas.includes(f) && !p.cierres.some((o) => o !== c && o.tipo === c.tipo && s.dia >= o.desde && o.lugar === l && o.f === f), CI.parroquia.min);
+    return mejor;
+  }
+  function cierresAmanecer(s) {
+    const p = s.presion;
+    p.hoy = { nuevos: [], mueve: [] };
+    if ((s.verano || 0) < (PR.desdeVerano || 0)) return;
+    if (!p.cierres) p.cierres = crearCierres(s);
+    for (const c of p.cierres) {
+      if (s.dia < c.desde) continue;
+      const m = adondeCierre(s, c), antes = { lugar: c.lugar, f: c.f };
+      if (m) { c.lugar = m.l; c.f = m.f; }
+      const quien = c.tipo === "puerta" ? "un guarda" : "los diputados";
+      if (s.dia === c.desde) { p.hoy.nuevos.push(c); apunta(s, "cierre", `Ponen ${quien} en ${L[c.lugar].corto} a ${nombreFranja(c.f).toLowerCase()}.`); }
+      else if (antes.lugar !== c.lugar || antes.f !== c.f) { p.hoy.mueve.push({ c, antes }); apunta(s, "cierre", `Mueven ${quien} de ${L[antes.lugar].corto} a ${L[c.lugar].corto}, a ${nombreFranja(c.f).toLowerCase()}.`); }
     }
   }
   // la posada (con las tretas): lo que dan las blancas y no el pan. Dormir dentro sin la ronda de noche.
@@ -2238,10 +2380,17 @@
     }
     if (s.conPresion) {
       L2.push("== La ciudad se endurece ==");
+      if (PR.modo === "cierres") {
+        const cs = s.cronica.filter((c) => c.tipo === "cierre");
+        L2.push(cs.length ? cs.map((c) => `${cad ? c.anio + ", " : ""}día ${c.dia}: ${c.texto}`).join(" · ") : "No pusieron guarda ni diputados.");
+        const n = (t) => s.cronica.filter((c) => c.tipo === t).length;
+        L2.push(`Le echaron los diputados: ${s.cronica.filter((c) => c.tipo === "echado" && /diputados/.test(c.texto)).length} · pasó con la llave: ${n("llave")}${s.conTretas ? ` · noches en la posada: ${n("posada")}` : ""}`);
+      } else {
       const cs = s.cronica.filter((c) => c.tipo === "corchete");
       L2.push(cs.length ? cs.map((c) => `${cad ? c.anio + ", " : ""}día ${c.dia}: ${c.texto}`).join(" · ") : "No pusieron corchetes.");
       const enc = s.cronica.filter((c) => c.tipo === "encuentro" && c.corchete).length;
       L2.push(`Llegó donde vigilaba un corchete: ${enc} ${enc === 1 ? "vez" : "veces"}${s.conTretas ? ` · noches en la posada: ${s.cronica.filter((c) => c.tipo === "posada").length}` : ""}`);
+      }
       L2.push("");
     }
     if (s.conTuyos) {
@@ -2313,7 +2462,7 @@
     TT, tretaAqui, previsionTreta, pedirCon, catalogada, puedeUsarla, ofertaTxt, aprender, olvidar, tiendaAqui, comprar, mercadoPan,
     comprarPan, venderPan, puedeQuitar, quitar, citasPosibles, quedar, citaTxt,
     // la ciudad se endurece (prototipo) y la posada
-    corcheteEn, corcheteTipo, puedePosada, pagarPosada, mesonCerrado, puedePoner, poner,
+    corcheteEn, corcheteTipo, cierreEn, pasoCerrado, diputadoCierra, llaveAbre, LLAVE, puedePosada, pagarPosada, mesonCerrado, puedePoner, poner,
     empezarJornada(s) { if (s.fase === "amanecer") { s.fase = "dia"; s.noche = null; } },
   };
 })();

@@ -34,6 +34,8 @@ module.exports = function (R, E) {
   if (!DADA && [...quiere].some((id) => COMPRA.has(id) || ((TR.lista.find((t) => t.id === id) || {}).aprende || {}).blancas)) quiere.add("voto");
   for (const x of NO_SABE) quiere.delete(x);
   const mas = (o, k, n) => { o[k] = (o[k] || 0) + (n == null ? 1 : n); };
+  // con los cierres (PRESION=1), la ropa buena y la carta son llaves: no pide con ellas (sumarían señas) salvo con TSIEMPRE
+  const esLlave = (s, id) => !SIEMPRE && !!(s.conPresion && s.presion && s.presion.cierres && Object.values(E.LLAVE || {}).includes(id));
   const valorPan = (pan) => (pan < 2 ? 1 : pan < 4 ? 0.55 : 0);
   const salir = (l) => (E.L[l].dentro ? Math.min(...E.PUERTAS.map((g) => E.DIST[l][g] + 1)) * PASO : 0);
 
@@ -69,6 +71,7 @@ module.exports = function (R, E) {
     for (const id of s.mazo) {
       const t = E.TT[id];
       if (NO_SABE.has(id) || !E.puedeUsarla(s, t)) continue;
+      if (esLlave(s, id)) continue; // con los cierres, las llaves no se gastan pidiendo con ellas
       if (tb != null && tb + (t.franjas || 1) * FR + (t.puesta && t.puesta.paso ? TR.ratos : 0) + salir(lugar) > FIN) continue;
       if (soloOk) { if (!E.tretaAqui(s, id).ok) continue; } else {
         if (!t.lugares.includes(lugar) || (t.usos && !(s.usos[id] > 0))) continue;
@@ -143,6 +146,10 @@ module.exports = function (R, E) {
     if (mp.compra && mp.compra.ok && (hambre || sobra)) return { a: "comprarPan" };
     // la ropa buena: se la pone fuera de la muralla, antes de cruzar la puerta (si no le conocen, no le paran)
     if (s.mazo.includes("vergonzante") && s.puesta !== "vergonzante" && !s.conocido && !E.L[s.lugar].dentro && E.puedePoner(s, "vergonzante")) return { a: "poner", t: "vergonzante" };
+    // con los cierres, la ropa buena es la llave del guarda: se la pone donde esté, conozcan o no su cara
+    if (s.conPresion && s.presion && s.presion.cierres && s.mazo.includes("vergonzante") && s.puesta !== "vergonzante" && !E.catalogada(s, "vergonzante") && E.puedePoner(s, "vergonzante")) return { a: "poner", t: "vergonzante" };
+    // la carta catalogada no se lleva encima: si la ronda te para, te la descubre siempre
+    if (s.mazo.includes("carta") && E.catalogada(s, "carta")) return { a: "olvidar", t: "carta" };
     // tretas de su lista que se venden aquí
     for (const x of E.tiendaAqui(s)) {
       if (!quiere.has(x.id) || !x.ok || s.blancas < x.blancas + (s.pan < 2 ? 2 * TR.pan.compra : 0)) continue; // antes, la cena
@@ -207,28 +214,34 @@ module.exports = function (R, E) {
     if (j.a === "venderPan") return E.venderPan(s);
     if (j.a === "quitar") return E.quitar(s);
     if (j.a === "poner") return E.poner(s, j.t);
+    if (j.a === "olvidar") return E.olvidar(s, j.t);
     return null;
   }
   // las cuentas de una tanda
-  const nueva = () => ({ posadas: 0, n: 0, usos: {}, pan: {}, bl: {}, pillado: {}, descubierta: {}, catalogada: {}, diaCat: {}, tiene: {}, compras: {}, blFin: 0, quitadas: 0, panCompra: 0, panVenta: 0, robada: 0, aprende: 0 });
+  const nueva = () => ({ diaCompra: {}, nCompra: {}, pases: {}, echado: 0, posadas: 0, n: 0, usos: {}, pan: {}, bl: {}, pillado: {}, descubierta: {}, catalogada: {}, diaCat: {}, tiene: {}, compras: {}, blFin: 0, quitadas: 0, panCompra: 0, panVenta: 0, robada: 0, aprende: 0 });
   function cuenta(A, s) {
     if (!s.conTretas) return;
     A.n++;
     for (const [id, x] of Object.entries(s.tretasLog || {})) {
       mas(A.tiene, id); mas(A.usos, id, x.usos); mas(A.pan, id, x.pan); mas(A.bl, id, x.blancas); mas(A.pillado, id, x.pillado); mas(A.descubierta, id, x.descubierta);
       if (x.compras) mas(A.compras, id, x.compras);
+      if (x.pases) mas(A.pases, id, x.pases);
       if (x.catalogada) { mas(A.catalogada, id); const d = +String(x.catalogada).replace(/.*día /, ""); mas(A.diaCat, id, d); }
     }
     A.blFin += s.blancas; A.quitadas += s.blancasQuitadas || 0;
+    // cuándo compra cada una (la primera vez de cada verano)
+    const vista = {};
+    for (const c of s.cronica) if (c.tipo === "compra") { const id = Object.keys(E.TT).find((k) => c.texto.includes(E.TT[k].nombre)); const k = `${c.anio}|${id}`; if (id && !vista[k]) { vista[k] = 1; mas(A.nCompra, id); mas(A.diaCompra, id, c.dia); } }
+    A.echado += s.cronica.filter((c) => c.tipo === "echado" && /diputados/.test(c.texto)).length;
     for (const c of s.cronica) { if (c.tipo === "panCompra") A.panCompra++; if (c.tipo === "panVenta") A.panVenta++; if (c.tipo === "robada") A.robada++; if (c.tipo === "aprende") A.aprende++; if (c.tipo === "posada") A.posadas++; }
   }
   function linea(A, nombre) {
     if (!A || !A.n) return "";
     const N = A.n, ids = Object.keys(A.tiene).sort((a, b) => (A.usos[b] || 0) - (A.usos[a] || 0));
-    const out = [`  TRETAS (${POL}): blancas al acabar ${(A.blFin / N).toFixed(1)} · se las quita la ronda ${(A.quitadas / N).toFixed(1)} · pan comprado ${(A.panCompra / N).toFixed(1)} · tretas aprendidas de noche ${(A.aprende / N).toFixed(1)} · noches en la posada ${(A.posadas / N).toFixed(1)} (por partida)`];
+    const out = [`  TRETAS (${POL}): le echan los diputados ${(A.echado / N).toFixed(2)} · blancas al acabar ${(A.blFin / N).toFixed(1)} · se las quita la ronda ${(A.quitadas / N).toFixed(1)} · pan comprado ${(A.panCompra / N).toFixed(1)} · tretas aprendidas de noche ${(A.aprende / N).toFixed(1)} · noches en la posada ${(A.posadas / N).toFixed(1)} (por partida)`];
     for (const id of ids) {
       const u = A.usos[id] || 0;
-      out.push(`    ${E.TT[id].nombre.padEnd(22)} la tiene el ${Math.round((100 * A.tiene[id]) / N)} % · la usa ${(u / N).toFixed(1)} veces · da ${(A.pan[id] / Math.max(1, u)).toFixed(2)} pedazos y ${(A.bl[id] / Math.max(1, u)).toFixed(1)} blancas por uso · le pillan ${A.pillado[id] || 0} · le descubren ${A.descubierta[id] || 0} · catalogada en el ${Math.round((100 * (A.catalogada[id] || 0)) / N)} % de las partidas${A.catalogada[id] ? ` (día ${(A.diaCat[id] / A.catalogada[id]).toFixed(1)} de media)` : ""}`);
+      out.push(`    ${E.TT[id].nombre.padEnd(22)} la tiene el ${Math.round((100 * A.tiene[id]) / N)} % · la usa ${(u / N).toFixed(1)} veces · da ${(A.pan[id] / Math.max(1, u)).toFixed(2)} pedazos y ${(A.bl[id] / Math.max(1, u)).toFixed(1)} blancas por uso · le pillan ${A.pillado[id] || 0} · le descubren ${A.descubierta[id] || 0} · catalogada en el ${Math.round((100 * (A.catalogada[id] || 0)) / N)} % de las partidas${A.catalogada[id] ? ` (día ${(A.diaCat[id] / A.catalogada[id]).toFixed(1)} de media)` : ""}${A.nCompra[id] ? ` · la compra ${(A.nCompra[id] / N).toFixed(2)} veces por partida (día ${(A.diaCompra[id] / A.nCompra[id]).toFixed(1)} de media)` : ""}${A.pases[id] ? ` · pasa ${(A.pases[id] / N).toFixed(1)} cierres` : ""}`);
     }
     return out.join("\n");
   }

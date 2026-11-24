@@ -332,6 +332,7 @@ function caminos(cx) {
     if (tau > FIN) continue;
     for (const v of E.VECINOS[u]) {
       if (hecho[v]) continue;
+      if (cx.s.conPresion && E.pasoCerrado(cx.s, u, v, llega[u])) continue; // el guarda de la puerta (cierres): por ahí no se pasa
       const r = tau < FIN ? prRonda(cx, v, E.franja(tau), true) : 0;
       const c = coste[u] + PASO * WT + r * cx.cpar;
       if (c < coste[v]) { coste[v] = c; llega[v] = tau; primero[v] = u === cx.aqui ? v : primero[u]; riesgo[v] = riesgo[u] + r * cx.cpar; }
@@ -354,6 +355,7 @@ function ocasiones(cx, C, dentro) {
     for (const tb of ta % FR === 0 || process.env.ALINEA === "nunca" ? [ta] : process.env.ALINEA === "siempre" ? [sig] : [ta, sig]) {
       const fb = E.franja(tb);
       if (tb + FR > FIN) continue;
+      if (s.conPresion && E.diputadoCierra(s, l, tb) && !E.llaveAbre(s, "parroquia")) continue; // los diputados (cierres): sin la carta, te echan
       const sale = tb + FR + PASO * SAL[l] <= FIN; // pedir y aún salir antes de que cierren
       if (!dentro && !sale) continue;
       let g, mucha;
@@ -385,6 +387,7 @@ function salida(cx, C) {
   for (const g of PUERTAS) {
     const tg = g === cx.aqui ? cx.t : C.llega[g];
     if (tg == null || tg + PASO > FIN) continue;
+    if (cx.s.conPresion && E.pasoCerrado(cx.s, g, AFUERA[g], tg)) continue; // el guarda (cierres)
     const c = g === cx.aqui ? 0 : C.coste[g];
     if (!mejor || c < mejor.c) mejor = { c, g };
   }
@@ -402,6 +405,7 @@ function encargo(s, cx, C) {
     if (!E.L[cx.aqui].dentro) return { a: "acabar" };
     const tg = cx.aqui === m.g ? cx.t : C.llega[m.g];
     if (tg == null || tg + PASO > FIN) return null;
+    if (s.conPresion && E.pasoCerrado(s, m.g, AFUERA[m.g], tg)) return null; // el guarda (cierres)
     s._meta = m;
     return { a: "mover", d: cx.aqui === m.g ? AFUERA[m.g] : C.primero[m.g] };
   }
@@ -415,6 +419,7 @@ function encargo(s, cx, C) {
   if (m.alin && cx.t % FR !== 0 && cx.t + FR <= FIN) { s._meta = m; return { a: "esperar" }; }
   if ((cx.rondaAqui && !TRC.oculto(s, cx.aqui, E.estado(s, cx.aqui, cx.d, cx.f))) || cx.t + FR > FIN || E.estado(s, cx.aqui, cx.d, cx.f).da < 2) return null;
   if (E.hayQuejas(s, cx.aqui) || (s.conTuyos && E.tuyosEn(s, cx.aqui).some((x) => x.pide))) return null; // ahí pide o acaba de pedir otro
+  if (s.conPresion && E.diputadoCierra(s, cx.aqui, cx.t) && !E.llaveAbre(s, "parroquia")) return null; // los diputados (cierres)
   return { a: "pedir" };
 }
 // El oficio por su cuenta. Devuelve una jugada: { a: "pedir" | "esperar" | "acabar" | "trabajo" | "mover", d: destino }
@@ -950,7 +955,9 @@ function jugar(sem, ver) {
       if (j) s._meta = null; else j = oficio(s, B);
       if (s._trcNo !== s.dia * 100 + s.t) j = TRC.cambia(s, j); // pedir con una treta, o quitarse lo que pesa para andar
     }
-    if (!ejecutar(s, j) && TRC.activo) s._trcNo = s.dia * 100 + s.t; // si no ha podido, esta vez sin tretas
+    const hecho = ejecutar(s, j);
+    if (!hecho && s.conPresion && (!TRC.activo || s._trcNo === s.dia * 100 + s.t)) { s._meta = null; if (!E.esperar(s)) E.acabarDia(s); } // no ha podido (cierres): espera
+    else if (!hecho && TRC.activo) s._trcNo = s.dia * 100 + s.t; // si no ha podido, esta vez sin tretas
     mirar(s, B);
   }
   if (s.conCadena) s._veranos.push({ anio: s.anio, quien: s.quien.id, fin: "FIN:" + s.final.tipo, dia: s.final.dia });

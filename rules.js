@@ -443,6 +443,22 @@
       puerta: { desde: 3, min: 2 }, // desde el día 3, uno en la puerta y la franja por la que más has pasado (si son 2 o más veces); se mueve si cambias
       desdeVerano: 0,     // en la cadena, desde qué verano (0: 1545; 1: 1553)
       paran: true,        // si los corchetes paran al que llega: true (todos), false (solo el de la puerta), "nunca" (solo ven pedir)
+      // Decidido por Sergio (24-nov, opción A de tres): sin corchetes por quejas; parejas de cierre y llave que atacan los
+      // huecos y la ruta del que juega bien, cambian cada verano y cuyas llaves se queman. Primero las dos con llaves que
+      // ya existen: el guarda de la puerta (llave: la ropa buena puesta) y los diputados de la parroquia (llave: la carta).
+      // «corchetes» deja la presión del 23-nov, para repetir sus medidas. Las cifras son de Claude, sin revisar.
+      modo: "cierres",
+      cierres: {
+        desde: [2, 4],    // el día en que aparece cada cierre: cada verano, al azar entre estos dos
+        senas: 1,         // señas que suma la llave cada vez que pasa un cierre (con PARAMS.tretas.catalogo, se la quitan y queda catalogada)
+        echa: 3,          // ratos que pierdes si los diputados te echan de la calle
+        // el guarda: empieza en la puerta que la ronda no cierra ese verano, a una de estas franjas; desde que está, cada
+        // mañana se va a la puerta y la hora por la que más sales (si son min veces o más), salvo donde cierra la ronda
+        puerta: { franjas: [4, 5], min: 2 },
+        // los diputados: empiezan en un hueco de estos sitios (con gente que da y sin la ronda de costumbre a esa hora); desde
+        // que están, cada mañana se van al sitio y la hora de estos donde más pan has sacado pidiendo (si son min pedazos o más)
+        parroquia: { sitios: ["sanpablo", "puerta", "rua", "plaza", "catedral", "sanmartin"], franjas: [0, 1, 3, 4], min: 3 },
+      },
     },
   };
 
@@ -483,7 +499,8 @@
   ];
   // solo con «Presión» (prototipo, rama claude/tretas)
   const LICENCIAS_PRESION = [
-    "Que el corregidor sume corchetes durante el verano donde más quejas hay, y en la puerta por la que más pasas, es del juego.",
+    "Hubo guardas en las puertas de las ciudades castellanas (Ávila, 1518-1520; Burgos, 1565), sobre todo con peste; en Salamanca no consta. Que el guarda no deje pasar a los pobres a la hora en que más sales, y que la ropa buena le engañe, es del juego.",
+    "Los diputados de las parroquias examinaban a los pobres y la cédula era obligatoria para pedir (Cortes de 1525, ley de 1540); Soto cuenta en 1545 que iban por las calles escribiendo pobres. Que te echen de la calle si no la llevas, y que vayan adonde más sacas, es del juego.",
   ];
 
   window.RULES = {

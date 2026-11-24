@@ -173,8 +173,17 @@ function riesgoPuerta(s, gate, t) {
   if ((((s.habitos || {})[f] || {})[gate] || []).length >= R.RONDA.aprende.minDias) pr += R.RONDA.aprende.prob;
   return pr;
 }
+// con los cierres (PRESION=1): el guarda de una puerta no deja pasar a su hora
+const AFUERA = Object.fromEntries(PUERTAS.map((g) => [g, E.VECINOS[g].find((v) => !E.L[v].dentro)]));
+const guarda = (s, desde, hacia, t) => !!(s.conPresion && E.pasoCerrado(s, desde, hacia, t));
 function volver(s) {
   if (s.lugar === "ribera") return E.acabarDia(s);
+  // en una puerta que el guarda no deja pasar: a la otra, si da tiempo
+  if (PUERTAS.includes(s.lugar) && guarda(s, s.lugar, AFUERA[s.lugar], s.t)) {
+    const otra = PUERTAS.find((g) => g !== s.lugar), dd = costes(s, s.lugar);
+    if (otra && s.t + dd[otra] + 2 <= E.FIN && !guarda(s, otra, AFUERA[otra], s.t + dd[otra])) { const mv = primerPaso(s, otra); if (mv) return E.mover(s, mv.destino); }
+    return E.acabarDia(s);
+  }
   // dentro de la muralla y lejos de una puerta: el que conoce la ronda elige por cuál salir; el novato («ciego»), la más cercana
   if (E.L[s.lugar].dentro && !PUERTAS.includes(s.lugar) && !s._ciego) {
     const m = R.MODOS[s.modo], dd = costes(s, s.lugar), fuera = m.zona === "lugar" ? m.paso : m.cruce;
@@ -182,6 +191,7 @@ function volver(s) {
     for (const g of PUERTAS) {
       const llega = s.t + dd[g];
       if (llega + fuera > E.FIN) continue;
+      if (guarda(s, g, AFUERA[g], llega)) continue; // se pregona: el veterano lo sabe
       const v = riesgoPuerta(s, g, llega) * 3 + dd[g] / 12;
       if (!mejor || v < mejor.v) mejor = { v, g };
     }
@@ -216,13 +226,19 @@ function novato(s, rnd, g) {
   if (tr && tr.ok) return E.pedirTrabajo(s);
   const pd = o.acc.find((x) => x.id === "pedir");
   const yaAqui = s.pedidoHoy.some((p) => p.lugar === s.lugar);
-  if (pd && pd.ok && !r && !yaAqui) return E.pedir(s);
+  const dip = s.conPresion && E.cierreEn(s, s.lugar, E.franja(Math.min(s.t, E.FIN - 1)), "parroquia"); // los diputados, si los tiene delante
+  if (pd && pd.ok && !r && !yaAqui && !dip) return E.pedir(s);
   if (g.libres > 3) return E.esperar(s);
   const cand = o.movs.filter((x) => x.ok && E.L[x.destino].dentro && !(r && E.zonaDe(s, x.destino) === E.zonaDe(s, r)));
   const nuevos = cand.filter((x) => !s.pedidoHoy.some((p) => p.lugar === x.destino));
   const pool = nuevos.length ? nuevos : cand;
   if (pool.length && o.quedan > 6) return E.mover(s, pool[Math.floor(rnd() * pool.length)].destino);
-  if (!E.L[s.lugar].dentro) { const mv = primerPaso(s, "puerta"); if (mv) return E.mover(s, mv.destino); }
+  if (!E.L[s.lugar].dentro) {
+    // a la puerta más cercana; con los cierres, a la que el guarda deja pasar
+    const dd = costes(s, s.lugar);
+    const g = s.conPresion ? PUERTAS.slice().sort((a, b) => dd[a] - dd[b]).find((x) => !guarda(s, AFUERA[x], x, s.t + dd[AFUERA[x]])) : "puerta";
+    const mv = g && primerPaso(s, g); if (mv) return E.mover(s, mv.destino);
+  }
   return E.esperar(s);
 }
 
@@ -272,7 +288,8 @@ function veterano(s, rnd, g, lambda, dentro) {
     const sig = s.t % 6 !== 0 && f < 5 && probRonda(s, s.lugar, s.dia, f + 1) > 0.5; // la ronda suele llegar aquí la franja siguiente
     const cabe = dentro || !E.L[s.lugar].dentro || s.t + 6 + salida(s, s.lugar) <= E.FIN; // pedir y aún salir antes de que cierren
     const ajeno = E.hayQuejas(s, s.lugar) || E.tuyosEn(s, s.lugar).some((x) => x.pide); // ahí pide o ha pedido otro: vendrá la ronda
-    if (cabe && !ajeno && valor(s, s.lugar, f, lambda) > 0.2 && !sig && !s.pedidoHoy.some((p) => p.lugar === s.lugar && E.L[s.lugar].aviso > 0)) return E.pedir(s);
+    const dip = s.conPresion && E.diputadoCierra(s, s.lugar, s.t); // los diputados: se pregona dónde andan
+    if (cabe && !ajeno && !dip && valor(s, s.lugar, f, lambda) > 0.2 && !sig && !s.pedidoHoy.some((p) => p.lugar === s.lugar && E.L[s.lugar].aviso > 0)) return E.pedir(s);
   }
   let best = null;
   for (const l of Object.keys(E.L)) {
@@ -280,6 +297,7 @@ function veterano(s, rnd, g, lambda, dentro) {
     const llega = s.t + dr[l];
     if (llega + 6 > E.FIN) continue;
     if (!dentro && llega + 6 + salida(s, l) > E.FIN) continue;
+    if (s.conPresion && E.diputadoCierra(s, l, llega)) continue;
     const v = valor(s, l, E.franja(llega), lambda) - dr[l] / 12;
     if (!best || v > best.v) best = { v, l };
   }

@@ -274,7 +274,7 @@
     const quedan = FIN - s.t;
     const movs = [];
     if (m.zona === "lugar") {
-      // con las muletas o las cadenas puestas se anda más despacio (tretas)
+      // con las cadenas puestas se anda más despacio (tretas)
       const paso = m.paso + (s.conTretas ? pesaPuesta(s) : 0);
       for (const d of VECINOS[s.lugar]) {
         movs.push({ id: d, destino: d, tipo: "paso", coste: paso, ok: quedan >= paso, porque: quedan >= paso ? "" : "no te da tiempo" });
@@ -417,8 +417,7 @@
         : dice ? `El alguacil te reconoce: ${dice}. Te llevan a la cárcel.` : "El alguacil te reconoce: ya te tenían visto. Te llevan a la cárcel."]);
       return;
     }
-    // con el brazo atado (tretas) te ve impedido: no te manda a las obras
-    if (rasgos(s) && !mujer && !s.llaga && !(s.conTretas && s.puesta === "atado") && s.cuerpo >= (CA.obrasForzadas || 99)) { obrasForzadas(s, r, dice); return; }
+    if (rasgos(s) && !mujer && !s.llaga && s.cuerpo >= (CA.obrasForzadas || 99)) { obrasForzadas(s, r, dice); return; }
     const azota = mujer && (s.conocido || espalda); // a la mujer que ya conoce, azotes (pregunta 12, opción B)
     const conocia = s.conocido;
     s.conocido = true;
@@ -837,8 +836,7 @@
     if (catalogada(s, id)) out.push(`La gente ya conoce ${t.nombre}: te dan como a cualquiera, y si la ronda te la ve, te detiene.`);
     if (t.sitioNuevo) out.push(s.votoSitios.includes(s.lugar) ? "Ya pediste para la cera en esta calle: el vecino se acuerda." : "Aquí no has pedido para la cera este verano.");
     if (t.sinHuir) out.push("Tendido no puedes huir: si llega la ronda, te coge.");
-    if (t.avisoExtra && !t.justicia) out.push("El corro se oye de lejos: avisarán a la ronda.");
-    if (t.justicia) out.push("El que da por miedo va a la justicia: te buscarán por tus señas.");
+    if (t.avisoExtra) out.push("El corro se oye de lejos: avisarán a la ronda.");
     if (t.puesta && t.puesta.paso && s.puesta !== id) out.push(`Te pondrás ${t.puesta.nombre}: andarás más despacio hasta que te las quites.`);
     return out;
   }
@@ -908,10 +906,6 @@
     // las señas: la queja lleva tu descripción (más donde más avisan); si te pillan con ella, más
     const senasAntes = s.senasTreta[id] || 0;
     if (t.fingir) s.senasTreta[id] = senasAntes + L[lugar].aviso + (repite && t.repite ? t.repite.senas || 0 : 0) + (pillado ? TR.senas : 0);
-    // el impedido (con el brazo atado) puede pedir delante de la ronda: si le ve, le mira el brazo
-    if (pillado && t.puesta && t.puesta.impedido && !cat && s.puesta === id) {
-      if (tirar(s, `impedido|${id}`) >= t.puesta.descubre) { s.impedidoPasa = true; pillado = null; }
-    }
     if (pillado) {
       lg.pillado++;
       const l1 = pillado === "llega"
@@ -923,8 +917,6 @@
       if (tuyo) { detenerTuyo(s, tuyo, "el muerto fingido", franja(Math.min(s.t, FIN - 1)), lugar); tuyo.cita = null; s.cita = null; }
       if (t.fingir && !cat && s.senasTreta[id] >= TR.catalogo) catalogar(s, id, lin);
       if (s.buscado) { lin.push(`El alguacil te mira despacio: ${senas(s)}.`); prender(s, "pidiendo, le reconoce la ronda", lin); return true; }
-      if (t.justicia) { lin.push("«Esto no es pedir: es quitar con un cuchillo», dice el alguacil. No te lleva a la cárcel de los pobres: te entrega a la justicia."); prender(s, "pidiendo con un cuchillo", lin); return true; }
-      if (t.puesta && t.puesta.impedido && s.puesta === id) { lin.push(`«Estira ese brazo», te dice. Lo estiras.`); olvidarTreta(s, id, true); logTreta(s, id).descubierta++; lin.push("Fingir para pedir es peor que pedir: te lleva a la cárcel."); detener(s, "fingidor", lin); return true; }
       lin.push(t.fingir ? "Pedir está prohibido en la ciudad desde la orden de pobres, y fingir es peor." : "Pedir está prohibido en la ciudad desde la orden de pobres, y vender coplas sin licencia también.");
       detener(s, `pidiendo con ${t.nombre}`, lin);
       return true;
@@ -945,11 +937,7 @@
     if (t.sitioNuevo && !repite) s.votoSitios.push(lugar);
     if (misa) s.misa = true;
     if (t.unaVez === "sitio") s.muertoSitios.push(lugar);
-    // el que da por miedo va a la justicia (si la palanca lo dice, no siempre): te buscan por tus señas
-    const denuncia = !!t.justicia && (t.denuncia == null || tirar(s, `denuncia|${id}`) < t.denuncia);
-    if (denuncia) { s.buscado = true; s.buscadoDia = s.dia; s.buscadoSabe = true; s.buscadoPor = "visto"; } // te ha visto la cara quien te dio
     const lin = [];
-    if (s.impedidoPasa) { s.impedidoPasa = false; lin.push("La ronda te ha visto pedir. El alguacil te mira el brazo atado y las muletas y pasa de largo: a los impedidos se les deja."); }
     if (misa) lin.push(`En la misa de prima, el cura te deja leer tu carta al acabar el sermón. Al salir, en la puerta, la gente te llena la mano: ${cosas(pan, bl) || "nada"}.`);
     else if (!pan && !bl && !panTuyo) lin.push(`Pides en ${L[lugar].nombre}, ${como}. No te dan nada.`);
     else lin.push(`Pides en ${L[lugar].nombre}, ${como}. ${t.franjas > 1 ? "En las dos franjas te dan" : "Te dan"} ${tuyo ? cosas(0, (pan + panTuyo) * TR.blancasPedazo + bl) + " para el entierro" : cosas(pan, bl)}.`);
@@ -959,7 +947,6 @@
       if (panTuyo) lin.push(`La mitad es de ${tuyo.nombre}, que con ella se compra pan. Tú te quedas ${bl === 1 ? "una blanca" : bl + " blancas"}.`);
     }
     if (sobra) lin.push(`No te cabe todo en el hatillo: se pierde${sobra === 1 ? " un pedazo" : "n " + sobra + " pedazos"}.`);
-    if (denuncia) lin.push("Te han visto bien la cara. Darán tus señas a la justicia, y unos días te buscarán por ellas.");
     else if (t.justicia) lin.push("El que te ha dado no levanta la vista. Ese no irá a la justicia.");
     if (cat) lin.push("La gente ya conoce esa: te dan como a cualquiera.");
     if (repite) lin.push("«¿Otra vez la cera?», rezonga un vecino.");
@@ -987,7 +974,6 @@
   }
   // te para la ronda llevando atrezo: puede descubrirte (fingir es peor que pedir: cárcel). Te quita el atrezo.
   const DESCUBRE = {
-    atado: ["«Estira ese brazo», te dice. Lo estiras. Te quita las muletas.", "Ni te pregunta: te quita las muletas. «Esa ya me la sé»."],
     cautivo: ["Te pregunta por el baño de Argel, por el nombre de tu amo, por la galera en que remabas. No sabes qué decir. Te quita las cadenas.", "Te mira las cadenas y se ríe: «Esa ya me la sé». Te las quita."],
     carta: ["Te pide la carta y mira el sello al sol: «Este sello no lo ha puesto ningún obispo». Se la queda.", "Te pide la carta y ni la lee: «Esa ya me la sé». Se la queda."],
     vergonzante: ["Te mira la ropa y luego las manos: «Buen paño para tan malas uñas».", "«Esa ya me la sé: harapos debajo del buen paño»."],
@@ -998,16 +984,7 @@
     if (p && p.puesta && (p.puesta.descubre || catalogada(s, p.id))) { id = p.id; pr = catalogada(s, id) ? 1 : p.puesta.descubre; }
     else if (s.mazo.includes("carta") && TT.carta && TT.carta.descubreParar) { id = "carta"; pr = catalogada(s, "carta") ? 1 : TT.carta.descubreParar; }
     if (!id) return false;
-    if (tirar(s, `descubre|${id}`) >= pr) {
-      // con el brazo atado, si el alguacil se lo cree, te deja: al impedido no se le echa
-      if (p && p.puesta && p.puesta.impedido && id === p.id) {
-        s.hoy.paradas++;
-        apunta(s, "impedido", `La ronda le para en ${L[s.lugar].corto} y le deja por impedido.`);
-        resultado(s, "Te para la ronda", [`En ${L[r].nombre} te para el alguacil. Te mira el brazo atado y las muletas: «Anda, sigue». Al impedido no se le echa.`], "neutro");
-        return true;
-      }
-      return false;
-    }
+    if (tirar(s, `descubre|${id}`) >= pr) return false;
     s.hoy.paradas++;
     const cat = catalogada(s, id);
     s.senasTreta[id] = (s.senasTreta[id] || 0) + TR.senas;
@@ -1163,7 +1140,7 @@
     s.aviso = { texto: `Te pones ${TT[id].puesta.nombre}.`, tono: "neutro" };
     return true;
   }
-  // quitarte las muletas o las cadenas (la ropa buena, no: la llevas todo el día)
+  // quitarte las cadenas (la ropa buena, no: la llevas todo el día)
   function puedeQuitar(s) { const t = s.puesta && TT[s.puesta]; return !!(s.conTretas && s.fase === "dia" && s.t + TR.ratos <= FIN && t && t.puesta && t.puesta.quitar); }
   function quitar(s) {
     if (!puedeQuitar(s)) return false;

@@ -391,14 +391,6 @@
             dice: "Una vieja te enseña su estampa de San Roque: «Pide para la cera del santo, que a eso no se niega nadie, y lo que te den es dinero, no pan. Pide sencillo: al que habla mucho no le dan. Y no vuelvas a la misma calle, que el vecino se acuerda»." },
           lugares: ["rua", "sanpablo", "plaza"], minDa: 2, bonus: 0, sitioNuevo: 1, repite: { aviso: 2, senas: 1 }, moneda: "blancas", fingir: true,
           como: "para la cera de San Roque, con la estampa en la mano" },
-        { id: "atado", pregon: "fingiéndose tullidos, con miembros atados y muletas", nombre: "el miembro atado", corto: "las muletas", boton: "Pedir con el brazo atado", quien: "todos",
-          aprende: { pan: 1, blancas: 2, quien: "un tullido",
-            dice: "Un tullido que no es tan tullido te enseña a atarte el brazo a la espalda: «Una venda, dos muletas y cara de pena. A la puerta de la iglesia te dan más que a un sano. Y al impedido le dejan pedir: si el alguacil te ve, te mira el brazo y, si se lo cree, pasa de largo. Pero con muletas se anda despacio, y si te manda estirarlo, estás perdido». Por enseñarte y por las muletas pide un pedazo de pan y dos blancas." },
-          lugares: ["catedral", "sanmartin", "sanesteban"], minDa: 2, bonus: 2, moneda: "pan", fingir: true,
-          // impedido (23-nov, tras medir): con ellas puestas, la ronda o un corchete que te ve pedir o te para no te detiene
-          // si pasas la mirada (la mitad de las veces); si no, fingidor
-          puesta: { paso: 1, descubre: 1 / 2, impedido: true, nombre: "las muletas", quitar: "Quitarte las muletas" },
-          como: "con el brazo atado a la espalda y las muletas" },
         { id: "carta", pregon: "con cartas y sellos que no ha dado el obispo", nombre: "la carta y el sello", corto: "la carta", boton: "Pedir con la carta", quien: "todos",
           compra: { lugar: "escuelas", franjas: [1, 3], blancas: 6, quien: "un estudiante pobre",
             dice: "Un estudiante pobre escribe cartas de limosna, con sello y todo, por seis blancas: «Dice que eres cautivo rescatado y que el obispo te da licencia para pedir. En la Rúa y en San Pablo no saben leer. Si la lees en misa un domingo, en la catedral, a prima, sacas en una mañana lo de una semana; pero eso, una vez. Y no se la enseñes a nadie que sepa leer»." },
@@ -416,12 +408,6 @@
             dice: "El buhonero vende pliegos de coplas de ciego, tres por tres blancas: «Cántalas donde haya mucha gente y vende los pliegos. Eso no es pedir: es vender. Pero el corro se oye de lejos»." },
           lugares: ["plaza", "rua"], minDa: 3, bonus: 0, moneda: "blancas", avisoExtra: 2, fingir: false, sinUsos: "se te han acabado los pliegos",
           como: "cantando coplas de ciego y vendiendo los pliegos" },
-        { id: "miedo", pregon: "con armas", nombre: "pedir con miedo", corto: "el cuchillo", boton: "Pedir con el cuchillo a la vista", quien: "hombre",
-          aprende: { pan: 2, blancas: 2, quien: "un mozo que vuelve de la guerra",
-            dice: "Un mozo que vuelve de la guerra te enseña su cuchillo: «Donde pasa poca gente, te pones delante y pides. Nadie te dice que no. Pero el que da por miedo va a la justicia, no a la ronda de pobres, y la justicia no azota: ahorca». Por enseñarte y por un cuchillo como el suyo, dos pedazos esta noche y dos blancas." },
-          lugares: ["sanpablo", "puerta", "sanesteban"], gente: [2], minDa: 1, bonus: 2, nuncaCero: true, moneda: "pan", blancasExtra: 1,
-          avisoExtra: 3, justicia: true, denuncia: 1, fingir: false, // denuncia: lo que va a la justicia quien da por miedo (1: siempre)
-          como: "plantado delante, con el cuchillo a la vista" },
         { id: "cautivo", pregon: "diciéndose cautivos de Argel, con cadenas", nombre: "el cautivo", corto: "las cadenas", boton: "Pedir con las cadenas de cautivo", quien: "hombre",
           compra: { lugar: "puerta", franjas: [0, 1, 2, 3, 4, 5], blancas: 4, quien: "un mozo que dice venir de Argel",
             dice: "Un mozo con cadenas al hombro dice que viene de Argel y te vende otras y la historia por cuatro blancas: «Cuéntala en la catedral y en la Rúa. Con una carta de rescate, mejor. Pesan, y si el alguacil te pregunta por el baño de Argel, más te vale saber qué decir»." },

@@ -2,7 +2,7 @@
 // política fija. La búsqueda del aplicado no sabe valorarlas; esto solo vale con OFICIO=1 (como HURTO).
 //
 // TRETAS=nunca          las tretas puestas, pero no aprende ni compra ninguna (la referencia: juega como sin ellas)
-// TRETAS=atado          solo esa (se pueden poner varias: TRETAS=carta,cautivo). Si alguna se compra, aprende también
+// TRETAS=carta          solo esa (se pueden poner varias: TRETAS=carta,cautivo). Si alguna se compra, aprende también
 //                       el voto, que es de donde salen las primeras blancas
 // TRETAS=todas          todas las que puede usar
 // TVB=0.4               lo que vale una blanca frente a un pedazo de pan cuando aún le hace falta (por defecto 0.4: con
@@ -16,7 +16,7 @@
 // treta que puede usar allí; al pedir, pide con ella si vale más que pedir sin más. Compra pan con blancas cuando no
 // tiene la cena o lleva demasiadas encima, y va a comprar las tretas de su lista cuando le llega. De noche acepta lo que
 // le ofrecen si está en su lista y no se queda sin cenar. Nunca se tiende de parida ni hace el muerto (no sabe
-// medir el riesgo de no poder huir) y se quita las muletas o las cadenas para andar.
+// medir el riesgo de no poder huir) y se quita las cadenas para andar.
 module.exports = function (R, E) {
   const P = R.PARAMS, TR = P.tretas || {}, FR = R.RATOS, FIN = E.FIN, PASO = R.MODOS.A.paso;
   const POL = process.env.TRETAS || "";
@@ -63,7 +63,7 @@ module.exports = function (R, E) {
     return c;
   }
   // de las que lleva, la mejor para pedir en un sitio y franja (la gente se estima con lo que hay), o null
-  // (tb: cuándo empezaría; con muletas o cadenas tiene que quitárselas y salir antes de que cierren)
+  // (tb: cuándo empezaría; con las cadenas tiene que quitárselas y salir antes de que cierren)
   function mejor(s, lugar, f, da, vp, soloOk, tb) {
     let best = null;
     for (const id of s.mazo) {
@@ -92,7 +92,7 @@ module.exports = function (R, E) {
     for (const id of s.mazo) {
       const b = mejor({ ...s, mazo: [id] }, l, fb, da, vp, false, tb);
       if (!b) continue;
-      const t = E.TT[id], ver = t.puesta && t.puesta.pillar ? t.puesta.pillar[da] : t.puesta && t.puesta.impedido ? t.puesta.descubre : 1;
+      const t = E.TT[id], ver = t.puesta && t.puesta.pillar ? t.puesta.pillar[da] : 1;
       const v = b.v * (1 - (pr || 0) * ver);
       if (!best || v > best) best = v;
     }
@@ -100,8 +100,7 @@ module.exports = function (R, E) {
     return SIEMPRE ? best + 1 : best;
   }
   // con la ronda o un corchete delante, ¿puede pedir sin que le vean? (la ropa buena, con mucha gente)
-  // (o con el brazo atado: al impedido le dejan pedir si se cree el brazo; lo arriesga si aún no le han detenido dos veces)
-  const escondeAqui = (s, id, e) => { const t = E.TT[id]; if (!t.puesta || !E.tretaAqui(s, id).ok) return false; if (t.puesta.pillar) return t.puesta.pillar[e.da >= 3 ? 3 : 2] === 0; return !!t.puesta.impedido && !E.catalogada(s, id) && s.detenciones < 2; };
+  const escondeAqui = (s, id, e) => { const t = E.TT[id]; if (!t.puesta || !E.tretaAqui(s, id).ok) return false; return !!t.puesta.pillar && t.puesta.pillar[e.da >= 3 ? 3 : 2] === 0; };
   function oculto(s, l, e) {
     if (!activo || !s.conTretas) return false;
     return s.mazo.some((id) => escondeAqui(s, id, e));

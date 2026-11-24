@@ -250,3 +250,34 @@ El novato acaba desterrado (83 %); el veterano, de hambre (57 %). Ninguna varian
 - **El veterano no pierde casi nada:** llega a la siega 3 puntos menos en un verano (y siega 5 más, porque al quedarse dentro come más) y 2-3 en la cadena.
 - **Las llaves, tal como están, no recuperan:** la ropa buena dada sube al 88 %, pero se la roban en la ribera (al final la conserva el 27 %); la carta dada baja al 81 %, porque la llevas siempre y la ronda que te para mira el sello (fingidor). Con llaves más baratas y seguras (palanca: ropa a 5 blancas y robada 1 de cada 6 noches; carta a 4 y el sello mirado 1 de cada 6), las dos dadas recuperan del todo (92 %).
 - **No se pueden pagar:** conseguidas, el oficio queda por debajo de no usar tretas (82 % frente a 84 %; sin presión, 89 % frente a 92 %). Compra la carta en el 18 % de los veranos y la ropa en el 1 % (con las baratas, en el 33 % y el 44 %, hacia el día 4). El voto le cuesta más de lo que le da: lo catalogan el día 4 y las blancas se van en pan y en la posada.
+
+## 10. La última vuelta: el Estudio, llaves baratas y en pan (24-nov, tarde)
+
+**Decidido (Sergio, 24-nov):** sí a las tres, en una sola vuelta: el tercer cierre (las Escuelas, con el hábito de estudiante), las llaves más baratas y que el ropavejero y el estudiante cobren también en pan. Es la última vuelta de ajuste con bots: cumpla o no el criterio, queda en la rama lista para jugar. Después Sergio juega una cadena entera con los dos botones y decide: si sirve, a `main`; si casi, se ajustan una o dos cosas que él haya notado; si no, se descartan tretas y presión. Sin más vueltas de bots entre medias.
+
+**Montado** [Claude, 24-nov, sin revisar]:
+
+- **Los alguaciles del Estudio:** aparecen entre el día 2 y el 4 en las Escuelas, a tercia o a nona, y cada mañana se van a la franja de las Escuelas donde más pan has sacado. Sin manteo te echan del patio (media franja, sin cárcel). Llave: **el hábito de estudiante**, treta nueva, solo para hombres; lo vende un estudiante pobre en las Escuelas (de prima a vísperas, menos a sexta) por 4 blancas o 2 pedazos de pan; se quema cuando el bedel te pregunta en latín (cuatro pases). Licencia nueva.
+- **Llaves más baratas y seguras:** la ropa buena, 5 blancas o 3 pedazos, y en la ribera te la roban 1 de cada 6 noches; la carta, 4 blancas o 2 pedazos, y la ronda que te para mira el sello 1 de cada 6 veces.
+- **Pagar en pan:** en la tienda salen las dos formas de pago. El oficio paga en pan si le quedan dos pedazos para cenar o lleva el hatillo lleno.
+
+**Lo medido** (un verano: 1.000, siega; cadena: 500, llega a la siega de 1557; sin presión, de los apartados anteriores):
+
+| | sin presión | tres cierres | con las llaves dadas | con las llaves conseguidas |
+|---|---|---|---|---|
+| oficio, un verano | 92 % | 84 % | 89 % | 75 % |
+| oficio, cadena, empieza el mozo | 48 % | 29 % | 47 % | 35 % |
+| oficio, cadena, empieza la moza | 86 % | 60 % | 67 % | 54 % |
+| veterano, un verano (siega; llega) | 24 %; 51 % | 28 %; 47 % | | |
+| veterano, cadena (mozo / moza) | 9 % / 13 % | 5 % / 7 % | | |
+| novato, un verano (siega; llega) | 28 %; 39 % | 19 %; 28 % | | |
+| novato, cadena (mozo / moza) | 6 % / 9 % | 3 % / 2 % | | |
+
+**¿Cumple el criterio?** A medias.
+
+- **Baja:** en un verano, 8 puntos (los mismos que con dos cierres: el Estudio, como los diputados, no muerde, porque el oficio se va a otro hueco); en la cadena, claramente (19 puntos con el mozo y 26 con la moza). Casi todo sigue siendo el guarda.
+- **Las llaves recuperan si las tienes:** en la cadena con el mozo, de 29 % a 47 %, casi como sin presión; en un verano, 5 puntos; con la moza, 7 (no puede usar el manteo).
+- **No se pagan:** conseguidas, el oficio queda por debajo de no usarlas (75 % en un verano; sin presión, 84 % frente a 92 %). Pagando solo con el pan que no cabe (TPAN=sobra), igual. Es en parte el bot: compra las tres llaves, vaya a necesitarlas o no, y usa el voto, que le cuesta más de lo que da.
+- **El veterano pierde 4 puntos en un verano** (llega del 51 % al 47 %; siega más, porque al quedarse dentro come más) **y la mitad en la cadena** (de 9 % a 5 %; la moza, de 13 % a 7 %). El novato pierde 11 en un verano. Esto no cumple «unos pocos puntos» en la cadena.
+
+**Qué mirar al jugar** (lo que los bots no dicen): si el guarda que te cierra la salida crea una decisión (salir antes, salir por la puerta de la ronda, dormir dentro, ponerte la ropa) o solo estorba; si compras la llave que te hace falta y si te compensa, en pan o en blancas; si los diputados y el Estudio te cambian dónde pides o simplemente vas al hueco de al lado; si notas cuándo se quema una llave; y, en la cadena, si desde 1553 lo que te mata es dormir dentro por culpa del guarda (para el hombre, una noche detenido es galeras).

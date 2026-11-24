@@ -392,11 +392,11 @@
           lugares: ["rua", "sanpablo", "plaza"], minDa: 2, bonus: 0, sitioNuevo: 1, repite: { aviso: 2, senas: 1 }, moneda: "blancas", fingir: true,
           como: "para la cera de San Roque, con la estampa en la mano" },
         { id: "carta", pregon: "con cartas y sellos que no ha dado el obispo", nombre: "la carta y el sello", corto: "la carta", boton: "Pedir con la carta", quien: "todos",
-          compra: { lugar: "escuelas", franjas: [1, 3], blancas: 6, quien: "un estudiante pobre",
-            dice: "Un estudiante pobre escribe cartas de limosna, con sello y todo, por seis blancas: «Dice que eres cautivo rescatado y que el obispo te da licencia para pedir. En la Rúa y en San Pablo no saben leer. Si la lees en misa un domingo, en la catedral, a prima, sacas en una mañana lo de una semana; pero eso, una vez. Y no se la enseñes a nadie que sepa leer»." },
+          compra: { lugar: "escuelas", franjas: [1, 3], blancas: 4, pan: 2, quien: "un estudiante pobre",
+            dice: "Un estudiante pobre escribe cartas de limosna, con sello y todo, por cuatro blancas o dos pedazos de pan: «Dice que eres cautivo rescatado y que el obispo te da licencia para pedir. En la Rúa y en San Pablo no saben leer. Si la lees en misa un domingo, en la catedral, a prima, sacas en una mañana lo de una semana; pero eso, una vez. Y no se la enseñes a nadie que sepa leer»." },
           lugares: ["rua", "sanpablo"], minDa: 2, bonus: 1, moneda: "blancas", fingir: true,
           misa: { lugar: "catedral", f: 0, tipos: ["domingo", "corpus"], tiradas: 3 },
-          descubreParar: 1 / 3, // la llevas siempre encima: si la ronda te para, a veces te la pide
+          descubreParar: 1 / 6, // la llevas siempre encima: si la ronda te para, a veces te la pide (1/3 hasta el 24-nov)
           como: "con tu carta de limosna, sello y todo" },
         { id: "parida", pregon: "fingiéndose recién paridas a las puertas de las iglesias", nombre: "la parida", corto: "la parida", boton: "Tenderte de parida (dos franjas)", quien: "mujer",
           aprende: { pan: 1, blancas: 2, quien: "una mujer",
@@ -415,11 +415,17 @@
           puesta: { paso: 1, descubre: 1 / 3, nombre: "las cadenas", quitar: "Quitarte las cadenas" },
           como: "con las cadenas al hombro, contando tu cautiverio en Argel" },
         { id: "vergonzante", pregon: "bien vestidos, fingiéndose vergonzantes", nombre: "el pobre vergonzante", corto: "la ropa buena", boton: "Pedir en voz baja, bien vestido", quien: "todos",
-          compra: { lugar: "rua", franjas: [0, 1, 2, 3, 4], blancas: 8, quien: "un ropavejero",
-            dice: "Un ropavejero te ofrece un sayo y unas calzas de buen paño, de segunda mano, por ocho blancas: «Con esto no pareces pobre. Pide en voz baja, como quien no está hecho a pedir: al vergonzante se le da. La ronda ni te mira. Pero no duermas con ella en la ribera, que allí te la pueden robar»." },
+          compra: { lugar: "rua", franjas: [0, 1, 2, 3, 4], blancas: 5, pan: 3, quien: "un ropavejero",
+            dice: "Un ropavejero te ofrece un sayo y unas calzas de buen paño, de segunda mano, por cinco blancas o tres pedazos de pan: «Con esto no pareces pobre. Pide en voz baja, como quien no está hecho a pedir: al vergonzante se le da. La ronda ni te mira. Pero no duermas con ella en la ribera, que allí te la pueden robar»." },
           lugares: ["rua", "sanpablo", "plaza"], minDa: 2, bonus: 0, moneda: "pan", fingir: true,
-          puesta: { noParan: true, pillar: { 2: 0.5, 3: 0 }, nombre: "la ropa buena" }, ribera: "roban", robo: 1 / 3, // una de cada tres noches en la ribera
+          puesta: { noParan: true, pillar: { 2: 0.5, 3: 0 }, nombre: "la ropa buena" }, ribera: "roban", robo: 1 / 6, // una de cada seis noches en la ribera (1/3 hasta el 24-nov por la tarde)
           como: "en voz baja, con tu ropa buena, como quien no está hecho a pedir" },
+        // la llave de las Escuelas (24-nov, decisión de Sergio): solo hombres, como los estudiantes
+        { id: "estudiante", pregon: "en hábito de estudiantes, sin serlo", nombre: "el hábito de estudiante", corto: "el manteo", boton: "Pedir con el manteo", quien: "hombre",
+          compra: { lugar: "escuelas", franjas: [0, 1, 3, 4], blancas: 4, pan: 2, quien: "un estudiante pobre",
+            dice: "Un estudiante pobre te vende un manteo viejo y te enseña cuatro latines, por cuatro blancas o dos pedazos de pan: «Con esto los alguaciles del Estudio no te echan de las Escuelas: al estudiante se le deja pedir. Pero si el bedel te pregunta en latín, más te vale saber qué contestar»." },
+          lugares: ["escuelas"], minDa: 2, bonus: 0, moneda: "pan", fingir: true,
+          como: "con el manteo y cuatro latines de memoria" },
         { id: "muerto", pregon: "para enterrar muertos que no lo están", nombre: "el muerto fingido", corto: "el muerto", boton: "Hacer el muerto", quien: "tuyo",
           aprende: { pan: 0, blancas: 0, quien: "tuyo",
             dice: "«Yo sé una que hacíamos en Madrid», dice {tuyo}. «Uno se tiende como muerto a la puerta de la iglesia, a la hora de vísperas, con una sábana, y el otro pide para enterrarlo. Con mucha gente se saca de una vez lo de un día. Hay que quedar la noche antes, y en cada iglesia, una vez. Y el muerto no puede correr»." },
@@ -458,6 +464,9 @@
         // los diputados: empiezan en un hueco de estos sitios (con gente que da y sin la ronda de costumbre a esa hora); desde
         // que están, cada mañana se van al sitio y la hora de estos donde más pan has sacado pidiendo (si son min pedazos o más)
         parroquia: { sitios: ["sanpablo", "puerta", "rua", "plaza", "catedral", "sanmartin"], franjas: [0, 1, 3, 4], min: 3 },
+        // los alguaciles del Estudio (24-nov, tarde): en las Escuelas, a una de estas franjas; se van a la de las Escuelas
+        // donde más pan has sacado. Llave: el hábito de estudiante (solo hombres)
+        estudio: { sitios: ["escuelas"], franjas: [1, 3], min: 3 },
       },
     },
   };
@@ -500,6 +509,7 @@
   // solo con «Presión» (prototipo, rama claude/tretas)
   const LICENCIAS_PRESION = [
     "Hubo guardas en las puertas de las ciudades castellanas (Ávila, 1518-1520; Burgos, 1565), sobre todo con peste; en Salamanca no consta. Que el guarda no deje pasar a los pobres a la hora en que más sales, y que la ropa buena le engañe, es del juego.",
+    "El maestrescuela tenía jurisdicción propia sobre el Estudio desde 1422; que sus alguaciles echaran a los pobres de las Escuelas está documentado para el siglo XVIII, no para 1545. Los mendigos «en hábito de estudiantes, sin serlo» son de Pérez de Herrera (1598).",
     "Los diputados de las parroquias examinaban a los pobres y la cédula era obligatoria para pedir (Cortes de 1525, ley de 1540); Soto cuenta en 1545 que iban por las calles escribiendo pobres. Que te echen de la calle si no la llevas, y que vayan adonde más sacas, es del juego.",
   ];
 

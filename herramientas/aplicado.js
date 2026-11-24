@@ -355,7 +355,7 @@ function ocasiones(cx, C, dentro) {
     for (const tb of ta % FR === 0 || process.env.ALINEA === "nunca" ? [ta] : process.env.ALINEA === "siempre" ? [sig] : [ta, sig]) {
       const fb = E.franja(tb);
       if (tb + FR > FIN) continue;
-      if (s.conPresion && E.diputadoCierra(s, l, tb) && !E.llaveAbre(s, "parroquia")) continue; // los diputados (cierres): sin la carta, te echan
+      if (s.conPresion && E.cierraSinLlave(s, l, tb)) continue; // los diputados (cierres): sin la carta, te echan
       const sale = tb + FR + PASO * SAL[l] <= FIN; // pedir y aún salir antes de que cierren
       if (!dentro && !sale) continue;
       let g, mucha;
@@ -419,7 +419,7 @@ function encargo(s, cx, C) {
   if (m.alin && cx.t % FR !== 0 && cx.t + FR <= FIN) { s._meta = m; return { a: "esperar" }; }
   if ((cx.rondaAqui && !TRC.oculto(s, cx.aqui, E.estado(s, cx.aqui, cx.d, cx.f))) || cx.t + FR > FIN || E.estado(s, cx.aqui, cx.d, cx.f).da < 2) return null;
   if (E.hayQuejas(s, cx.aqui) || (s.conTuyos && E.tuyosEn(s, cx.aqui).some((x) => x.pide))) return null; // ahí pide o acaba de pedir otro
-  if (s.conPresion && E.diputadoCierra(s, cx.aqui, cx.t) && !E.llaveAbre(s, "parroquia")) return null; // los diputados (cierres)
+  if (s.conPresion && E.cierraSinLlave(s, cx.aqui, cx.t)) return null; // los diputados (cierres)
   return { a: "pedir" };
 }
 // El oficio por su cuenta. Devuelve una jugada: { a: "pedir" | "esperar" | "acabar" | "trabajo" | "mover", d: destino }

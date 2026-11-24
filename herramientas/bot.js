@@ -226,7 +226,7 @@ function novato(s, rnd, g) {
   if (tr && tr.ok) return E.pedirTrabajo(s);
   const pd = o.acc.find((x) => x.id === "pedir");
   const yaAqui = s.pedidoHoy.some((p) => p.lugar === s.lugar);
-  const dip = s.conPresion && E.cierreEn(s, s.lugar, E.franja(Math.min(s.t, E.FIN - 1)), "parroquia"); // los diputados, si los tiene delante
+  const fh = E.franja(Math.min(s.t, E.FIN - 1)), dip = s.conPresion && (E.cierreEn(s, s.lugar, fh, "parroquia") || E.cierreEn(s, s.lugar, fh, "estudio")); // los diputados o el Estudio, si los tiene delante
   if (pd && pd.ok && !r && !yaAqui && !dip) return E.pedir(s);
   if (g.libres > 3) return E.esperar(s);
   const cand = o.movs.filter((x) => x.ok && E.L[x.destino].dentro && !(r && E.zonaDe(s, x.destino) === E.zonaDe(s, r)));

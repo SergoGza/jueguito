@@ -329,7 +329,7 @@
     else if (hayQuejas(s, s.lugar)) out.push("Hace poco han visto pedir aquí a otro.");
     if (s.t % R.RATOS !== 0) out.push("Empiezas a mitad de franja: la ronda puede llegar mientras pides.");
     // con la presión: el corchete de este sitio, ahora o a la franja siguiente (se sabe: lo pregonaron)
-    if (s.conPresion && diputadoCierra(s, s.lugar, s.t)) out.push(llaveAbre(s, "parroquia") ? "Aquí andan los diputados de la parroquia pidiendo la cédula: les enseñarás la carta." : "Aquí andan los diputados de la parroquia pidiendo la cédula: sin ella, te echarán de la calle.");
+    if (s.conPresion && diputadoCierra(s, s.lugar, s.t)) out.push(textoCierre(s, diputadoCierra(s, s.lugar, s.t)));
     if (s.conPresion && corcheteEn(s, s.lugar, f)) out.push("Aquí vigila un corchete a esta hora: si pides, te ve.");
     else if (s.conPresion && s.t % R.RATOS !== 0 && corcheteEn(s, s.lugar, f + 1)) out.push(`A ${nombreFranja(Math.min(f + 1, R.FRANJAS.length - 1)).toLowerCase()} vigila aquí un corchete: si empiezas ahora, te verá acabar.`);
     return out;
@@ -859,7 +859,7 @@
     if (t.sinHuir) out.push("Tendido no puedes huir: si llega la ronda, te coge.");
     if (t.avisoExtra) out.push("El corro se oye de lejos: avisarán a la ronda.");
     if (t.puesta && t.puesta.paso && s.puesta !== id) out.push(`Te pondrás ${t.puesta.nombre}: andarás más despacio hasta que te las quites.`);
-    if (s.conPresion && diputadoCierra(s, s.lugar, s.t)) out.push(llaveAbre(s, "parroquia") ? "Aquí andan los diputados de la parroquia pidiendo la cédula: les enseñarás la carta." : "Aquí andan los diputados de la parroquia pidiendo la cédula: sin ella, te echarán de la calle.");
+    if (s.conPresion && diputadoCierra(s, s.lugar, s.t)) out.push(textoCierre(s, diputadoCierra(s, s.lugar, s.t)));
     return out;
   }
   // pedir con una treta: como pedir, con lo que la treta cambia
@@ -1109,26 +1109,31 @@
       const rellena = tiene && !!t.usos && !(s.usos[t.id] > 0);
       if (tiene && !rellena) continue;
       let porque = "";
-      if (s.blancas < c.blancas) porque = `no tienes ${c.blancas} blancas`;
+      const okBl = s.blancas >= c.blancas, okPan = !!c.pan && s.pan >= c.pan; // (24-nov) el ropavejero y el estudiante cobran también en pan
+      if (!okBl && !okPan) porque = `no tienes ${c.blancas} blancas${c.pan ? ` ni ${c.pan} pedazos de pan` : ""}`;
       else if (FIN - s.t < TR.ratos) porque = "no te da tiempo";
-      out.push({ id: t.id, nombre: t.nombre, blancas: c.blancas, usos: t.usos || 0, rellena, ok: !porque, lleno: !tiene && s.mazo.length >= TR.mazo, porque, quien: c.quien, dice: c.dice });
+      out.push({ id: t.id, nombre: t.nombre, blancas: c.blancas, pan: c.pan || 0, okBl, okPan, usos: t.usos || 0, rellena, ok: !porque, lleno: !tiene && s.mazo.length >= TR.mazo, porque, quien: c.quien, dice: c.dice });
     }
     return out;
   }
-  function comprar(s, id, olvidarId) {
+  // moneda: "pan" o "blancas"; sin decir, en blancas si llegan
+  function comprar(s, id, olvidarId, moneda) {
     const x = tiendaAqui(s).find((y) => y.id === id);
     if (!x || !x.ok) return false;
+    const enPan = moneda === "pan" ? x.okPan : moneda === "blancas" ? false : !x.okBl;
+    if (enPan ? !x.okPan : !x.okBl) return false;
     if (x.lleno && !(olvidarId && olvidarTreta(s, olvidarId))) return false;
     const t = TT[id];
-    s.blancas -= x.blancas;
+    if (enPan) s.pan -= x.pan; else s.blancas -= x.blancas;
     if (!x.rellena) s.mazo.push(id);
     if (t.usos) s.usos[id] = t.usos;
     const lg = logTreta(s, id);
     if (!lg.desde) lg.desde = `${s.conCadena ? s.anio + ", " : ""}día ${s.dia}`;
     lg.compras = (lg.compras || 0) + 1;
     pasar(s, TR.ratos, "esperar", true);
-    apunta(s, "compra", `Compra ${t.nombre} en ${L[s.lugar].corto} (${x.blancas} blancas).`);
-    s.aviso = { texto: `Pagas ${x.blancas} blancas a ${x.quien}. ${x.rellena ? `Tienes otra vez ${t.nombre}.` : `Ya tienes ${t.nombre}.`}`, tono: "bien" };
+    const paga = enPan ? `${x.pan} ${x.pan === 1 ? "pedazo" : "pedazos"} de pan` : `${x.blancas} blancas`;
+    apunta(s, "compra", `Compra ${t.nombre} en ${L[s.lugar].corto} (${paga}).`);
+    s.aviso = { texto: `Pagas ${paga} a ${x.quien}. ${x.rellena ? `Tienes otra vez ${t.nombre}.` : `Ya tienes ${t.nombre}.`}`, tono: "bien" };
     return true;
   }
   // el pan también se compra (caro) y se vende (barato)
@@ -1278,7 +1283,8 @@
   //     más pan sacas; si pides delante, te piden la cédula y, sin ella, te echan de la calle. Llave: la carta.
   // Cada pase suma señas a la llave; con PARAMS.tretas.catalogo, te la quitan y queda catalogada (y quemada para tu gente).
   const CI = PR.cierres || {};
-  const LLAVE = { puerta: "vergonzante", parroquia: "carta" };
+  const LLAVE = { puerta: "vergonzante", parroquia: "carta", estudio: "estudiante" };
+  const ECHAN = ["parroquia", "estudio"]; // los cierres que te echan si pides delante sin la llave
   const conCierres = (s) => !!(s.conPresion && PR.modo === "cierres" && s.presion && s.presion.cierres);
   function cierreEn(s, l, f, tipo) {
     if (!conCierres(s) || f == null || f < 0 || f >= R.FRANJAS.length) return null;
@@ -1300,21 +1306,27 @@
     const c = cierreEn(s, g, f, "puerta");
     return c && !llaveAbre(s, "puerta") ? c : null;
   }
-  // ¿te echan los diputados si pides aquí ahora? (miran la franja en que empiezas y en la que acabas)
+  // ¿hay aquí, si pides ahora, quien te pida la cédula (los diputados) o te eche por no ser estudiante (el Estudio)?
+  // (miran la franja en que empiezas y en la que acabas)
   function diputadoCierra(s, l, t) {
     if (!conCierres(s) || t >= FIN) return null;
     const f0 = franja(t), f1 = franja(Math.min(t + R.RATOS - 1, FIN - 1));
-    return cierreEn(s, l, f0, "parroquia") || (f1 !== f0 ? cierreEn(s, l, f1, "parroquia") : null);
+    const en = (f) => ECHAN.map((k) => cierreEn(s, l, f, k)).find(Boolean) || null;
+    return en(f0) || (f1 !== f0 ? en(f1) : null);
   }
+  // ¿te echarían si pides aquí ahora? (hay cierre y no llevas su llave)
+  const cierraSinLlave = (s, l, t) => { const c = diputadoCierra(s, l, t); return !!c && !llaveAbre(s, c.tipo); };
   // pasar un cierre con la llave: suma señas; con bastantes, te la quitan y queda catalogada
   function pasaConLlave(s, tipo, lin) {
     const id = LLAVE[tipo];
     s.senasTreta[id] = (s.senasTreta[id] || 0) + (CI.senas || 1);
     s.presion.pases[tipo] = (s.presion.pases[tipo] || 0) + 1;
     logTreta(s, id).pases = (logTreta(s, id).pases || 0) + 1;
-    apunta(s, "llave", `Pasa ${tipo === "puerta" ? "al guarda de la puerta con la ropa buena" : "a los diputados con la carta"}.`);
+    apunta(s, "llave", `Pasa ${tipo === "puerta" ? "al guarda de la puerta con la ropa buena" : tipo === "estudio" ? "a los alguaciles del Estudio con el manteo" : "a los diputados con la carta"}.`);
     if (s.senasTreta[id] >= TR.catalogo) {
-      lin.push(tipo === "puerta" ? "Al pasar, el guarda te tira del paño: «Ese ya me lo sé. Harapos debajo». Te quita la ropa buena." : "El diputado mira el sello más despacio: «Este ya lo he visto. Esta carta no la ha firmado ningún cura». Se queda con ella.");
+      lin.push(tipo === "puerta" ? "Al pasar, el guarda te tira del paño: «Ese ya me lo sé. Harapos debajo». Te quita la ropa buena."
+        : tipo === "estudio" ? "El bedel te pregunta más en latín y ya no sabes qué contestar: «Tú no has pisado un aula». Te quita el manteo."
+        : "El diputado mira el sello más despacio: «Este ya lo he visto. Esta carta no la ha firmado ningún cura». Se queda con ella.");
       olvidarTreta(s, id, true);
       catalogar(s, id, lin);
     }
@@ -1323,17 +1335,23 @@
   function pasaDiputado(s) {
     const c = diputadoCierra(s, s.lugar, s.t);
     if (!c) return null;
-    if (llaveAbre(s, "parroquia")) {
-      const lin = ["Un diputado de la parroquia anda escribiendo pobres. Le enseñas la carta: mira el sello, te apunta y te deja."];
-      pasaConLlave(s, "parroquia", lin);
+    const est = c.tipo === "estudio";
+    if (llaveAbre(s, c.tipo)) {
+      const lin = [est ? "Un alguacil del Estudio te mira el manteo y te deja. El bedel te dice algo en latín y le contestas con lo que sabes." : "Un diputado de la parroquia anda escribiendo pobres. Le enseñas la carta: mira el sello, te apunta y te deja."];
+      pasaConLlave(s, c.tipo, lin);
       return lin;
     }
     pasar(s, CI.echa || 3, "perdido", false);
     s.presion.echado = (s.presion.echado || 0) + 1;
-    apunta(s, "echado", `Le echan los diputados de ${L[s.lugar].corto}.`);
-    resultado(s, "Te echan de la calle", [`Un diputado de la parroquia anda por ${L[s.lugar].nombre} escribiendo pobres. Te pide la cédula y no la tienes.`, "Te apunta en su lista y te echa de la calle: aquí, a esta hora, no pides."], "mal");
+    apunta(s, "echado", est ? `Le echan los alguaciles del Estudio de ${L[s.lugar].corto}.` : `Le echan los diputados de ${L[s.lugar].corto}.`);
+    resultado(s, est ? "Te echan de las Escuelas" : "Te echan de la calle", est
+      ? ["Los alguaciles del Estudio andan por las Escuelas echando a los que piden sin ser estudiantes.", "«Aquí no se pide sin manteo», te dicen, y te sacan del patio: aquí, a esta hora, no pides."]
+      : [`Un diputado de la parroquia anda por ${L[s.lugar].nombre} escribiendo pobres. Te pide la cédula y no la tienes.`, "Te apunta en su lista y te echa de la calle: aquí, a esta hora, no pides."], "mal");
     return true;
   }
+  const textoCierre = (s, c) => c.tipo === "estudio"
+    ? (llaveAbre(s, c.tipo) ? "Aquí andan los alguaciles del Estudio: llevas el manteo." : "Aquí andan los alguaciles del Estudio: sin manteo de estudiante, te echarán de las Escuelas.")
+    : (llaveAbre(s, c.tipo) ? "Aquí andan los diputados de la parroquia pidiendo la cédula: les enseñarás la carta." : "Aquí andan los diputados de la parroquia pidiendo la cédula: sin ella, te echarán de la calle.");
   const rango = (s, clave, [a, b]) => a + Math.floor(mundo(s, clave) * (b - a + 1));
   function crearCierres(s) {
     const cierra = s.circuito && s.circuito[5]; // la puerta que cierra la ronda este verano
@@ -1348,6 +1366,8 @@
       const h = libres.length ? libres[Math.floor(mundo(s, `cierre|hueco${i || ""}`) * libres.length)] : { l: cp.sitios[0], f: cp.franjas[0] };
       out.push({ tipo: "parroquia", lugar: h.l, f: h.f, desde: rango(s, `cierre|dd${i || ""}`, CI.desde) });
     }
+    const ce = CI.estudio;
+    if (ce) out.push({ tipo: "estudio", lugar: ce.sitios[Math.floor(mundo(s, "cierre|el") * ce.sitios.length)], f: ce.franjas[Math.floor(mundo(s, "cierre|ef") * ce.franjas.length)], desde: rango(s, "cierre|de", CI.desde) });
     return out;
   }
   // adónde va hoy cada cierre: el guarda, a la puerta y hora por la que más sales; los diputados, adonde más sacas
@@ -1361,7 +1381,7 @@
       if (!mejor || v > mejor.v) mejor = { v, l, f };
     };
     if (c.tipo === "puerta") for (const [k, n] of Object.entries(p.salidas)) ver(k, n, (l, f) => !(l === cierra && f === 5), CI.puerta.min);
-    else for (const [k, n] of Object.entries(p.saca)) ver(k, n, (l, f) => CI.parroquia.sitios.includes(l) && CI.parroquia.franjas.includes(f) && !p.cierres.some((o) => o !== c && o.tipo === c.tipo && s.dia >= o.desde && o.lugar === l && o.f === f), CI.parroquia.min);
+    else { const cd = CI[c.tipo]; for (const [k, n] of Object.entries(p.saca)) ver(k, n, (l, f) => cd.sitios.includes(l) && cd.franjas.includes(f) && !p.cierres.some((o) => o !== c && o.tipo === c.tipo && s.dia >= o.desde && o.lugar === l && o.f === f), cd.min); }
     return mejor;
   }
   function cierresAmanecer(s) {
@@ -1373,7 +1393,7 @@
       if (s.dia < c.desde) continue;
       const m = adondeCierre(s, c), antes = { lugar: c.lugar, f: c.f };
       if (m) { c.lugar = m.l; c.f = m.f; }
-      const quien = c.tipo === "puerta" ? "un guarda" : "los diputados";
+      const quien = c.tipo === "puerta" ? "un guarda" : c.tipo === "estudio" ? "a los alguaciles del Estudio" : "los diputados";
       if (s.dia === c.desde) { p.hoy.nuevos.push(c); apunta(s, "cierre", `Ponen ${quien} en ${L[c.lugar].corto} a ${nombreFranja(c.f).toLowerCase()}.`); }
       else if (antes.lugar !== c.lugar || antes.f !== c.f) { p.hoy.mueve.push({ c, antes }); apunta(s, "cierre", `Mueven ${quien} de ${L[antes.lugar].corto} a ${L[c.lugar].corto}, a ${nombreFranja(c.f).toLowerCase()}.`); }
     }
@@ -2384,7 +2404,7 @@
         const cs = s.cronica.filter((c) => c.tipo === "cierre");
         L2.push(cs.length ? cs.map((c) => `${cad ? c.anio + ", " : ""}día ${c.dia}: ${c.texto}`).join(" · ") : "No pusieron guarda ni diputados.");
         const n = (t) => s.cronica.filter((c) => c.tipo === t).length;
-        L2.push(`Le echaron los diputados: ${s.cronica.filter((c) => c.tipo === "echado" && /diputados/.test(c.texto)).length} · pasó con la llave: ${n("llave")}${s.conTretas ? ` · noches en la posada: ${n("posada")}` : ""}`);
+        L2.push(`Le echaron los diputados o el Estudio: ${s.cronica.filter((c) => c.tipo === "echado" && /diputados|Estudio/.test(c.texto)).length} · pasó con la llave: ${n("llave")}${s.conTretas ? ` · noches en la posada: ${n("posada")}` : ""}`);
       } else {
       const cs = s.cronica.filter((c) => c.tipo === "corchete");
       L2.push(cs.length ? cs.map((c) => `${cad ? c.anio + ", " : ""}día ${c.dia}: ${c.texto}`).join(" · ") : "No pusieron corchetes.");
@@ -2462,7 +2482,7 @@
     TT, tretaAqui, previsionTreta, pedirCon, catalogada, puedeUsarla, ofertaTxt, aprender, olvidar, tiendaAqui, comprar, mercadoPan,
     comprarPan, venderPan, puedeQuitar, quitar, citasPosibles, quedar, citaTxt,
     // la ciudad se endurece (prototipo) y la posada
-    corcheteEn, corcheteTipo, cierreEn, pasoCerrado, diputadoCierra, llaveAbre, LLAVE, puedePosada, pagarPosada, mesonCerrado, puedePoner, poner,
+    corcheteEn, corcheteTipo, cierreEn, pasoCerrado, diputadoCierra, cierraSinLlave, llaveAbre, LLAVE, puedePosada, pagarPosada, mesonCerrado, puedePoner, poner,
     empezarJornada(s) { if (s.fase === "amanecer") { s.fase = "dia"; s.noche = null; } },
   };
 })();

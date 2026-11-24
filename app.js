@@ -123,7 +123,7 @@
       if (s.conPresion && s.t < E.FIN && E.corcheteEn(s, l.id, E.franja(s.t))) g += `<rect x="${l.x - 21}" y="${l.y - 20}" width="11" height="11" rx="2" fill="var(--bad)"/><text x="${l.x - 15.5}" y="${l.y - 11.5}" font-size="8" fill="#fff" text-anchor="middle" font-weight="700">C</text>`;
       // los cierres: el guarda de la puerta (G) y los diputados (D), a esta hora (se saben: los pregonaron)
       const ci = s.conPresion && s.t < E.FIN && E.cierreEn(s, l.id, E.franja(s.t));
-      if (ci) g += `<rect x="${l.x - 21}" y="${l.y - 20}" width="11" height="11" rx="2" fill="var(--bad)"/><text x="${l.x - 15.5}" y="${l.y - 11.5}" font-size="8" fill="#fff" text-anchor="middle" font-weight="700">${ci.tipo === "puerta" ? "G" : "D"}</text>`;
+      if (ci) g += `<rect x="${l.x - 21}" y="${l.y - 20}" width="11" height="11" rx="2" fill="var(--bad)"/><text x="${l.x - 15.5}" y="${l.y - 11.5}" font-size="8" fill="#fff" text-anchor="middle" font-weight="700">${ci.tipo === "puerta" ? "G" : ci.tipo === "estudio" ? "E" : "D"}</text>`;
       if (pedidos[l.id]) g += `<ellipse cx="${l.x - 13}" cy="${l.y - 12}" rx="6" ry="3.6" fill="none" stroke="var(--bad)" stroke-width="1.2"/><circle cx="${l.x - 13}" cy="${l.y - 12}" r="1.6" fill="var(--bad)"/>`;
       if (aqui) g += `<circle cx="${l.x}" cy="${l.y}" r="3.5" fill="var(--accent)"/>`;
       g += `<text x="${l.x}" y="${l.y + 25}" font-size="${fs}" text-anchor="middle" fill="var(--ink)" font-weight="${aqui ? 700 : 400}" paint-order="stroke" stroke="var(--surface)" stroke-width="3">${esc(l.corto)}</text>`;
@@ -131,7 +131,7 @@
       g += `</g>`;
     }
     g += `</svg>`;
-    const ley = `<div class="leyenda" aria-hidden="true"><span><i style="background:var(--g3)"></i>mucha gente</span><span><i style="background:var(--g2)"></i>poca</span><span><i style="background:var(--g1)"></i>nadie que dé</span><span><i style="border-style:dashed"></i>sin ver</span><span style="color:var(--bad)">◆ ronda</span>${s.conPresion ? `<span style="color:var(--bad)">■ ${s.conPresion && s.presion && s.presion.cierres ? "G guarda · D diputados" : "corchete"} (a esta hora)</span>` : ""}<span style="color:var(--bad)">◉ te vieron pedir hoy</span><span>••• otros pobres pidiendo</span><span>Lo que no ves ahora sale más claro: es de cuando lo viste y puede haber cambiado.</span><span><b>Toca un sitio con borde discontinuo para ir.</b></span></div>`;
+    const ley = `<div class="leyenda" aria-hidden="true"><span><i style="background:var(--g3)"></i>mucha gente</span><span><i style="background:var(--g2)"></i>poca</span><span><i style="background:var(--g1)"></i>nadie que dé</span><span><i style="border-style:dashed"></i>sin ver</span><span style="color:var(--bad)">◆ ronda</span>${s.conPresion ? `<span style="color:var(--bad)">■ ${s.conPresion && s.presion && s.presion.cierres ? "G guarda · D diputados · E Estudio" : "corchete"} (a esta hora)</span>` : ""}<span style="color:var(--bad)">◉ te vieron pedir hoy</span><span>••• otros pobres pidiendo</span><span>Lo que no ves ahora sale más claro: es de cuando lo viste y puede haber cambiado.</span><span><b>Toca un sitio con borde discontinuo para ir.</b></span></div>`;
     return `<div class="mapa">${g}${ley}</div>`;
   }
 
@@ -266,9 +266,9 @@
     if (s.conPresion && s.presion.hoy) {
       const fr = (f) => R.FRANJAS[f].nombre.toLowerCase();
       for (const c of (s.presion.hoy.nuevos || []).filter((x) => !x.tipo)) notas.push(`Por la ciudad se dice que el corregidor ha puesto un corchete en ${L[c.lugar].nombre}, a ${fr(c.f)}: allí se quejaban mucho de los pobres.`);
-      const QUIEN = { puerta: (c) => `un guarda en ${L[c.lugar].nombre}, a ${fr(c.f)}: no deja pasar a los pobres, ni entrar ni salir`, parroquia: (c) => `a los diputados de la parroquia en ${L[c.lugar].nombre}, a ${fr(c.f)}: andan escribiendo pobres y piden la cédula` };
+      const QUIEN = { puerta: (c) => `un guarda en ${L[c.lugar].nombre}, a ${fr(c.f)}: no deja pasar a los pobres, ni entrar ni salir`, parroquia: (c) => `a los diputados de la parroquia en ${L[c.lugar].nombre}, a ${fr(c.f)}: andan escribiendo pobres y piden la cédula`, estudio: (c) => `a los alguaciles del Estudio en ${L[c.lugar].nombre}, a ${fr(c.f)}: echan a los que piden sin ser estudiantes` };
       for (const c of s.presion.hoy.nuevos || []) if (c.tipo) notas.push(`Por la ciudad se dice que el corregidor ha puesto ${QUIEN[c.tipo](c)}.`);
-      for (const { c, antes } of s.presion.hoy.mueve || []) notas.push(c.tipo === "puerta" ? `El guarda ya no está en ${L[antes.lugar].nombre} a ${fr(antes.f)}: desde hoy está en ${L[c.lugar].nombre}, a ${fr(c.f)}. «Por ahí salen los pordioseros», le han dicho.` : `Los diputados ya no andan por ${L[antes.lugar].nombre} a ${fr(antes.f)}: desde hoy, por ${L[c.lugar].nombre}, a ${fr(c.f)}. «Ahí es donde les dan», les han dicho.`);
+      for (const { c, antes } of s.presion.hoy.mueve || []) notas.push(c.tipo === "estudio" ? `Los alguaciles del Estudio ya no andan por ${L[antes.lugar].nombre} a ${fr(antes.f)}: desde hoy, a ${fr(c.f)}.` : c.tipo === "puerta" ? `El guarda ya no está en ${L[antes.lugar].nombre} a ${fr(antes.f)}: desde hoy está en ${L[c.lugar].nombre}, a ${fr(c.f)}. «Por ahí salen los pordioseros», le han dicho.` : `Los diputados ya no andan por ${L[antes.lugar].nombre} a ${fr(antes.f)}: desde hoy, por ${L[c.lugar].nombre}, a ${fr(c.f)}. «Ahí es donde les dan», les han dicho.`);
       const pu = s.presion.hoy.puerta, q = s.presion.hoy.quita;
       if (pu) notas.push(`${q ? `Han quitado el corchete de ${L[q.lugar].nombre}. ` : ""}Desde hoy vigila un corchete en ${L[pu.lugar].nombre} a ${fr(pu.f)}: «Ese mozo pasa por aquí todos los días», le han dicho.`);
     }
@@ -298,7 +298,7 @@
         if (r === id) partes.push(`<span class="ronda-txt">la ronda</span>`);
         if (s.conPresion && E.corcheteEn(s, id, f)) partes.push(`<span class="ronda-txt">un corchete vigilando</span>`);
         const ci = s.conPresion && E.cierreEn(s, id, f);
-        if (ci) partes.push(`<span class="ronda-txt">${ci.tipo === "puerta" ? "un guarda en la puerta" : "los diputados de la parroquia"}</span>`);
+        if (ci) partes.push(`<span class="ronda-txt">${ci.tipo === "puerta" ? "un guarda en la puerta" : ci.tipo === "estudio" ? "los alguaciles del Estudio" : "los diputados de la parroquia"}</span>`);
         h += `<li>${zona.length > 1 ? `<b>${esc(li.corto)}${id === s.lugar ? " (aquí)" : ""}:</b> ` : ""}${partes.map((p) => (p.startsWith("<span") ? p : esc(p))).join(" · ")}</li>`;
       }
       h += `</ul>`;
@@ -375,10 +375,16 @@
     // lo que se vende aquí
     for (const x of E.tiendaAqui(s)) {
       h += `<p class="small">${esc(x.dice)}</p>`;
-      const tit = x.rellena ? `Comprar pliegos (${x.blancas} blancas)` : `Comprar ${x.nombre} (${x.blancas} blancas)`;
-      if (!x.ok) bs.push(btn("comprar", tit, x.porque, { disabled: true }));
-      else if (!x.lleno) bs.push(btn("comprar", tit, `${TR.ratos} rato`, { data: { t: x.id } }));
-      else for (const id of s.mazo) bs.push(btn("comprar", `${tit} y dejar ${E.TT[id].nombre}`, `llevas ya ${TR.mazo}`, { data: { t: x.id, o: id } }));
+      const que = x.rellena ? "pliegos" : x.nombre;
+      // en blancas y, si el que vende lo acepta, en pan
+      const formas = [["blancas", `${x.blancas} blancas`, x.okBl]].concat(x.pan ? [["pan", `${x.pan} ${x.pan === 1 ? "pedazo" : "pedazos"} de pan`, x.okPan]] : []);
+      if (!x.ok) bs.push(btn("comprar", `Comprar ${que} (${formas.map((f) => f[1]).join(" o ")})`, x.porque, { disabled: true }));
+      else for (const [m, precio, ok] of formas) {
+        if (!ok) continue;
+        const tit = `Comprar ${que} (${precio})`;
+        if (!x.lleno) bs.push(btn("comprar", tit, `${TR.ratos} rato`, { data: { t: x.id, m } }));
+        else for (const id of s.mazo) bs.push(btn("comprar", `${tit} y dejar ${E.TT[id].nombre}`, `llevas ya ${TR.mazo}`, { data: { t: x.id, o: id, m } }));
+      }
     }
     const mp = E.mercadoPan(s);
     if (mp.compra) bs.push(btn("comprarPan", "Comprar un pedazo de pan", mp.compra.ok ? `${mp.compra.precio} blancas · ${TR.ratos} rato` : mp.compra.porque, { disabled: !mp.compra.ok }));
@@ -571,7 +577,7 @@
       <p>Las blancas se guardan de un día para otro, pero si la ronda te para con muchas encima, te las quita, y si te detienen, también. El pan se compra en la Plaza y en la Rúa y se vende a la ventera de la Puerta del Río, pero no al mismo precio.</p>
       <p>Las tretas se gastan: cada vez que pides con una donde alguien avisa, la queja lleva tu descripción. Cuando la autoridad ya la conoce, la pregona: desde entonces no te dan más que pidiendo sin más, y el alguacil que te para con ella te detiene. Lo pregonado vale para toda tu gente.</p>` : ""}
       ${conTretas && TR.posada ? `<p>En la Rúa y en la Plaza hay mesones: si acabas el día allí, por ${TR.posada.blancas} blancas duermes en el pajar y la ronda de noche no entra. Antes del alba te echan por la Puerta del Río. Los mesoneros no quieren pobres fijos: lo que te dicen, escúchalo.</p>` : ""}
-      ${conPresion ? (P.presion.modo === "cierres" ? `<h3>La ciudad se endurece</h3><p>A los pocos días de empezar el verano, el corregidor pone un guarda en una puerta de la muralla, a una hora, que no deja pasar a los pobres, y los diputados de la parroquia salen a escribir pobres a una calle, a una hora, y piden la cédula: sin ella, te echan. No se quedan quietos: van adonde más te ven pasar y adonde más te dan. Se sabe al amanecer, y en el mapa se ven los de la hora en que estás.</p>` : `<h3>La ciudad se endurece</h3><p>Durante el verano, el corregidor pone corchetes donde más se quejan de los pobres (de ti, de los tuyos y de los demás) y en la puerta por la que más pasas. Cada corchete vigila un sitio a una hora todos los días: si pides delante te ve, y si llegas te puede parar, como la ronda. De noche no vigilan. Se sabe al amanecer, y en el mapa se ven los de la hora en que estás.</p>`) : ""}
+      ${conPresion ? (P.presion.modo === "cierres" ? `<h3>La ciudad se endurece</h3><p>A los pocos días de empezar el verano, el corregidor pone un guarda en una puerta de la muralla, a una hora, que no deja pasar a los pobres, los diputados de la parroquia salen a escribir pobres a una calle, a una hora, y piden la cédula, y los alguaciles del Estudio echan de las Escuelas a los que piden sin ser estudiantes: sin cédula o sin manteo, te echan. No se quedan quietos: van adonde más te ven pasar y adonde más te dan. Se sabe al amanecer, y en el mapa se ven los de la hora en que estás.</p>` : `<h3>La ciudad se endurece</h3><p>Durante el verano, el corregidor pone corchetes donde más se quejan de los pobres (de ti, de los tuyos y de los demás) y en la puerta por la que más pasas. Cada corchete vigila un sitio a una hora todos los días: si pides delante te ve, y si llegas te puede parar, como la ronda. De noche no vigilan. Se sabe al amanecer, y en el mapa se ven los de la hora en que estás.</p>`) : ""}
       <h3>Lo que sabe cualquiera en Salamanca</h3><p>Las iglesias se llenan a la hora de misa (prima) y a vísperas. El mercado de la plaza, por la mañana; los jueves de mercado, hasta nona. Los estudiantes salen a tercia y a nona. A vísperas, la gente pasea por la Rúa. ${esc(fiestasTxt)}</p>
       <h3>Licencias históricas</h3><ul class="small">${(conTretas ? R.LICENCIAS.filter((x) => !x.startsWith("La limosna se da en pan")).concat(R.LICENCIAS_TRETAS || []) : R.LICENCIAS).concat(conPresion ? R.LICENCIAS_PRESION || [] : [], conHurto ? R.LICENCIAS_HURTO.filter((x) => conCadena || !x.startsWith("Desde la pragmática de 1552")) : [], conCadena ? R.LICENCIAS_CADENA : []).map((x) => `<li>${esc(x)}</li>`).join("")}</ul>
       <div class="btns">${btn("cerrar", "Cerrar", "", { cls: "primary" })}</div></div>`;
@@ -622,7 +628,7 @@
     if (s.conPresion) {
       if (s.presion.cierres) {
         const cs = s.presion.cierres.filter((c) => s.dia >= c.desde);
-        h += `<h3>El guarda y los diputados</h3>${cs.length ? `<ul class="ciudad">${cs.map((c) => `<li><b>${c.tipo === "puerta" ? "El guarda" : "Los diputados"}</b>: ${esc(L[c.lugar].corto)}, a ${R.FRANJAS[c.f].nombre.toLowerCase()}</li>`).join("")}</ul>` : `<p>Todavía no han puesto a nadie.</p>`}`;
+        h += `<h3>El guarda, los diputados y el Estudio</h3>${cs.length ? `<ul class="ciudad">${cs.map((c) => `<li><b>${c.tipo === "puerta" ? "El guarda" : c.tipo === "estudio" ? "Los alguaciles del Estudio" : "Los diputados"}</b>: ${esc(L[c.lugar].corto)}, a ${R.FRANJAS[c.f].nombre.toLowerCase()}</li>`).join("")}</ul>` : `<p>Todavía no han puesto a nadie.</p>`}`;
       }
       const cs = s.presion.corchetes.concat(s.presion.puerta ? [s.presion.puerta] : []);
       if (!s.presion.cierres) h += `<h3>Dónde vigilan los corchetes</h3>${cs.length ? `<ul class="ciudad">${cs.map((c) => `<li><b>${esc(L[c.lugar].corto)}</b>, a ${R.FRANJAS[c.f].nombre.toLowerCase()} (desde el ${esc(corto(c.dia))})</li>`).join("")}</ul>` : `<p>Todavía no han puesto ninguno.</p>`}`;
@@ -769,7 +775,7 @@
     pedirCon(d) { E.pedirCon(s, d.t); },
     aprender(d) { E.aprender(s, d.o || null); },
     olvidar(d) { if (!confirm(`¿Dejar ${E.TT[d.t].nombre}? Para volver a tenerla tendrás que aprenderla o comprarla otra vez.`)) return "nada"; E.olvidar(s, d.t); },
-    comprar(d) { E.comprar(s, d.t, d.o || null); E.comprobarNoche(s); },
+    comprar(d) { E.comprar(s, d.t, d.o || null, d.m || null); E.comprobarNoche(s); },
     comprarPan() { E.comprarPan(s); E.comprobarNoche(s); },
     venderPan() { E.venderPan(s); E.comprobarNoche(s); },
     quitar() { E.quitar(s); E.comprobarNoche(s); },

@@ -9,6 +9,8 @@
 //                       el pan a 2 blancas, media ración, menos el camino al mercado y el riesgo de llevarlas encima)
 // TDADA=1               empieza el verano con las tretas de su lista ya aprendidas o compradas (y sin el voto si no está
 //                       en la lista): mide lo que hace cada treta, sin lo que cuesta conseguirla
+// TPAN=sobra            con los cierres, paga las llaves en pan solo con el hatillo lleno (por defecto, también si le quedan
+//                       dos pedazos para cenar)
 // TSIEMPRE=1            usa las tretas de su lista siempre que puede, valgan o no más que pedir sin más (para medir
 //                       cada treta por sí misma)
 //
@@ -34,6 +36,11 @@ module.exports = function (R, E) {
   if (!DADA && [...quiere].some((id) => COMPRA.has(id) || ((TR.lista.find((t) => t.id === id) || {}).aprende || {}).blancas)) quiere.add("voto");
   for (const x of NO_SABE) quiere.delete(x);
   const mas = (o, k, n) => { o[k] = (o[k] || 0) + (n == null ? 1 : n); };
+  // ¿puede pagar? en blancas, guardándose para la cena si no la tiene; en pan (24-nov), si le quedan dos pedazos
+  // para cenar o lleva el hatillo lleno (el pan que sobra)
+  const conBlancas = (s, n) => s.blancas >= n + (s.pan < 2 ? 2 * TR.pan.compra : 0);
+  // TPAN=sobra: en pan solo con el hatillo lleno (lo que no le cabe)
+  const conPan = (s, n) => !!n && s.pan >= n && (process.env.TPAN === "sobra" ? s.pan >= P.panMax : s.pan - n >= 2 || s.pan >= P.panMax);
   // con los cierres (PRESION=1), la ropa buena y la carta son llaves: no pide con ellas (sumarían señas) salvo con TSIEMPRE
   const esLlave = (s, id) => !SIEMPRE && !!(s.conPresion && s.presion && s.presion.cierres && Object.values(E.LLAVE || {}).includes(id));
   const valorPan = (pan) => (pan < 2 ? 1 : pan < 4 ? 0.55 : 0);
@@ -152,9 +159,11 @@ module.exports = function (R, E) {
     if (s.mazo.includes("carta") && E.catalogada(s, "carta")) return { a: "olvidar", t: "carta" };
     // tretas de su lista que se venden aquí
     for (const x of E.tiendaAqui(s)) {
-      if (!quiere.has(x.id) || !x.ok || s.blancas < x.blancas + (s.pan < 2 ? 2 * TR.pan.compra : 0)) continue; // antes, la cena
-      if (x.lleno) { const cat = s.mazo.find((id) => E.catalogada(s, id)) || (s.mazo.includes("voto") && x.id !== "voto" ? "voto" : null); if (!cat) continue; return { a: "comprar", t: x.id, o: cat }; }
-      return { a: "comprar", t: x.id };
+      if (!quiere.has(x.id) || !x.ok) continue;
+      const m = conBlancas(s, x.blancas) ? "blancas" : conPan(s, x.pan) ? "pan" : null; // antes, la cena
+      if (!m) continue;
+      if (x.lleno) { const cat = s.mazo.find((id) => E.catalogada(s, id)) || (s.mazo.includes("voto") && x.id !== "voto" ? "voto" : null); if (!cat) continue; return { a: "comprar", t: x.id, o: cat, m }; }
+      return { a: "comprar", t: x.id, m };
     }
     // ir a comprar pan: a vísperas o antes de que cierre, si no tiene la cena y le llega
     if (s.pan < 2 && s.blancas >= precio && f >= 3) {
@@ -166,7 +175,7 @@ module.exports = function (R, E) {
       const sitios = [];
       for (const t of TR.lista) {
         if (!t.compra || !quiere.has(t.id) || s.mazo.includes(t.id) && !(t.usos && !(s.usos[t.id] > 0))) continue;
-        if (!E.puedeUsarla(s, t) || (s.quemadas || []).includes(t.id) || s.blancas < t.compra.blancas + (s.pan < 2 ? 2 * TR.pan.compra : 0)) continue;
+        if (!E.puedeUsarla(s, t) || (s.quemadas || []).includes(t.id) || E.catalogada(s, t.id) || !(conBlancas(s, t.compra.blancas) || conPan(s, t.compra.pan))) continue;
         if (s.mazo.length >= TR.mazo && !s.mazo.some((id) => E.catalogada(s, id) || id === "voto")) continue;
         sitios.push([t.compra.lugar, t.compra.franjas]);
       }
@@ -209,7 +218,7 @@ module.exports = function (R, E) {
   }
   function ejecutar(s, j) {
     if (j.a === "pedirCon") return E.pedirCon(s, j.t);
-    if (j.a === "comprar") return E.comprar(s, j.t, j.o || null);
+    if (j.a === "comprar") return E.comprar(s, j.t, j.o || null, j.m || null);
     if (j.a === "comprarPan") return E.comprarPan(s);
     if (j.a === "venderPan") return E.venderPan(s);
     if (j.a === "quitar") return E.quitar(s);

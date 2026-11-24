@@ -179,3 +179,31 @@ Con la presión, todas las tretas restan menos el vergonzante. El voto sin posad
 El novato acaba desterrado (83 %); el veterano, de hambre (57 %). Ninguna variante probada el 23-nov (sin las quejas de otros, corchetes que no paran o que solo ven, sin el de la puerta, solo el de la puerta, desde el día 5, más limosna, solo desde 1553) les devuelve más de un tercio de lo que pierden: la presión les quita el margen que no tienen, y al oficio solo el que le sobra.
 
 **Valoración de Claude:** la presión, tal como está, es dificultad para todos y pesa más sobre los flojos. Lo único que la abre es una salida concreta a un cierre concreto (la ropa buena para la puerta); las tretas de blancas no abren nada y restan. El miembro atado y pedir con miedo restan con presión y sin ella: no les veo arreglo con cifras; se quitan o se replantean desde cero.
+
+## 8. El rumbo (24-nov, pregunta abierta)
+
+**Decidido (Sergio, 24-nov):** se quitan el miembro atado y pedir con miedo (commit `acc6def`; quedan siete tretas y la llaga). No juega la versión con presión: las tretas restan y los flojos se hunden. **Criterio para la próxima versión** [Sergio, 24-nov]: sin tretas, el oficio baja claramente del 92 %, y con ellas recupera; el veterano no pierde más de unos pocos puntos. Se miden los dos siempre.
+
+**La pregunta:** A) quitar los corchetes por quejas y montar dos o tres parejas de cierre y salida, empezando por la puerta y el vergonzante; B) presión general suave, con las tretas como variedad; C) sin presión.
+
+**Lo medido para decidir** (siega en 1545; el oficio, 600-1.000 veranos; el veterano y el novato de `bot.js`, 1.000):
+
+| | oficio sin tretas | oficio con la mejor treta | veterano | novato |
+|---|---|---|---|---|
+| sin presión (C) | 92 % | 95 % (el vergonzante); ninguna mejora de verdad | 24 % | 28 % |
+| presión suave (B: corchetes por quejas desde el día 4, uno al día, hasta 3, sin el de la puerta) | 89 % | 92 % (el vergonzante); las demás, igual o peor | 13 % | 13 % |
+| solo el corchete de la puerta (como está) | 88-90 % | 93 % (el vergonzante) | 19 % | 14 % |
+| la presión de ahora | 62 % | 77 % (el vergonzante) | 2 % | 0 % |
+
+- **B no cumple el criterio:** la presión más suave que se ha probado apenas toca al oficio (−3) y le quita al veterano la mitad (−11). Los corchetes caen donde se acumulan quejas, y el que más quejas deja en los mismos sitios es el que juega peor.
+- **El corchete de la puerta, tal como está, tampoco:** al oficio le quita 2-4 puntos y al veterano 5. Cierra la ruta de todos, no la del que juega bien.
+- **Lo que dice que A puede llegar:** en el informe del aplicado, el oficio que solo pide en los sitios de costumbre de la ronda (sin las Escuelas, la calle de San Pablo, las puertas ni San Esteban) llega el 75 % en vez del 92 %. Sus huecos valen unos 17 puntos. Lo que no se sabe es cuánto pierde el veterano: hay que medirlo.
+
+**Propuesta para A** [Claude, 24-nov, sin decidir]:
+
+- **Común a las tres.** Sin corchetes por quejas. Cada verano la semilla decide qué cierres hay, desde qué día y dónde empiezan, sobre los huecos que deja la ronda ese verano (por construcción, los que conoce el que juega bien); desde que está, cada cierre se va al hueco de su clase donde más has sacado sin la ronda, como el de la puerta sigue a la puerta que más usas. Se pregona al amanecer y se ve en el mapa. Sin la llave, te echa: pierdes la franja y no sacas nada, sin cárcel, para que no muerda al que va justo. Con la llave pasas, pero cada pase suma señas en ese cierre, y con unas pocas se la sabe («Ese ya me lo sé»): ese verano ya no abre, y entre veranos queda quemada para tu gente, como el catálogo.
+- **1. La ruta: la puerta que la ronda no cierra ↔ el vergonzante.** El oficio entra la mitad de los días por la orilla y la Puerta de San Pablo y sale por la puerta que no cierra la ronda. El cierre es un guarda en esa puerta (la que la ronda deja libre ese verano), a la hora por la que más pasas. Base: con peste, los concejos ponían guardas en las puertas y tapiaban los postigos (Ávila, 1518-1520; Burgos, 1565; en `claude/borrador-veranos-salamanca.md`); en Salamanca, no encontrado: licencia. La llave: la ropa buena, porque el guarda mira los carros y los harapos (`pobre-vergonzante`).
+- **2. Las Escuelas ↔ el hábito de estudiante (treta nueva).** Las Escuelas a tercia y a nona son el hueco más seguro del oficio todos los veranos. El cierre: los alguaciles del Estudio echan a los pobres de los patios. Base: el maestrescuela tenía jurisdicción propia sobre el Estudio desde 1422, documentado; sus rondas contra los que piden, documentadas solo para 1736-1739: licencia para 1545. La llave: manteo y cuatro latines; la ley de 1540 dejaba pedir a los estudiantes fuera de su tierra, y Pérez de Herrera describe mendigos «en hábito de estudiantes, sin serlo», con palabras de mal latín, a los que se descubre preguntándoles más (`estudiante-pobre`, `ley-de-pobres-1540`). Se quema así: el bedel te pregunta en latín.
+- **3. Las calles de parroquia ↔ la carta y el sello.** La calle de San Pablo, que no está en ninguna costumbre de la ronda, y la Puerta del Río a prima son los otros huecos fijos del oficio. El cierre: los diputados de la parroquia «escribiendo pobres» por la calle y pidiendo la cédula. Base documentada para estos años: Soto, en 1545, cuenta que van caballeros con su gente por las calles a escribir a los pobres (`empadronamiento-publico`); sin cédula de diputado no se pide (Cortes de 1525; ley de 1540; `cedula-de-pobre`). La llave: la carta y el sello, que ya existe, como cédula falsa. Se quema así: el diputado mira el sello y, a la tercera, lo conoce. Se compra en las Escuelas, así que las parejas 2 y 3 se tocan.
+
+**Qué se mediría:** el oficio sin tretas y con cada llave, el veterano y el novato, en un verano y en la cadena, con las mismas semillas. Lo que haría falta para cumplir el criterio: el oficio sin tretas en torno al 75-80 %, con las llaves cerca del 90 % y el veterano a 3 puntos o menos de su 24 %.

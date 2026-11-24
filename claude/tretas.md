@@ -105,6 +105,8 @@ Opcional: los agentes de Claude (`herramientas/agentes/`) juegan la app real, le
 - **Se sabe**: al amanecer («Por la ciudad se dice que el corregidor ha puesto un corchete en las Escuelas, a tercia»), en el mapa (los de la hora en que estás) y en Recuerdos.
 - **La posada** (con las tretas): en la Rúa y en la Plaza, si acabas el día allí, por 3 blancas duermes en el pajar del mesón y la ronda de noche no entra.
 
+**Ojo (24-nov):** las cifras con presión de este apartado están infladas: el oficio daba el día por perdido cuando un corchete le vigilaba la puerta. Las buenas, en el 7.
+
 **Cómo se ajustó** (el oficio sin tretas, 1.000 veranos de 1545): sin presión, 92 % de siega. Solo el corchete de la puerta, 81 %; solo los de las quejas (desde el día 2 y hasta 8), 75 %; los dos así, 51 %. Con los de las quejas desde el día 3 y hasta 5, **62 %** (sin siega 18 %, hambre 19 %): es lo que queda.
 
 **Cada treta, dada desde el primer día** (`TDADA=1`: el bot empieza con ella, sin el voto si no es la suya; así se mide lo que hace la treta y no lo que cuesta conseguirla; 1.000 veranos; siega):
@@ -134,3 +136,46 @@ Opcional: los agentes de Claude (`herramientas/agentes/`) juegan la app real, le
 
 **Valoración de Claude:** la presión hace lo que se pedía: el oficio baja del 92 % al 62 % y las tretas de blancas pasan de neutras a valer 12 o 13 puntos, pero por la posada, no por ellas. Eso apunta a que las tretas importan cuando lo que dan abre una salida que la presión cierra, no cuando dan más. Cuidado: la posada puede ser la nueva rutina (dormir en el mesón cada noche que se pueda). Y la ropa buena, que es la que mejor encaja con la presión, hoy no funciona.
 
+## 7. Antes de jugar con los dos botones (24-nov)
+
+**Pedido (Sergio, 23-nov):** medir a los flojos con presión (novato y veterano, un verano y la cadena) y la cadena con presión, con tretas y sin ellas; que cada salida resuelva una sola cosa (la posada, solo la noche; la puerta, su propia salida, por ejemplo el vergonzante); que la posada se gaste con el uso; arreglar el vergonzante y decir si el miembro atado y pedir con miedo tienen arreglo o se quitan; explicar qué cambia en el corchete de la puerta respecto a lo descartado el 31 de octubre.
+
+**Montado** [Claude, 24-nov, sin revisar]:
+
+- **La posada, solo la noche.** Antes del alba el mesonero te echa por la Puerta del Río y esperas en el puente a que abran: la puerta se cruza igual.
+- **La posada se gasta:** cada mesón (Rúa, Plaza) te abre 2 noches por verano. La segunda te avisa («ya me han preguntado por ti»); si vuelves, no te abre y da parte: quedas fichado. De las dos formas propuestas, el mesonero que da parte (el corchete en el mesón no vigila de noche, que es cuando sirve la posada).
+- **El vergonzante, salida de la puerta:** en la ribera te pueden robar la ropa buena 1 de cada 3 noches (antes, siempre la primera), y puedes ponértela fuera antes de cruzar (un rato). Con ella, ni los corchetes ni la ronda te paran al llegar.
+- **El miembro atado:** con las muletas puestas, si la ronda o un corchete te ve o te para, al impedido le dejan pedir si pasa la mirada (la mitad de las veces); si no, fingidor.
+- **Pedir con miedo:** palanca de cuántas veces el que da va a la justicia (sigue en todas).
+- **Presión reajustada:** corchetes desde el día 2, dos al día, hasta 10. Palancas nuevas: desde qué verano en la cadena y si paran al que llega.
+- **Fallo del bot arreglado:** el oficio daba el día por perdido cuando un corchete le vigilaba la puerta. Con el arreglo, la presión de ayer (desde el día 3, uno al día, hasta 5) deja al oficio en el 82 %, no en el 62 %; por eso se ha subido.
+
+**El oficio, un verano** (1.000 veranos de 1545; siega; «dada»: el bot empieza con la treta, para medir lo que hace y no lo que cuesta conseguirla; «conseguida»: la aprende o la compra, con el voto para las primeras blancas):
+
+| | dada, sin presión | dada, con presión | conseguida, con presión |
+|---|---|---|---|
+| ninguna | 92 % | 62 % | 62 % |
+| el vergonzante | 95 % | **77 %** | 51 % |
+| el cautivo | 93 % | 57 % | 47 % |
+| las coplas | 92 % | 56 % | 51 % |
+| pedir con miedo | 69 % | 52 % | 51 % |
+| el voto | 92 % | 51 % | 52 % |
+| la carta | 88 % | 47 % | 51 % |
+| el miembro atado | 81 % | 45 % | 50 % |
+| todas | 66 % | 28 % | 44 % |
+
+Con la presión, todas las tretas restan menos el vergonzante. El voto sin posada da el 55 %: no es la posada, es el voto (cambia pan por blancas, se cataloga el día 4 en 9 de cada 10 veranos y el bot lo sigue usando). Conseguidas, todas quedan en torno al 50 % porque todas empiezan por el voto, y la ropa buena casi no se llega a comprar.
+
+**La cadena del oficio** (500 cadenas; llega a la siega de 1557): sin presión, sin tretas 48 %, el voto 49 %, todas 35 %. Con presión, sin tretas 20 %, el voto 13 %, el vergonzante (conseguido) 13 %, todas 8 %.
+
+**Los flojos** (bot.js; 1.000 veranos de 1545, siega / sin siega; la cadena, 500, llega a la siega de 1557):
+
+| | novato | veterano | novato, cadena | veterano, cadena |
+|---|---|---|---|---|
+| sin presión | 28 / 11 % | 24 / 27 % | 7 % | 10 % |
+| presión del 23-nov | 6 / 3 % | 7 / 18 % | 0 % | 1 % |
+| presión de ahora | 0 / 1 % | 2 / 4 % | 0 % | 0 % |
+
+El novato acaba desterrado (83 %); el veterano, de hambre (57 %). Ninguna variante probada el 23-nov (sin las quejas de otros, corchetes que no paran o que solo ven, sin el de la puerta, solo el de la puerta, desde el día 5, más limosna, solo desde 1553) les devuelve más de un tercio de lo que pierden: la presión les quita el margen que no tienen, y al oficio solo el que le sobra.
+
+**Valoración de Claude:** la presión, tal como está, es dificultad para todos y pesa más sobre los flojos. Lo único que la abre es una salida concreta a un cierre concreto (la ropa buena para la puerta); las tretas de blancas no abren nada y restan. El miembro atado y pedir con miedo restan con presión y sin ella: no les veo arreglo con cifras; se quitan o se replantean desde cero.

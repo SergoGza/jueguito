@@ -269,7 +269,7 @@
     if (s.yaNoBuscan) notas.push("Han pasado tres días de aquello. En la plaza ya han dado otras señas: por las tuyas no pregunta nadie.");
     if (s.lugar === "puerta" && s.cronica.some((c) => c.dia === s.dia - 1 && c.anio === s.anio && c.tipo === "prendido")) notas.push("Después, te sueltan en la Puerta del Río.");
     else if (s.lugar === "puerta" && s.cronica.some((c) => c.dia === s.dia - 1 && c.anio === s.anio && c.tipo === "detenido")) notas.push("Te sueltan al amanecer en la Puerta del Río.");
-    else if (L[s.lugar].dentro && (s.porDia[s.porDia.length - 1] || {}).duerme === "posada") notas.push(`Te despiertas en el pajar del mesón, en ${L[s.lugar].nombre}.`);
+    else if ((s.porDia[s.porDia.length - 1] || {}).duerme === "posada") notas.push("El mesonero te echó antes del alba por la Puerta del Río. Esperas en el puente a que abran.");
     else if (L[s.lugar].dentro) notas.push(`Te despiertas en un portal de ${L[s.lugar].nombre}.`);
     else notas.push("Te despiertas en la ribera.");
     h += `<div class="panel">${notas.map((x) => `<p>${esc(x)}</p>`).join("")}</div>`;
@@ -363,6 +363,7 @@
     if (lis.length) h += `<ul class="ciudad">${lis.join("")}</ul><p class="small muted">Llevas ${s.mazo.length} de ${TR.mazo}${s.llaga ? " (la llaga no cuenta)" : ""}.</p>`;
     const bs = [];
     if (E.puedeQuitar(s)) bs.push(btn("quitar", E.TT[s.puesta].puesta.quitar, `${TR.ratos} rato · andarás a paso normal`));
+    for (const id of s.mazo) if (E.puedePoner(s, id)) bs.push(btn("poner", `Ponerte ${E.TT[id].puesta.nombre}`, `${TR.ratos} rato${E.TT[id].puesta.paso ? " · andarás más despacio" : ""}`, { data: { t: id } }));
     // lo que se vende aquí
     for (const x of E.tiendaAqui(s)) {
       h += `<p class="small">${esc(x.dice)}</p>`;
@@ -451,6 +452,7 @@
     }
     // las tretas: te roban la ropa buena; alguien te ofrece una; quedas con uno de los tuyos para el muerto; la posada
     if (s.conTretas) {
+      if (s.mesonCerrado) h += `<div class="panel res mal"><p>El mesonero no te abre: «Te dije que no volvieras. Ya he dado parte de ti al alguacil». Duermes en un portal.</p></div>`;
       if (E.puedePosada(s)) h += `<div class="panel"><p>El mesonero te mira de arriba abajo: «${TR.posada.blancas} blancas por el pajar. Aquí la ronda no entra»</p></div><div class="btns">${btn("posada", "Pagar la posada", `${TR.posada.blancas} blancas · te quedan ${s.blancas - TR.posada.blancas}`)}</div>`;
       if (s.robada) h += `<div class="panel res mal"><p>${esc(s.robada)}</p></div>`;
       const of = E.ofertaTxt(s);
@@ -560,7 +562,7 @@
       ${conTretas ? `<h3>Las tretas</h3><p>Maneras de pedir que se aprenden de otros pobres (de noche, en la ribera, siempre hay alguien que enseña una) o se compran de día, en su sitio. Cada una tiene sus sitios, sus horas y su precio, en pan o en blancas; lo que da y lo que arriesga te lo dice quien te la enseña o te la vende. Llevas ${TR.mazo} como mucho: para otra, tienes que dejar una.</p>
       <p>Las blancas se guardan de un día para otro, pero si la ronda te para con muchas encima, te las quita, y si te detienen, también. El pan se compra en la Plaza y en la Rúa y se vende a la ventera de la Puerta del Río, pero no al mismo precio.</p>
       <p>Las tretas se gastan: cada vez que pides con una donde alguien avisa, la queja lleva tu descripción. Cuando la autoridad ya la conoce, la pregona: desde entonces no te dan más que pidiendo sin más, y el alguacil que te para con ella te detiene. Lo pregonado vale para toda tu gente.</p>` : ""}
-      ${conTretas && TR.posada ? `<p>En la Rúa y en la Plaza hay mesones: si acabas el día allí, por ${TR.posada.blancas} blancas duermes en el pajar y la ronda de noche no entra.</p>` : ""}
+      ${conTretas && TR.posada ? `<p>En la Rúa y en la Plaza hay mesones: si acabas el día allí, por ${TR.posada.blancas} blancas duermes en el pajar y la ronda de noche no entra. Antes del alba te echan por la Puerta del Río. Los mesoneros no quieren pobres fijos: lo que te dicen, escúchalo.</p>` : ""}
       ${conPresion ? `<h3>La ciudad se endurece</h3><p>Durante el verano, el corregidor pone corchetes donde más se quejan de los pobres (de ti, de los tuyos y de los demás) y en la puerta por la que más pasas. Cada corchete vigila un sitio a una hora todos los días: si pides delante te ve, y si llegas te puede parar, como la ronda. De noche no vigilan. Se sabe al amanecer, y en el mapa se ven los de la hora en que estás.</p>` : ""}
       <h3>Lo que sabe cualquiera en Salamanca</h3><p>Las iglesias se llenan a la hora de misa (prima) y a vísperas. El mercado de la plaza, por la mañana; los jueves de mercado, hasta nona. Los estudiantes salen a tercia y a nona. A vísperas, la gente pasea por la Rúa. ${esc(fiestasTxt)}</p>
       <h3>Licencias históricas</h3><ul class="small">${(conTretas ? R.LICENCIAS.filter((x) => !x.startsWith("La limosna se da en pan")).concat(R.LICENCIAS_TRETAS || []) : R.LICENCIAS).concat(conPresion ? R.LICENCIAS_PRESION || [] : [], conHurto ? R.LICENCIAS_HURTO.filter((x) => conCadena || !x.startsWith("Desde la pragmática de 1552")) : [], conCadena ? R.LICENCIAS_CADENA : []).map((x) => `<li>${esc(x)}</li>`).join("")}</ul>
@@ -759,6 +761,7 @@
     comprarPan() { E.comprarPan(s); E.comprobarNoche(s); },
     venderPan() { E.venderPan(s); E.comprobarNoche(s); },
     quitar() { E.quitar(s); E.comprobarNoche(s); },
+    poner(d) { E.poner(s, d.t); E.comprobarNoche(s); },
     quedar(d) { E.quedar(s, d.id, d.l); },
     pestana(d) { ui.pestana = d.id === "ciudad" ? "ciudad" : "acciones"; render(); return "modal"; },
     empezarDia() { E.empezarJornada(s); },

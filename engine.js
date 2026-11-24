@@ -361,7 +361,7 @@
     if (s.t >= FIN) { s.aviso = { texto: `Llegas a ${L[destino].nombre} ya de noche.`, tono: "neutro" }; return true; }
     // con la presión, si no está la ronda puede haber un corchete vigilando aquí a esta hora
     const rr0 = rondaEnTuZona(s);
-    const corch = !rr0 && !!s.conPresion && L[destino].dentro && corcheteEn(s, destino, franja(s.t));
+    const corch = !rr0 && !!s.conPresion && L[destino].dentro && corchetePara(s, destino, franja(s.t));
     const r = rr0 || (corch ? destino : null);
     if (r && (corch || zonaDe(s, destino) !== zonaAntes)) {
       s.hoy.encuentros++;
@@ -908,6 +908,10 @@
     // las señas: la queja lleva tu descripción (más donde más avisan); si te pillan con ella, más
     const senasAntes = s.senasTreta[id] || 0;
     if (t.fingir) s.senasTreta[id] = senasAntes + L[lugar].aviso + (repite && t.repite ? t.repite.senas || 0 : 0) + (pillado ? TR.senas : 0);
+    // el impedido (con el brazo atado) puede pedir delante de la ronda: si le ve, le mira el brazo
+    if (pillado && t.puesta && t.puesta.impedido && !cat && s.puesta === id) {
+      if (tirar(s, `impedido|${id}`) >= t.puesta.descubre) { s.impedidoPasa = true; pillado = null; }
+    }
     if (pillado) {
       lg.pillado++;
       const l1 = pillado === "llega"
@@ -920,6 +924,7 @@
       if (t.fingir && !cat && s.senasTreta[id] >= TR.catalogo) catalogar(s, id, lin);
       if (s.buscado) { lin.push(`El alguacil te mira despacio: ${senas(s)}.`); prender(s, "pidiendo, le reconoce la ronda", lin); return true; }
       if (t.justicia) { lin.push("«Esto no es pedir: es quitar con un cuchillo», dice el alguacil. No te lleva a la cárcel de los pobres: te entrega a la justicia."); prender(s, "pidiendo con un cuchillo", lin); return true; }
+      if (t.puesta && t.puesta.impedido && s.puesta === id) { lin.push(`«Estira ese brazo», te dice. Lo estiras.`); olvidarTreta(s, id, true); logTreta(s, id).descubierta++; lin.push("Fingir para pedir es peor que pedir: te lleva a la cárcel."); detener(s, "fingidor", lin); return true; }
       lin.push(t.fingir ? "Pedir está prohibido en la ciudad desde la orden de pobres, y fingir es peor." : "Pedir está prohibido en la ciudad desde la orden de pobres, y vender coplas sin licencia también.");
       detener(s, `pidiendo con ${t.nombre}`, lin);
       return true;
@@ -940,8 +945,11 @@
     if (t.sitioNuevo && !repite) s.votoSitios.push(lugar);
     if (misa) s.misa = true;
     if (t.unaVez === "sitio") s.muertoSitios.push(lugar);
-    if (t.justicia) { s.buscado = true; s.buscadoDia = s.dia; s.buscadoSabe = true; s.buscadoPor = "visto"; } // te ha visto la cara quien te dio
+    // el que da por miedo va a la justicia (si la palanca lo dice, no siempre): te buscan por tus señas
+    const denuncia = !!t.justicia && (t.denuncia == null || tirar(s, `denuncia|${id}`) < t.denuncia);
+    if (denuncia) { s.buscado = true; s.buscadoDia = s.dia; s.buscadoSabe = true; s.buscadoPor = "visto"; } // te ha visto la cara quien te dio
     const lin = [];
+    if (s.impedidoPasa) { s.impedidoPasa = false; lin.push("La ronda te ha visto pedir. El alguacil te mira el brazo atado y las muletas y pasa de largo: a los impedidos se les deja."); }
     if (misa) lin.push(`En la misa de prima, el cura te deja leer tu carta al acabar el sermón. Al salir, en la puerta, la gente te llena la mano: ${cosas(pan, bl) || "nada"}.`);
     else if (!pan && !bl && !panTuyo) lin.push(`Pides en ${L[lugar].nombre}, ${como}. No te dan nada.`);
     else lin.push(`Pides en ${L[lugar].nombre}, ${como}. ${t.franjas > 1 ? "En las dos franjas te dan" : "Te dan"} ${tuyo ? cosas(0, (pan + panTuyo) * TR.blancasPedazo + bl) + " para el entierro" : cosas(pan, bl)}.`);
@@ -951,7 +959,8 @@
       if (panTuyo) lin.push(`La mitad es de ${tuyo.nombre}, que con ella se compra pan. Tú te quedas ${bl === 1 ? "una blanca" : bl + " blancas"}.`);
     }
     if (sobra) lin.push(`No te cabe todo en el hatillo: se pierde${sobra === 1 ? " un pedazo" : "n " + sobra + " pedazos"}.`);
-    if (t.justicia && (pan || bl)) lin.push("Te han visto bien la cara. Darán tus señas a la justicia, y unos días te buscarán por ellas.");
+    if (denuncia) lin.push("Te han visto bien la cara. Darán tus señas a la justicia, y unos días te buscarán por ellas.");
+    else if (t.justicia) lin.push("El que te ha dado no levanta la vista. Ese no irá a la justicia.");
     if (cat) lin.push("La gente ya conoce esa: te dan como a cualquiera.");
     if (repite) lin.push("«¿Otra vez la cera?», rezonga un vecino.");
     if (t.fingir && !cat) {
@@ -988,7 +997,17 @@
     let id = null, pr = 0;
     if (p && p.puesta && (p.puesta.descubre || catalogada(s, p.id))) { id = p.id; pr = catalogada(s, id) ? 1 : p.puesta.descubre; }
     else if (s.mazo.includes("carta") && TT.carta && TT.carta.descubreParar) { id = "carta"; pr = catalogada(s, "carta") ? 1 : TT.carta.descubreParar; }
-    if (!id || tirar(s, `descubre|${id}`) >= pr) return false;
+    if (!id) return false;
+    if (tirar(s, `descubre|${id}`) >= pr) {
+      // con el brazo atado, si el alguacil se lo cree, te deja: al impedido no se le echa
+      if (p && p.puesta && p.puesta.impedido && id === p.id) {
+        s.hoy.paradas++;
+        apunta(s, "impedido", `La ronda le para en ${L[s.lugar].corto} y le deja por impedido.`);
+        resultado(s, "Te para la ronda", [`En ${L[r].nombre} te para el alguacil. Te mira el brazo atado y las muletas: «Anda, sigue». Al impedido no se le echa.`], "neutro");
+        return true;
+      }
+      return false;
+    }
     s.hoy.paradas++;
     const cat = catalogada(s, id);
     s.senasTreta[id] = (s.senasTreta[id] || 0) + TR.senas;
@@ -1027,12 +1046,13 @@
   // al anochecer: te quitas el atrezo; en la ribera te roban la ropa buena; y alguien te ofrece una treta
   function tretasAnochecer(s) {
     s.puesta = null; s.robada = null; s.oferta = null;
-    if (s.duerme === "raso" && s.mazo.includes("vergonzante") && TT.vergonzante.ribera === "roban") {
+    if (s.duerme === "raso" && s.mazo.includes("vergonzante") && TT.vergonzante.ribera === "roban" && tirar(s, "robaRopa") < (TT.vergonzante.robo != null ? TT.vergonzante.robo : 1)) {
       olvidarTreta(s, "vergonzante", true);
-      s.robada = "De madrugada, alguien te quita de debajo de la cabeza la ropa buena. En la ribera, el buen paño dura una noche.";
+      s.robada = "De madrugada, alguien te quita de debajo de la cabeza la ropa buena. En la ribera, el buen paño no dura.";
       apunta(s, "robada", "Le roban la ropa buena en la ribera.");
     }
     if (s.duerme === "raso") s.oferta = ofertaNoche(s);
+    s.mesonCerrado = mesonCerrado(s); // el mesón que ya dio parte no te abre
   }
   // cada noche en la ribera, alguien te ofrece una treta de las que puedes usar (la primera noche, la del voto)
   function ofertaNoche(s) {
@@ -1133,6 +1153,16 @@
     s.aviso = { texto: `La ventera te compra un pedazo de pan por ${m.precio === 1 ? "una blanca" : m.precio + " blancas"}.`, tono: "neutro" };
     return true;
   }
+  // ponerte el atrezo sin pedir (para cruzar una puerta bien vestido, por ejemplo): un rato
+  function puedePoner(s, id) { const t = TT[id]; return !!(s.conTretas && s.fase === "dia" && s.t + TR.ratos <= FIN && t && t.puesta && s.mazo.includes(id) && s.puesta !== id && puedeUsarla(s, t)); }
+  function poner(s, id) {
+    if (!puedePoner(s, id)) return false;
+    s.puesta = id;
+    pasar(s, TR.ratos, "esperar", true);
+    apunta(s, "pone", `Se pone ${TT[id].puesta.nombre}.`);
+    s.aviso = { texto: `Te pones ${TT[id].puesta.nombre}.`, tono: "neutro" };
+    return true;
+  }
   // quitarte las muletas o las cadenas (la ropa buena, no: la llevas todo el día)
   function puedeQuitar(s) { const t = s.puesta && TT[s.puesta]; return !!(s.conTretas && s.fase === "dia" && s.t + TR.ratos <= FIN && t && t.puesta && t.puesta.quitar); }
   function quitar(s) {
@@ -1163,7 +1193,7 @@
     s.pregonInvierno = s.catalogadas.filter((id) => !s.quemadas.includes(id));
     for (const id of s.pregonInvierno) s.quemadas.push(id);
     for (const tu of s.tuyos || []) tu.cita = null;
-    Object.assign(s, { catalogadas: [], senasTreta: {}, votoSitios: [], misa: false, muertoSitios: [], ofrecidas: [], cita: null, puesta: null, oferta: null, robada: null, blancas: 0 });
+    Object.assign(s, { catalogadas: [], senasTreta: {}, votoSitios: [], misa: false, muertoSitios: [], ofrecidas: [], cita: null, puesta: null, oferta: null, robada: null, blancas: 0, mesones: {} });
   }
 
   // ------------------------------------------------------------------ la ciudad se endurece (prototipo, rama claude/tretas)
@@ -1176,15 +1206,22 @@
     s.conPresion = true;
     s.presion = { q: {}, cruces: {}, corchetes: [], puerta: null, hoy: null, otrosHasta: 0, historia: [] };
   }
-  function corcheteEn(s, l, f) {
-    if (!s.conPresion || f == null || f < 0 || f >= R.FRANJAS.length) return false;
+  function corcheteEn(s, l, f) { return !!corcheteTipo(s, l, f); }
+  // «puerta» (el de la ruta) o «quejas»; null si no hay
+  function corcheteTipo(s, l, f) {
+    if (!s.conPresion || f == null || f < 0 || f >= R.FRANJAS.length) return null;
     const p = s.presion;
-    return p.corchetes.some((c) => c.lugar === l && c.f === f) || (!!p.puerta && p.puerta.lugar === l && p.puerta.f === f);
+    if (p.puerta && p.puerta.lugar === l && p.puerta.f === f) return "puerta";
+    return p.corchetes.some((c) => c.lugar === l && c.f === f) ? "quejas" : null;
   }
+  // ¿el corchete de aquí para al que llega? (el de la puerta, siempre; los de las quejas, si la palanca lo dice)
+  //  paran: true (todos), false (solo el de la puerta) o "nunca" (ninguno: solo ven pedir)
+  const corchetePara = (s, l, f) => { const k = corcheteTipo(s, l, f); return PR.paran !== "nunca" && (k === "puerta" || (k === "quejas" && PR.paran !== false)); };
   function sumaQueja(s, l, f, n) { if (!n || !L[l].dentro) return; const k = `${l}|${f}`; s.presion.q[k] = (s.presion.q[k] || 0) + n; }
   function presionAmanecer(s) {
     const p = s.presion;
     p.hoy = { nuevos: [], puerta: null, quita: null };
+    if ((s.verano || 0) < (PR.desdeVerano || 0)) return; // (palanca) en la cadena, la ciudad se endurece desde ese verano
     // las quejas de los otros pobres de los días pasados: donde pidieron y había gente, lo que avisa el sitio
     for (let d = p.otrosHasta + 1; d < s.dia; d++) {
       for (const l of DENTRO) for (let f = 0; f < R.FRANJAS.length; f++) if (L[l].aviso && genteDelDia(s, l, d, f) >= 2 && hayPobres(s, l, d, f)) sumaQueja(s, l, f, L[l].aviso * (PR.otros || 0));
@@ -1223,15 +1260,26 @@
     }
   }
   // la posada (con las tretas): lo que dan las blancas y no el pan. Dormir dentro sin la ronda de noche.
+  // Solo la noche: al amanecer el mesonero te echa por la Puerta del Río. Y se gasta: cada mesón te acoge
+  // TR.posada.veces noches por verano; la última te avisa, y si vuelves no te abre y da parte (te tiene fichado el alguacil).
+  const mesonDadoParte = (s, l) => ((s.mesones || {})[l] || 0) >= (TR.posada.veces || 99);
   function puedePosada(s) {
     const po = TR.posada;
-    return !!(s.conTretas && po && s.fase === "noche" && s.duerme === "portal" && po.en.includes(s.lugar) && s.blancas >= po.blancas);
+    return !!(s.conTretas && po && s.fase === "noche" && s.duerme === "portal" && po.en.includes(s.lugar) && s.blancas >= po.blancas && !mesonDadoParte(s, s.lugar));
   }
   function pagarPosada(s) {
     if (!puedePosada(s)) return false;
     s.blancas -= TR.posada.blancas;
     s.duerme = "posada";
+    s.mesones = s.mesones || {};
+    s.mesones[s.lugar] = (s.mesones[s.lugar] || 0) + 1;
     apunta(s, "posada", `Paga la posada en ${L[s.lugar].corto} (${TR.posada.blancas} blancas).`);
+    return true;
+  }
+  // de noche, en un mesón que ya ha dado parte: no te abre, y el alguacil ya tiene tus señas
+  function mesonCerrado(s) {
+    if (!s.conTretas || !TR.posada || s.fase !== "noche" || s.duerme !== "portal" || !TR.posada.en.includes(s.lugar) || !mesonDadoParte(s, s.lugar)) return false;
+    if (!s.conocido) { s.conocido = true; apunta(s, "meson", `El mesonero de ${L[s.lugar].corto} da parte de él.`); }
     return true;
   }
 
@@ -1318,7 +1366,11 @@
       dc += P.cena[comido];
       lin.push(comido === 2 ? "Cenas una ración entera." : comido === 1 ? "Cenas media ración." : "Te acuestas sin cenar.");
       if (s.trabajoHoy) { dc -= P.trabajo.cansancio; lin.push("Estás molido del trabajo."); }
-      if (s.duerme === "posada") lin.push(`Duermes en el pajar del mesón, en ${L[s.lugar].nombre}. La ronda de noche no entra en las posadas.`);
+      if (s.duerme === "posada") {
+        lin.push(`Duermes en el pajar del mesón, en ${L[s.lugar].nombre}. La ronda de noche no entra en las posadas.`);
+        if (mesonDadoParte(s, s.lugar)) lin.push("Al cobrarte, el mesonero baja la voz: «No vuelvas. Ya me han preguntado por ti, y la próxima vez tendré que dar parte».");
+        lin.push("Antes de que amanezca te echa por la Puerta del Río: «Los pobres, fuera de la muralla hasta que abran».");
+      }
       else if (s.duerme === "portal") {
         const rn = riesgoNoche(s);
         const p = P.nocheDentro[rn.nivel][s.conocido ? 1 : 0] * (s.llaga ? LL.noche : 1);
@@ -1383,6 +1435,7 @@
       return fin(s, "aguanta", "Al amanecer empieza la siega. El mayoral te mira y pasa de largo: «Tus brazos no me valen, muchacho». Has aguantado, pero no te quiere nadie.");
     }
     if (s.duerme === "carcel" || detenidoNoche) s.lugar = "puerta";
+    else if (s.duerme === "posada") s.lugar = "puente"; // al amanecer el mesonero te echa por la puerta: solo la noche
     s.dia++;
     empezarDia(s);
     return true;
@@ -2283,7 +2336,7 @@
     TT, tretaAqui, previsionTreta, pedirCon, catalogada, puedeUsarla, ofertaTxt, aprender, olvidar, tiendaAqui, comprar, mercadoPan,
     comprarPan, venderPan, puedeQuitar, quitar, citasPosibles, quedar, citaTxt,
     // la ciudad se endurece (prototipo) y la posada
-    corcheteEn, puedePosada, pagarPosada,
+    corcheteEn, corcheteTipo, puedePosada, pagarPosada, mesonCerrado, puedePoner, poner,
     empezarJornada(s) { if (s.fase === "amanecer") { s.fase = "dia"; s.noche = null; } },
   };
 })();

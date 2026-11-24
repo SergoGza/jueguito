@@ -380,7 +380,8 @@
       ratos: 1,           // comprar, vender o quitarte el atrezo
       registro: 6,        // con más blancas encima, si la ronda te para te las quita («mucho dinero para un pobre»)
       // la posada (prototipo de presión, 23-nov): lo que las blancas dan y el pan no. Dormir dentro sin la ronda de noche
-      posada: { blancas: 3, en: ["rua", "plaza"] },
+      // solo la noche (al amanecer te echan por la Puerta del Río) y se gasta: cada mesón, 2 noches por verano; si vuelves, da parte
+      posada: { blancas: 3, en: ["rua", "plaza"], veces: 2 },
       // el pan también se compra y se vende (no al mismo precio, para que pan y blancas no sean la misma moneda)
       pan: { compra: 2, compraEscasez: 3, venta: 1, compraEn: { plaza: [0, 1, 2, 3], rua: [0, 1, 2, 3, 4] }, ventaEn: { puerta: [0, 1, 2, 3, 4, 5] } },
       lista: [
@@ -392,9 +393,11 @@
           como: "para la cera de San Roque, con la estampa en la mano" },
         { id: "atado", pregon: "fingiéndose tullidos, con miembros atados y muletas", nombre: "el miembro atado", corto: "las muletas", boton: "Pedir con el brazo atado", quien: "todos",
           aprende: { pan: 1, blancas: 2, quien: "un tullido",
-            dice: "Un tullido que no es tan tullido te enseña a atarte el brazo a la espalda: «Una venda, dos muletas y cara de pena. A la puerta de la iglesia te dan más que a un sano, y la ronda no te manda a las obras. Pero con muletas se anda despacio, y si el alguacil te manda estirar el brazo, estás perdido». Por enseñarte y por las muletas pide un pedazo de pan y dos blancas." },
+            dice: "Un tullido que no es tan tullido te enseña a atarte el brazo a la espalda: «Una venda, dos muletas y cara de pena. A la puerta de la iglesia te dan más que a un sano. Y al impedido le dejan pedir: si el alguacil te ve, te mira el brazo y, si se lo cree, pasa de largo. Pero con muletas se anda despacio, y si te manda estirarlo, estás perdido». Por enseñarte y por las muletas pide un pedazo de pan y dos blancas." },
           lugares: ["catedral", "sanmartin", "sanesteban"], minDa: 2, bonus: 2, moneda: "pan", fingir: true,
-          puesta: { paso: 1, descubre: 1 / 2, nombre: "las muletas", quitar: "Quitarte las muletas" },
+          // impedido (23-nov, tras medir): con ellas puestas, la ronda o un corchete que te ve pedir o te para no te detiene
+          // si pasas la mirada (la mitad de las veces); si no, fingidor
+          puesta: { paso: 1, descubre: 1 / 2, impedido: true, nombre: "las muletas", quitar: "Quitarte las muletas" },
           como: "con el brazo atado a la espalda y las muletas" },
         { id: "carta", pregon: "con cartas y sellos que no ha dado el obispo", nombre: "la carta y el sello", corto: "la carta", boton: "Pedir con la carta", quien: "todos",
           compra: { lugar: "escuelas", franjas: [1, 3], blancas: 6, quien: "un estudiante pobre",
@@ -417,7 +420,7 @@
           aprende: { pan: 2, blancas: 2, quien: "un mozo que vuelve de la guerra",
             dice: "Un mozo que vuelve de la guerra te enseña su cuchillo: «Donde pasa poca gente, te pones delante y pides. Nadie te dice que no. Pero el que da por miedo va a la justicia, no a la ronda de pobres, y la justicia no azota: ahorca». Por enseñarte y por un cuchillo como el suyo, dos pedazos esta noche y dos blancas." },
           lugares: ["sanpablo", "puerta", "sanesteban"], gente: [2], minDa: 1, bonus: 2, nuncaCero: true, moneda: "pan", blancasExtra: 1,
-          avisoExtra: 3, justicia: true, fingir: false,
+          avisoExtra: 3, justicia: true, denuncia: 1, fingir: false, // denuncia: lo que va a la justicia quien da por miedo (1: siempre)
           como: "plantado delante, con el cuchillo a la vista" },
         { id: "cautivo", pregon: "diciéndose cautivos de Argel, con cadenas", nombre: "el cautivo", corto: "las cadenas", boton: "Pedir con las cadenas de cautivo", quien: "hombre",
           compra: { lugar: "puerta", franjas: [0, 1, 2, 3, 4, 5], blancas: 4, quien: "un mozo que dice venir de Argel",
@@ -427,9 +430,9 @@
           como: "con las cadenas al hombro, contando tu cautiverio en Argel" },
         { id: "vergonzante", pregon: "bien vestidos, fingiéndose vergonzantes", nombre: "el pobre vergonzante", corto: "la ropa buena", boton: "Pedir en voz baja, bien vestido", quien: "todos",
           compra: { lugar: "rua", franjas: [0, 1, 2, 3, 4], blancas: 8, quien: "un ropavejero",
-            dice: "Un ropavejero te ofrece un sayo y unas calzas de buen paño, de segunda mano, por ocho blancas: «Con esto no pareces pobre. Pide en voz baja, como quien no está hecho a pedir: al vergonzante se le da. La ronda ni te mira. Pero no duermas con ella en la ribera, que allí te la roban»." },
+            dice: "Un ropavejero te ofrece un sayo y unas calzas de buen paño, de segunda mano, por ocho blancas: «Con esto no pareces pobre. Pide en voz baja, como quien no está hecho a pedir: al vergonzante se le da. La ronda ni te mira. Pero no duermas con ella en la ribera, que allí te la pueden robar»." },
           lugares: ["rua", "sanpablo", "plaza"], minDa: 2, bonus: 0, moneda: "pan", fingir: true,
-          puesta: { noParan: true, pillar: { 2: 0.5, 3: 0 }, nombre: "la ropa buena" }, ribera: "roban",
+          puesta: { noParan: true, pillar: { 2: 0.5, 3: 0 }, nombre: "la ropa buena" }, ribera: "roban", robo: 1 / 3, // una de cada tres noches en la ribera
           como: "en voz baja, con tu ropa buena, como quien no está hecho a pedir" },
         { id: "muerto", pregon: "para enterrar muertos que no lo están", nombre: "el muerto fingido", corto: "el muerto", boton: "Hacer el muerto", quien: "tuyo",
           aprende: { pan: 0, blancas: 0, quien: "tuyo",
@@ -444,13 +447,16 @@
     // por la que más pasas. Las cifras son de Claude, sin revisar. Un corchete vigila un sitio a una hora todos los días
     // desde que lo ponen: si pides delante te ve, y si llegas te puede parar, como la ronda. Se dice al amanecer.
     presion: {
-      desde: 3,           // el primer día con corchetes (se ponen al amanecer, con las quejas de los días anteriores)
-      porDia: 1,          // corchetes nuevos cada mañana
-      max: 5,             // como mucho (con 5, el oficio sin tretas llega a la siega el 62 %; sin presión, el 92 %)
+      desde: 2,           // el primer día con corchetes (se ponen al amanecer, con las quejas de los días anteriores)
+      porDia: 2,          // corchetes nuevos cada mañana
+      max: 10,            // como mucho. Con desde 2, 2 al día y 10, el oficio sin tretas llega a la siega el 62 % (sin presión,
+                          // el 92 %); con desde 3, 1 al día y 5, el 82 % (el 62 % que salía antes era un fallo del bot, 24-nov)
       umbral: 2,          // quejas acumuladas que hacen falta en un sitio y hora
       otros: 1,           // peso de las quejas de otros pobres (cada franja en que piden donde hay gente, lo que avisa el sitio)
       franjas: [0, 1, 3, 4], // a sexta comen; a completas está la ronda en la puerta
       puerta: { desde: 3, min: 2 }, // desde el día 3, uno en la puerta y la franja por la que más has pasado (si son 2 o más veces); se mueve si cambias
+      desdeVerano: 0,     // en la cadena, desde qué verano (0: 1545; 1: 1553)
+      paran: true,        // si los corchetes paran al que llega: true (todos), false (solo el de la puerta), "nunca" (solo ven pedir)
     },
   };
 

@@ -286,9 +286,10 @@ function contexto(s, K) {
 }
 const quejas = (cx, f) => (f < 0 ? { n: 0, v: {} } : cx.av[f] || (cx.av[f] = misQuejas(cx.s, f)));
 // probabilidad de que la ronda esté en un sitio a una franja, con lo que sé
-function prRonda(cx, l, f2) {
+function prRonda(cx, l, f2, alLlegar) {
   if (f2 >= NF || !E.L[l].dentro) return 0;
-  if (cx.s.conPresion && E.corcheteEn(cx.s, l, f2)) return 1; // los corchetes se pregonan: sabe dónde y a qué hora vigilan
+  // los corchetes se pregonan: sabe dónde y a qué hora vigilan (al llegar, solo cuenta el que para)
+  if (cx.s.conPresion && E.corcheteEn(cx.s, l, f2) && (!alLlegar || (P.presion.paran !== "nunca" && (P.presion.paran !== false || E.corcheteTipo(cx.s, l, f2) === "puerta")))) return 1;
   if (f2 === cx.f) {
     if (cx.vista) return l === cx.vista ? 1 : 0; // la he visto en esta franja: sé dónde está
     if (l === cx.aqui) return 0;
@@ -331,7 +332,7 @@ function caminos(cx) {
     if (tau > FIN) continue;
     for (const v of E.VECINOS[u]) {
       if (hecho[v]) continue;
-      const r = tau < FIN ? prRonda(cx, v, E.franja(tau)) : 0;
+      const r = tau < FIN ? prRonda(cx, v, E.franja(tau), true) : 0;
       const c = coste[u] + PASO * WT + r * cx.cpar;
       if (c < coste[v]) { coste[v] = c; llega[v] = tau; primero[v] = u === cx.aqui ? v : primero[u]; riesgo[v] = riesgo[u] + r * cx.cpar; }
     }
@@ -424,7 +425,9 @@ function oficioLibre(s, cx, C) {
     if (o.l !== cx.aqui) return { a: "mover", d: C.primero[o.l], plan: { tipo: "ir", l: o.l, alin: o.tb !== o.ta } };
     return o.tb === cx.t ? { a: "pedir" } : { a: "esperar" };
   }
-  if (!E.L[cx.aqui].dentro) return { a: "acabar" };
+  // fuera de la muralla y sin nada que valga ahora: con la presión, esperar a que cambie la franja (un corchete en la
+  // puerta solo vigila a su hora) en vez de dar el día por perdido. Sin la presión, como siempre.
+  if (!E.L[cx.aqui].dentro) return s.conPresion && cx.t + FR <= 3 * FR ? { a: "esperar" } : { a: "acabar" };
   const g = salida(cx, C);
   if (!g) return { a: "acabar" }; // ya no llega: duerme donde está
   return { a: "mover", d: cx.aqui === g ? AFUERA[g] : C.primero[g], plan: { tipo: "salir", g } };

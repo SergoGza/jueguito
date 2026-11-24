@@ -15,6 +15,9 @@
 //                                                  que más ve; hambre, primero al más flaco; generoso, lo que piden aunque
 //                                                  se quede sin cenar
 //     OIDOS=0                                      el bot no usa lo que le cuentan para aprender la ronda
+//   PRESION=1 ...                                  (la ciudad se endurece: corchetes; rama claude/tretas). El novato solo ve
+//                                                  el corchete que tiene delante; el veterano y los demás saben dónde están,
+//                                                  porque se pregonan
 //   CADENA=1 ...                                   (varios veranos, 1545, 1553 y 1557, con los tuyos y los rasgos; j0.11; 1553 desde la j0.13)
 //     HEREDERO=cuerpo|pedro|catalina               a quién elige el bot cuando puede elegir (por defecto, el de más cuerpo)
 //     SEXO=mujer                                   el bot empieza como una moza (solo para medir los rasgos)
@@ -83,6 +86,7 @@ function cree(s, d, f) {
 }
 // probabilidad de que la ronda esté en la zona de un sitio a una franja, según lo que cree el bot (sin contar avisos)
 function probRonda(s, l, d, f) {
+  if (s.conPresion && d === s.dia && E.corcheteEn(s, l, f)) return 1; // los corchetes se pregonan
   const z = E.zonaDe(s, l);
   let pr = (R.RONDA.desvio * E.lugaresZona(s, z).filter((x) => E.L[x].dentro).length) / DENTRO_N;
   for (const [c, p] of Object.entries(cree(s, d, f))) if (E.zonaDe(s, c) === z) pr += (1 - R.RONDA.desvio) * p;
@@ -207,7 +211,7 @@ function novato(s, rnd, g) {
   const o = E.opciones(s);
   const vuelta = costes(s, s.lugar).ribera;
   if (o.quedan <= vuelta + (R.MODOS[s.modo].zona === "lugar" ? 2 : 0)) return volver(s);
-  const r = E.rondaEnTuZona(s);
+  const r = E.rondaEnTuZona(s) || (s.conPresion && s.t < E.FIN && E.corcheteEn(s, s.lugar, E.franja(s.t)) ? s.lugar : null);
   const tr = o.acc.find((x) => x.id === "trabajo");
   if (tr && tr.ok) return E.pedirTrabajo(s);
   const pd = o.acc.find((x) => x.id === "pedir");
@@ -260,7 +264,7 @@ function veterano(s, rnd, g, lambda, dentro) {
     const margen = E.L[s.lugar].dentro ? salida(s, s.lugar) : dr.ribera;
     if (o.quedan <= margen + (m.zona === "lugar" ? 1 : 0) || (s.t >= 30 && s.pan >= 2) || s.pan >= 4) return volver(s);
   }
-  const r = E.rondaEnTuZona(s);
+  const r = E.rondaEnTuZona(s) || (s.conPresion && s.t < E.FIN && E.corcheteEn(s, s.lugar, f) ? s.lugar : null);
   const tr = o.acc.find((x) => x.id === "trabajo");
   if (tr && tr.ok && s.cuerpo >= 4 && !s.llaga) return E.pedirTrabajo(s);
   const pd = o.acc.find((x) => x.id === "pedir");
@@ -318,7 +322,7 @@ const SOLO = process.env.BOTS ? process.env.BOTS.split(",") : process.env.LLAGA 
 function jugar(modo, bot, sem) {
   let st = 12345 + sem * 7919;
   const rnd = () => { st = (st * 1103515245 + 12345) & 0x7fffffff; return st / 0x7fffffff; };
-  const s = E.nueva(modo, "bot", String(sem), { llaga: !!LLAGA[bot], tuyos: !!process.env.TUYOS, cadena: !!process.env.CADENA, mujer: process.env.SEXO === "mujer", hurto: HC.activo });
+  const s = E.nueva(modo, "bot", String(sem), { llaga: !!LLAGA[bot], tuyos: !!process.env.TUYOS, cadena: !!process.env.CADENA, mujer: process.env.SEXO === "mujer", hurto: HC.activo, presion: !!process.env.PRESION });
   s._sabe = SABE[bot] || "aprende";
   s._veranos = []; // lo que le pasa en cada verano al que juega (para medir la cadena)
   const g = { clave: null, libres: 0 };

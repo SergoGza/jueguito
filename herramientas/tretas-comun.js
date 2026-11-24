@@ -92,7 +92,7 @@ module.exports = function (R, E) {
     for (const id of s.mazo) {
       const b = mejor({ ...s, mazo: [id] }, l, fb, da, vp, false, tb);
       if (!b) continue;
-      const t = E.TT[id], ver = t.puesta && t.puesta.pillar ? t.puesta.pillar[da] : 1;
+      const t = E.TT[id], ver = t.puesta && t.puesta.pillar ? t.puesta.pillar[da] : t.puesta && t.puesta.impedido ? t.puesta.descubre : 1;
       const v = b.v * (1 - (pr || 0) * ver);
       if (!best || v > best) best = v;
     }
@@ -100,9 +100,11 @@ module.exports = function (R, E) {
     return SIEMPRE ? best + 1 : best;
   }
   // con la ronda o un corchete delante, ¿puede pedir sin que le vean? (la ropa buena, con mucha gente)
+  // (o con el brazo atado: al impedido le dejan pedir si se cree el brazo; lo arriesga si aún no le han detenido dos veces)
+  const escondeAqui = (s, id, e) => { const t = E.TT[id]; if (!t.puesta || !E.tretaAqui(s, id).ok) return false; if (t.puesta.pillar) return t.puesta.pillar[e.da >= 3 ? 3 : 2] === 0; return !!t.puesta.impedido && !E.catalogada(s, id) && s.detenciones < 2; };
   function oculto(s, l, e) {
     if (!activo || !s.conTretas) return false;
-    return s.mazo.some((id) => { const t = E.TT[id]; return t.puesta && t.puesta.pillar && t.puesta.pillar[e.da >= 3 ? 3 : 2] === 0 && E.tretaAqui(s, id).ok; });
+    return s.mazo.some((id) => escondeAqui(s, id, e));
   }
   const tieneBlancas = (s) => activo && !!s.conTretas && s.mazo.some((id) => E.TT[id].moneda !== "pan" && !NO_SABE.has(id));
   // al pedir: con qué treta (o null, sin ninguna)
@@ -110,7 +112,7 @@ module.exports = function (R, E) {
     if (!activo || !s.conTretas) return null;
     const e = E.estado(s, s.lugar, s.dia, E.franja(s.t));
     const vigilado = !!E.rondaEnTuZona(s) || (!!s.conPresion && E.corcheteEn(s, s.lugar, E.franja(s.t)));
-    if (vigilado) { const id = s.mazo.find((x) => { const t = E.TT[x]; return t.puesta && t.puesta.pillar && t.puesta.pillar[e.da >= 3 ? 3 : 2] === 0 && E.tretaAqui(s, x).ok; }); return id || null; }
+    if (vigilado) return s.mazo.find((x) => escondeAqui(s, x, e)) || null;
     const vp = valorPan(s.pan);
     const b = mejor(s, s.lugar, E.franja(s.t), e.da >= 3 ? 3 : e.gente === 2 ? 2 : e.da, vp, true, s.t);
     if (!b) return null;
@@ -140,6 +142,8 @@ module.exports = function (R, E) {
     const hambre = s.pan < 2 && s.blancas >= precio && (f >= 2 || s.pan === 0);
     const sobra = s.blancas > TR.registro && s.pan < P.panMax;
     if (mp.compra && mp.compra.ok && (hambre || sobra)) return { a: "comprarPan" };
+    // la ropa buena: se la pone fuera de la muralla, antes de cruzar la puerta (si no le conocen, no le paran)
+    if (s.mazo.includes("vergonzante") && s.puesta !== "vergonzante" && !s.conocido && !E.L[s.lugar].dentro && E.puedePoner(s, "vergonzante")) return { a: "poner", t: "vergonzante" };
     // tretas de su lista que se venden aquí
     for (const x of E.tiendaAqui(s)) {
       if (!quiere.has(x.id) || !x.ok || s.blancas < x.blancas + (s.pan < 2 ? 2 * TR.pan.compra : 0)) continue; // antes, la cena
@@ -168,8 +172,9 @@ module.exports = function (R, E) {
   // antes de ejecutar lo que dice el oficio: pedir con treta, o quitarse lo que pesa para andar
   // la posada: si iba a salir de la muralla (o a dormir en un portal) y le llegan las blancas, duerme en el mesón
   const PO = TR.posada;
+  const mesonLibre = (s, l) => ((s.mesones || {})[l] || 0) < (PO.veces || 99);
   function quierePosada(s) {
-    if (!PO || !activo || !s.conTretas || POSADA === "nunca") return false;
+    if (!PO || !activo || !s.conTretas || POSADA === "nunca" || !PO.en.some((l) => mesonLibre(s, l))) return false;
     const precioPan = E.escasez(s, s.dia) ? TR.pan.compraEscasez : TR.pan.compra;
     return s.blancas >= PO.blancas + Math.max(0, 2 - s.pan) * precioPan;
   }
@@ -177,9 +182,9 @@ module.exports = function (R, E) {
     if (!activo || !s.conTretas || !j) return j;
     const saliendo = (j.a === "mover" && ((j.plan && j.plan.tipo === "salir") || (s._meta && s._meta.tipo === "salir"))) || (j.a === "acabar" && E.L[s.lugar].dentro);
     if (saliendo && quierePosada(s)) {
-      if (PO.en.includes(s.lugar)) { s._meta = null; return { a: "acabar" }; }
+      if (PO.en.includes(s.lugar) && mesonLibre(s, s.lugar)) { s._meta = null; return { a: "acabar" }; }
       let best = null;
-      for (const l of PO.en) { const d = E.DIST[s.lugar][l]; if (s.t + d * (PASO + (pesa(s) ? 1 : 0)) <= FIN && (!best || d < best.d)) best = { l, d }; }
+      for (const l of PO.en.filter((x) => mesonLibre(s, x))) { const d = E.DIST[s.lugar][l]; if (s.t + d * (PASO + (pesa(s) ? 1 : 0)) <= FIN && (!best || d < best.d)) best = { l, d }; }
       if (best) { s._meta = null; return { a: "mover", d: paso(s, best.l) }; }
     }
     if (j.a === "pedir") { const id = elegir(s); if (id) return { a: "pedirCon", t: id }; }
@@ -202,6 +207,7 @@ module.exports = function (R, E) {
     if (j.a === "comprarPan") return E.comprarPan(s);
     if (j.a === "venderPan") return E.venderPan(s);
     if (j.a === "quitar") return E.quitar(s);
+    if (j.a === "poner") return E.poner(s, j.t);
     return null;
   }
   // las cuentas de una tanda

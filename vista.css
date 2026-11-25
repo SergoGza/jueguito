@@ -1,0 +1,142 @@
+/* Liber Vagatorum · vista 2D (rama claude/vista). Encima de styles.css, que sigue valiendo para las demás pantallas.
+   Moñigotes, nada de arte: colores planos para distinguir quién es quién. */
+:root {
+  --v-fuera: #dcdcbf; --v-dentro: #efe5cf; --v-calle: #e0cfab; --v-plaza: #e5d4ae; --v-piedra: #d6c5a0; --v-escenario: rgba(255, 250, 240, 0.6);
+  --bld: #f8f0e1; --bld-line: #8a7558; --tejado: #c48c5e; --ventana: #f8f0e1;
+  --f-gente: #6f5a44; --f-paso: #b2a18b; --f-pobre: #a8743c; --f-cuenco: #6b4a2a; --f-ronda: #1c1816; --f-corchete: #4d423b; --f-vara: #7a5a2a;
+  --f-yo: var(--accent); --f-hatillo: #c9a15a; --f-pedro: #3d6b98; --f-cata: #4c8a47; --f-vigia: #5b3a6e; --f-vecino: #7d6b58; --f-capataz: #8a5a2b;
+  --toldo: #b5473a; --f-junco: #7d8f5a; --luz-k: 1;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --v-fuera: #1c2118; --v-dentro: #282119; --v-calle: #3a3024; --v-plaza: #342a1f; --v-piedra: #4a3f30; --v-escenario: rgba(255, 240, 220, 0.07);
+    --bld: #3b3128; --bld-line: #a8916f; --tejado: #7c5036; --ventana: #4a3f30;
+    --f-gente: #cdb99c; --f-paso: #7d6f5f; --f-pobre: #d49c55; --f-cuenco: #e2c38c; --f-ronda: #f1e8d8; --f-corchete: #bcae98; --f-vara: #d9b46a;
+    --f-hatillo: #d9b46a; --f-pedro: #7fb0e0; --f-cata: #8dcc87; --f-vigia: #c79ae0; --f-vecino: #b8a68f; --f-capataz: #d59a5c; --toldo: #d0675a; --f-junco: #8ea36a; --luz-k: 0.5;
+  }
+}
+:root[data-theme="dark"] {
+  --v-fuera: #1c2118; --v-dentro: #282119; --v-calle: #3a3024; --v-plaza: #342a1f; --v-piedra: #4a3f30; --v-escenario: rgba(255, 240, 220, 0.07);
+  --bld: #3b3128; --bld-line: #a8916f; --tejado: #7c5036; --ventana: #4a3f30;
+  --f-gente: #cdb99c; --f-paso: #7d6f5f; --f-pobre: #d49c55; --f-cuenco: #e2c38c; --f-ronda: #f1e8d8; --f-corchete: #bcae98; --f-vara: #d9b46a;
+  --f-hatillo: #d9b46a; --f-pedro: #7fb0e0; --f-cata: #8dcc87; --f-vigia: #c79ae0; --f-vecino: #b8a68f; --f-capataz: #d59a5c; --toldo: #d0675a; --f-junco: #8ea36a; --luz-k: 0.5;
+}
+
+/* ------------------------------------------------------------------ la pantalla del día: cabecera, escena, tarjeta, botones */
+body.v-en-dia { overflow: hidden; padding-bottom: 0; }
+.v-dia { display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
+.v-top { position: static; flex: 0 0 auto; padding-left: 10px; padding-right: 10px; }
+.v-top .top-row { flex-wrap: nowrap; }
+.v-top .top-title { font-size: 0.95rem; }
+.v-estado { display: flex; flex-wrap: wrap; gap: 3px 14px; align-items: center; margin-top: 4px; }
+.st { display: inline-flex; align-items: center; gap: 3px; color: var(--ink); }
+.st small { color: var(--muted); font-size: 0.7rem; margin-right: 2px; }
+.st.mal, .st.mal small { color: var(--bad); }
+.st b { font-size: 0.85rem; }
+.st .ico { width: 18px; height: 12px; }
+.pip { display: inline-block; width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid currentColor; }
+.pip.on { background: currentColor; }
+.pip.x { opacity: 0.3; border-style: dashed; background: none; }
+.pip.pan { width: 12px; height: 8px; border-radius: 6px 6px 2px 2px; border-color: var(--f-hatillo); }
+.pip.pan.on { background: var(--f-hatillo); }
+.pip.grillete { border-radius: 2px; }
+.v-top .dia-barra { margin-top: 4px; }
+
+.v-main { flex: 1 1 auto; min-height: 0; display: flex; flex-direction: column; }
+.v-escena { position: relative; flex: 1 1 auto; min-height: 0; background: var(--v-fuera); overflow: hidden; }
+.v-escena svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; touch-action: manipulation; user-select: none; -webkit-user-select: none; -webkit-tap-highlight-color: transparent; }
+.v-lado { flex: 0 0 auto; position: relative; }
+.v-lado .v-tarjeta { display: none; }
+.v-tarjeta {
+  position: absolute; left: 8px; right: 8px; bottom: 8px; z-index: 3; max-height: 48%; overflow: auto;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 6px 12px 8px; box-shadow: 0 6px 22px rgba(0, 0, 0, 0.22);
+  font-size: 0.92rem;
+}
+.v-tarjeta.arriba { bottom: auto; top: 8px; }
+.v-tarjeta.vacia { display: none; }
+.v-tarjeta.pista { background: var(--warn-bg); border-color: var(--warn); padding: 8px 12px; }
+.v-tarjeta.pista p { margin: 0; }
+.v-tarjeta.res.mal { border: 2px solid var(--bad); background: var(--bad-bg); }
+.v-tarjeta.res.bien { border-color: var(--good); }
+.v-tarjeta p { margin: 0.3em 0; }
+.v-tarjeta .btns { margin-top: 6px; }
+.v-tit { display: flex; align-items: center; gap: 8px; }
+.v-tit h3 { flex: 1; margin: 4px 0 2px; }
+.v-tit .btn.ir { width: auto; display: inline-block; min-height: 0; padding: 7px 14px; white-space: nowrap; }
+.cerrar { border: 0; background: none; color: var(--muted); font-size: 1.5rem; line-height: 1; cursor: pointer; padding: 0 2px 2px; }
+.v-fig { background: var(--sel); border-radius: 8px; padding: 4px 8px; font-weight: 600; }
+.v-lin { margin: 4px 0; padding-left: 1.1em; }
+.v-lin li { margin: 2px 0; }
+.v-desc { margin: 6px 0 2px; }
+.v-rec { border-top: 1px dashed var(--line); margin-top: 6px; padding-top: 4px; }
+.v-rec p { margin: 2px 0; }
+.v-toast { position: absolute; top: 8px; left: 8px; right: 8px; margin: 0; padding: 6px 10px; z-index: 2; font-size: 0.9rem;
+  background: var(--bad-bg); border: 1px solid var(--bad); border-radius: 10px; animation: v-toast 6s forwards; pointer-events: none; }
+@keyframes v-toast { 0%, 80% { opacity: 1; } 100% { opacity: 0; } }
+
+.v-barra { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 8px 8px calc(8px + env(safe-area-inset-bottom)); background: var(--bg); border-top: 1px solid var(--line); }
+.v-barra .btn { min-height: 0; padding: 7px 10px; }
+.v-barra .btn .t { font-size: 0.95rem; line-height: 1.2; }
+.v-barra .btn .d { font-size: 0.75rem; line-height: 1.2; }
+.v-barra .btn.grande { grid-column: 1 / -1; }
+.v-barra .btn .ico, .v-tit .ico { width: 14px; height: 14px; vertical-align: -2px; margin-right: 5px; }
+.v-dia.bloqueado .v-barra .btn { opacity: 0.4; pointer-events: none; }
+
+@media (min-width: 900px) {
+  .v-main { flex-direction: row; }
+  .v-lado { width: 380px; display: flex; flex-direction: column; border-left: 1px solid var(--line); background: var(--bg); }
+  .v-escena .v-tarjeta { display: none; }
+  .v-lado .v-tarjeta { display: block; position: static; flex: 1 1 auto; max-height: none; margin: 10px; box-shadow: none; }
+  .v-lado .v-tarjeta.vacia { visibility: hidden; }
+  .v-barra { border-top: 1px solid var(--line); }
+}
+
+/* ------------------------------------------------------------------ el plano */
+.suelo-fuera { fill: var(--v-fuera); }
+.suelo-dentro { fill: var(--v-dentro); }
+.rio { fill: var(--river); }
+.rio-linea { fill: none; stroke: var(--river-line); stroke-width: 1.2; }
+.rotulo-rio { font-size: 12px; font-style: italic; fill: var(--river-line); }
+.puente { fill: var(--v-piedra); stroke: var(--wall); stroke-width: 1; }
+.arco { fill: none; stroke: var(--wall); stroke-width: 1; }
+.calle { stroke: var(--v-calle); stroke-width: 11; stroke-linecap: round; }
+.camino { stroke: var(--accent); stroke-width: 3; stroke-dasharray: 5 5; stroke-linecap: round; opacity: 0.55; }
+.camino.no { stroke: var(--muted); opacity: 0.25; }
+.camino.sel { stroke-dasharray: none; stroke-width: 4.5; opacity: 0.9; }
+.muralla { fill: none; stroke: var(--wall); stroke-width: 6; stroke-linejoin: round; }
+.torre { fill: var(--wall); }
+.bld { fill: var(--bld); stroke: var(--bld-line); stroke-width: 1; }
+.tejado { fill: var(--tejado); stroke: var(--bld-line); stroke-width: 0.8; }
+.cruz { stroke: var(--bld-line); stroke-width: 1.4; fill: none; }
+.hueco { fill: var(--bld-line); }
+.andamio { stroke: var(--bld-line); stroke-width: 1.4; fill: none; }
+.fachada { fill: var(--tejado); opacity: 0.55; }
+.claustro { fill: var(--v-dentro); stroke: var(--bld-line); }
+.soportal { stroke: var(--bld-line); stroke-width: 2; stroke-dasharray: 3 3; }
+.suelo-plaza { fill: var(--v-plaza); }
+.juncos path { stroke: var(--f-junco); stroke-width: 1.4; fill: none; }
+.acena rect, .acena circle { fill: var(--bld); stroke: var(--bld-line); }
+.acena path { stroke: var(--bld-line); fill: none; }
+.toque { fill: transparent; cursor: pointer; }
+.sitio { cursor: pointer; }
+.sin-ver .bld, .sin-ver .tejado, .sin-ver .acena, .sin-ver .andamio, .sin-ver .suelo-plaza { opacity: 0.55; }
+.escenario { fill: var(--v-escenario); }
+.sin-ver .escenario { fill: none; stroke: var(--muted); stroke-width: 1; stroke-dasharray: 3 3; }
+.escenario.vecino { stroke: var(--accent); stroke-width: 1.6; stroke-dasharray: 5 4; }
+.escenario.sel { fill: var(--sel); stroke: var(--accent); stroke-width: 3; stroke-dasharray: none; }
+.escenario.aqui { stroke: var(--accent); stroke-width: 3; stroke-dasharray: none; }
+.escenario.peligro { stroke: var(--bad); animation: v-latido 1.2s ease-in-out infinite; }
+@keyframes v-latido { 50% { stroke-width: 6; } }
+.rotulo { font-size: 14px; font-weight: 600; fill: var(--ink); paint-order: stroke; stroke: var(--v-dentro); stroke-width: 3.5px; stroke-linejoin: round; cursor: pointer; }
+.rotulo.aqui { font-weight: 800; fill: var(--accent); }
+.v-luz { position: absolute; inset: 0; pointer-events: none; mix-blend-mode: multiply; z-index: 1; }
+.alerta { animation: v-brinco 0.9s ease-in-out infinite; }
+@keyframes v-brinco { 50% { transform: translateY(-3px); } }
+.mas-pan { font-size: 17px; font-weight: 800; fill: var(--good); paint-order: stroke; stroke: var(--surface); stroke-width: 3px; animation: v-sube 1.6s ease-out forwards; pointer-events: none; }
+@keyframes v-sube { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(-26px); } }
+
+/* la leyenda dibujada (en la ayuda) */
+.leyenda-v { margin: 6px 0; }
+.ley-fila { display: flex; align-items: center; gap: 10px; margin: 4px 0; }
+.ley-fila svg { width: 70px; height: 44px; flex: 0 0 70px; background: var(--v-dentro); border-radius: 6px; }
+.ley-fila span { font-size: 0.9rem; }

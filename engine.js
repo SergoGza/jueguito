@@ -1349,9 +1349,34 @@
       : [`Un diputado de la parroquia anda por ${L[s.lugar].nombre} escribiendo pobres. Te pide la cédula y no la tienes.`, "Te apunta en su lista y te echa de la calle: aquí, a esta hora, no pides."], "mal");
     return true;
   }
-  const textoCierre = (s, c) => c.tipo === "estudio"
-    ? (llaveAbre(s, c.tipo) ? "Aquí andan los alguaciles del Estudio: llevas el manteo." : "Aquí andan los alguaciles del Estudio: sin manteo de estudiante, te echarán de las Escuelas.")
-    : (llaveAbre(s, c.tipo) ? "Aquí andan los diputados de la parroquia pidiendo la cédula: les enseñarás la carta." : "Aquí andan los diputados de la parroquia pidiendo la cédula: sin ella, te echarán de la calle.");
+  // (25-nov) el aviso dice si están ya o cuándo llegan: como la ronda, si empiezas antes y acabas en su franja, te echan
+  const textoCierre = (s, c) => {
+    const est = c.tipo === "estudio", llave = llaveAbre(s, c.tipo), ahora = s.t < FIN && c.f === franja(s.t);
+    const quien = est ? "los alguaciles del Estudio" : "los diputados de la parroquia";
+    if (ahora) return est ? (llave ? "Aquí están los alguaciles del Estudio: llevas el manteo, no te echarán." : "Aquí están los alguaciles del Estudio: sin manteo de estudiante, te echarán de las Escuelas.")
+      : (llave ? "Aquí están los diputados de la parroquia pidiendo la cédula: les enseñarás la carta." : "Aquí están los diputados de la parroquia pidiendo la cédula: sin ella, te echarán de la calle.");
+    return `A ${nombreFranja(c.f).toLowerCase()} llegan ${quien}: ${llave ? (est ? "llevas el manteo." : "les enseñarás la carta.") : "si empiezas ahora, te echarán."}`;
+  };
+  // (25-nov) para qué sirve cada llave, quién la vende, dónde y cuándo: lo dice el mundo al poner el cierre
+  const TXT_LLAVE = { puerta: "Con la ropa buena puesta no te mira", parroquia: "Con carta y sello te dejan", estudio: "Con manteo de estudiante no te echan" };
+  const articulo = (n) => (/^(Plaza|Rúa|Catedral|Puerta|Iglesia|Calle)/.test(n) ? "la " : /^Escuelas/.test(n) ? "las " : "");
+  function franjasTxt(fs) {
+    const n = (f) => nombreFranja(f).toLowerCase(), xs = fs.slice().sort((a, b) => a - b);
+    const seguido = xs.every((f, i) => i === 0 || f === xs[i - 1] + 1);
+    if (seguido && xs.length > 2) return `de ${n(xs[0])} a ${n(xs[xs.length - 1])}`;
+    const ts = xs.map(n);
+    return `a ${ts.length > 1 ? ts.slice(0, -1).join(", a ") + " y a " + ts[ts.length - 1] : ts[0]}`;
+  }
+  function llaveTxt(s, tipo) {
+    const t = TT[LLAVE[tipo]];
+    if (!t || !t.compra) return "";
+    const c = t.compra, n = L[c.lugar].nombre;
+    const precio = `${c.blancas} blancas${c.pan ? ` o ${c.pan} pedazos de pan` : ""}`;
+    const que = { puerta: "la vende", parroquia: "las escribe", estudio: "lo vende" }[tipo];
+    const solo = t.quien === "hombre" ? (esHombre(s) ? " (solo vale a los hombres)" : " (a una mujer no le vale)") : "";
+    return `${TXT_LLAVE[tipo]}: ${que} ${c.quien} en ${articulo(n)}${n}, ${franjasTxt(c.franjas)}, por ${precio}${solo}.`;
+  }
+  const cierresActivos = (s) => (conCierres(s) ? s.presion.cierres.filter((c) => s.dia >= c.desde) : []);
   const rango = (s, clave, [a, b]) => a + Math.floor(mundo(s, clave) * (b - a + 1));
   function crearCierres(s) {
     const cierra = s.circuito && s.circuito[5]; // la puerta que cierra la ronda este verano
@@ -2482,7 +2507,7 @@
     TT, tretaAqui, previsionTreta, pedirCon, catalogada, puedeUsarla, ofertaTxt, aprender, olvidar, tiendaAqui, comprar, mercadoPan,
     comprarPan, venderPan, puedeQuitar, quitar, citasPosibles, quedar, citaTxt,
     // la ciudad se endurece (prototipo) y la posada
-    corcheteEn, corcheteTipo, cierreEn, pasoCerrado, diputadoCierra, cierraSinLlave, llaveAbre, LLAVE, puedePosada, pagarPosada, mesonCerrado, puedePoner, poner,
+    corcheteEn, corcheteTipo, cierreEn, pasoCerrado, diputadoCierra, cierraSinLlave, llaveAbre, LLAVE, llaveTxt, cierresActivos, puedePosada, pagarPosada, mesonCerrado, puedePoner, poner,
     empezarJornada(s) { if (s.fase === "amanecer") { s.fase = "dia"; s.noche = null; } },
   };
 })();

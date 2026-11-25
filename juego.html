@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Liber Vagatorum · juego 2D</title>
+  <meta name="description" content="Liber Vagatorum: prototipo de videojuego con moñigotes, con el mismo motor que el juguete.">
+  <meta name="theme-color" content="#2b2118">
+  <link rel="icon" type="image/png" href="icons/icon-192.png">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="vista.css">
+  <link rel="stylesheet" href="juego.css">
+</head>
+<body>
+  <!-- el día: el HUD arriba, la escena (Phaser) y encima los menús, el resultado y el mapa -->
+  <div id="juego" hidden>
+    <div id="hud"></div>
+    <div id="marco"><div id="lienzo"></div><div id="capa"></div></div>
+  </div>
+  <!-- las pantallas de menú: inicio, amanecer, noche, relevo, siega, final -->
+  <div id="app"><p style="padding:2rem">Cargando…</p></div>
+  <div id="modal" class="modal" hidden></div>
+  <noscript>Este juego necesita JavaScript.</noscript>
+  <!-- Phaser 3.90 (MIT, lib/phaser-LICENSE.md), copiado en el repositorio -->
+  <script src="lib/phaser.min.js"></script>
+  <!-- el motor del juguete, tal cual; el juego solo dibuja -->
+  <script src="rules.js"></script>
+  <script src="engine.js"></script>
+  <script src="juego-mapa.js"></script>
+  <script src="juego.js"></script>
+</body>
+</html>

@@ -42,7 +42,7 @@
     puerta: { ancho: 1.15, salidas: { catedral: { lado: "izq" }, puente: { lado: "fondo", x: 0.62, arco: true } }, vigia: 0.76, ventana: 0.24, calleja: 0.9, ronda: 0.42, pobres: 0.12, tuyos: 0.3 },
     catedral: { ancho: 1.7, salidas: { rua: { lado: "izq" }, escuelas: { lado: "der" }, puerta: { lado: "fondo", x: 0.08 } }, ventana: 0.86, calleja: 0.95, ronda: 0.68, pobres: 0.49, tuyos: 0.3, obra: 0.2 },
     escuelas: { ancho: 1.35, salidas: { catedral: { lado: "izq" }, sanesteban: { lado: "der" } }, vigia: 0.42, ventana: 0.8, calleja: 0.16, ronda: 0.66, pobres: 0.28, tuyos: 0.55 },
-    rua: { ancho: 1.9, salidas: { catedral: { lado: "izq" }, plaza: { lado: "der" }, sanmartin: { lado: "fondo", x: 0.4 } }, ventana: 0.66, calleja: 0.82, ronda: 0.56, pobres: 0.22, tuyos: 0.72 },
+    rua: { ancho: 1.9, salidas: { catedral: { lado: "der" }, plaza: { lado: "izq" }, sanmartin: { lado: "fondo", x: 0.4 } }, ventana: 0.66, calleja: 0.82, ronda: 0.56, pobres: 0.22, tuyos: 0.72 },
     sanmartin: { ancho: 1.25, salidas: { rua: { lado: "izq" }, plaza: { lado: "der" } }, vigia: 0.36, ventana: 0.8, calleja: 0.14, ronda: 0.62, pobres: 0.47, tuyos: 0.25 },
     plaza: { ancho: 2.3, salidas: { sanmartin: { lado: "izq" }, sanpablo: { lado: "der" }, rua: { lado: "fondo", x: 0.2 } }, ventana: 0.62, calleja: 0.86, ronda: 0.5, pobres: 0.35, tuyos: 0.72 },
     sanpablo: { ancho: 1.35, salidas: { plaza: { lado: "izq" }, sanesteban: { lado: "der" } }, ventana: 0.5, calleja: 0.3, ronda: 0.62, pobres: 0.2, tuyos: 0.42 },
@@ -52,6 +52,8 @@
   // las salidas tienen que ser exactamente los caminos de las reglas
   for (const [a, b] of R.CAMINOS) if (!ESCENAS[a].salidas[b] || !ESCENAS[b].salidas[a]) console.error("Falta la salida", a, b);
   for (const [a, e] of Object.entries(ESCENAS)) for (const b of Object.keys(e.salidas)) if (!E.VECINOS[a].includes(b)) console.error("Salida que no es camino", a, b);
+  // si sales por la izquierda, entras por la derecha: si no, con la tecla pulsada volverías a salir
+  for (const [a, b] of R.CAMINOS) { const la = ESCENAS[a].salidas[b].lado, lb = ESCENAS[b].salidas[a].lado; if (la === lb && la !== "fondo") console.error("Salidas del mismo lado", a, b); }
 
   const WV = 1280, HV = 720, SUELO = 470, PIES = 600; // la pantalla, la línea de las fachadas y por dónde andas
   const anchoDe = (id) => Math.round(ESCENAS[id].ancho * WV);
@@ -171,8 +173,8 @@
     comun: (c, sombr) => (g) => persona(g, { tunica: c, sombrero: sombr ? "chato" : null, sc: 0x3a2e26 }),
     mujer: (c, toca) => (g) => persona(g, { tunica: c, largo: true, toca: toca || 0xe6dcc8 }),
     compradora: (c) => (g) => { persona(g, { tunica: c, largo: true, toca: 0xe6dcc8 }); ell(g, 0x8a6a3a, 16, -34, 20, 13); raya(g, 0x6a4a2a, 2, 9, -48, 16, -40); },
-    estudiante: () => (g) => persona(g, { tunica: 0x23201e, largo: true, sombrero: "bonete", sc: 0x23201e }),
-    clerigo: () => (g) => persona(g, { tunica: 0x1d1a19, largo: true, sombrero: "teja", sc: 0x1d1a19 }),
+    estudiante: () => (g) => persona(g, { tunica: 0x2e2c3a, largo: true, sombrero: "bonete", sc: 0x2e2c3a }),
+    clerigo: () => (g) => persona(g, { tunica: 0x4a3c33, largo: true, sombrero: "teja", sc: 0x3a2f28 }),
     fraile: () => (g) => persona(g, { tunica: 0xece6d8, largo: true, capa: 0x26211e, capucha: 0x26211e }),
     viajero: (c) => (g) => { persona(g, { tunica: c, sombrero: "ala", sc: 0x5a4a3a }); circ(g, 0x9a7a4a, -14, -56, 11); raya(g, 0x6a4a2a, 3, 15, -70, 22, 0); },
     pobre: (parche) => (g) => sentado(g, { tunica: 0xa8743c, piernas: 0x6b4a2a, parche: parche ? 0x7a5226 : null }),
@@ -329,11 +331,16 @@
       SC = this;
       this.cosas = []; this.objs = []; this.zonas = [];
       this.luz = this.add.rectangle(0, 0, WV, HV, 0xffffff, 1).setOrigin(0).setScrollFactor(0).setDepth(5000).setBlendMode(Phaser.BlendModes.MULTIPLY);
+      // si la ronda está en la escena pero fuera de cuadro (las escenas anchas), un aviso en el borde
+      this.borde = this.add.container(0, 0).setScrollFactor(0).setDepth(7500).setVisible(false);
+      const gb = this.add.graphics(); ell(gb, 0xb33a2e, 0, 0, 70, 42); this.borde.add(gb);
+      this.bordeTxt = this.add.text(0, 0, "!", { fontFamily: "system-ui", fontSize: "26px", fontStyle: "bold", color: "#fff" }).setOrigin(0.5);
+      this.borde.add(this.bordeTxt);
       this.burbuja = this.add.text(0, 0, "", { fontFamily: "system-ui, sans-serif", fontSize: "19px", color: "#2b2118", backgroundColor: "#fffaf0", padding: { x: 10, y: 6 }, wordWrap: { width: 420 } }).setOrigin(0.5, 1).setDepth(6000).setVisible(false);
       this.input.on("pointerdown", (p, objs) => tocarEscena(p, objs));
       if (enDia()) construir(ui.escena || s.lugar, ui.x);
     }
-    update() { mover(); }
+    update() { mover(); avisoBorde(); }
   }
 
   // construir la escena de un sitio; x: dónde apareces
@@ -343,7 +350,7 @@
     for (const o of sc.objs) o.destroy();
     for (const z of sc.zonas) z.destroy();
     sc.tweens.killAll();
-    sc.objs = []; sc.zonas = []; sc.cosas = [];
+    sc.objs = []; sc.zonas = []; sc.cosas = []; sc.ronda = null;
     ui.escena = id;
     const W = anchoDe(id), f = franjaAct();
     const r = rng(`${s.semilla}|${s.anio}|${id}`);
@@ -514,6 +521,18 @@
     return grupo;
   }
 
+  function avisoBorde() {
+    const sc = SC;
+    if (!sc || !sc.borde) return;
+    const al = sc.ronda && sc.ronda[0] && sc.ronda[0].active ? sc.ronda[0] : null;
+    if (!al || !enDia()) { sc.borde.setVisible(false); return; }
+    const v = sc.cameras.main.worldView;
+    if (al.x > v.x + 40 && al.x < v.right - 40) { sc.borde.setVisible(false); return; }
+    const izq = al.x <= v.x + 40;
+    sc.borde.setVisible(true).setPosition(izq ? 34 : WV - 34, 330);
+    sc.bordeTxt.setText(izq ? "◀ !" : "! ▶");
+  }
+
   // ------------------------------------------------------------------ andar
   let reloj = 0;
   function mover() {
@@ -538,6 +557,7 @@
     SC.zonaYo.x = ui.x;
     andando(true);
     const sal = ESCENAS[ui.escena].salidas;
+    if (ui.soltar) { if (ui.x < 12 || ui.x > W - 12) { ui.x = Math.max(12, Math.min(W - 12, ui.x)); SC.yo.x = ui.x; } acercarse(); return; }
     for (const [a, sl] of Object.entries(sal)) {
       if ((sl.lado === "izq" && dir < 0 && ui.x <= 12) || (sl.lado === "der" && dir > 0 && ui.x >= W - 12)) { salir(a, "borde"); return; }
     }
@@ -631,6 +651,7 @@
     const de = s.lugar, antes = foto();
     E.mover(s, a); E.comprobarNoche(s);
     cuenta("salidas"); cuenta("salidas_" + como);
+    ui.soltar = teclas.izq || teclas.der;
     llegar(de, a, antes);
   }
   // después de llegar a un sitio (por una salida o en el viaje): se dibuja ese sitio; si pasó algo, sale el resultado
@@ -1269,7 +1290,7 @@
     if (k === "KeyE") { ACC.menuAcc(); pintar(); return; }
     if (ui.menu && /^Digit[1-9]$/.test(k)) { const it = (menuAcciones.items || [])[+k.slice(5) - 1]; if (it && it.ok) { ACC.op({ id: it.id }); if (it.id === "mirar") pintar(); } }
   });
-  window.addEventListener("keyup", (ev) => { if (MOV[ev.code]) teclas[MOV[ev.code]] = false; });
+  window.addEventListener("keyup", (ev) => { if (MOV[ev.code]) { teclas[MOV[ev.code]] = false; if (!teclas.izq && !teclas.der) ui.soltar = false; } });
   window.addEventListener("blur", () => { teclas.izq = teclas.der = false; });
 
   pintar();

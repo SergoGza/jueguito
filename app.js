@@ -137,7 +137,7 @@
       g += `</g>`;
     }
     g += `</svg>`;
-    const ley = `<div class="leyenda" aria-hidden="true"><span><i style="background:var(--g3)"></i>mucha gente</span><span><i style="background:var(--g2)"></i>poca</span><span><i style="background:var(--g1)"></i>nadie que dé</span><span><i style="border-style:dashed"></i>sin ver</span><span style="color:var(--bad)">◆ ronda</span>${s.conPresion ? `<span style="color:var(--bad)">■ ${s.conPresion && s.presion && s.presion.cierres ? "G guarda · D diputados · E Estudio, con su hora" : "corchete"} (a esta hora)</span>` : ""}<span style="color:var(--bad)">◉ te vieron pedir hoy</span><span>••• otros pobres pidiendo</span><span>Lo que no ves ahora sale más claro: es de cuando lo viste y puede haber cambiado.</span><span><b>Toca un sitio con borde discontinuo para ir.</b></span></div>`;
+    const ley = `<div class="leyenda" aria-hidden="true"><span><i style="background:var(--g3)"></i>mucha gente</span><span><i style="background:var(--g2)"></i>poca</span><span><i style="background:var(--g1)"></i>nadie que dé</span><span><i style="border-style:dashed"></i>sin ver</span><span style="color:var(--bad)">◆ ronda</span>${s.conPresion ? `<span style="color:var(--bad)">■ ${s.conPresion && s.presion && s.presion.cierres ? "G guarda · D diputados · E Estudio, con su hora (relleno, si es ahora)" : "corchete (a esta hora)"}</span>` : ""}<span style="color:var(--bad)">◉ te vieron pedir hoy</span><span>••• otros pobres pidiendo</span><span>Lo que no ves ahora sale más claro: es de cuando lo viste y puede haber cambiado.</span><span><b>Toca un sitio con borde discontinuo para ir.</b></span></div>`;
     return `<div class="mapa">${g}${ley}</div>`;
   }
 

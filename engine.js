@@ -1731,4 +1731,11 @@
     mercado, genteDelDia, descLugar, verano,
     empezarJornada(s) { if (s.fase === "amanecer") { s.fase = "dia"; s.noche = null; } },
   };
+
+  // ------------------------------------------------------------------ lecturas para la vista 2D (rama claude/vista)
+  // Solo leen: no cambian el estado ni tiran dados. Van aparte del bloque de arriba para juntarlas con otras ramas
+  // sin choques. estado().pobres cuenta juntos a los otros pobres y a los tuyos que piden; la vista los dibuja por separado.
+  window.ENGINE.vista = {
+    pobresAjenos: (s, lugar, d, f) => hayPobres(s, lugar, d, f),
+  };
 })();

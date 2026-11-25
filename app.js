@@ -231,6 +231,19 @@
     return h + `<div class="btns">${btn("siguienteVerano", `Bajar a Salamanca en junio de ${iv.siguiente}`, "", { cls: "primary" })}</div></div>`;
   }
 
+  // dónde va la ronda el día del Corpus, franja a franja (25-nov: que el aviso lo diga entero)
+  function rondaCorpus() {
+    const c = R.RONDA.circuitoCorpus || [], fr = (f) => R.FRANJAS[f].nombre.toLowerCase(), partes = [];
+    for (let f = 0; f < c.length - 1; f++) {
+      if (!c[f]) continue;
+      let g = f; while (g + 1 < c.length - 1 && c[g + 1] === c[f]) g++;
+      const fs = []; for (let k = f; k <= g; k++) fs.push(fr(k));
+      const n = L[c[f]].nombre, art = /^(Plaza|Rúa|Catedral|Puerta|Iglesia|Calle)/.test(n) ? "la " : /^Escuelas/.test(n) ? "las " : "";
+      partes.push(`a ${fs.length > 1 ? fs.slice(0, -1).join(", a ") + " y a " + fs[fs.length - 1] : fs[0]}, en ${art}${n}`);
+      f = g;
+    }
+    return partes.join("; ") + "; al anochecer, a cerrar su puerta";
+  }
   function pantallaAmanecer() {
     const d = E.dia(s);
     let h = cabecera() + `<div class="wrap">`;
@@ -250,7 +263,7 @@
     const rh = s.relevoHoy;
     if (rh && rh.dia === s.dia && rh.anio === s.anio) notas.push(`Desde hoy eres ${rh.nombre}. ${rh.tipo === "galeras" ? `A ${rh.antes} se lo llevaron a galeras` : rh.tipo === "desterrado" ? `A ${rh.antes} ${rh.antesEl ? "lo" : "la"} echaron de la ciudad` : `${rh.antes.charAt(0).toUpperCase() + rh.antes.slice(1)} murió anoche`}; lo que queda de verano es tuyo.`);
     if (d.tipo === "domingo") notas.push(`Es domingo${d.fiesta && d.fiesta !== "Domingo" ? " de " + d.fiesta : ""}: no hay obra. Las iglesias se llenan a prima y a tercia; la plaza está tranquila.`);
-    if (d.tipo === "corpus") notas.push("Es Corpus Christi: procesión por la Rúa y la plaza a tercia y a sexta, y la ronda va con ella. No hay obra.");
+    if (d.tipo === "corpus") notas.push(`Es Corpus Christi: hay procesión y la ronda va con ella todo el día: ${rondaCorpus()}. No hay obra.`);
     if (E.mercado(s)) notas.push("Es jueves, día de mercado: la plaza está llena de puestos hasta nona.");
     if (s.dia === E.escasezDesde(s) && s.dia > 1) notas.push("El pan ha subido en la plaza. Desde hoy, la gente da menos.");
     if (s.yaNoBuscan) notas.push("Han pasado tres días de aquello. En la plaza ya han dado otras señas: por las tuyas no pregunta nadie.");

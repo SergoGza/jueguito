@@ -277,7 +277,7 @@
     const notas = [];
     // (25-nov) has caído y sigues el mismo verano como uno de los tuyos
     const rh = s.relevoHoy;
-    if (rh && rh.dia === s.dia && rh.anio === s.anio) notas.push(`Desde hoy eres ${rh.nombre}. ${rh.tipo === "galeras" ? `A ${rh.antes} se lo llevaron a galeras` : rh.tipo === "desterrado" ? `A ${rh.antes} ${rh.antesEl ? "lo" : "la"} echaron de la ciudad` : `${rh.antes.charAt(0).toUpperCase() + rh.antes.slice(1)} murió anoche`}; lo que queda de verano es tuyo.`);
+    if (rh && rh.dia === s.dia && rh.anio === s.anio) { const aQ = rh.antes.startsWith("el ") ? "Al " + rh.antes.slice(3) : "A " + rh.antes; notas.push(`Desde hoy eres ${rh.nombre}. ${rh.tipo === "galeras" ? `${aQ} se lo llevaron a galeras` : rh.tipo === "desterrado" ? `${aQ} ${rh.antesEl ? "lo" : "la"} echaron de la ciudad` : `${rh.antes.charAt(0).toUpperCase() + rh.antes.slice(1)} murió anoche`}; lo que queda de verano es tuyo.`); }
     if (d.tipo === "domingo") notas.push(`Es domingo${d.fiesta && d.fiesta !== "Domingo" ? " de " + d.fiesta : ""}: no hay obra. Las iglesias se llenan a prima y a tercia; la plaza está tranquila.`);
     if (d.tipo === "corpus") notas.push(`Es Corpus Christi: hay procesión y la ronda va con ella todo el día: ${rondaCorpus()}. No hay obra.`);
     if (E.mercado(s)) notas.push("Es jueves, día de mercado: la plaza está llena de puestos hasta nona.");

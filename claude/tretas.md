@@ -281,3 +281,23 @@ El novato acaba desterrado (83 %); el veterano, de hambre (57 %). Ninguna varian
 - **El veterano pierde 4 puntos en un verano** (llega del 51 % al 47 %; siega más, porque al quedarse dentro come más) **y la mitad en la cadena** (de 9 % a 5 %; la moza, de 13 % a 7 %). El novato pierde 11 en un verano. Esto no cumple «unos pocos puntos» en la cadena.
 
 **Qué mirar al jugar** (lo que los bots no dicen): si el guarda que te cierra la salida crea una decisión (salir antes, salir por la puerta de la ronda, dormir dentro, ponerte la ropa) o solo estorba; si compras la llave que te hace falta y si te compensa, en pan o en blancas; si los diputados y el Estudio te cambian dónde pides o simplemente vas al hueco de al lado; si notas cuándo se quema una llave; y, en la cadena, si desde 1553 lo que te mata es dormir dentro por culpa del guarda (para el hombre, una noche detenido es galeras).
+
+## 11. La última vuelta antes de cerrar (25-nov)
+
+**Decidido (Sergio, 25-nov), tras jugar dos cadenas:** 1) El relevo, la A: al caer, sigues el mismo verano como el heredero que elijas, desde el día siguiente; en un commit aparte que pueda subir a `main` aunque se descarten tretas y presión. 2) Presión, «casi», solo con arreglos para que se entienda: el guarda, los diputados y el Estudio se ven todo el día en el mapa, con su hora; los diputados mantienen la regla, pero el aviso dice cuándo llegan; el aviso del Corpus dice dónde está la ronda todo el día; y el mundo dice para qué sirve cada llave antes de comprarla, quién la vende, dónde y a qué hora. 3) No se tocan las galeras ni la espalda. No se recalibra nada sin preguntar. Después juega otra cadena: si sigue sin comprar ninguna llave, se descarta la presión y se quedan las tretas de ingreso.
+
+**Montado** [Claude, 25-nov, sin revisar]:
+
+- **El relevo A**, en la rama `claude/relevo` (sale de `main`; commits `427971f`, `46c7e34` y la versión del sw) y traído a esta rama. El heredero amanece donde durmió (o le sueltan en la Puerta si estaba detenido) con su cuerpo, su pan, sus detenciones y su espalda; la ronda le conoce la cara si ya le había parado ese verano; sigue sabiendo dónde pedía el que se fue y suma dónde pide él. Vale también en el último verano. Si caes la noche del día 10, como antes: el heredero va a la siega. La regla de antes queda con `PARAMS.cadena.relevo: "sinTi"`. Pantalla: la del relevo dice que lo que queda de verano lo juegas con quien elijas, y al amanecer, «Desde hoy eres Pedro…».
+- **El aviso del Corpus** (en `claude/relevo`, commit `3a1bd32`, porque vale también sin tretas): «la ronda va con ella todo el día: a prima, en la Plaza de San Martín; a tercia, a sexta y a nona, en la Rúa Mayor; a vísperas, en la Plaza de San Martín; al anochecer, a cerrar su puerta».
+- **Presión** (commits `285b850` y `a8d6a04`): G, D y E en el mapa todo el día con su hora, rellenos a su hora; «A vísperas llegan los diputados de la parroquia: si empiezas ahora, te echarán» y «Aquí están…» solo cuando están (lo mismo con el Estudio); al ponerlos, el pregón dice la llave («Con la ropa buena puesta no te mira: la vende un ropavejero en la Rúa Mayor, de prima a vísperas, por 5 blancas o 3 pedazos de pan»; la carta, el estudiante pobre en las Escuelas a tercia y a nona; el manteo, en las Escuelas, solo para hombres), y lo mismo en Recuerdos y en la ayuda.
+
+**El relevo A, medido** (la cadena, 1.000; sin tretas ni presión, sobre `main` con el relevo; llega a la siega de 1557 el que juega, sin la A / con la A):
+
+| | empieza el mozo | empieza la moza |
+|---|---|---|
+| oficio | 49 % / 54 % | 85 % / 87 % |
+| veterano | 10 % / 8 % | 13 % / 11 % |
+| novato | 6 % / 7 % | 9 % / 8 % |
+
+Cambia poco: el que juega bien gana 2-5 puntos y el veterano pierde 2. Se juegan más vidas por cadena (el veterano, de 1,6 a 1,9). Lo que cambia es de dónde sale el resultado: ya no hay días que se resuelven sin jugarlos.

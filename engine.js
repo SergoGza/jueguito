@@ -949,7 +949,8 @@
     analFin(s, s.quien.nombre, esHombre(s), tipo, s.dia);
     s.cadena.vidas.push({ id: s.quien.id, nombre: s.quien.nombre, el: esHombre(s), anio: s.anio, dia: s.dia, tipo, acompanado: muere || horca ? cands.length > 0 : null });
     if (!cands.length) return finCadena(s, tipo, texto);
-    if (s.verano >= ultimoVerano()) { anal(s, `Sigue ${nombres(cands)}.`); return finCadena(s, tipo, texto); }
+    // en el último verano, sin días por jugar (o con la regla de antes), el final dice quién sigue
+    if (s.verano >= ultimoVerano() && (CA.relevo !== "juega" || s.dia >= R.DIAS)) { anal(s, `Sigue ${nombres(cands)}.`); return finCadena(s, tipo, texto); }
     for (const tu of tuyosVivos(s)) tu.malsinaManana = false; // ya no hay a quién vender
     s.relevo = { tipo, texto, candidatos: cands.map((t) => t.id) };
     s.fase = "relevo";
@@ -1019,6 +1020,8 @@
     anal(s, `Sigue ${tu0.nombre}.`);
     apunta(s, "relevo", `Sigue ${tu0.nombre}.`);
     s.heredero = id;
+    // (25-nov) con días por delante, sigues ese mismo verano como el heredero, desde el día siguiente
+    if (CA.relevo === "juega" && s.dia < R.DIAS) return seguirComo(s, tu0, tipo);
     const lin = [];
     if (!restoDelVerano(s, lin)) return true;
     const tu = s.tuyos.find((t) => t.id === s.heredero);
@@ -1032,6 +1035,27 @@
     s.siega = { yo: res, tuyos: siegaTuyos(s, lin) };
     s.invierno = { anio: s.anio, siguiente: R.VERANOS[s.verano + 1].anio, lineas: lin, relevo: true };
     s.fase = "invierno";
+    return true;
+  }
+  // seguir el mismo verano como el heredero: amanece donde durmió (o le sueltan en la Puerta), con su cuerpo, su pan,
+  // sus detenciones y su espalda; la ronda le conoce la cara si ya le había parado este verano, y sigue sabiendo dónde
+  // pedía el que se ha ido y dónde pide él
+  function seguirComo(s, tu, tipo) {
+    const antes = s.quien.nombre, antesEl = s.quien.el !== false;
+    const donde = tu.detenido ? "puerta" : L[tu.lugar] && (L[tu.lugar].dentro || tu.lugar === "ribera") ? tu.lugar : "ribera";
+    const conocido = !!tu.conocido, buscado = !!tu.buscado, buscadoDia = tu.buscadoDia;
+    for (const [f, ls] of Object.entries(tu.habitos || {})) for (const [l, dias] of Object.entries(ls)) {
+      const h = ((s.habitos = s.habitos || {})[f] = s.habitos[f] || {});
+      h[l] = [...new Set((h[l] || []).concat(dias))];
+    }
+    heredar(s, tu, tipo);
+    s.heredero = null;
+    s.conocido = conocido;
+    if (buscado) { s.buscado = true; s.buscadoDia = buscadoDia; }
+    s.lugar = donde;
+    s.relevoHoy = { dia: s.dia + 1, anio: s.anio, nombre: tu.nombre, antes, antesEl, tipo };
+    s.dia++;
+    empezarDia(s);
     return true;
   }
   // se acaba el verano en la siega (has llegado)

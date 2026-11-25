@@ -209,6 +209,7 @@
     let h = cabecera() + `<div class="wrap"><h2>Noche del día ${s.dia}</h2>`;
     h += panelNoche(true);
     h += `<div class="panel res mal"><h2>${esc(TIT(r.tipo))}</h2><p>${esc(r.texto)}</p></div>`;
+    if (P.cadena && P.cadena.relevo === "juega" && s.dia < R.DIAS) h += `<p>Lo que queda de verano lo juegas con quien elijas, desde mañana: con su cuerpo, su pan y sus detenciones.</p>`;
     h += `<div class="btns">`;
     for (const id of r.candidatos) {
       const tu = s.tuyos.find((t) => t.id === id);
@@ -245,6 +246,9 @@
       h += `<div class="panel${s.noche.detenido ? " res mal" : ""}"><h3>${s.noche.detenido ? (E.esHombre(s) ? "La noche: detenido" : "La noche: detenida") : "La noche"}</h3>${s.noche.lineas.map((x) => `<p>${esc(x)}</p>`).join("")}<p>Cuerpo: ${s.noche.antes} → <b>${s.noche.despues}</b>.</p></div>`;
     }
     const notas = [];
+    // (25-nov) has caído y sigues el mismo verano como uno de los tuyos
+    const rh = s.relevoHoy;
+    if (rh && rh.dia === s.dia && rh.anio === s.anio) notas.push(`Desde hoy eres ${rh.nombre}. ${rh.tipo === "galeras" ? `A ${rh.antes} se lo llevaron a galeras` : rh.tipo === "desterrado" ? `A ${rh.antes} ${rh.antesEl ? "lo" : "la"} echaron de la ciudad` : `${rh.antes.charAt(0).toUpperCase() + rh.antes.slice(1)} murió anoche`}; lo que queda de verano es tuyo.`);
     if (d.tipo === "domingo") notas.push(`Es domingo${d.fiesta && d.fiesta !== "Domingo" ? " de " + d.fiesta : ""}: no hay obra. Las iglesias se llenan a prima y a tercia; la plaza está tranquila.`);
     if (d.tipo === "corpus") notas.push("Es Corpus Christi: procesión por la Rúa y la plaza a tercia y a sexta, y la ronda va con ella. No hay obra.");
     if (E.mercado(s)) notas.push("Es jueves, día de mercado: la plaza está llena de puestos hasta nona.");

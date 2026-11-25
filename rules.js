@@ -294,6 +294,10 @@
       // si la para por la calle, no la lleva a la cárcel: la echa, y si ya la conoce (o le ve la espalda), la azota allí
       // mismo (PARAMS.carcel.azotes de cuerpo esa noche; pregunta 12, opción B). Pedir delante de la ronda y la noche, igual.
       obrasForzadas: 5,
+      // al caer (muerto acompañado, desterrado o a galeras) con días por delante: «juega», sigues ese mismo verano como
+      // el heredero desde el día siguiente (decidido por Sergio, 25-nov, opción A); «sinTi», los días que faltan pasan
+      // sin jugarlos y el heredero llega a la siega como esté (j0.11 a j0.13)
+      relevo: "juega",
     },
     // hurtar y la horca (j0.12; se activa al empezar, sola o con lo demás; solo en la prueba A). Decidido por rondas
     // del 10 al 12 de noviembre de 2026 (ver «Hurtar y la horca» en claude/decisiones-replanteamiento.md, en el proyecto).

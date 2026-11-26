@@ -35,7 +35,7 @@ kbd { font: 600 0.72em system-ui, sans-serif; border: 1px solid var(--line); bor
 #capa > * { pointer-events: auto; }
 .j-teclas { position: absolute; left: 10px; bottom: 8px; font-size: 0.78rem; color: #f3e9d3; background: rgba(43, 33, 24, 0.6); padding: 3px 8px; border-radius: 6px; pointer-events: none !important; }
 .j-carta, .j-menu {
-  position: absolute; left: 50%; transform: translateX(-50%); bottom: 40px; width: min(560px, calc(100% - 24px)); max-height: 60%; overflow: auto;
+  position: absolute; left: 0; right: 0; margin-inline: auto; bottom: 40px; width: min(560px, calc(100% - 24px)); max-height: calc(100% - 60px); overflow: auto;
   background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 12px; padding: 8px 14px 10px; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.35);
 }
 .j-carta.res.mal { border: 2px solid var(--bad); background: var(--bad-bg); }
@@ -54,6 +54,10 @@ kbd { font: 600 0.72em system-ui, sans-serif; border: 1px solid var(--line); bor
 .j-op .ico { width: 14px; height: 14px; vertical-align: -2px; margin-right: 5px; }
 .j-prev { margin-top: 8px; border-top: 1px dashed var(--line); padding-top: 6px; font-size: 0.9rem; min-height: 2.6em; }
 .j-prev ul { margin: 0; padding-left: 1.1em; }
+/* el aviso del motor (comprar, pasar al guarda, cruzarte con la ronda): unos segundos arriba */
+.j-aviso { position: absolute; left: 50%; top: 12px; transform: translateX(-50%); max-width: min(620px, calc(100% - 24px)); background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 10px; padding: 6px 14px; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3); pointer-events: none !important; font-size: 0.95rem; }
+.j-aviso.mal { border: 2px solid var(--bad); background: var(--bad-bg); }
+.j-aviso.bien { border: 2px solid var(--good); }
 
 /* ------------------------------------------------------------------ el mapa */
 .j-mapa { position: absolute; inset: 10px; display: flex; gap: 10px; background: var(--bg); border: 1px solid var(--line); border-radius: 12px; padding: 8px; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4); }

@@ -111,7 +111,7 @@ window.LV_MAPA = (function () {
     if (r) out.push(`Viste aquí a la ronda: ${r}.`);
     const c = (s.contado || []).filter((x) => x.ronda && x.lugar === id);
     if (c.length) out.push(`Te contaron que estaba aquí: ${R.FRANJAS.map((fr, f) => { const xs = c.filter((x) => x.f === f); return xs.length ? `${fr.nombre.toLowerCase()} (${xs.map((x) => `${x.quien}, ${corto(x.dia)}${x.oidas ? ", de oídas" : ""}`).join("; ")})` : ""; }).filter(Boolean).join(" · ")}.`);
-    const p = por(s.cronica.filter((x) => (x.tipo === "pedir" || x.tipo === "pillado") && x.anio === s.anio && x.lugar === id).map((x) => ({ f: E.franja(x.t), dia: x.dia })));
+    const p = por(s.cronica.filter((x) => (x.tipo === "pedir" || x.tipo === "pillado" || x.tipo === "treta") && x.anio === s.anio && x.lugar === id).map((x) => ({ f: E.franja(x.t), dia: x.dia })));
     if (p) out.push(`Has pedido aquí: ${p}.`);
     return out;
   }
@@ -173,6 +173,13 @@ window.LV_MAPA = (function () {
       if (pedidoAqui(s, id).length) figs += G(x + wx, y + wy, vecino(x + wx, y + wy, true));
       if (r === id) figs += G(x + 24, y + 6, ronda(x + 24, y + 6));
       else if (ult && ult.lugar === id && !(aqui && s.t < E.FIN)) figs += `<g opacity="${ult.op}">${G(x + 24, y + 6, ronda(x + 24, y + 6))}</g>`;
+      // con la presión: el guarda (G), los diputados (D) y el Estudio (E), con su hora; relleno, si es ahora (lo pregonaron)
+      if (s.conPresion && E.cierresActivos) E.cierresActivos(s).filter((c) => c.lugar === id).forEach((c, i) => {
+        const ya = s.t < E.FIN && c.f === f, x0 = x + 42 + i * 22, y0 = y - 22;
+        const letra = c.tipo === "puerta" ? "G" : c.tipo === "estudio" ? "E" : "D";
+        const hora = ({ 0: "prima", 1: "tercia", 2: "sexta", 3: "nona", 4: "vísp.", 5: "compl." })[c.f];
+        figs += `<rect x="${x0}" y="${y0}" width="17" height="17" rx="3" fill="${ya ? "var(--bad)" : "var(--surface)"}" stroke="var(--bad)" stroke-width="1.4"/><text x="${x0 + 8.5}" y="${y0 + 13}" font-size="12" fill="${ya ? "#fff" : "var(--bad)"}" text-anchor="middle" font-weight="700">${letra}</text><text x="${x0 + 8.5}" y="${y0 + 28}" font-size="10" font-weight="700" fill="var(--bad)" text-anchor="middle" paint-order="stroke" stroke="var(--surface)" stroke-width="3">${hora}</text>`;
+      });
       if (id === marca) figs += `<g id="m-yo">${G(x - 8, y + 20, yo(x - 8, y + 20, s.llaga))}</g>`;
       const n = ruta.indexOf(id);
       rot += `<text class="rotulo${aqui ? " aqui" : ""}" data-m-lugar="${id}" x="${x}" y="${y + 40}" text-anchor="middle">${esc(l.corto)}${n >= 0 ? ` · ${n + 1}` : ""}</text>`;

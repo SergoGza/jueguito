@@ -54,6 +54,9 @@ const R = window.RULES, E = window.ENGINE, P = R.PARAMS;
 // dice cuándo hurta el oficio (solo con OFICIO=1: la búsqueda no sabe valorar el hurto). SIN_TABLA=1 se salta la tabla
 // de valor (el oficio solo la usa para decidir si cena con un pedazo), para medir muchas variantes deprisa.
 const HC = require("./hurto-comun.js")(R, E);
+// las tretas (rama claude/tretas): TRETAS=nunca|<ids>|todas activa las tretas y dice cuáles aprende, compra y usa el oficio
+// (solo con OFICIO=1, como HURTO: la búsqueda no sabe valorarlas). Ver tretas-comun.js.
+const TRC = require("./tretas-comun.js")(R, E);
 const LL = P.llaga, AP = R.RONDA.aprende, PERS = R.RONDA.persigue, DESVIO = R.RONDA.desvio;
 const FIN = E.FIN, FR = R.RATOS, NF = R.FRANJAS.length, PASO = R.MODOS.A.paso;
 
@@ -64,6 +67,7 @@ const CFG = {
   uAguanta: process.env.AGUANTA != null ? +process.env.AGUANTA : 0.9,
   mundos: +process.env.MUNDOS || 8,
   dar: process.env.DAR || "busca",
+  presion: !!process.env.PRESION, // la ciudad se endurece (prototipo, rama claude/tretas): los corchetes se pregonan, así que los sabe
 };
 
 // ------------------------------------------------------------------ la ciudad, de memoria
@@ -262,6 +266,7 @@ function costeDetencion(s) {
 // lo que cuesta que te pare la ronda al llegar, por la probabilidad de que lo haga si está
 function costeParada(s) {
   if (s.buscado) return P.hurto.pararBuscado * 30; // le buscan por ladrón: que le paren es que le prendan
+  if (s.conTretas && s.puesta && (E.TT[s.puesta].puesta || {}).noParan && !s.conocido) return 0.02; // bien vestido no te paran
   if (s.llaga && (!LL.protege || (s.llagaPasadas || 0) < LL.protege)) return 0.05;
   const ras = !!s.conCadena, conoce = s.conocido || (ras && !!s.azotado);
   if (ras && !E.esHombre(s)) return (conoce ? P.pararAlLlegar.conocido : P.pararAlLlegar.desconocido) * (conoce ? 2.5 : 1);
@@ -275,14 +280,16 @@ function contexto(s, K) {
   const cx = { s, d, f, t: s.t, aqui: s.lugar, tipo, G: ganancias(E.mercado(s, d) ? "mercado" : tipo, E.escasez(s, d), !!s.llaga), rho0: tipo === "corpus" ? K.rhoCorpus : K.rho,
     av: {}, hab: misCostumbres(s), vista: null, cpar: costeParada(s), cdet: costeDetencion(s) };
   const r = E.rondaEnTuZona(s);
-  cx.rondaAqui = !!r;
+  cx.rondaAqui = !!r || (!!s.conPresion && E.corcheteEn(s, s.lugar, f)); // un corchete aquí, como la ronda
   if (r) { cx.vista = s.lugar; s._rv = d * 10 + f; s._rl = s.lugar; } else if (s._rv === d * 10 + f) cx.vista = s._rl;
   return cx;
 }
 const quejas = (cx, f) => (f < 0 ? { n: 0, v: {} } : cx.av[f] || (cx.av[f] = misQuejas(cx.s, f)));
 // probabilidad de que la ronda esté en un sitio a una franja, con lo que sé
-function prRonda(cx, l, f2) {
+function prRonda(cx, l, f2, alLlegar) {
   if (f2 >= NF || !E.L[l].dentro) return 0;
+  // los corchetes se pregonan: sabe dónde y a qué hora vigilan (al llegar, solo cuenta el que para)
+  if (cx.s.conPresion && E.corcheteEn(cx.s, l, f2) && (!alLlegar || (P.presion.paran !== "nunca" && (P.presion.paran !== false || E.corcheteTipo(cx.s, l, f2) === "puerta")))) return 1;
   if (f2 === cx.f) {
     if (cx.vista) return l === cx.vista ? 1 : 0; // la he visto en esta franja: sé dónde está
     if (l === cx.aqui) return 0;
@@ -300,6 +307,7 @@ function prRonda(cx, l, f2) {
 function prLlegaPidiendo(cx, l, fb) {
   const f2 = fb + 1;
   if (f2 >= NF) return 0;
+  if (cx.s.conPresion && E.corcheteEn(cx.s, l, f2)) return 1;
   const q = quejas(cx, fb);
   const a = E.L[l].aviso, antes = q.v[l] || 0, mio = antes + a;
   let n = q.n, T = q.donde;
@@ -324,7 +332,8 @@ function caminos(cx) {
     if (tau > FIN) continue;
     for (const v of E.VECINOS[u]) {
       if (hecho[v]) continue;
-      const r = tau < FIN ? prRonda(cx, v, E.franja(tau)) : 0;
+      if (cx.s.conPresion && E.pasoCerrado(cx.s, u, v, llega[u])) continue; // el guarda de la puerta (cierres): por ahí no se pasa
+      const r = tau < FIN ? prRonda(cx, v, E.franja(tau), true) : 0;
       const c = coste[u] + PASO * WT + r * cx.cpar;
       if (c < coste[v]) { coste[v] = c; llega[v] = tau; primero[v] = u === cx.aqui ? v : primero[u]; riesgo[v] = riesgo[u] + r * cx.cpar; }
     }
@@ -336,7 +345,7 @@ function caminos(cx) {
 function ocasiones(cx, C, dentro) {
   const s = cx.s, out = [];
   const vp = valorPan(s.pan);
-  if (vp <= 0) return out;
+  if (vp <= 0 && !TRC.tieneBlancas(s)) return out;
   const eAqui = E.L[cx.aqui].dentro ? E.estado(s, cx.aqui, cx.d, cx.f) : null;
   for (const l of DENTRO) {
     if (VETA.includes(l)) continue;
@@ -346,11 +355,12 @@ function ocasiones(cx, C, dentro) {
     for (const tb of ta % FR === 0 || process.env.ALINEA === "nunca" ? [ta] : process.env.ALINEA === "siempre" ? [sig] : [ta, sig]) {
       const fb = E.franja(tb);
       if (tb + FR > FIN) continue;
+      if (s.conPresion && E.cierraSinLlave(s, l, tb)) continue; // los diputados (cierres): sin la carta, te echan
       const sale = tb + FR + PASO * SAL[l] <= FIN; // pedir y aún salir antes de que cierren
       if (!dentro && !sale) continue;
       let g, mucha;
       if (l === cx.aqui && tb === cx.t) {
-        if (cx.rondaAqui || eAqui.da < 2) continue;
+        if ((cx.rondaAqui && !TRC.oculto(s, l, eAqui)) || eAqui.da < 2) continue;
         // ahí pide o acaba de pedir otro: vendrá la ronda
         if (E.hayQuejas(s, l) || (s.conTuyos && E.tuyosEn(s, l).some((x) => x.pide))) continue;
         g = media(eAqui.da, E.escasez(s, cx.d), !!s.llaga); mucha = eAqui.da >= 3 ? 1 : 0;
@@ -360,7 +370,10 @@ function ocasiones(cx, C, dentro) {
       if (g <= 0) continue;
       const seg2 = tb + FR - (fb + 1) * FR;
       const rb = seg2 > 0 ? prLlegaPidiendo(cx, l, fb) * (1 - 0.5 * mucha) * seg2 / FR : 0;
-      const neto = g * vp - rb * cx.cdet - C.riesgo[l]; // lo que espera sacar menos lo que arriesga
+      // con las tretas, lo que espera sacar es lo de la mejor treta que pueda usar ahí, si vale más que pedir sin más
+      let gv = g * vp;
+      if (TRC.activo) { const tv = TRC.valor(s, l, fb, g, mucha, vp, tb, l === cx.aqui && tb === cx.t ? (cx.rondaAqui ? 1 : 0) : prRonda(cx, l, fb)); if (tv != null) gv = Math.max(gv, tv); }
+      const neto = gv - rb * cx.cdet - C.riesgo[l]; // lo que espera sacar menos lo que arriesga
       if (!dentro && neto <= UMBRAL) continue;
       out.push({ v: neto - KAPPA * (tb + FR - cx.t) / FR, neto, l, tb, ta, sale }); // entre las que valen la pena, la que antes rinde
     }
@@ -374,6 +387,7 @@ function salida(cx, C) {
   for (const g of PUERTAS) {
     const tg = g === cx.aqui ? cx.t : C.llega[g];
     if (tg == null || tg + PASO > FIN) continue;
+    if (cx.s.conPresion && E.pasoCerrado(cx.s, g, AFUERA[g], tg)) continue; // el guarda (cierres)
     const c = g === cx.aqui ? 0 : C.coste[g];
     if (!mejor || c < mejor.c) mejor = { c, g };
   }
@@ -391,6 +405,7 @@ function encargo(s, cx, C) {
     if (!E.L[cx.aqui].dentro) return { a: "acabar" };
     const tg = cx.aqui === m.g ? cx.t : C.llega[m.g];
     if (tg == null || tg + PASO > FIN) return null;
+    if (s.conPresion && E.pasoCerrado(s, m.g, AFUERA[m.g], tg)) return null; // el guarda (cierres)
     s._meta = m;
     return { a: "mover", d: cx.aqui === m.g ? AFUERA[m.g] : C.primero[m.g] };
   }
@@ -402,8 +417,9 @@ function encargo(s, cx, C) {
   if (m.tipo === "dormir") return { a: "acabar" };
   // tipo «ir»: ya estoy; si toca, espero a que empiece la franja, y pido
   if (m.alin && cx.t % FR !== 0 && cx.t + FR <= FIN) { s._meta = m; return { a: "esperar" }; }
-  if (cx.rondaAqui || cx.t + FR > FIN || E.estado(s, cx.aqui, cx.d, cx.f).da < 2) return null;
+  if ((cx.rondaAqui && !TRC.oculto(s, cx.aqui, E.estado(s, cx.aqui, cx.d, cx.f))) || cx.t + FR > FIN || E.estado(s, cx.aqui, cx.d, cx.f).da < 2) return null;
   if (E.hayQuejas(s, cx.aqui) || (s.conTuyos && E.tuyosEn(s, cx.aqui).some((x) => x.pide))) return null; // ahí pide o acaba de pedir otro
+  if (s.conPresion && E.cierraSinLlave(s, cx.aqui, cx.t)) return null; // los diputados (cierres)
   return { a: "pedir" };
 }
 // El oficio por su cuenta. Devuelve una jugada: { a: "pedir" | "esperar" | "acabar" | "trabajo" | "mover", d: destino }
@@ -414,7 +430,9 @@ function oficioLibre(s, cx, C) {
     if (o.l !== cx.aqui) return { a: "mover", d: C.primero[o.l], plan: { tipo: "ir", l: o.l, alin: o.tb !== o.ta } };
     return o.tb === cx.t ? { a: "pedir" } : { a: "esperar" };
   }
-  if (!E.L[cx.aqui].dentro) return { a: "acabar" };
+  // fuera de la muralla y sin nada que valga ahora: con la presión, esperar a que cambie la franja (un corchete en la
+  // puerta solo vigila a su hora) en vez de dar el día por perdido. Sin la presión, como siempre.
+  if (!E.L[cx.aqui].dentro) return s.conPresion && cx.t + FR <= 3 * FR ? { a: "esperar" } : { a: "acabar" };
   const g = salida(cx, C);
   if (!g) return { a: "acabar" }; // ya no llega: duerme donde está
   return { a: "mover", d: cx.aqui === g ? AFUERA[g] : C.primero[g], plan: { tipo: "salir", g } };
@@ -424,6 +442,8 @@ function oficio(s, K) {
   return encargo(s, cx, C) || oficioLibre(s, cx, C);
 }
 function ejecutar(s, j) {
+  const x = TRC.ejecutar(s, j);
+  if (x != null) return x;
   if (j.a === "hurtar") return E.hurtar(s);
   if (j.a === "restituir") return E.restituir(s);
   if (j.a === "mover") return E.mover(s, j.d);
@@ -531,7 +551,7 @@ function firma() {
 }
 // empezar un verano de la cadena como se quiera: se monta el invierno anterior y se deja que el motor haga el resto
 function empezarVerano(y, el, sem, yo, det, azot, bits, clases) {
-  const s = E.nueva("A", "v", sem, { cadena: CFG.cadena, tuyos: CFG.tuyos, llaga: CFG.llaga, mujer: !el, hurto: HC.activo });
+  const s = E.nueva("A", "v", sem, { cadena: CFG.cadena, tuyos: CFG.tuyos, llaga: CFG.llaga, mujer: !el, hurto: HC.activo, tretas: TRC.activo, presion: CFG.presion });
   if (y === 0) return s;
   s.verano = y - 1; s.anio = R.VERANOS[y - 1].anio;
   s.detenciones = det; s.azotado = azot;
@@ -871,7 +891,7 @@ function pensarRelevo(s, B, rng, traza) {
 
 // ------------------------------------------------------------------ una partida
 function jugar(sem, ver) {
-  const s = E.nueva("A", "aplicado", String(sem), { llaga: CFG.llaga, tuyos: CFG.tuyos, cadena: CFG.cadena, mujer: CFG.mujer, hurto: HC.activo });
+  const s = E.nueva("A", "aplicado", String(sem), { llaga: CFG.llaga, tuyos: CFG.tuyos, cadena: CFG.cadena, mujer: CFG.mujer, hurto: HC.activo, tretas: TRC.activo, presion: CFG.presion });
   const rng = azar(`aplicado|${sem}`);
   const busca = !CFG.soloOficio;
   let B = nuevoSaber(s);
@@ -895,7 +915,7 @@ function jugar(sem, ver) {
       B = nuevoSaber(s); B.vis = vis;
       continue;
     }
-    if (fz === "amanecer") { E.empezarJornada(s); continue; }
+    if (fz === "amanecer") { TRC.inicio(s); E.empezarJornada(s); continue; }
     if (fz === "resultado") {
       if (s.ultimo && s.ultimo.lineas.some((l) => l.includes("me han contado"))) s._ms = true; // lo dice el alguacil
       E.seguir(s); continue;
@@ -911,7 +931,7 @@ function jugar(sem, ver) {
         n = c.cena;
         if (n === 0 && s.pan >= 1 && s.duerme !== "carcel") (s._ayunos = s._ayunos || []).push(s.dia);
         dice(`noche: ${c.k}`, tr);
-      } else { n = cenaBase(s); if (n === 0 && s.pan >= 1 && s.duerme !== "carcel") (s._ayunos = s._ayunos || []).push(s.dia); }
+      } else { TRC.noche(s); n = cenaBase(s); if (n === 0 && s.pan >= 1 && s.duerme !== "carcel") (s._ayunos = s._ayunos || []).push(s.dia); }
       if ((s.final || {}).tipo == null) B.vis = { tipo: "cenar", txt: JSON.stringify(podar(s)), n };
       E.cenar(s, n);
       continue;
@@ -931,9 +951,13 @@ function jugar(sem, ver) {
       }
     } else {
       j = HC.decidir(s); // si la política de hurto dice que ahora toca, hurta o va a hurtar; si no, el oficio
+      if (!j && s._trcNo !== s.dia * 100 + s.t) j = TRC.decidir(s); // las tretas: comprar pan o tretas, o ir a comprarlas
       if (j) s._meta = null; else j = oficio(s, B);
+      if (s._trcNo !== s.dia * 100 + s.t) j = TRC.cambia(s, j); // pedir con una treta, o quitarse lo que pesa para andar
     }
-    ejecutar(s, j);
+    const hecho = ejecutar(s, j);
+    if (!hecho && s.conPresion && (!TRC.activo || s._trcNo === s.dia * 100 + s.t)) { s._meta = null; if (!E.esperar(s)) E.acabarDia(s); } // no ha podido (cierres): espera
+    else if (!hecho && TRC.activo) s._trcNo = s.dia * 100 + s.t; // si no ha podido, esta vez sin tretas
     mirar(s, B);
   }
   if (s.conCadena) s._veranos.push({ anio: s.anio, quien: s.quien.id, fin: "FIN:" + s.final.tipo, dia: s.final.dia });
@@ -968,6 +992,7 @@ function contar(A, s) {
     }
     if (c.tipo === "noche" && c.texto.includes("portal")) mas(A.portal, c.lugar);
     if (c.tipo === "detenido" && c.motivo === "de noche") mas(A.portalDet, c.lugar);
+    if (c.tipo === "treta") dado += c.panBruto || 0; // las tretas (rama claude/tretas)
     if (c.tipo === "pedir" || c.tipo === "pillado") {
       const f = E.franja(c.t), punto = c.t % FR === 0, sig = s.conCadena ? undefined : s.rondas[`${c.dia}|${f + 1}`];
       if (c.tipo === "pillado") { mas(A.pillado, `${punto ? "en punto" : "a media franja"}, ${c.pillado === "llega" ? "llega la ronda" : "la ronda estaba"}`); if (punto) pon("pillado pidiendo en punto"); }
@@ -1020,6 +1045,7 @@ function tanda(desde, hasta) {
     const s = jugar(i);
     contar(A, s);
     HC.cuenta((A.hurto = A.hurto || HC.nueva()), s);
+    if (TRC.activo) TRC.cuenta((A.tretas = A.tretas || TRC.nueva()), s);
     // semillas de muestra para el informe
     const t = "final: " + (s.conCadena ? (utilidad(s) ? "completa" : "acaba en " + s.final.cadena.hasta + ", " + s.final.tipo) : s.final.tipo);
     (A.semillas[t] = A.semillas[t] || []).length < 8 && A.semillas[t].push(i);
@@ -1066,7 +1092,7 @@ module.exports = { R, E, P, CFG, V, DENTRO, PUERTAS, azar, nuevoSaber, creer, mi
 
 if (require.main === module) (async () => {
   const N = +process.argv[2] || 200, desde = +process.env.DESDE || 1;
-  const variante = `${CFG.cadena ? "la cadena" : "un verano"}${CFG.cadena ? (CFG.mujer ? ", empieza la moza" : ", empieza el mozo") : ""}${CFG.tuyos && !CFG.cadena ? ", con los tuyos" : ""}${CFG.llaga ? ", con la llaga" : ""}`;
+  const variante = `${CFG.cadena ? "la cadena" : "un verano"}${CFG.cadena ? (CFG.mujer ? ", empieza la moza" : ", empieza el mozo") : ""}${CFG.tuyos && !CFG.cadena ? ", con los tuyos" : ""}${CFG.llaga ? ", con la llaga" : ""}${CFG.presion ? ", con presión" : ""}`;
   const nombre = CFG.soloOficio ? "oficio" : "aplicado";
   if (process.env.VY) {
     // un proceso que construye la tabla de un verano para un sexo
@@ -1094,6 +1120,7 @@ if (require.main === module) (async () => {
     console.log(`${N} partidas (semillas ${desde} a ${desde + N - 1}) · versión ${R.version} · ${variante} · AGUANTA=${CFG.uAguanta} · MUNDOS=${CFG.mundos} · ${((Date.now() - t0) / 1000).toFixed(0)} s\n`);
     pinta(A, nombre);
     if (HC.activo) console.log(HC.linea(A.hurto, { bot: nombre, variante: process.env.VAR || "base" }));
+    if (TRC.activo) console.log(TRC.linea(A.tretas, nombre));
     HC.guarda(A.hurto, { bot: nombre, variante: process.env.VAR || "base" });
     if (process.env.JSON) fs.writeFileSync(process.env.JSON, JSON.stringify(A));
   };

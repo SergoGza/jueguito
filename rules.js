@@ -294,6 +294,10 @@
       // si la para por la calle, no la lleva a la cárcel: la echa, y si ya la conoce (o le ve la espalda), la azota allí
       // mismo (PARAMS.carcel.azotes de cuerpo esa noche; pregunta 12, opción B). Pedir delante de la ronda y la noche, igual.
       obrasForzadas: 5,
+      // al caer (muerto acompañado, desterrado o a galeras) con días por delante: «juega», sigues ese mismo verano como
+      // el heredero desde el día siguiente (decidido por Sergio, 25-nov, opción A); «sinTi», los días que faltan pasan
+      // sin jugarlos y el heredero llega a la siega como esté (j0.11 a j0.13)
+      relevo: "juega",
     },
     // hurtar y la horca (j0.12; se activa al empezar, sola o con lo demás; solo en la prueba A). Decidido por rondas
     // del 10 al 12 de noviembre de 2026 (ver «Hurtar y la horca» en claude/decisiones-replanteamiento.md, en el proyecto).
@@ -368,6 +372,107 @@
       // cuántos días te buscan por tus señas (null: hasta que te prenden o hasta el invierno)
       buscaDias: 3, // DECIDIDO (ronda 9): te buscan tres días
     },
+    // las tretas (rama claude/tretas; se activan al empezar, como hurtar). Lo decidido es de Sergio (23-nov): un
+    // repertorio que se gana y se quema, que cuesta, que se paga en pan o en blancas y que el rasgo filtra. Las cifras
+    // y el detalle de cada una son de Claude (23-nov, sin revisar): las fichas están en claude/borrador-tretas.md.
+    // Nada se explica: lo dicen quien te la enseña o te la vende, la gente y el alguacil.
+    tretas: {
+      mazo: 3,            // cuántas llevas como mucho; para una cuarta hay que olvidar una
+      catalogo: 4,        // señas que junta una treta antes de que la autoridad la catalogue ese verano
+      senas: 2,           // señas que suma si la ronda te descubre con ella (al pedir o al pararte)
+      blancasPedazo: 2,   // lo que da en blancas cada pedazo de la tirada, en las tretas que dan blancas
+      ratos: 1,           // comprar, vender o quitarte el atrezo
+      registro: 6,        // con más blancas encima, si la ronda te para te las quita («mucho dinero para un pobre»)
+      // la posada (prototipo de presión, 23-nov): lo que las blancas dan y el pan no. Dormir dentro sin la ronda de noche
+      // solo la noche (al amanecer te echan por la Puerta del Río) y se gasta: cada mesón, 2 noches por verano; si vuelves, da parte
+      posada: { blancas: 3, en: ["rua", "plaza"], veces: 2 },
+      // el pan también se compra y se vende (no al mismo precio, para que pan y blancas no sean la misma moneda)
+      pan: { compra: 2, compraEscasez: 3, venta: 1, compraEn: { plaza: [0, 1, 2, 3], rua: [0, 1, 2, 3, 4] }, ventaEn: { puerta: [0, 1, 2, 3, 4, 5] } },
+      lista: [
+        // la de entrada: gratis, la primera noche en la ribera
+        { id: "voto", pregon: "para la cera de los santos sin licencia del cura", nombre: "el voto", corto: "el voto", boton: "Pedir para la cera del santo", quien: "todos", primera: true,
+          aprende: { pan: 0, blancas: 0, quien: "una vieja",
+            dice: "Una vieja te enseña su estampa de San Roque: «Pide para la cera del santo, que a eso no se niega nadie, y lo que te den es dinero, no pan. Pide sencillo: al que habla mucho no le dan. Y no vuelvas a la misma calle, que el vecino se acuerda»." },
+          lugares: ["rua", "sanpablo", "plaza"], minDa: 2, bonus: 0, sitioNuevo: 1, repite: { aviso: 2, senas: 1 }, moneda: "blancas", fingir: true,
+          como: "para la cera de San Roque, con la estampa en la mano" },
+        { id: "carta", pregon: "con cartas y sellos que no ha dado el obispo", nombre: "la carta y el sello", corto: "la carta", boton: "Pedir con la carta", quien: "todos",
+          compra: { lugar: "escuelas", franjas: [1, 3], blancas: 4, pan: 2, quien: "un estudiante pobre",
+            dice: "Un estudiante pobre escribe cartas de limosna, con sello y todo, por cuatro blancas o dos pedazos de pan: «Dice que eres cautivo rescatado y que el obispo te da licencia para pedir. En la Rúa y en San Pablo no saben leer. Si la lees en misa un domingo, en la catedral, a prima, sacas en una mañana lo de una semana; pero eso, una vez. Y no se la enseñes a nadie que sepa leer»." },
+          lugares: ["rua", "sanpablo"], minDa: 2, bonus: 1, moneda: "blancas", fingir: true,
+          misa: { lugar: "catedral", f: 0, tipos: ["domingo", "corpus"], tiradas: 3 },
+          descubreParar: 1 / 6, // la llevas siempre encima: si la ronda te para, a veces te la pide (1/3 hasta el 24-nov)
+          como: "con tu carta de limosna, sello y todo" },
+        { id: "parida", pregon: "fingiéndose recién paridas a las puertas de las iglesias", nombre: "la parida", corto: "la parida", boton: "Tenderte de parida (dos franjas)", quien: "mujer",
+          aprende: { pan: 1, blancas: 2, quien: "una mujer",
+            dice: "Una mujer te enseña a hacerte la recién parida: «Una sábana, cera en la cara para estar pálida y una criatura de trapo. Te tiendes a la puerta de la iglesia dos franjas seguidas y te dan como a nadie. Pero tumbada no puedes correr: si viene la ronda, te levanta la sábana». Por enseñarte y por la sábana, un pedazo esta noche y dos blancas." },
+          lugares: ["catedral", "sanesteban"], minDa: 2, franjas: 2, bonus: 2, moneda: "mitad", sinHuir: true, fingir: true,
+          como: "tendida en una sábana, de recién parida, con la criatura de trapo" },
+        { id: "coplas", pregon: "cantando coplas sin licencia", nombre: "las coplas", corto: "las coplas", boton: "Cantar y vender coplas", quien: "todos",
+          compra: { lugar: "plaza", franjas: [0, 1], blancas: 3, usos: 3, quien: "el buhonero",
+            dice: "El buhonero vende pliegos de coplas de ciego, tres por tres blancas: «Cántalas donde haya mucha gente y vende los pliegos. Eso no es pedir: es vender. Pero el corro se oye de lejos»." },
+          lugares: ["plaza", "rua"], minDa: 3, bonus: 0, moneda: "blancas", avisoExtra: 2, fingir: false, sinUsos: "se te han acabado los pliegos",
+          como: "cantando coplas de ciego y vendiendo los pliegos" },
+        { id: "cautivo", pregon: "diciéndose cautivos de Argel, con cadenas", nombre: "el cautivo", corto: "las cadenas", boton: "Pedir con las cadenas de cautivo", quien: "hombre",
+          compra: { lugar: "puerta", franjas: [0, 1, 2, 3, 4, 5], blancas: 4, quien: "un mozo que dice venir de Argel",
+            dice: "Un mozo con cadenas al hombro dice que viene de Argel y te vende otras y la historia por cuatro blancas: «Cuéntala en la catedral y en la Rúa. Con una carta de rescate, mejor. Pesan, y si el alguacil te pregunta por el baño de Argel, más te vale saber qué decir»." },
+          lugares: ["catedral", "rua"], minDa: 2, bonus: 1, combo: { carta: 1 }, moneda: "blancas", fingir: true,
+          puesta: { paso: 1, descubre: 1 / 3, nombre: "las cadenas", quitar: "Quitarte las cadenas" },
+          como: "con las cadenas al hombro, contando tu cautiverio en Argel" },
+        { id: "vergonzante", pregon: "bien vestidos, fingiéndose vergonzantes", nombre: "el pobre vergonzante", corto: "la ropa buena", boton: "Pedir en voz baja, bien vestido", quien: "todos",
+          compra: { lugar: "rua", franjas: [0, 1, 2, 3, 4], blancas: 5, pan: 3, quien: "un ropavejero",
+            dice: "Un ropavejero te ofrece un sayo y unas calzas de buen paño, de segunda mano, por cinco blancas o tres pedazos de pan: «Con esto no pareces pobre. Pide en voz baja, como quien no está hecho a pedir: al vergonzante se le da. La ronda ni te mira. Pero no duermas con ella en la ribera, que allí te la pueden robar»." },
+          lugares: ["rua", "sanpablo", "plaza"], minDa: 2, bonus: 0, moneda: "pan", fingir: true,
+          puesta: { noParan: true, pillar: { 2: 0.5, 3: 0 }, nombre: "la ropa buena" }, ribera: "roban", robo: 1 / 6, // una de cada seis noches en la ribera (1/3 hasta el 24-nov por la tarde)
+          como: "en voz baja, con tu ropa buena, como quien no está hecho a pedir" },
+        // la llave de las Escuelas (24-nov, decisión de Sergio): solo hombres, como los estudiantes
+        { id: "estudiante", pregon: "en hábito de estudiantes, sin serlo", nombre: "el hábito de estudiante", corto: "el manteo", boton: "Pedir con el manteo", quien: "hombre",
+          compra: { lugar: "escuelas", franjas: [0, 1, 3, 4], blancas: 4, pan: 2, quien: "un estudiante pobre",
+            dice: "Un estudiante pobre te vende un manteo viejo y te enseña cuatro latines, por cuatro blancas o dos pedazos de pan: «Con esto los alguaciles del Estudio no te echan de las Escuelas: al estudiante se le deja pedir. Pero si el bedel te pregunta en latín, más te vale saber qué contestar»." },
+          lugares: ["escuelas"], minDa: 2, bonus: 0, moneda: "pan", fingir: true,
+          como: "con el manteo y cuatro latines de memoria" },
+        { id: "muerto", pregon: "para enterrar muertos que no lo están", nombre: "el muerto fingido", corto: "el muerto", boton: "Hacer el muerto", quien: "tuyo",
+          aprende: { pan: 0, blancas: 0, quien: "tuyo",
+            dice: "«Yo sé una que hacíamos en Madrid», dice {tuyo}. «Uno se tiende como muerto a la puerta de la iglesia, a la hora de vísperas, con una sábana, y el otro pide para enterrarlo. Con mucha gente se saca de una vez lo de un día. Hay que quedar la noche antes, y en cada iglesia, una vez. Y el muerto no puede correr»." },
+          lugares: ["catedral", "sanmartin"], minDa: 2, tiradas: 4, moneda: "blancas", mitadTuyo: true, unaVez: "sitio", sinHuir: true, fingir: true,
+          cita: { f: 4 }, // a vísperas: el otro tiene el día para llegar
+          como: "con {tuyo} tendido en el suelo como muerto, pidiendo para enterrarlo" },
+      ],
+    },
+    // la ciudad se endurece (prototipo, rama claude/tretas, 23-nov; se activa al empezar). Decidido por Sergio: corchetes
+    // que se suman durante el verano donde se acumulan quejas (tuyas, de los tuyos y de otros pobres), y uno en la puerta
+    // por la que más pasas. Las cifras son de Claude, sin revisar. Un corchete vigila un sitio a una hora todos los días
+    // desde que lo ponen: si pides delante te ve, y si llegas te puede parar, como la ronda. Se dice al amanecer.
+    presion: {
+      desde: 2,           // el primer día con corchetes (se ponen al amanecer, con las quejas de los días anteriores)
+      porDia: 2,          // corchetes nuevos cada mañana
+      max: 10,            // como mucho. Con desde 2, 2 al día y 10, el oficio sin tretas llega a la siega el 62 % (sin presión,
+                          // el 92 %); con desde 3, 1 al día y 5, el 82 % (el 62 % que salía antes era un fallo del bot, 24-nov)
+      umbral: 2,          // quejas acumuladas que hacen falta en un sitio y hora
+      otros: 1,           // peso de las quejas de otros pobres (cada franja en que piden donde hay gente, lo que avisa el sitio)
+      franjas: [0, 1, 3, 4], // a sexta comen; a completas está la ronda en la puerta
+      puerta: { desde: 3, min: 2 }, // desde el día 3, uno en la puerta y la franja por la que más has pasado (si son 2 o más veces); se mueve si cambias
+      desdeVerano: 0,     // en la cadena, desde qué verano (0: 1545; 1: 1553)
+      paran: true,        // si los corchetes paran al que llega: true (todos), false (solo el de la puerta), "nunca" (solo ven pedir)
+      // Decidido por Sergio (24-nov, opción A de tres): sin corchetes por quejas; parejas de cierre y llave que atacan los
+      // huecos y la ruta del que juega bien, cambian cada verano y cuyas llaves se queman. Primero las dos con llaves que
+      // ya existen: el guarda de la puerta (llave: la ropa buena puesta) y los diputados de la parroquia (llave: la carta).
+      // «corchetes» deja la presión del 23-nov, para repetir sus medidas. Las cifras son de Claude, sin revisar.
+      modo: "cierres",
+      cierres: {
+        desde: [2, 4],    // el día en que aparece cada cierre: cada verano, al azar entre estos dos
+        senas: 1,         // señas que suma la llave cada vez que pasa un cierre (con PARAMS.tretas.catalogo, se la quitan y queda catalogada)
+        echa: 3,          // ratos que pierdes si los diputados te echan de la calle
+        // el guarda: empieza en la puerta que la ronda no cierra ese verano, a una de estas franjas; desde que está, cada
+        // mañana se va a la puerta y la hora por la que más sales (si son min veces o más), salvo donde cierra la ronda
+        puerta: { franjas: [4, 5], min: 2 },
+        // los diputados: empiezan en un hueco de estos sitios (con gente que da y sin la ronda de costumbre a esa hora); desde
+        // que están, cada mañana se van al sitio y la hora de estos donde más pan has sacado pidiendo (si son min pedazos o más)
+        parroquia: { sitios: ["sanpablo", "puerta", "rua", "plaza", "catedral", "sanmartin"], franjas: [0, 1, 3, 4], min: 3 },
+        // los alguaciles del Estudio (24-nov, tarde): en las Escuelas, a una de estas franjas; se van a la de las Escuelas
+        // donde más pan has sacado. Llave: el hábito de estudiante (solo hombres)
+        estudio: { sitios: ["escuelas"], franjas: [1, 3], min: 3 },
+      },
+    },
   };
 
   const LICENCIAS = [
@@ -397,9 +502,24 @@
     "Entre un verano y otro, lo que pasa en el invierno se resume en cómo llegas: con hoz, espigando o sin nada.",
   ];
 
+  // solo con «Tretas» (rama claude/tretas). La primera sustituye a la de la limosna en pan.
+  const LICENCIAS_TRETAS = [
+    "La limosna se da en pan, salvo en las tretas que piden para algo (la cera, el rescate, el entierro) o venden algo (las coplas), que dan blancas. Los precios en blancas son del juego.",
+    "Las tretas salen de los catálogos de mendigos de la época (el Liber vagatorum, Pérez de Herrera, los pleitos de Alcalá, Madrid y otras ciudades); que se usen en Salamanca en 1545 es del juego.",
+    "El estudiante que escribe cartas en las Escuelas, el buhonero de pliegos, el mozo que vende cadenas de Argel y el ropavejero de la Rúa son del juego.",
+    "Que la autoridad catalogue una treta y la pregone sale de lo que hacían los catálogos de mendigos; cuándo y cómo, es del juego.",
+    "Las posadas y mesones de la Rúa y la Plaza existían; que la ronda de noche no entre en ellas y lo que cuestan son del juego.",
+  ];
+  // solo con «Presión» (prototipo, rama claude/tretas)
+  const LICENCIAS_PRESION = [
+    "Hubo guardas en las puertas de las ciudades castellanas (Ávila, 1518-1520; Burgos, 1565), sobre todo con peste; en Salamanca no consta. Que el guarda no deje pasar a los pobres a la hora en que más sales, y que la ropa buena le engañe, es del juego.",
+    "El maestrescuela tenía jurisdicción propia sobre el Estudio desde 1422; que sus alguaciles echaran a los pobres de las Escuelas está documentado para el siglo XVIII, no para 1545. Los mendigos «en hábito de estudiantes, sin serlo» son de Pérez de Herrera (1598).",
+    "Los diputados de las parroquias examinaban a los pobres y la cédula era obligatoria para pedir (Cortes de 1525, ley de 1540); Soto cuenta en 1545 que iban por las calles escribiendo pobres. Que te echen de la calle si no la llevas, y que vayan adonde más sacas, es del juego.",
+  ];
+
   window.RULES = {
-    version: "j0.13", CONFIG, FRANJAS, RATOS, DIAS, MODOS, BARRIOS, LUGARES, CAMINOS, CALENDARIO, VERANOS, DIAS_SENALADOS,
-    RONDA, PARAMS, LICENCIAS, LICENCIAS_CADENA, LICENCIAS_HURTO,
+    version: "j0.13-tretas", CONFIG, FRANJAS, RATOS, DIAS, MODOS, BARRIOS, LUGARES, CAMINOS, CALENDARIO, VERANOS, DIAS_SENALADOS,
+    RONDA, PARAMS, LICENCIAS, LICENCIAS_CADENA, LICENCIAS_HURTO, LICENCIAS_TRETAS, LICENCIAS_PRESION,
     // la mesa de los agentes pregunta por PERSONAJES: en el juguete, cada «personaje» es una prueba
     PERSONAJES: [
       { id: "A", nombre: "Mozo de La Armuña", origen: "De la Tierra", cuerpoTipo: "Válido", resumen: MODOS.A.resumen, claves: ["Prueba A · calles"] },

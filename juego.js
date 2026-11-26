@@ -36,18 +36,18 @@
   // ventana: dónde se asoma el vecino. calleja: por dónde se va la ronda (no lleva a ningún sitio vecino: no dice adónde va).
   // ronda, pobres, tuyos: dónde se ponen. Lo dibujado es de la vista, no de las reglas.
   const ESCENAS = {
-    ribera: { ancho: 1.3, fuera: true, salidas: { puente: { lado: "der" } }, pobres: 0.35, tuyos: 0.55 },
-    puente: { ancho: 1.15, fuera: true, salidas: { ribera: { lado: "izq" }, orilla: { lado: "der" }, puerta: { lado: "fondo", x: 0.5, arco: true } }, pobres: 0.25, tuyos: 0.7 },
-    orilla: { ancho: 1.3, fuera: true, salidas: { puente: { lado: "izq" }, sanpolo: { lado: "der" } }, pobres: 0.3, tuyos: 0.62 },
-    puerta: { ancho: 1.15, salidas: { catedral: { lado: "izq" }, puente: { lado: "fondo", x: 0.62, arco: true } }, vigia: 0.76, ventana: 0.24, calleja: 0.9, ronda: 0.42, pobres: 0.12, tuyos: 0.3 },
-    catedral: { ancho: 1.7, salidas: { rua: { lado: "izq" }, escuelas: { lado: "der" }, puerta: { lado: "fondo", x: 0.08 } }, ventana: 0.86, calleja: 0.95, ronda: 0.68, pobres: 0.49, tuyos: 0.3, obra: 0.2 },
-    escuelas: { ancho: 1.35, salidas: { catedral: { lado: "izq" }, sanesteban: { lado: "der" } }, vigia: 0.42, ventana: 0.8, calleja: 0.16, ronda: 0.66, pobres: 0.28, tuyos: 0.55 },
-    rua: { ancho: 1.9, salidas: { catedral: { lado: "der" }, plaza: { lado: "izq" }, sanmartin: { lado: "fondo", x: 0.4 } }, ventana: 0.66, calleja: 0.82, ronda: 0.56, pobres: 0.22, tuyos: 0.72 },
-    sanmartin: { ancho: 1.25, salidas: { rua: { lado: "izq" }, plaza: { lado: "der" } }, vigia: 0.36, ventana: 0.8, calleja: 0.14, ronda: 0.62, pobres: 0.47, tuyos: 0.25 },
-    plaza: { ancho: 2.3, salidas: { sanmartin: { lado: "izq" }, sanpablo: { lado: "der" }, rua: { lado: "fondo", x: 0.2 } }, ventana: 0.62, calleja: 0.86, ronda: 0.5, pobres: 0.35, tuyos: 0.72 },
-    sanpablo: { ancho: 1.35, salidas: { plaza: { lado: "izq" }, sanesteban: { lado: "der" } }, ventana: 0.5, calleja: 0.3, ronda: 0.62, pobres: 0.2, tuyos: 0.42 },
-    sanesteban: { ancho: 1.5, salidas: { escuelas: { lado: "izq" }, sanpolo: { lado: "der" }, sanpablo: { lado: "fondo", x: 0.78 } }, ventana: 0.15, calleja: 0.9, ronda: 0.6, pobres: 0.42, tuyos: 0.25 },
-    sanpolo: { ancho: 1.15, salidas: { sanesteban: { lado: "izq" }, orilla: { lado: "fondo", x: 0.6, arco: true } }, ventana: 0.22, calleja: 0.88, ronda: 0.38, pobres: 0.12, tuyos: 0.78 },
+    ribera: { ancho: 1, fuera: true, salidas: { puente: { lado: "der" } }, pobres: 0.35, tuyos: 0.55 },
+    puente: { ancho: 1, fuera: true, salidas: { ribera: { lado: "izq" }, orilla: { lado: "der" }, puerta: { lado: "fondo", x: 0.5, arco: true } }, pobres: 0.25, tuyos: 0.7 },
+    orilla: { ancho: 1, fuera: true, salidas: { puente: { lado: "izq" }, sanpolo: { lado: "der" } }, pobres: 0.3, tuyos: 0.62 },
+    puerta: { ancho: 1, salidas: { catedral: { lado: "izq" }, puente: { lado: "fondo", x: 0.62, arco: true } }, vigia: 0.76, ventana: 0.24, calleja: 0.9, ronda: 0.42, pobres: 0.12, tuyos: 0.3 },
+    catedral: { ancho: 1.3, salidas: { rua: { lado: "izq" }, escuelas: { lado: "der" }, puerta: { lado: "fondo", x: 0.08 } }, ventana: 0.86, calleja: 0.95, ronda: 0.68, pobres: 0.49, tuyos: 0.3, obra: 0.2 },
+    escuelas: { ancho: 1.1, salidas: { catedral: { lado: "izq" }, sanesteban: { lado: "der" } }, vigia: 0.42, ventana: 0.8, calleja: 0.16, ronda: 0.66, pobres: 0.28, tuyos: 0.55 },
+    rua: { ancho: 1.3, salidas: { catedral: { lado: "der" }, plaza: { lado: "izq" }, sanmartin: { lado: "fondo", x: 0.4 } }, ventana: 0.66, calleja: 0.82, ronda: 0.56, pobres: 0.22, tuyos: 0.72 },
+    sanmartin: { ancho: 1, salidas: { rua: { lado: "izq" }, plaza: { lado: "der" } }, vigia: 0.36, ventana: 0.8, calleja: 0.14, ronda: 0.62, pobres: 0.47, tuyos: 0.25 },
+    plaza: { ancho: 1.5, salidas: { sanmartin: { lado: "izq" }, sanpablo: { lado: "der" }, rua: { lado: "fondo", x: 0.2 } }, ventana: 0.62, calleja: 0.86, ronda: 0.5, pobres: 0.35, tuyos: 0.72 },
+    sanpablo: { ancho: 1.05, salidas: { plaza: { lado: "izq" }, sanesteban: { lado: "der" } }, ventana: 0.5, calleja: 0.3, ronda: 0.62, pobres: 0.2, tuyos: 0.42 },
+    sanesteban: { ancho: 1.15, salidas: { escuelas: { lado: "izq" }, sanpolo: { lado: "der" }, sanpablo: { lado: "fondo", x: 0.78 } }, ventana: 0.15, calleja: 0.9, ronda: 0.6, pobres: 0.42, tuyos: 0.25 },
+    sanpolo: { ancho: 1, salidas: { sanesteban: { lado: "izq" }, orilla: { lado: "fondo", x: 0.6, arco: true } }, ventana: 0.22, calleja: 0.88, ronda: 0.38, pobres: 0.12, tuyos: 0.78 },
   };
   // las salidas tienen que ser exactamente los caminos de las reglas
   for (const [a, b] of R.CAMINOS) if (!ESCENAS[a].salidas[b] || !ESCENAS[b].salidas[a]) console.error("Falta la salida", a, b);
@@ -56,6 +56,7 @@
   for (const [a, b] of R.CAMINOS) { const la = ESCENAS[a].salidas[b].lado, lb = ESCENAS[b].salidas[a].lado; if (la === lb && la !== "fondo") console.error("Salidas del mismo lado", a, b); }
 
   const WV = 1280, HV = 720, SUELO = 470, PIES = 600; // la pantalla, la línea de las fachadas y por dónde andas
+  const VEL = 400; // px por segundo andando
   const anchoDe = (id) => Math.round(ESCENAS[id].ancho * WV);
   const salidaX = (id, sal) => (sal.lado === "izq" ? 0 : sal.lado === "der" ? anchoDe(id) : Math.round(sal.x * anchoDe(id)));
   // dónde apareces al llegar de otro sitio: en la salida que lleva a él
@@ -551,7 +552,7 @@
     // si te queda un resultado bueno a la vista, andar es seguir
     if (s.fase === "resultado") { seguirResultado(); guardar(); pintar(); if (s.fase !== "dia") return; }
     const antes = ui.x;
-    ui.x = Math.max(0, Math.min(W, ui.x + dir * 330 * dt / 1000));
+    ui.x = Math.max(0, Math.min(W, ui.x + dir * VEL * dt / 1000));
     cuenta("px", Math.abs(ui.x - antes));
     SC.yo.x = ui.x; SC.yo.setScale((dir < 0 ? -1.05 : 1.05) * FK, 1.05 * FK);
     SC.zonaYo.x = ui.x;
@@ -1134,7 +1135,7 @@
     lin.splice(1, 0,
       `Juego 2D (rama claude/juego2d, ${VERSION_JUEGO}).`,
       `Andar: pasos que contó el motor ${pasos} · por las salidas ${v.salidas || 0} (por el borde ${v.salidas_borde || 0}, por una puerta del fondo ${v.salidas_puerta || 0}) · con el mapa ${v.pasos_mapa || 0} en ${v.viajes || 0} viajes (parados porque te paró o pasó algo ${v.viajes_parados_algo || 0}, porque viste a la ronda ${v.viajes_parados_ronda || 0}, por la noche o el tiempo ${(v.viajes_parados_noche || 0) + (v.viajes_parados_tiempo || 0)}) · mapa abierto ${v.mapa || 0} veces.`,
-      `En las escenas: ${seg} s, ${Math.round(v.px || 0)} px andados (unos ${Math.round((v.px || 0) / 330)} s andando), ${v.visitas || 0} escenas visitadas · al acercarte: ${cerca} · clics: ${clics} · menú de acciones ${v.menu || 0} · acciones ${v.accion || 0} · Recuerdos ${x.recuerdaAbierto || 0}.`,
+      `En las escenas: ${seg} s, ${Math.round(v.px || 0)} px andados (unos ${Math.round((v.px || 0) / VEL)} s andando), ${v.visitas || 0} escenas visitadas · al acercarte: ${cerca} · clics: ${clics} · menú de acciones ${v.menu || 0} · acciones ${v.accion || 0} · Recuerdos ${x.recuerdaAbierto || 0}.`,
       `Qué no supo leer en las escenas o en el mapa: ${(x.encuesta || {}).plano || "—"}`);
     return lin.join("\n");
   }

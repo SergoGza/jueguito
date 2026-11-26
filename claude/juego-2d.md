@@ -7,7 +7,7 @@
 ## Qué hay
 
 - **Una página nueva** (`juego.html`, `juego.js`, `juego-mapa.js`, `juego.css`) que carga `rules.js` y `engine.js` tal cual. El motor no se ha tocado: no hizo falta ninguna lectura nueva; vale la de la vista (`ENGINE.vista.pobresAjenos`). Phaser 3.90 va copiado en `lib/`, con su licencia MIT.
-- **Doce escenas de perfil**, una por sitio, más anchas que la pantalla las grandes (la plaza, 2,3 pantallas; la Rúa, 1,9; la catedral, 1,7). Andas con ← → o A y D, o haciendo clic en el suelo, sin que pase el tiempo.
+- **Doce escenas de perfil**, una por sitio. Las grandes son más anchas que la pantalla (la plaza, 1,5 pantallas; la Rúa y la catedral, 1,3); las de paso caben en una (la ribera, el puente, la orilla, las dos puertas y San Martín). Andas con ← → o A y D, o haciendo clic en el suelo, sin que pase el tiempo.
 - **Las salidas son los caminos de las reglas, ni uno más**:
   - en los extremos sales al llegar al borde;
   - en una puerta al fondo, con W o ↑ delante de ella, o con un clic.
@@ -61,20 +61,22 @@
 
 ## Cuánto se anda (valoración de Claude)
 
-**Lo medido.** Se anda a 330 px por segundo. Cruzar una escena de una salida a otra:
-- de 2 a 3 segundos el puente, las puertas y la Puerta de San Pablo;
-- unos 5 la orilla, las Escuelas, San Martín, la calle de San Pablo y San Esteban;
-- hasta 6 la catedral y 7 la Rúa;
-- casi 9 la plaza de punta a punta.
+**Lo medido.** Se anda a 400 px por segundo. Cruzar una escena de una salida a otra:
+- unos 3 segundos las que caben en una pantalla (la ribera, el puente, la orilla, las dos puertas y San Martín) y algo más las Escuelas, la calle de San Pablo y San Esteban;
+- unos 4 la catedral y la Rúa;
+- unos 4,5 la plaza de punta a punta.
+- Desde el puente, la puerta del fondo está a un segundo y medio.
 
-De la ribera a la catedral por las salidas son unos 7 segundos con la tecla pulsada y tres escenas (6 ratos). Con el mapa, un clic e Intro. El veterano de los bots da 7,1 pasos al día: por las salidas serían de 20 a 40 segundos al día con la tecla pulsada.
+De la ribera a la catedral por las salidas son unos 4,5 segundos con la tecla pulsada y tres escenas (6 ratos). Con el mapa, un clic e Intro. El veterano de los bots da 7,1 pasos al día: por las salidas serían de 15 a 25 segundos al día con la tecla pulsada.
+
+**Lo que cambió el 26-nov.** Sergio, al jugarlo: le gusta, pero los sitios son demasiado largos; sirven para ver cómo funciona y qué hay, pero a veces el recorrido de una salida a otra se hace largo [Sergio, 26-nov]. Las escenas eran de 1,15 a 2,3 pantallas y se andaba a 330 px por segundo (la plaza, casi 9 segundos; de la ribera a la catedral, unos 7). Ahora son de 1 a 1,5 pantallas y se anda a 400 [Claude, 26-nov, sin revisar]: las travesías largas quedan en la mitad. Lo que hay en cada escena está en el mismo sitio relativo; la gente se reparte en menos ancho, con la misma densidad.
 
 **Si andar es mirar o trámite.** Lo que hace falta para decidir se ve al llegar, sin andar: la gente, los pobres, la ronda, el vecino y quién avisa. Andar dentro de una escena sirve para:
 - leer lo que dice cada cosa al acercarte;
 - descubrir lo que queda fuera de cuadro en las escenas anchas (la plaza, la Rúa, la catedral), para lo que está el aviso del borde con la ronda;
 - llegar a la salida.
 
-Mi previsión: en las escenas pequeñas y en el camino de la ribera a la puerta, andar será trámite y se usará el mapa. En la plaza y la Rúa, andar es mirar las primeras veces y trámite cuando ya sabes qué hay.
+Mi previsión: en las escenas pequeñas y en el camino de la ribera a la puerta, andar será trámite y se usará el mapa. En la plaza y la Rúa, andar es mirar las primeras veces y trámite cuando ya sabes qué hay. La impresión de Sergio del 26-nov va en esa línea.
 
 **Cuántas veces se usa el mapa.** No lo sé: en mis pruebas lo decidía un guion al azar. Lo dirá el informe de la primera partida de Sergio, con los viajes, los pasos con el mapa frente a los de las salidas, y los segundos y píxeles andados.
 

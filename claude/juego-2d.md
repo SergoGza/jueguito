@@ -1,12 +1,12 @@
 # Juego 2D con moñigotes (rama `claude/juego2d`)
 
-25 de noviembre de 2026. Prototipo de videojuego pedido por Sergio, con lo que decidió ese día en `claude/videojuego-escenas.md`: Salamanca en escenas de perfil unidas por salidas, y un mapa para ir lejos. Qué se quiere probar: si funciona como videojuego y si se entiende sin leer texto en cada turno. No cambia ninguna regla. Sale de `claude/vista`.
+25 de noviembre de 2026. Prototipo de videojuego pedido por Sergio, con lo que decidió ese día en `claude/videojuego-escenas.md`: Salamanca en escenas de perfil unidas por salidas, y un mapa para ir lejos. Qué se quiere probar: si funciona como videojuego y si se entiende sin leer texto en cada turno. No cambia ninguna regla. Sale de `claude/vista`. El 26-nov, a petición de Sergio, se le juntó la rama `claude/tretas` tal como quedó el 25-nov: las tretas, la presión (los cierres) y el relevo A (apartado «Tretas y presión»).
 
 **Para jugar (en el ordenador):** https://raw.githack.com/SergoGza/jueguito/claude/juego2d/juego.html. Con `?semilla=N` la partida sale siempre igual.
 
 ## Qué hay
 
-- **Una página nueva** (`juego.html`, `juego.js`, `juego-mapa.js`, `juego.css`) que carga `rules.js` y `engine.js` tal cual. El motor no se ha tocado: no hizo falta ninguna lectura nueva; vale la de la vista (`ENGINE.vista.pobresAjenos`). Phaser 3.90 va copiado en `lib/`, con su licencia MIT.
+- **Una página nueva** (`juego.html`, `juego.js`, `juego-mapa.js`, `juego.css`) que carga `rules.js` y `engine.js` tal cual. Desde el 26-nov el motor es el de `claude/tretas` más la lectura de la vista (`ENGINE.vista.pobresAjenos`), que es lo único que añade y no cambia nada. Como `claude/tretas` trae el relevo A, en la cadena el heredero juega lo que queda de verano, también sin los botones nuevos. Phaser 3.90 va copiado en `lib/`, con su licencia MIT.
 - **Doce escenas de perfil**, una por sitio. Las grandes son más anchas que la pantalla (la plaza, 1,5 pantallas; la Rúa y la catedral, 1,3); las de paso caben en una (la ribera, el puente, la orilla, las dos puertas y San Martín). Andas con ← → o A y D, o haciendo clic en el suelo, sin que pase el tiempo.
 - **Las salidas son los caminos de las reglas, ni uno más**:
   - en los extremos sales al llegar al borde;
@@ -42,6 +42,58 @@
   - lo de las escenas: tiempo, píxeles andados, a qué se acercó, qué tocó, menú y Recuerdos;
   - la respuesta a una pregunta nueva de la encuesta: «¿Qué no supiste leer en las escenas o en el mapa? ¿Andar por las escenas era mirar o un trámite?».
 
+## Tretas y presión (26-nov)
+
+Los botones «Activar tretas» y «Activar presión» del inicio, como en el juguete de la rama `claude/tretas`. Las reglas son las de esa rama; aquí solo se ponen en las escenas.
+
+- **Los que venden, en su sitio y a sus horas**, cada uno con lo suyo en la mano:
+  - el estudiante pobre de las Escuelas, con cartas y manteos;
+  - el buhonero de la plaza, con pliegos;
+  - el mozo de Argel de la Puerta del Río, con cadenas;
+  - el ropavejero de la Rúa, con ropa.
+  
+  Al acercarte dice qué vende y por cuánto. Lo que dice de cada cosa (para qué sirve), en el menú, al pasar por encima.
+- **El pan:** la panadera de la plaza y la Rúa lo vende; la ventera de la Puerta del Río lo compra.
+- **El mesón**, con su tablero y su ramo, en la Rúa y la plaza. Al acercarte, lo que cuesta y si el mesonero ya te ha avisado.
+- **El menú (E):**
+  - pedir con cada treta que llevas (las que no valen aquí, con su porqué);
+  - ponerte o quitarte el atrezo;
+  - comprar en blancas o en pan (si llevas tres, eligiendo cuál dejas);
+  - comprar y vender pan;
+  - «Acabar el día» dice si aquí hay mesón.
+- **Tú, con el atrezo puesto:** con la ropa buena vas de paño oscuro y golilla; con las cadenas, se ven.
+- **«Tus tretas» (T):** las que llevas, si las conocen, las pregonadas para tu gente y dejar una.
+- **El HUD** lleva las blancas, en rojo si son más de las que la ronda te deja.
+- **La presión, a su hora y en su sitio:**
+  - el guarda de la puerta, con alabarda y gorro rojo, junto al arco;
+  - los diputados de la parroquia, de golilla, con el libro;
+  - los alguaciles del Estudio, de azul, con bonete y vara.
+  
+  Al acercarte dicen qué hacen y cuál es su llave, con el texto del motor (quién la vende, dónde, a qué hora y por cuánto).
+- **En el mapa**, G, D y E junto a su sitio, con su hora (relleno, si es ahora), y en la tarjeta de cada sitio.
+- **El guarda cierra la salida:** el letrero dice «el guarda de la puerta no deja pasar a los pobres a esta hora». El viaje del mapa se para ahí, con ese aviso.
+- **Los avisos del motor** salen unos segundos arriba:
+  - lo que pagas al comprar;
+  - «el guarda te mira el paño y te deja pasar»;
+  - cruzarte con la ronda sin que te pare.
+- **Las pantallas** son las de la rama: el amanecer (el pregón de lo catalogado, los cierres nuevos y los que se mueven, la cita, el Corpus con la ronda de todo el día, despertar tras el mesón), la noche (la posada, la ropa robada, quien ofrece una treta, quedar para el muerto), el relevo A, el final con las tretas usadas y su pregunta, la ayuda, Recuerdos y el informe.
+
+### Lo que decidió Claude al juntarlo [Claude, 26-nov, sin revisar]
+
+- **Dónde se pone cada uno y cómo va vestido**, para que se distinga sin leer.
+  - Los que venden y la panadera tienen sitio fijo.
+  - El guarda va junto al arco de la puerta.
+  - Los diputados y los alguaciles del Estudio van donde se pone la ronda en ese sitio; si está la ronda, a su lado.
+- **Las líneas de interfaz** se componen con los textos del motor:
+  - lo que dicen el guarda, los diputados y el Estudio, con `llaveTxt`;
+  - el que vende, qué y por cuánto;
+  - el mesón;
+  - la panadera y la ventera.
+- **Se ven a su hora, no antes.** El guarda, los diputados y el Estudio solo están en la escena a su hora; antes, solo en el mapa y en el aviso al pedir. Los que venden, a las horas en que venden.
+- **El muerto fingido** se hace desde el menú con el tuyo que quedó; en la escena el tuyo no se dibuja tendido.
+- **Las ventanas de la noche de los tuyos que no estaban contigo** ya no salen vacías.
+- **El menú ya no tiene la transformación de centrado.** Con muchas opciones salía un recuadro negro encima en Chrome sin pantalla; ahora puede ocupar casi toda la altura.
+
 ## Lo que decidió Claude al montarlo [Claude, 25-nov, sin revisar]
 
 - **La ronda entra por la salida del lado de donde venía**, como dice la decisión 2, y **se va por una calleja** que no lleva a ningún sitio vecino. Así no dice adónde va; lo contrario cambiaría lo que sabes. Se lo pregunté a Sergio el 25-nov y respondió «sin preferencia». Se cambia en una línea (`animarCambios`).
@@ -57,6 +109,13 @@
 - **En Chrome sin pantalla, a 1280 × 800:** siete partidas enteras jugadas con teclado, menú y mapa (con los tuyos y, a veces, llaga, varios veranos y hurtar). Ningún error. Cada salida llega adonde lleva, y los viajes paran donde deben: por la ronda, por la noche, porque no da tiempo o porque te paró. Miré capturas de la ribera, el puente, la Puerta del Río, la catedral, las Escuelas, la plaza y San Esteban, con la ronda, los tuyos, el vecino y los resultados.
 - **En el móvil**, solo de prueba a 844 × 390 y 390 × 844: tocando se anda y se sale, y los botones abren el menú y el mapa. En horizontal se juega justo; en vertical la escena queda en una franja y sale un aviso para girarlo.
 - **No probado** en un ordenador ni en un móvil de verdad, ni en Firefox ni en Safari. Phaser usa WebGL; sin él, dibuja en canvas.
+- **El 26-nov, con tretas y presión:**
+  - nueve partidas enteras jugadas al azar con menú, mapa y salidas, con varios veranos en la mitad;
+  - una llevada hasta los tres cierres para fotografiarlos (el guarda no deja pasar; con la ropa buena, sí);
+  - una con el muerto fingido y la posada;
+  - dos sin los botones, que dan lo mismo que antes.
+  
+  Ningún error. El bot al azar casi no llega a usar tretas por sí solo, así que en la mitad se le dieron al empezar (es una prueba de pantalla, no de reglas).
 - **No he jugado yo con el teclado:** lo que digo del andar sale de los anchos de las escenas y de los bots, no de haberlo sentido.
 
 ## Cuánto se anda (valoración de Claude)
@@ -82,10 +141,7 @@ Mi previsión: en las escenas pequeñas y en el camino de la ribera a la puerta,
 
 ## Qué falta
 
-- **Sin tretas ni presión**, como se pidió. Por eso no está «de noche, en la ribera, quien ofrece tretas» de la decisión 4. Para juntarlo con `claude/tretas` harían falta:
-  - el guarda, los diputados y los alguaciles del Estudio como muñecos en su sitio, que el viaje también pare con «el guarda no te deja pasar»;
-  - las llaves y las blancas en el HUD;
-  - la tienda en el menú.
+- **Las tretas y la presión están desde el 26-nov.** Lo de la noche (quien ofrece tretas, la posada, quedar para el muerto) sigue en la pantalla de la noche, en texto. El modo antiguo de la presión, los corchetes por quejas, no tiene muñecos: está apagado en las reglas.
 - **Nada nuevo fuera de la muralla:** los carros, el ciego y los segadores van después.
 - **La noche, el viejo de la llaga y lo que cuentan los tuyos** siguen en texto, en la pantalla de la noche.
 - **Sin sonido.** Las campanas solo se mueven.
@@ -100,6 +156,7 @@ Mi previsión: en las escenas pequeñas y en el camino de la ribera a la puerta,
 4. **El camino de la ribera a la puerta:** si lo andas o abres el mapa, y desde qué día.
 5. **Si el viaje del mapa que para al ver a la ronda se entiende**, o se siente como un corte.
 6. **En la plaza y la Rúa**, si andar es mirar o es trámite.
+7. **Con tretas y presión:** si encuentras a quien vende y entiendes para qué sirve cada llave antes de comprarla, si ves a tiempo al guarda y a los diputados (en el mapa, con su hora) y si compras alguna llave. Es lo que dijiste que decidiría si la presión se queda.
 
 ## Cómo probarlo con alguien que no conoce el juego
 
